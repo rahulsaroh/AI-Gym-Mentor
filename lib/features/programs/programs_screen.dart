@@ -17,6 +17,11 @@ class ProgramsScreen extends ConsumerWidget {
         title: Text('Exercise Plans', style: GoogleFonts.outfit(fontWeight: FontWeight.bold)),
         actions: [
           IconButton(
+            icon: const Icon(LucideIcons.fileJson),
+            onPressed: () => ref.read(programsNotifierProvider.notifier).exportSampleJson(),
+            tooltip: 'Sample Format',
+          ),
+          IconButton(
             icon: const Icon(LucideIcons.download),
             onPressed: () => ref.read(programsNotifierProvider.notifier).importTemplate(),
             tooltip: 'Import JSON',

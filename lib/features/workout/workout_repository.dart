@@ -281,6 +281,51 @@ class WorkoutRepository {
       }
     });
   }
+
+  String getSampleJson() {
+    return jsonEncode({
+      'name': 'Sample 3-Day Split',
+      'description': 'A simple example of a workout program structure.',
+      'days': [
+        {
+          'name': 'Upper Body',
+          'order': 0,
+          'exercises': [
+            {
+              'exerciseName': 'Bench Press',
+              'order': 0,
+              'setType': 'normal',
+              'setsJson': '[{"reps":10, "weight": 60.0}, {"reps":10, "weight": 60.0}, {"reps":10, "weight": 60.0}]',
+              'restTime': 90,
+              'notes': 'Keep core tight'
+            },
+            {
+              'exerciseName': 'Pull Ups',
+              'order': 1,
+              'setType': 'normal',
+              'setsJson': '[{"reps":12, "weight": 0.0}, {"reps":12, "weight": 0.0}, {"reps":12, "weight": 0.0}]',
+              'restTime': 60,
+              'notes': 'Full extension'
+            }
+          ]
+        },
+        {
+          'name': 'Lower Body',
+          'order': 1,
+          'exercises': [
+            {
+              'exerciseName': 'Squat (Barbell)',
+              'order': 0,
+              'setType': 'normal',
+              'setsJson': '[{"reps":8, "weight": 80.0}, {"reps":8, "weight": 80.0}, {"reps":8, "weight": 80.0}]',
+              'restTime': 120,
+              'notes': 'Go deep'
+            }
+          ]
+        }
+      ],
+    });
+  }
 }
 
 class TypedTemplateExercise {

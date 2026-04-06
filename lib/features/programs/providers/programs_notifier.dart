@@ -55,6 +55,16 @@ class ProgramsNotifier extends _$ProgramsNotifier {
     );
   }
 
+  Future<void> exportSampleJson() async {
+    final repo = ref.read(workoutRepositoryProvider);
+    final jsonStr = repo.getSampleJson();
+    
+    await Share.share(
+      jsonStr,
+      subject: 'GymLog Pro Sample Program Format',
+    );
+  }
+
   Future<void> importTemplate() async {
     final result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
