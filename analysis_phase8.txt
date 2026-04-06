@@ -1,0 +1,76 @@
+Analyzing gym gemini pro...                                     
+
+   info - 'AutoDisposeProviderRef' is deprecated and shouldn't be used. will be removed in 3.0.0. Use Ref instead - lib\core\auth\auth_provider.g.dart:22:27 - deprecated_member_use
+   info - 'AutoDisposeProviderRef' is deprecated and shouldn't be used. will be removed in 3.0.0. Use Ref instead - lib\core\database\database.g.dart:5262:26 - deprecated_member_use
+warning - The diagnostic 'lint' doesn't need to be ignored here because it's already being ignored - lib\core\database\database.g.dart:5263:21 - duplicate_ignore
+   info - 'ProviderRef' is deprecated and shouldn't be used. will be removed in 3.0.0. Use Ref instead - lib\core\providers\database_provider.g.dart:22:26 - deprecated_member_use
+   info - Use 'const' with the constructor to improve performance - lib\features\analytics\analytics_dashboard_screen.dart:54:15 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\analytics\analytics_dashboard_screen.dart:62:15 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\analytics\analytics_dashboard_screen.dart:70:15 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\analytics\analytics_dashboard_screen.dart:173:11 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\analytics\analytics_dashboard_screen.dart:241:25 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\analytics\analytics_dashboard_screen.dart:241:48 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\analytics\analytics_dashboard_screen.dart:242:24 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\analytics\analytics_dashboard_screen.dart:242:47 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\analytics\analytics_dashboard_screen.dart:243:26 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\analytics\analytics_dashboard_screen.dart:243:49 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\analytics\analytics_dashboard_screen.dart:293:25 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\analytics\analytics_dashboard_screen.dart:293:48 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\analytics\analytics_dashboard_screen.dart:294:24 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\analytics\analytics_dashboard_screen.dart:294:47 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\analytics\analytics_dashboard_screen.dart:295:26 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\analytics\analytics_dashboard_screen.dart:295:49 - prefer_const_constructors
+   info - 'AutoDisposeFutureProviderRef' is deprecated and shouldn't be used. will be removed in 3.0.0. Use Ref instead - lib\features\analytics\analytics_providers.g.dart:24:29 - deprecated_member_use
+   info - 'AutoDisposeFutureProviderRef' is deprecated and shouldn't be used. will be removed in 3.0.0. Use Ref instead - lib\features\analytics\analytics_providers.g.dart:40:7 - deprecated_member_use
+   info - 'AutoDisposeFutureProviderRef' is deprecated and shouldn't be used. will be removed in 3.0.0. Use Ref instead - lib\features\analytics\analytics_providers.g.dart:57:7 - deprecated_member_use
+   info - 'AutoDisposeFutureProviderRef' is deprecated and shouldn't be used. will be removed in 3.0.0. Use Ref instead - lib\features\analytics\analytics_providers.g.dart:73:28 - deprecated_member_use
+   info - 'AutoDisposeFutureProviderRef' is deprecated and shouldn't be used. will be removed in 3.0.0. Use Ref instead - lib\features\analytics\analytics_providers.g.dart:90:7 - deprecated_member_use
+   info - 'AutoDisposeFutureProviderRef' is deprecated and shouldn't be used. will be removed in 3.0.0. Use Ref instead - lib\features\analytics\analytics_providers.g.dart:105:24 - deprecated_member_use
+   info - Use 'const' with the constructor to improve performance - lib\features\analytics\body_measurements_screen.dart:155:23 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\analytics\body_measurements_screen.dart:155:46 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\analytics\body_measurements_screen.dart:156:22 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\analytics\body_measurements_screen.dart:156:45 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\analytics\body_measurements_screen.dart:157:24 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\analytics\body_measurements_screen.dart:157:47 - prefer_const_constructors
+   info - 'AutoDisposeProviderRef' is deprecated and shouldn't be used. will be removed in 3.0.0. Use Ref instead - lib\features\analytics\measurements_repository.g.dart:26:7 - deprecated_member_use
+   info - The private field _sort could be 'final' - lib\features\analytics\pr_hall_of_fame_screen.dart:17:10 - prefer_final_fields
+   info - 'AutoDisposeProviderRef' is deprecated and shouldn't be used. will be removed in 3.0.0. Use Ref instead - lib\features\analytics\stats_repository.g.dart:23:30 - deprecated_member_use
+   info - 'AutoDisposeFutureProviderRef' is deprecated and shouldn't be used. will be removed in 3.0.0. Use Ref instead - lib\features\exercises\exercise_history_provider.g.dart:146:27 - deprecated_member_use
+   info - 'AutoDisposeFutureProviderRef' is deprecated and shouldn't be used. will be removed in 3.0.0. Use Ref instead - lib\features\exercises\exercise_history_provider.g.dart:279:8 - deprecated_member_use
+   info - 'AutoDisposeFutureProviderRef' is deprecated and shouldn't be used. will be removed in 3.0.0. Use Ref instead - lib\features\exercises\exercise_history_provider.g.dart:424:8 - deprecated_member_use
+   info - 'AutoDisposeProviderRef' is deprecated and shouldn't be used. will be removed in 3.0.0. Use Ref instead - lib\features\exercises\exercise_history_repository.g.dart:26:7 - deprecated_member_use
+   info - Use 'const' with the constructor to improve performance - lib\features\exercises\exercise_history_screen.dart:200:19 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\exercises\exercise_history_screen.dart:202:23 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\exercises\exercise_history_screen.dart:202:46 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\exercises\exercise_history_screen.dart:203:22 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\exercises\exercise_history_screen.dart:203:45 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\exercises\exercise_history_screen.dart:204:24 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\exercises\exercise_history_screen.dart:204:47 - prefer_const_constructors
+   info - 'AutoDisposeProviderRef' is deprecated and shouldn't be used. will be removed in 3.0.0. Use Ref instead - lib\features\exercises\exercise_repository.g.dart:25:33 - deprecated_member_use
+   info - 'AutoDisposeStreamProviderRef' is deprecated and shouldn't be used. will be removed in 3.0.0. Use Ref instead - lib\features\exercises\exercises_provider.g.dart:22:27 - deprecated_member_use
+   info - 'AutoDisposeStreamProviderRef' is deprecated and shouldn't be used. will be removed in 3.0.0. Use Ref instead - lib\features\exercises\exercises_provider.g.dart:38:32 - deprecated_member_use
+   info - 'AutoDisposeFutureProviderRef' is deprecated and shouldn't be used. will be removed in 3.0.0. Use Ref instead - lib\features\history\history_providers.g.dart:23:27 - deprecated_member_use
+   info - 'AutoDisposeFutureProviderRef' is deprecated and shouldn't be used. will be removed in 3.0.0. Use Ref instead - lib\features\history\history_providers.g.dart:38:26 - deprecated_member_use
+   info - Use 'const' with the constructor to improve performance - lib\features\history\history_screen.dart:47:11 - prefer_const_constructors
+   info - The import of 'package:flutter/services.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart' - lib\features\history\workout_detail_screen.dart:2:8 - unnecessary_import
+   info - The declaration '_getController' isn't referenced - lib\features\history\workout_detail_screen.dart:30:25 - unused_element
+   info - Unnecessary use of string interpolation - lib\features\history\workout_detail_screen.dart:273:41 - unnecessary_string_interpolations
+   info - 'AutoDisposeProviderRef' is deprecated and shouldn't be used. will be removed in 3.0.0. Use Ref instead - lib\features\settings\settings_provider.g.dart:22:26 - deprecated_member_use
+warning - The value of the local variable 'theme' isn't used - lib\features\settings\settings_screen.dart:21:11 - unused_local_variable
+  error - The operator '|' isn't defined for the type 'Expression<bool>' - lib\features\settings\settings_screen.dart:355:95 - undefined_operator
+   info - Unnecessary braces in a string interpolation - lib\features\settings\settings_screen.dart:375:26 - unnecessary_brace_in_string_interps
+   info - Unnecessary braces in a string interpolation - lib\features\settings\settings_screen.dart:375:51 - unnecessary_brace_in_string_interps
+warning - Unused import: 'package:shared_preferences/shared_preferences.dart' - lib\features\settings\sheets_setup_screen.dart:8:8 - unused_import
+warning - Unused import: 'package:drift/drift.dart' - lib\features\workout\workout_providers.dart:1:8 - unused_import
+   info - 'AutoDisposeFutureProviderRef' is deprecated and shouldn't be used. will be removed in 3.0.0. Use Ref instead - lib\features\workout\workout_providers.g.dart:23:28 - deprecated_member_use
+   info - 'AutoDisposeFutureProviderRef' is deprecated and shouldn't be used. will be removed in 3.0.0. Use Ref instead - lib\features\workout\workout_providers.g.dart:40:7 - deprecated_member_use
+   info - 'AutoDisposeFutureProviderRef' is deprecated and shouldn't be used. will be removed in 3.0.0. Use Ref instead - lib\features\workout\workout_providers.g.dart:178:26 - deprecated_member_use
+   info - 'AutoDisposeProviderRef' is deprecated and shouldn't be used. will be removed in 3.0.0. Use Ref instead - lib\features\workout\workout_repository.g.dart:24:32 - deprecated_member_use
+   info - Use 'const' with the constructor to improve performance - lib\features\workout\workout_screen.dart:21:11 - prefer_const_constructors
+   info - The import of 'package:flutter_riverpod/flutter_riverpod.dart' is unnecessary because all of the used elements are also provided by the import of 'package:riverpod_annotation/riverpod_annotation.dart' - lib\services\connectivity_service.dart:2:8 - unnecessary_import
+  error - The getter 'first' isn't defined for the type 'ConnectivityResult' - lib\services\connectivity_service.dart:12:74 - undefined_getter
+  error - The method 'listen' isn't defined for the type 'ConnectivityService' - lib\services\connectivity_service.dart:16:5 - undefined_method
+   info - The import of 'package:flutter_riverpod/flutter_riverpod.dart' is unnecessary because all of the used elements are also provided by the import of 'package:riverpod_annotation/riverpod_annotation.dart' - lib\services\sync_worker.dart:1:8 - unnecessary_import
+  error - The method 'isLessThan' isn't defined for the type 'GeneratedColumn' - lib\services\sync_worker.dart:31:37 - undefined_method
+   info - Use 'const' with the constructor to improve performance - lib\services\sync_worker.dart:61:13 - prefer_const_constructors
+

@@ -1,0 +1,20 @@
+Analyzing gym gemini pro...                                     
+
+   info - 'AutoDisposeProviderRef' is deprecated and shouldn't be used. will be removed in 3.0.0. Use Ref instead - lib\core\database\database.g.dart:5262:26 - deprecated_member_use
+warning - The diagnostic 'lint' doesn't need to be ignored here because it's already being ignored - lib\core\database\database.g.dart:5263:21 - duplicate_ignore
+   info - 'ProviderRef' is deprecated and shouldn't be used. will be removed in 3.0.0. Use Ref instead - lib\core\providers\database_provider.g.dart:22:26 - deprecated_member_use
+warning - Duplicate import - lib\core\router\router.dart:9:8 - duplicate_import
+   info - 'AutoDisposeProviderRef' is deprecated and shouldn't be used. will be removed in 3.0.0. Use Ref instead - lib\features\exercises\exercise_repository.g.dart:25:33 - deprecated_member_use
+   info - 'AutoDisposeStreamProviderRef' is deprecated and shouldn't be used. will be removed in 3.0.0. Use Ref instead - lib\features\exercises\exercises_provider.g.dart:22:27 - deprecated_member_use
+   info - 'AutoDisposeStreamProviderRef' is deprecated and shouldn't be used. will be removed in 3.0.0. Use Ref instead - lib\features\exercises\exercises_provider.g.dart:38:32 - deprecated_member_use
+   info - Don't use 'BuildContext's across async gaps - lib\features\splash\splash_screen.dart:49:7 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps - lib\features\splash\splash_screen.dart:51:7 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps - lib\features\splash\splash_screen.dart:53:7 - use_build_context_synchronously
+  error - This expression has a type of 'void' so its value can't be used - lib\features\workout\active_workout_screen.dart:211:23 - use_of_void_result
+warning - Unused import: 'package:drift/drift.dart' - lib\features\workout\workout_providers.dart:1:8 - unused_import
+   info - 'AutoDisposeFutureProviderRef' is deprecated and shouldn't be used. will be removed in 3.0.0. Use Ref instead - lib\features\workout\workout_providers.g.dart:23:28 - deprecated_member_use
+   info - 'AutoDisposeFutureProviderRef' is deprecated and shouldn't be used. will be removed in 3.0.0. Use Ref instead - lib\features\workout\workout_providers.g.dart:40:7 - deprecated_member_use
+   info - 'AutoDisposeFutureProviderRef' is deprecated and shouldn't be used. will be removed in 3.0.0. Use Ref instead - lib\features\workout\workout_providers.g.dart:178:26 - deprecated_member_use
+   info - Use 'const' with the constructor to improve performance - lib\features\workout\workout_screen.dart:21:11 - prefer_const_constructors
+
+16 issues found. (ran in 1.3s)

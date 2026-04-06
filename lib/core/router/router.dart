@@ -1,0 +1,160 @@
+import 'package:go_router/go_router.dart';
+import 'package:gym_gemini_pro/features/workout/workout_screen.dart';
+import 'package:gym_gemini_pro/features/shell/placeholder_screens.dart' hide SplashScreen, OnboardingScreen, ExerciseLibraryScreen, WorkoutScreen, HistoryScreen, SettingsScreen;
+import 'package:gym_gemini_pro/features/splash/splash_screen.dart';
+import 'package:gym_gemini_pro/features/onboarding/onboarding_screen.dart';
+import 'package:gym_gemini_pro/features/setup/setup_screen.dart';
+import 'package:gym_gemini_pro/features/exercises/exercises_screen.dart';
+import 'package:gym_gemini_pro/features/workout/active_workout_screen.dart';
+import 'package:gym_gemini_pro/features/history/history_screen.dart';
+import 'package:gym_gemini_pro/features/history/workout_detail_screen.dart';
+import 'package:gym_gemini_pro/features/exercises/exercise_history_screen.dart';
+import 'package:gym_gemini_pro/features/exercises/exercise_detail_screen.dart';
+import 'package:gym_gemini_pro/features/analytics/analytics_dashboard_screen.dart';
+import 'package:gym_gemini_pro/features/analytics/pr_hall_of_fame_screen.dart';
+import 'package:gym_gemini_pro/features/analytics/body_measurements_screen.dart';
+import 'package:gym_gemini_pro/features/settings/settings_screen.dart';
+import 'package:gym_gemini_pro/features/settings/plates_config_screen.dart';
+import 'package:gym_gemini_pro/features/settings/about_screen.dart';
+import 'package:gym_gemini_pro/features/settings/sheets_setup_screen.dart';
+
+final router = GoRouter(
+  initialLocation: '/',
+  routes: [
+    GoRoute(
+      path: '/',
+      builder: (context, state) => const SplashScreen(),
+    ),
+    GoRoute(
+      path: '/onboarding',
+      builder: (context, state) => const OnboardingScreen(),
+    ),
+    GoRoute(
+      path: '/setup',
+      builder: (context, state) => const SetupScreen(),
+    ),
+    StatefulShellRoute.indexedStack(
+      builder: (context, state, navigationShell) {
+        return MainShell(child: navigationShell);
+      },
+      branches: [
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: '/app',
+              builder: (context, state) => const WorkoutHomeScreen(),
+              routes: [
+                GoRoute(
+                  path: 'workout/active',
+                  builder: (context, state) {
+                    final id = int.parse(state.uri.queryParameters['id']!);
+                    final dayId = state.uri.queryParameters['dayId'] != null 
+                        ? int.parse(state.uri.queryParameters['dayId']!) 
+                        : null;
+                    return ActiveWorkoutScreen(workoutId: id, dayId: dayId);
+                  },
+                ),
+              ],
+            ),
+          ],
+        ),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: '/exercises',
+              builder: (context, state) => const ExercisesScreen(),
+              routes: [
+                GoRoute(
+                  path: ':id',
+                  builder: (context, state) {
+                    final id = int.parse(state.pathParameters['id']!);
+                    return ExerciseDetailScreen(exerciseId: id);
+                  },
+                ),
+                GoRoute(
+                  path: 'history/:id',
+                  builder: (context, state) {
+                    final id = int.parse(state.pathParameters['id']!);
+                    return ExerciseHistoryScreen(exerciseId: id);
+                  },
+                ),
+              ],
+            ),
+          ],
+        ),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: '/history',
+              builder: (context, state) => const HistoryScreen(),
+              routes: [
+                GoRoute(
+                  path: 'workout/:id',
+                  builder: (context, state) {
+                    final id = int.parse(state.pathParameters['id']!);
+                    return WorkoutDetailScreen(workoutId: id);
+                  },
+                ),
+              ],
+            ),
+          ],
+        ),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: '/programs',
+              builder: (context, state) => const ProgramsScreen(),
+            ),
+          ],
+        ),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: '/analytics',
+              builder: (context, state) => const AnalyticsDashboardScreen(),
+              routes: [
+                GoRoute(
+                  path: 'prs',
+                  builder: (context, state) => const PRHallOfFameScreen(),
+                ),
+                GoRoute(
+                  path: 'measurements',
+                  builder: (context, state) => const BodyMeasurementsScreen(),
+                ),
+              ],
+            ),
+          ],
+        ),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: '/settings',
+              builder: (context, state) => const SettingsScreen(),
+              routes: [
+                GoRoute(
+                  path: 'plates',
+                  builder: (context, state) => const PlatesConfigScreen(),
+                ),
+                GoRoute(
+                  path: 'about',
+                  builder: (context, state) => const AboutScreen(),
+                ),
+                GoRoute(
+                  path: 'setup-sheets',
+                  builder: (context, state) => const SheetsSetupScreen(),
+                ),
+                GoRoute(
+                  path: 'sheets-success',
+                  builder: (context, state) {
+                    final id = state.extra as String;
+                    return SheetsSuccessScreen(spreadsheetId: id);
+                  },
+                ),
+              ],
+            ),
+          ],
+        ),
+      ],
+    ),
+  ],
+);

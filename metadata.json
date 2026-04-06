@@ -1,0 +1,5 @@
+{
+  "name": "GymLog Pro",
+  "description": "A personal gym logging app with AI JSON export capabilities.",
+  "requestFramePermissions": []
+}
