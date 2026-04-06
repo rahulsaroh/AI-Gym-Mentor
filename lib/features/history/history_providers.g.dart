@@ -20,6 +20,8 @@ final historyStatsProvider =
   allTransitiveDependencies: null,
 );
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 typedef HistoryStatsRef = AutoDisposeFutureProviderRef<Map<String, dynamic>>;
 String _$heatmapSetsHash() => r'ef0bd3c30c5cf06663643107545e187d33378366';
 
@@ -35,6 +37,8 @@ final heatmapSetsProvider =
   allTransitiveDependencies: null,
 );
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 typedef HeatmapSetsRef = AutoDisposeFutureProviderRef<List<WorkoutSet>>;
 String _$historyListHash() => r'76b6d80f4570392b35f2da9d31111c37da9570e9';
 
@@ -52,4 +56,4 @@ final historyListProvider =
 
 typedef _$HistoryList = AutoDisposeAsyncNotifier<List<Workout>>;
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

@@ -176,7 +176,7 @@ class GymGeminiApp extends ConsumerWidget {
           fontSizeFactor: fontSize == FontSize.large ? 1.2 : 1.0,
         ),
       ),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         color: surfaceColor,
         elevation: 0,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),

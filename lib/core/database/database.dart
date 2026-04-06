@@ -59,6 +59,7 @@ class Workouts extends Table {
   DateTimeColumn get endTime => dateTime().nullable()();
   IntColumn get duration => integer().nullable()(); // in minutes or seconds
   IntColumn get templateId => integer().nullable().references(WorkoutTemplates, #id)();
+  IntColumn get dayId => integer().nullable().references(TemplateDays, #id)();
   TextColumn get notes => text().nullable()();
   TextColumn get status => text().withDefault(const Constant('draft'))(); // draft, completed
 }
@@ -130,7 +131,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 6;
+  int get schemaVersion => 7;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -179,6 +180,11 @@ class AppDatabase extends _$AppDatabase {
               debugPrint('Index creation skipped (likely exists): $e');
             }
           }
+          if (from < 7) {
+            if (!await hasColumn('workouts', 'day_id')) {
+              await m.addColumn(workouts, workouts.dayId);
+            }
+          }
         },
         beforeOpen: (details) async {
           await customStatement('PRAGMA foreign_keys = ON');
@@ -188,6 +194,37 @@ class AppDatabase extends _$AppDatabase {
             await batch((batch) {
               batch.insertAll(exercises, initialExercises);
             });
+
+            // Seed sample PPL program
+            final allExercises = await select(exercises).get();
+            final exerciseMap = {for (var e in allExercises) e.name: e.id};
+
+            final templateId = await into(workoutTemplates).insert(WorkoutTemplatesCompanion.insert(
+              name: samplePPLProgram.name,
+              description: Value(samplePPLProgram.description),
+            ));
+
+            for (int i = 0; i < samplePPLProgram.days.length; i++) {
+              final day = samplePPLProgram.days[i];
+              final dayId = await into(templateDays).insert(TemplateDaysCompanion.insert(
+                templateId: templateId,
+                name: day.name,
+                order: i,
+              ));
+
+              for (int j = 0; j < day.exerciseNames.length; j++) {
+                final exName = day.exerciseNames[j];
+                final exId = exerciseMap[exName];
+                if (exId != null) {
+                  await into(templateExercises).insert(TemplateExercisesCompanion.insert(
+                    dayId: dayId,
+                    exerciseId: exId,
+                    order: j,
+                    setsJson: '[]', // Start with empty sets
+                  ));
+                }
+              }
+            }
           }
         },
       );

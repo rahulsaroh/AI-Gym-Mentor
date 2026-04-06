@@ -31,6 +31,11 @@ class WorkoutHomeState with _$WorkoutHomeState {
     @Default({}) Map<int, double> weeklyVolume, // millisecondsSinceEpoch -> volume
     BodyMeasurement? lastWeight,
     @Default(false) bool isRestDay,
+    String? todayDayName,
+    @Default([]) List<String> todayExercises,
+    @Default(0) int estimatedDuration,
+    int? nextDayId,
+    int? templateId,
   }) = _WorkoutHomeState;
 }
 
@@ -84,6 +89,39 @@ class WorkoutHomeNotifier extends _$WorkoutHomeNotifier {
     final tips = _getMotivationTips();
     final tipIndex = (now.year * 365 + now.month * 31 + now.day) % tips.length;
 
+    // Program logic: Determine today's workout day from active template
+    String? todayDayName;
+    List<String> todayExercises = [];
+    int estimatedDuration = 0;
+    int? nextDayId;
+    int? activeTemplateId;
+
+    final activeTemplate = await workoutRepo.getActiveTemplate();
+    if (activeTemplate != null) {
+      activeTemplateId = activeTemplate.id;
+      final templateDays = await workoutRepo.getTemplateDays(activeTemplate.id);
+      if (templateDays.isNotEmpty) {
+        final lastTemplateWorkout = await workoutRepo.getLastWorkoutOfTemplate(activeTemplate.id);
+        
+        int nextDayIndex = 0;
+        if (lastTemplateWorkout != null && lastTemplateWorkout.dayId != null) {
+          // Find the index of the last day and move to next
+          final lastDayIndex = templateDays.indexWhere((d) => d.id == lastTemplateWorkout.dayId);
+          if (lastDayIndex != -1) {
+            nextDayIndex = (lastDayIndex + 1) % templateDays.length;
+          }
+        }
+        
+        final nextDay = templateDays[nextDayIndex];
+        todayDayName = nextDay.name;
+        nextDayId = nextDay.id;
+        
+        final templateExercises = await workoutRepo.getTemplateExercises(nextDay.id);
+        todayExercises = templateExercises.map((te) => te.exercise.name).toList();
+        estimatedDuration = templateExercises.length * 12; // Estimate: 12 mins per exercise
+      }
+    }
+
     return WorkoutHomeState(
       greeting: greeting,
       userName: userName,
@@ -94,8 +132,24 @@ class WorkoutHomeNotifier extends _$WorkoutHomeNotifier {
       activeDraft: activeDraft,
       weeklyVolume: weeklyVolume,
       lastWeight: lastWeight,
-      isRestDay: false, // Placeholder until programs feature exists
+      isRestDay: false, 
+      todayDayName: todayDayName,
+      todayExercises: todayExercises,
+      estimatedDuration: estimatedDuration,
+      nextDayId: nextDayId,
+      templateId: activeTemplateId,
     );
+  }
+
+  Future<int> startWorkout({int? templateId, int? dayId, String? name}) async {
+    final repo = ref.read(workoutRepositoryProvider);
+    final id = await repo.createWorkout(
+      name: name ?? 'New Workout',
+      templateId: templateId,
+      dayId: dayId,
+    );
+    ref.invalidateSelf();
+    return id;
   }
 
   Future<void> logWeight(double weight) async {

@@ -266,7 +266,7 @@ class _WorkoutSummaryOverlayState extends State<WorkoutSummaryOverlay>
                     filled: true,
                     fillColor: Theme.of(context)
                         .colorScheme
-                        .surfaceVariant
+                        .surfaceContainerHighest
                         .withOpacity(0.3),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -325,7 +325,7 @@ class _WorkoutSummaryOverlayState extends State<WorkoutSummaryOverlay>
       decoration: BoxDecoration(
         color: isHighlight
             ? Theme.of(context).colorScheme.tertiaryContainer.withOpacity(0.5)
-            : Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
+            : Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.3),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
@@ -370,7 +370,7 @@ class _WorkoutSummaryOverlayState extends State<WorkoutSummaryOverlay>
       decoration: BoxDecoration(
         color: isHighlight
             ? Theme.of(context).colorScheme.tertiaryContainer.withOpacity(0.5)
-            : Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
+            : Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.3),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(

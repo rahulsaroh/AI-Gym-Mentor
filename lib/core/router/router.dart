@@ -17,6 +17,7 @@ import 'package:gym_gemini_pro/features/settings/settings_screen.dart';
 import 'package:gym_gemini_pro/features/settings/plates_config_screen.dart';
 import 'package:gym_gemini_pro/features/settings/about_screen.dart';
 import 'package:gym_gemini_pro/features/settings/sheets_setup_screen.dart';
+import 'package:gym_gemini_pro/features/programs/programs_screen.dart';
 
 final router = GoRouter(
   initialLocation: '/',

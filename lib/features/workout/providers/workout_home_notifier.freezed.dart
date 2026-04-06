@@ -19,7 +19,9 @@ mixin _$MotivationTip {
   String get text => throw _privateConstructorUsedError;
   String get category => throw _privateConstructorUsedError;
 
-  @JsonKey(ignore: true)
+  /// Create a copy of MotivationTip
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $MotivationTipCopyWith<MotivationTip> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -43,6 +45,8 @@ class _$MotivationTipCopyWithImpl<$Res, $Val extends MotivationTip>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of MotivationTip
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -81,6 +85,8 @@ class __$$MotivationTipImplCopyWithImpl<$Res>
       _$MotivationTipImpl _value, $Res Function(_$MotivationTipImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of MotivationTip
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -128,7 +134,9 @@ class _$MotivationTipImpl implements _MotivationTip {
   @override
   int get hashCode => Object.hash(runtimeType, text, category);
 
-  @JsonKey(ignore: true)
+  /// Create a copy of MotivationTip
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$MotivationTipImplCopyWith<_$MotivationTipImpl> get copyWith =>
@@ -144,8 +152,11 @@ abstract class _MotivationTip implements MotivationTip {
   String get text;
   @override
   String get category;
+
+  /// Create a copy of MotivationTip
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$MotivationTipImplCopyWith<_$MotivationTipImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -163,8 +174,15 @@ mixin _$WorkoutHomeState {
       throw _privateConstructorUsedError; // millisecondsSinceEpoch -> volume
   BodyMeasurement? get lastWeight => throw _privateConstructorUsedError;
   bool get isRestDay => throw _privateConstructorUsedError;
+  String? get todayDayName => throw _privateConstructorUsedError;
+  List<String> get todayExercises => throw _privateConstructorUsedError;
+  int get estimatedDuration => throw _privateConstructorUsedError;
+  int? get nextDayId => throw _privateConstructorUsedError;
+  int? get templateId => throw _privateConstructorUsedError;
 
-  @JsonKey(ignore: true)
+  /// Create a copy of WorkoutHomeState
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $WorkoutHomeStateCopyWith<WorkoutHomeState> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -185,7 +203,12 @@ abstract class $WorkoutHomeStateCopyWith<$Res> {
       Workout? activeDraft,
       Map<int, double> weeklyVolume,
       BodyMeasurement? lastWeight,
-      bool isRestDay});
+      bool isRestDay,
+      String? todayDayName,
+      List<String> todayExercises,
+      int estimatedDuration,
+      int? nextDayId,
+      int? templateId});
 
   $MotivationTipCopyWith<$Res> get dailyTip;
 }
@@ -200,6 +223,8 @@ class _$WorkoutHomeStateCopyWithImpl<$Res, $Val extends WorkoutHomeState>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of WorkoutHomeState
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -213,6 +238,11 @@ class _$WorkoutHomeStateCopyWithImpl<$Res, $Val extends WorkoutHomeState>
     Object? weeklyVolume = null,
     Object? lastWeight = freezed,
     Object? isRestDay = null,
+    Object? todayDayName = freezed,
+    Object? todayExercises = null,
+    Object? estimatedDuration = null,
+    Object? nextDayId = freezed,
+    Object? templateId = freezed,
   }) {
     return _then(_value.copyWith(
       greeting: null == greeting
@@ -255,9 +285,31 @@ class _$WorkoutHomeStateCopyWithImpl<$Res, $Val extends WorkoutHomeState>
           ? _value.isRestDay
           : isRestDay // ignore: cast_nullable_to_non_nullable
               as bool,
+      todayDayName: freezed == todayDayName
+          ? _value.todayDayName
+          : todayDayName // ignore: cast_nullable_to_non_nullable
+              as String?,
+      todayExercises: null == todayExercises
+          ? _value.todayExercises
+          : todayExercises // ignore: cast_nullable_to_non_nullable
+              as List<String>,
+      estimatedDuration: null == estimatedDuration
+          ? _value.estimatedDuration
+          : estimatedDuration // ignore: cast_nullable_to_non_nullable
+              as int,
+      nextDayId: freezed == nextDayId
+          ? _value.nextDayId
+          : nextDayId // ignore: cast_nullable_to_non_nullable
+              as int?,
+      templateId: freezed == templateId
+          ? _value.templateId
+          : templateId // ignore: cast_nullable_to_non_nullable
+              as int?,
     ) as $Val);
   }
 
+  /// Create a copy of WorkoutHomeState
+  /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
   $MotivationTipCopyWith<$Res> get dailyTip {
@@ -285,7 +337,12 @@ abstract class _$$WorkoutHomeStateImplCopyWith<$Res>
       Workout? activeDraft,
       Map<int, double> weeklyVolume,
       BodyMeasurement? lastWeight,
-      bool isRestDay});
+      bool isRestDay,
+      String? todayDayName,
+      List<String> todayExercises,
+      int estimatedDuration,
+      int? nextDayId,
+      int? templateId});
 
   @override
   $MotivationTipCopyWith<$Res> get dailyTip;
@@ -299,6 +356,8 @@ class __$$WorkoutHomeStateImplCopyWithImpl<$Res>
       $Res Function(_$WorkoutHomeStateImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of WorkoutHomeState
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -312,6 +371,11 @@ class __$$WorkoutHomeStateImplCopyWithImpl<$Res>
     Object? weeklyVolume = null,
     Object? lastWeight = freezed,
     Object? isRestDay = null,
+    Object? todayDayName = freezed,
+    Object? todayExercises = null,
+    Object? estimatedDuration = null,
+    Object? nextDayId = freezed,
+    Object? templateId = freezed,
   }) {
     return _then(_$WorkoutHomeStateImpl(
       greeting: null == greeting
@@ -354,6 +418,26 @@ class __$$WorkoutHomeStateImplCopyWithImpl<$Res>
           ? _value.isRestDay
           : isRestDay // ignore: cast_nullable_to_non_nullable
               as bool,
+      todayDayName: freezed == todayDayName
+          ? _value.todayDayName
+          : todayDayName // ignore: cast_nullable_to_non_nullable
+              as String?,
+      todayExercises: null == todayExercises
+          ? _value._todayExercises
+          : todayExercises // ignore: cast_nullable_to_non_nullable
+              as List<String>,
+      estimatedDuration: null == estimatedDuration
+          ? _value.estimatedDuration
+          : estimatedDuration // ignore: cast_nullable_to_non_nullable
+              as int,
+      nextDayId: freezed == nextDayId
+          ? _value.nextDayId
+          : nextDayId // ignore: cast_nullable_to_non_nullable
+              as int?,
+      templateId: freezed == templateId
+          ? _value.templateId
+          : templateId // ignore: cast_nullable_to_non_nullable
+              as int?,
     ));
   }
 }
@@ -371,8 +455,14 @@ class _$WorkoutHomeStateImpl implements _WorkoutHomeState {
       this.activeDraft,
       final Map<int, double> weeklyVolume = const {},
       this.lastWeight,
-      this.isRestDay = false})
-      : _weeklyVolume = weeklyVolume;
+      this.isRestDay = false,
+      this.todayDayName,
+      final List<String> todayExercises = const [],
+      this.estimatedDuration = 0,
+      this.nextDayId,
+      this.templateId})
+      : _weeklyVolume = weeklyVolume,
+        _todayExercises = todayExercises;
 
   @override
   final String greeting;
@@ -403,10 +493,28 @@ class _$WorkoutHomeStateImpl implements _WorkoutHomeState {
   @override
   @JsonKey()
   final bool isRestDay;
+  @override
+  final String? todayDayName;
+  final List<String> _todayExercises;
+  @override
+  @JsonKey()
+  List<String> get todayExercises {
+    if (_todayExercises is EqualUnmodifiableListView) return _todayExercises;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_todayExercises);
+  }
+
+  @override
+  @JsonKey()
+  final int estimatedDuration;
+  @override
+  final int? nextDayId;
+  @override
+  final int? templateId;
 
   @override
   String toString() {
-    return 'WorkoutHomeState(greeting: $greeting, userName: $userName, dateString: $dateString, currentStreak: $currentStreak, dailyTip: $dailyTip, lastWorkout: $lastWorkout, activeDraft: $activeDraft, weeklyVolume: $weeklyVolume, lastWeight: $lastWeight, isRestDay: $isRestDay)';
+    return 'WorkoutHomeState(greeting: $greeting, userName: $userName, dateString: $dateString, currentStreak: $currentStreak, dailyTip: $dailyTip, lastWorkout: $lastWorkout, activeDraft: $activeDraft, weeklyVolume: $weeklyVolume, lastWeight: $lastWeight, isRestDay: $isRestDay, todayDayName: $todayDayName, todayExercises: $todayExercises, estimatedDuration: $estimatedDuration, nextDayId: $nextDayId, templateId: $templateId)';
   }
 
   @override
@@ -433,7 +541,17 @@ class _$WorkoutHomeStateImpl implements _WorkoutHomeState {
             (identical(other.lastWeight, lastWeight) ||
                 other.lastWeight == lastWeight) &&
             (identical(other.isRestDay, isRestDay) ||
-                other.isRestDay == isRestDay));
+                other.isRestDay == isRestDay) &&
+            (identical(other.todayDayName, todayDayName) ||
+                other.todayDayName == todayDayName) &&
+            const DeepCollectionEquality()
+                .equals(other._todayExercises, _todayExercises) &&
+            (identical(other.estimatedDuration, estimatedDuration) ||
+                other.estimatedDuration == estimatedDuration) &&
+            (identical(other.nextDayId, nextDayId) ||
+                other.nextDayId == nextDayId) &&
+            (identical(other.templateId, templateId) ||
+                other.templateId == templateId));
   }
 
   @override
@@ -448,9 +566,16 @@ class _$WorkoutHomeStateImpl implements _WorkoutHomeState {
       activeDraft,
       const DeepCollectionEquality().hash(_weeklyVolume),
       lastWeight,
-      isRestDay);
+      isRestDay,
+      todayDayName,
+      const DeepCollectionEquality().hash(_todayExercises),
+      estimatedDuration,
+      nextDayId,
+      templateId);
 
-  @JsonKey(ignore: true)
+  /// Create a copy of WorkoutHomeState
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$WorkoutHomeStateImplCopyWith<_$WorkoutHomeStateImpl> get copyWith =>
@@ -469,7 +594,12 @@ abstract class _WorkoutHomeState implements WorkoutHomeState {
       final Workout? activeDraft,
       final Map<int, double> weeklyVolume,
       final BodyMeasurement? lastWeight,
-      final bool isRestDay}) = _$WorkoutHomeStateImpl;
+      final bool isRestDay,
+      final String? todayDayName,
+      final List<String> todayExercises,
+      final int estimatedDuration,
+      final int? nextDayId,
+      final int? templateId}) = _$WorkoutHomeStateImpl;
 
   @override
   String get greeting;
@@ -486,13 +616,26 @@ abstract class _WorkoutHomeState implements WorkoutHomeState {
   @override
   Workout? get activeDraft;
   @override
-  Map<int, double> get weeklyVolume;
-  @override // millisecondsSinceEpoch -> volume
+  Map<int, double> get weeklyVolume; // millisecondsSinceEpoch -> volume
+  @override
   BodyMeasurement? get lastWeight;
   @override
   bool get isRestDay;
   @override
-  @JsonKey(ignore: true)
+  String? get todayDayName;
+  @override
+  List<String> get todayExercises;
+  @override
+  int get estimatedDuration;
+  @override
+  int? get nextDayId;
+  @override
+  int? get templateId;
+
+  /// Create a copy of WorkoutHomeState
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$WorkoutHomeStateImplCopyWith<_$WorkoutHomeStateImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

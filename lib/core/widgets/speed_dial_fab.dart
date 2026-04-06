@@ -83,7 +83,7 @@ class _SpeedDialFabState extends State<SpeedDialFab>
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                             decoration: BoxDecoration(
-                              color: Theme.of(context).colorScheme.surfaceVariant,
+                              color: Theme.of(context).colorScheme.surfaceContainerHighest,
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Text(child.label!, style: Theme.of(context).textTheme.labelMedium),

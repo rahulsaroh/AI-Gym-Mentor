@@ -84,7 +84,7 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
                         decoration: InputDecoration(
                           hintText: "e.g. Alex",
                           filled: true,
-                          fillColor: colorScheme.surfaceVariant.withOpacity(0.3),
+                          fillColor: colorScheme.surfaceContainerHighest.withOpacity(0.3),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: BorderSide.none,
@@ -100,7 +100,7 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
                         width: double.infinity,
                         padding: const EdgeInsets.all(4),
                         decoration: BoxDecoration(
-                          color: colorScheme.surfaceVariant.withOpacity(0.3),
+                          color: colorScheme.surfaceContainerHighest.withOpacity(0.3),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Row(

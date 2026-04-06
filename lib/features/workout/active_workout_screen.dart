@@ -526,7 +526,7 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen> with 
                     width: 40,
                     height: 32,
                     decoration: BoxDecoration(
-                      color: isCompleted ? Colors.green : Theme.of(context).colorScheme.surfaceVariant,
+                      color: isCompleted ? Colors.green : Theme.of(context).colorScheme.surfaceContainerHighest,
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: Icon(
@@ -570,7 +570,7 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen> with 
             isDense: true,
             contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
             filled: true,
-            fillColor: isCompleted ? Colors.transparent : Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
+            fillColor: isCompleted ? Colors.transparent : Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.3),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
               borderSide: BorderSide.none,

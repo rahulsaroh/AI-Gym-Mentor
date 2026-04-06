@@ -19,6 +19,8 @@ final allExercisesProvider = AutoDisposeStreamProvider<List<Exercise>>.internal(
   allTransitiveDependencies: null,
 );
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 typedef AllExercisesRef = AutoDisposeStreamProviderRef<List<Exercise>>;
 String _$filteredExercisesHash() => r'fad828c9cc7a996d85b8c8bcd38b2d0124c34814';
 
@@ -35,6 +37,8 @@ final filteredExercisesProvider =
   allTransitiveDependencies: null,
 );
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 typedef FilteredExercisesRef = AutoDisposeStreamProviderRef<List<Exercise>>;
 String _$exerciseFiltersHash() => r'2e0386f9581f23adb9de9ab1356b5551b88187a2';
 
@@ -53,4 +57,4 @@ final exerciseFiltersProvider =
 
 typedef _$ExerciseFilters = AutoDisposeNotifier<Map<String, String>>;
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

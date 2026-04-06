@@ -20,6 +20,8 @@ final activeWorkoutProvider = AutoDisposeFutureProvider<Workout?>.internal(
   allTransitiveDependencies: null,
 );
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 typedef ActiveWorkoutRef = AutoDisposeFutureProviderRef<Workout?>;
 String _$workoutTemplatesHash() => r'd62598744ca7c737193ed697ba983dcb6bf359cb';
 
@@ -36,6 +38,8 @@ final workoutTemplatesProvider =
   allTransitiveDependencies: null,
 );
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 typedef WorkoutTemplatesRef
     = AutoDisposeFutureProviderRef<List<WorkoutTemplate>>;
 String _$templateDaysHash() => r'63e24068ca9260cfd5ec6d8d60ba6cf4253bb396';
@@ -175,6 +179,8 @@ class TemplateDaysProvider
   }
 }
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 mixin TemplateDaysRef on AutoDisposeFutureProviderRef<List<TemplateDay>> {
   /// The parameter `templateId` of this provider.
   int get templateId;
@@ -189,4 +195,4 @@ class _TemplateDaysProviderElement
   int get templateId => (origin as TemplateDaysProvider).templateId;
 }
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

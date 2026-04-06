@@ -72,7 +72,7 @@ class _ExercisePickerOverlayState extends ConsumerState<ExercisePickerOverlay> {
                     hintText: 'Search exercises...',
                     prefixIcon: const Icon(LucideIcons.search),
                     filled: true,
-                    fillColor: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.5),
+                    fillColor: Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.5),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide.none,

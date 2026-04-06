@@ -96,7 +96,7 @@ class RestTimerOverlay extends ConsumerWidget {
             painter: TimerPainter(
               progress: progress,
               color: Theme.of(context).colorScheme.primary,
-              backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
+              backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
             ),
           ),
         ),

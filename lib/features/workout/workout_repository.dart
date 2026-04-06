@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:drift/drift.dart';
 import 'package:gym_gemini_pro/core/database/database.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -152,6 +153,144 @@ class WorkoutRepository {
 
     return dailyVolume;
   }
+
+  Future<WorkoutTemplate?> getActiveTemplate() async {
+    return await (_db.select(_db.workoutTemplates)..limit(1)).getSingleOrNull();
+  }
+
+  Future<List<TemplateDay>> getTemplateDays(int templateId) async {
+    return await (_db.select(_db.templateDays)
+          ..where((t) => t.templateId.equals(templateId))
+          ..orderBy([(t) => OrderingTerm(expression: t.order, mode: OrderingMode.asc)]))
+        .get();
+  }
+
+  Future<List<TypedTemplateExercise>> getTemplateExercises(int dayId) async {
+    final query = _db.select(_db.templateExercises).join([
+      innerJoin(_db.exercises, _db.exercises.id.equalsExp(_db.templateExercises.exerciseId)),
+    ])
+      ..where(_db.templateExercises.dayId.equals(dayId))
+      ..orderBy([OrderingTerm(expression: _db.templateExercises.order, mode: OrderingMode.asc)]);
+
+    final rows = await query.get();
+    return rows.map((row) {
+      return TypedTemplateExercise(
+        templateExercise: row.readTable(_db.templateExercises),
+        exercise: row.readTable(_db.exercises),
+      );
+    }).toList();
+  }
+
+  Future<Workout?> getLastWorkoutOfTemplate(int templateId) async {
+    return await (_db.select(_db.workouts)
+          ..where((t) => t.templateId.equals(templateId) & t.status.equals('completed'))
+          ..orderBy([(t) => OrderingTerm(expression: t.date, mode: OrderingMode.desc)])
+          ..limit(1))
+        .getSingleOrNull();
+  }
+
+  Future<int> createWorkout({String name = 'New Workout', int? templateId, int? dayId}) async {
+    return await _db.into(_db.workouts).insert(WorkoutsCompanion.insert(
+      name: name,
+      date: DateTime.now(),
+      startTime: Value(DateTime.now()),
+      status: const Value('draft'),
+      templateId: Value(templateId),
+      dayId: Value(dayId),
+    ));
+  }
+
+  Future<List<WorkoutTemplate>> getAllTemplates() async {
+    return await _db.select(_db.workoutTemplates).get();
+  }
+
+  Future<void> deleteTemplate(int id) async {
+    await _db.transaction(() async {
+      final days = await (_db.select(_db.templateDays)..where((t) => t.templateId.equals(id))).get();
+      for (final day in days) {
+        await (_db.delete(_db.templateExercises)..where((t) => t.dayId.equals(day.id))).go();
+      }
+      await (_db.delete(_db.templateDays)..where((t) => t.templateId.equals(id))).go();
+      await (_db.delete(_db.workoutTemplates)..where((t) => t.id.equals(id))).go();
+    });
+  }
+
+  Future<String> exportTemplateToJson(int id) async {
+    final template = await (_db.select(_db.workoutTemplates)..where((t) => t.id.equals(id))).getSingle();
+    final days = await getTemplateDays(id);
+    final List<Map<String, dynamic>> daysJson = [];
+    
+    for (final day in days) {
+      final exercises = await getTemplateExercises(day.id);
+      daysJson.add({
+        'name': day.name,
+        'order': day.order,
+        'exercises': exercises.map((e) => {
+          'exerciseName': e.exercise.name,
+          'order': e.templateExercise.order,
+          'setType': e.templateExercise.setType.name,
+          'setsJson': e.templateExercise.setsJson,
+          'restTime': e.templateExercise.restTime,
+          'notes': e.templateExercise.notes,
+        }).toList(),
+      });
+    }
+
+    return jsonEncode({
+      'name': template.name,
+      'description': template.description,
+      'days': daysJson,
+    });
+  }
+
+  Future<void> importTemplateFromJson(String jsonStr) async {
+    final data = jsonDecode(jsonStr);
+    final name = data['name'] as String;
+    final description = data['description'] as String?;
+    final days = data['days'] as List;
+
+    await _db.transaction(() async {
+      final templateId = await _db.into(_db.workoutTemplates).insert(WorkoutTemplatesCompanion.insert(
+        name: name,
+        description: Value(description),
+      ));
+
+      for (final dayData in days) {
+        final dayId = await _db.into(_db.templateDays).insert(TemplateDaysCompanion.insert(
+          templateId: templateId,
+          name: dayData['name'],
+          order: dayData['order'],
+        ));
+
+        final exercises = dayData['exercises'] as List;
+        for (final exData in exercises) {
+          final exerciseName = exData['exerciseName'] as String;
+          final ex = await (_db.select(_db.exercises)..where((t) => t.name.equals(exerciseName))).getSingleOrNull();
+          if (ex != null) {
+            await _db.into(_db.templateExercises).insert(TemplateExercisesCompanion.insert(
+              dayId: dayId,
+              exerciseId: ex.id,
+              order: exData['order'],
+              setType: Value(SetType.values.byName(exData['setType'])),
+              setsJson: exData['setsJson'],
+              restTime: Value(exData['restTime'] ?? 90),
+              notes: Value(exData['notes']),
+            ));
+          }
+        }
+      }
+    });
+  }
+}
+
+class TypedTemplateExercise {
+  final TemplateExercise templateExercise;
+  final Exercise exercise;
+
+  TypedTemplateExercise({
+    required this.templateExercise,
+    required this.exercise,
+  });
 }
 
 @riverpod

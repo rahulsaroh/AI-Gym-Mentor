@@ -83,15 +83,6 @@ class HistoryScreen extends ConsumerWidget {
   }
 }
 
-class ProgramsScreen extends ConsumerWidget {
-  const ProgramsScreen({super.key});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return const Center(child: Text('Programs Screen'));
-  }
-}
-
 class AnalyticsScreen extends ConsumerWidget {
   const AnalyticsScreen({super.key});
 

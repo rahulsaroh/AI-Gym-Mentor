@@ -190,7 +190,7 @@ class _WorkoutSummaryHeader extends StatelessWidget {
                   const SizedBox(height: 4),
                   LinearProgressIndicator(
                     value: percent.toDouble(),
-                    backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
+                    backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
                     borderRadius: BorderRadius.circular(4),
                     minHeight: 6,
                   ),

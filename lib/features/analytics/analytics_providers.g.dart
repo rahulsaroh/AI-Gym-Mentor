@@ -21,6 +21,8 @@ final dashboardStatsProvider =
   allTransitiveDependencies: null,
 );
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 typedef DashboardStatsRef = AutoDisposeFutureProviderRef<Map<String, dynamic>>;
 String _$volumeTrendHash() => r'935c7018f9f9a3bf41d853b18762429a91c23abe';
 
@@ -36,6 +38,8 @@ final volumeTrendProvider =
   allTransitiveDependencies: null,
 );
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 typedef VolumeTrendRef
     = AutoDisposeFutureProviderRef<List<Map<String, dynamic>>>;
 String _$frequencyTrendHash() => r'cc2587a6626bbc1a32ff29aaf4d5fe68dbc4f869';
@@ -53,6 +57,8 @@ final frequencyTrendProvider =
   allTransitiveDependencies: null,
 );
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 typedef FrequencyTrendRef
     = AutoDisposeFutureProviderRef<List<Map<String, dynamic>>>;
 String _$muscleBalanceHash() => r'860179fe720350a7682d614814868b6d9d426aa1';
@@ -70,6 +76,8 @@ final muscleBalanceProvider =
   allTransitiveDependencies: null,
 );
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 typedef MuscleBalanceRef = AutoDisposeFutureProviderRef<Map<String, dynamic>>;
 String _$plateauAlertsHash() => r'22d5173c246fcf1cbaef93a060f998e8d77722d4';
 
@@ -86,6 +94,8 @@ final plateauAlertsProvider =
   allTransitiveDependencies: null,
 );
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 typedef PlateauAlertsRef
     = AutoDisposeFutureProviderRef<List<Map<String, dynamic>>>;
 String _$recentPRsHash() => r'e5ddfa3864cb894d3b2fc51e9132a036660b4fe7';
@@ -102,6 +112,8 @@ final recentPRsProvider =
   allTransitiveDependencies: null,
 );
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 typedef RecentPRsRef = AutoDisposeFutureProviderRef<List<Map<String, dynamic>>>;
 String _$bodyMeasurementsListHash() =>
     r'cc3be684cf40e60673ea5bb2dbe0e57fd04e8886';
@@ -122,4 +134,4 @@ final bodyMeasurementsListProvider = AutoDisposeAsyncNotifierProvider<
 typedef _$BodyMeasurementsList
     = AutoDisposeAsyncNotifier<List<BodyMeasurement>>;
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

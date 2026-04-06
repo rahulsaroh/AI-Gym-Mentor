@@ -139,12 +139,12 @@ class _StreakBadge extends StatelessWidget {
   }
 }
 
-class _TodayPlanSection extends StatelessWidget {
+class _TodayPlanSection extends ConsumerWidget {
   final WorkoutHomeState state;
   const _TodayPlanSection({required this.state});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return SliverToBoxAdapter(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -177,7 +177,7 @@ class _TodayPlanSection extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      state.isRestDay ? 'Rest Day' : 'Today: Push Day A',
+                      state.isRestDay ? 'Rest Day' : 'Today: ${state.todayDayName ?? "Push Day A"}',
                       style: GoogleFonts.outfit(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
@@ -190,7 +190,7 @@ class _TodayPlanSection extends StatelessWidget {
                 const SizedBox(height: 8),
                 if (!state.isRestDay) ...[
                   Text(
-                    '6 exercises • Est. 75 mins',
+                    '${state.todayExercises.length} exercises • Est. ${state.estimatedDuration} mins',
                     style: GoogleFonts.outfit(
                       color: Colors.white70,
                       fontSize: 14,
@@ -199,11 +199,9 @@ class _TodayPlanSection extends StatelessWidget {
                   const SizedBox(height: 16),
                   Wrap(
                     spacing: 8,
-                    children: [
-                      _ExerciseChip(label: 'Bench Press'),
-                      _ExerciseChip(label: 'Shoulder Press'),
-                      _ExerciseChip(label: 'Tricep Pushdowns'),
-                    ],
+                    runSpacing: 8,
+                    children: state.todayExercises.take(3).map((e) => _ExerciseChip(label: e)).toList() 
+                      + (state.todayExercises.length > 3 ? [_ExerciseChip(label: '+${state.todayExercises.length - 3} more')] : []),
                   ),
                 ] else
                   Padding(
@@ -217,7 +215,18 @@ class _TodayPlanSection extends StatelessWidget {
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: () => context.push('/active-workout'),
+                    onPressed: () async {
+                      if (state.activeDraft != null) {
+                        context.push('/app/workout/active?id=${state.activeDraft!.id}');
+                        return;
+                      }
+                      final id = await ref.read(workoutHomeNotifierProvider.notifier).startWorkout(
+                        templateId: state.templateId,
+                        dayId: state.nextDayId,
+                        name: state.todayDayName ?? 'New Workout',
+                      );
+                      context.push('/app/workout/active?id=$id');
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white,
                       foregroundColor: Theme.of(context).colorScheme.primary,
@@ -227,7 +236,7 @@ class _TodayPlanSection extends StatelessWidget {
                       ),
                     ),
                     child: Text(
-                      state.isRestDay ? 'Start Quick Workout' : 'Start Today\'s Workout',
+                      state.activeDraft != null ? 'Resume Workout' : (state.isRestDay ? 'Start Quick Workout' : 'Start Today\'s Workout'),
                       style: GoogleFonts.outfit(fontWeight: FontWeight.bold),
                     ),
                   ),
@@ -318,7 +327,7 @@ class _QuickActionItem extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 16),
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.5),
+            color: Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.5),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
               color: Theme.of(context).dividerColor.withOpacity(0.1),
@@ -465,7 +474,7 @@ class _WeeklyVolumeSection extends StatelessWidget {
                           toY: (i + 1) * 500.0, // Mock volume mapping for now
                           color: i == DateTime.now().weekday - 1 
                             ? Theme.of(context).colorScheme.primary 
-                            : Theme.of(context).colorScheme.surfaceVariant,
+                            : Theme.of(context).colorScheme.surfaceContainerHighest,
                           width: 16,
                           borderRadius: BorderRadius.circular(4),
                         ),

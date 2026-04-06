@@ -75,7 +75,7 @@ class PlateCalculatorDialog extends StatelessWidget {
               Container(
                 height: 100,
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
+                  color: Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.3),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Center(

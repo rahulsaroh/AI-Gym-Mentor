@@ -7,7 +7,7 @@ part of 'workout_home_notifier.dart';
 // **************************************************************************
 
 String _$workoutHomeNotifierHash() =>
-    r'b873f8a8f2d2b3e8db8717ae6dfdb15d43154980';
+    r'1482a10c1fc0f323ef36ea59c0b2262e7382a6b2';
 
 /// See also [WorkoutHomeNotifier].
 @ProviderFor(WorkoutHomeNotifier)
@@ -24,4 +24,4 @@ final workoutHomeNotifierProvider = AutoDisposeAsyncNotifierProvider<
 
 typedef _$WorkoutHomeNotifier = AutoDisposeAsyncNotifier<WorkoutHomeState>;
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

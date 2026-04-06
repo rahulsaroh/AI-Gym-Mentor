@@ -76,7 +76,7 @@ class _ExercisesScreenState extends ConsumerState<ExercisesScreen> {
                         hintText: 'Search exercises...',
                         prefixIcon: const Icon(LucideIcons.search),
                         filled: true,
-                        fillColor: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.5),
+                        fillColor: Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.5),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: BorderSide.none,
@@ -241,7 +241,7 @@ class _ExercisesScreenState extends ConsumerState<ExercisesScreen> {
                                 child: Card(
                                   margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                                   elevation: 0,
-                                  color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
+                                  color: Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.3),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(12),
                                   ),
