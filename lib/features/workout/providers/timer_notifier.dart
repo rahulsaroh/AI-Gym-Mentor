@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 part 'timer_notifier.g.dart';
 
@@ -43,7 +44,19 @@ class TimerNotifier extends _$TimerNotifier {
   @override
   TimerState build() {
     _restoreState();
+    _setupServiceListener();
     return TimerState();
+  }
+
+  void _setupServiceListener() {
+    FlutterBackgroundService().on('update').listen((event) {
+      if (event != null && event['remaining'] != null) {
+        final remaining = event['remaining'] as int;
+        if (state.isRunning) {
+          state = state.copyWith(remainingSeconds: remaining);
+        }
+      }
+    });
   }
 
   Future<void> _restoreState() async {
@@ -73,6 +86,7 @@ class TimerNotifier extends _$TimerNotifier {
     final endTime = DateTime.now().add(Duration(seconds: duration));
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_endTimeKey, endTime.toIso8601String());
+    await prefs.setInt('rest_timer_initial_duration', duration);
     if (exerciseName != null) {
       await prefs.setString(_exerciseNameKey, exerciseName);
     }
@@ -140,5 +154,24 @@ class TimerNotifier extends _$TimerNotifier {
     await prefs.setString(_endTimeKey, newEndTime.toIso8601String());
     
     state = state.copyWith(remainingSeconds: newRemaining);
+    
+    // Notify service if running
+    FlutterBackgroundService().invoke('add_30s'); // Service also updates its internal endTime
+  }
+
+  Future<bool> checkPermissions() async {
+    final notificationStatus = await Permission.notification.status;
+    if (!notificationStatus.isGranted) {
+      final result = await Permission.notification.request();
+      if (!result.isGranted) return false;
+    }
+
+    // Exact alarm for Android 13+
+    if (await Permission.scheduleExactAlarm.isDenied) {
+      final result = await Permission.scheduleExactAlarm.request();
+      if (!result.isGranted) return false;
+    }
+
+    return true;
   }
 }

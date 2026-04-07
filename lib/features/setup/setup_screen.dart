@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-enum WeightUnit { kg, lbs }
-enum ExperienceLevel { beginner, intermediate, advanced }
+import 'package:gym_gemini_pro/features/settings/settings_provider.dart';
+import 'package:gym_gemini_pro/features/settings/models/settings_state.dart';
 
 class SetupScreen extends ConsumerStatefulWidget {
   const SetupScreen({super.key});
@@ -31,14 +30,36 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
 
     setState(() => _isSaving = true);
 
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('userName', name);
-    await prefs.setString('weightUnit', _selectedUnit.name);
-    await prefs.setString('experienceLevel', _selectedExperience.name);
-    await prefs.setBool('hasCompletedSetup', true);
+    try {
+      // Update global settings provider
+      final currentSettings = await ref.read(settingsProvider.future);
+      await ref.read(settingsProvider.notifier).updateSettings(
+            currentSettings.copyWith(
+              userName: name,
+              weightUnit: _selectedUnit,
+              experienceLevel: _selectedExperience,
+            ),
+          );
 
-    if (mounted) {
-      context.go('/app');
+      // Still set the legacy flag for the Splash screen check
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('hasCompletedSetup', true);
+      // Also set these just in case other parts of the app use them (legacy)
+      await prefs.setString('userName', name);
+      await prefs.setString('weightUnit', _selectedUnit.name);
+      await prefs.setString('experienceLevel', _selectedExperience.name);
+
+      if (mounted) {
+        context.go('/app');
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error saving settings: $e')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isSaving = false);
     }
   }
 

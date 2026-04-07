@@ -173,6 +173,7 @@ mixin _$WorkoutHomeState {
   Map<int, double> get weeklyVolume =>
       throw _privateConstructorUsedError; // millisecondsSinceEpoch -> volume
   BodyMeasurement? get lastWeight => throw _privateConstructorUsedError;
+  String? get lastWorkoutSummary => throw _privateConstructorUsedError;
   bool get isRestDay => throw _privateConstructorUsedError;
   String? get todayDayName => throw _privateConstructorUsedError;
   List<String> get todayExercises => throw _privateConstructorUsedError;
@@ -203,6 +204,7 @@ abstract class $WorkoutHomeStateCopyWith<$Res> {
       Workout? activeDraft,
       Map<int, double> weeklyVolume,
       BodyMeasurement? lastWeight,
+      String? lastWorkoutSummary,
       bool isRestDay,
       String? todayDayName,
       List<String> todayExercises,
@@ -237,6 +239,7 @@ class _$WorkoutHomeStateCopyWithImpl<$Res, $Val extends WorkoutHomeState>
     Object? activeDraft = freezed,
     Object? weeklyVolume = null,
     Object? lastWeight = freezed,
+    Object? lastWorkoutSummary = freezed,
     Object? isRestDay = null,
     Object? todayDayName = freezed,
     Object? todayExercises = null,
@@ -281,6 +284,10 @@ class _$WorkoutHomeStateCopyWithImpl<$Res, $Val extends WorkoutHomeState>
           ? _value.lastWeight
           : lastWeight // ignore: cast_nullable_to_non_nullable
               as BodyMeasurement?,
+      lastWorkoutSummary: freezed == lastWorkoutSummary
+          ? _value.lastWorkoutSummary
+          : lastWorkoutSummary // ignore: cast_nullable_to_non_nullable
+              as String?,
       isRestDay: null == isRestDay
           ? _value.isRestDay
           : isRestDay // ignore: cast_nullable_to_non_nullable
@@ -337,6 +344,7 @@ abstract class _$$WorkoutHomeStateImplCopyWith<$Res>
       Workout? activeDraft,
       Map<int, double> weeklyVolume,
       BodyMeasurement? lastWeight,
+      String? lastWorkoutSummary,
       bool isRestDay,
       String? todayDayName,
       List<String> todayExercises,
@@ -370,6 +378,7 @@ class __$$WorkoutHomeStateImplCopyWithImpl<$Res>
     Object? activeDraft = freezed,
     Object? weeklyVolume = null,
     Object? lastWeight = freezed,
+    Object? lastWorkoutSummary = freezed,
     Object? isRestDay = null,
     Object? todayDayName = freezed,
     Object? todayExercises = null,
@@ -414,6 +423,10 @@ class __$$WorkoutHomeStateImplCopyWithImpl<$Res>
           ? _value.lastWeight
           : lastWeight // ignore: cast_nullable_to_non_nullable
               as BodyMeasurement?,
+      lastWorkoutSummary: freezed == lastWorkoutSummary
+          ? _value.lastWorkoutSummary
+          : lastWorkoutSummary // ignore: cast_nullable_to_non_nullable
+              as String?,
       isRestDay: null == isRestDay
           ? _value.isRestDay
           : isRestDay // ignore: cast_nullable_to_non_nullable
@@ -455,6 +468,7 @@ class _$WorkoutHomeStateImpl implements _WorkoutHomeState {
       this.activeDraft,
       final Map<int, double> weeklyVolume = const {},
       this.lastWeight,
+      this.lastWorkoutSummary,
       this.isRestDay = false,
       this.todayDayName,
       final List<String> todayExercises = const [],
@@ -491,6 +505,8 @@ class _$WorkoutHomeStateImpl implements _WorkoutHomeState {
   @override
   final BodyMeasurement? lastWeight;
   @override
+  final String? lastWorkoutSummary;
+  @override
   @JsonKey()
   final bool isRestDay;
   @override
@@ -514,7 +530,7 @@ class _$WorkoutHomeStateImpl implements _WorkoutHomeState {
 
   @override
   String toString() {
-    return 'WorkoutHomeState(greeting: $greeting, userName: $userName, dateString: $dateString, currentStreak: $currentStreak, dailyTip: $dailyTip, lastWorkout: $lastWorkout, activeDraft: $activeDraft, weeklyVolume: $weeklyVolume, lastWeight: $lastWeight, isRestDay: $isRestDay, todayDayName: $todayDayName, todayExercises: $todayExercises, estimatedDuration: $estimatedDuration, nextDayId: $nextDayId, templateId: $templateId)';
+    return 'WorkoutHomeState(greeting: $greeting, userName: $userName, dateString: $dateString, currentStreak: $currentStreak, dailyTip: $dailyTip, lastWorkout: $lastWorkout, activeDraft: $activeDraft, weeklyVolume: $weeklyVolume, lastWeight: $lastWeight, lastWorkoutSummary: $lastWorkoutSummary, isRestDay: $isRestDay, todayDayName: $todayDayName, todayExercises: $todayExercises, estimatedDuration: $estimatedDuration, nextDayId: $nextDayId, templateId: $templateId)';
   }
 
   @override
@@ -540,6 +556,8 @@ class _$WorkoutHomeStateImpl implements _WorkoutHomeState {
                 .equals(other._weeklyVolume, _weeklyVolume) &&
             (identical(other.lastWeight, lastWeight) ||
                 other.lastWeight == lastWeight) &&
+            (identical(other.lastWorkoutSummary, lastWorkoutSummary) ||
+                other.lastWorkoutSummary == lastWorkoutSummary) &&
             (identical(other.isRestDay, isRestDay) ||
                 other.isRestDay == isRestDay) &&
             (identical(other.todayDayName, todayDayName) ||
@@ -566,6 +584,7 @@ class _$WorkoutHomeStateImpl implements _WorkoutHomeState {
       activeDraft,
       const DeepCollectionEquality().hash(_weeklyVolume),
       lastWeight,
+      lastWorkoutSummary,
       isRestDay,
       todayDayName,
       const DeepCollectionEquality().hash(_todayExercises),
@@ -594,6 +613,7 @@ abstract class _WorkoutHomeState implements WorkoutHomeState {
       final Workout? activeDraft,
       final Map<int, double> weeklyVolume,
       final BodyMeasurement? lastWeight,
+      final String? lastWorkoutSummary,
       final bool isRestDay,
       final String? todayDayName,
       final List<String> todayExercises,
@@ -619,6 +639,8 @@ abstract class _WorkoutHomeState implements WorkoutHomeState {
   Map<int, double> get weeklyVolume; // millisecondsSinceEpoch -> volume
   @override
   BodyMeasurement? get lastWeight;
+  @override
+  String? get lastWorkoutSummary;
   @override
   bool get isRestDay;
   @override

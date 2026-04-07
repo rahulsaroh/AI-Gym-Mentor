@@ -6,6 +6,7 @@ import 'package:gym_gemini_pro/core/auth/auth_provider.dart';
 import 'package:gym_gemini_pro/features/settings/settings_provider.dart';
 import 'package:gym_gemini_pro/services/sheets_service.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:gym_gemini_pro/services/sync_worker.dart';
 
 class SheetsSetupScreen extends ConsumerStatefulWidget {
   const SheetsSetupScreen({super.key});
@@ -53,6 +54,9 @@ class _SheetsSetupScreenState extends ConsumerState<SheetsSetupScreen> {
       await ref.read(settingsProvider.notifier).updateSettings(
         settings.copyWith(googleDriveEmail: user.email),
       );
+      
+      // Trigger sync for pending items
+      ref.read(syncWorkerProvider.notifier).processQueue();
 
       if (mounted) {
         context.pushReplacement('/settings/sheets-success', extra: spreadsheetId);

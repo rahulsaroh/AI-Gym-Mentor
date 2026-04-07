@@ -19,7 +19,7 @@ class _ExercisesScreenState extends ConsumerState<ExercisesScreen> {
   final TextEditingController _searchController = TextEditingController();
 
   static const List<String> muscleGroups = [
-    'All Muscles', 'Chest', 'Back', 'Shoulders', 'Biceps', 'Triceps', 'Legs', 'Glutes', 'Core', 'Cardio', 'Full Body'
+    'All Muscles', 'Chest', 'Back', 'Shoulders', 'Biceps', 'Triceps', 'Quads', 'Hamstrings', 'Glutes', 'Calves', 'Core', 'Cardio', 'Full Body'
   ];
   
   static const List<String> equipmentTypes = [
@@ -54,7 +54,7 @@ class _ExercisesScreenState extends ConsumerState<ExercisesScreen> {
             floating: true,
             pinned: true,
             snap: false,
-            expandedHeight: 180,
+            expandedHeight: 280,
             backgroundColor: Theme.of(context).colorScheme.surface,
             elevation: 0,
             flexibleSpace: FlexibleSpaceBar(
@@ -69,9 +69,19 @@ class _ExercisesScreenState extends ConsumerState<ExercisesScreen> {
                             fontWeight: FontWeight.bold,
                           ),
                     ),
-                    const SizedBox(height: 16),
-                    TextField(
+                  ],
+                ),
+              ),
+            ),
+            bottom: PreferredSize(
+              preferredSize: const Size.fromHeight(170),
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+                    child: TextField(
                       controller: _searchController,
+                      autofocus: true,
                       decoration: InputDecoration(
                         hintText: 'Search exercises...',
                         prefixIcon: const Icon(LucideIcons.search),
@@ -81,20 +91,13 @@ class _ExercisesScreenState extends ConsumerState<ExercisesScreen> {
                           borderRadius: BorderRadius.circular(12),
                           borderSide: BorderSide.none,
                         ),
-                        contentPadding: const EdgeInsets.symmetric(vertical: 0),
+                        contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
                       ),
                     ),
-                  ],
-                ),
-              ),
-            ),
-            bottom: PreferredSize(
-              preferredSize: const Size.fromHeight(100),
-              child: Column(
-                children: [
+                  ),
                   SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
                     child: Row(
                       children: muscleGroups.map((muscle) {
                         final isSelected = filters['muscle'] == muscle;
@@ -208,24 +211,24 @@ class _ExercisesScreenState extends ConsumerState<ExercisesScreen> {
                         ),
                         ...items.map((ex) => Slidable(
                                 key: ValueKey('exercise_${ex.id}'),
-                                endActionPane: ActionPane(
+                                startActionPane: ActionPane(
                                   motion: const DrawerMotion(),
-                                  extentRatio: 0.3,
+                                  extentRatio: 0.25,
                                   children: [
                                     SlidableAction(
-                                      onPressed: (_) => context.push('/exercises/${ex.id}/history'),
+                                      onPressed: (_) => context.push('/exercises/history/${ex.id}'),
                                       backgroundColor: Colors.indigo,
                                       foregroundColor: Colors.white,
                                       icon: LucideIcons.history,
                                       label: 'History',
-                                      borderRadius: const BorderRadius.horizontal(right: Radius.circular(12)),
+                                      borderRadius: const BorderRadius.horizontal(left: Radius.circular(12)),
                                     ),
                                   ],
                                 ),
-                                startActionPane: ex.isCustom
+                                endActionPane: ex.isCustom
                                     ? ActionPane(
                                         motion: const DrawerMotion(),
-                                        extentRatio: 0.25,
+                                        extentRatio: 0.5,
                                         children: [
                                           SlidableAction(
                                             onPressed: (_) => context.push('/exercises/${ex.id}/edit'),
@@ -233,7 +236,14 @@ class _ExercisesScreenState extends ConsumerState<ExercisesScreen> {
                                             foregroundColor: Colors.white,
                                             icon: LucideIcons.pencil,
                                             label: 'Edit',
-                                            borderRadius: const BorderRadius.horizontal(left: Radius.circular(12)),
+                                          ),
+                                          SlidableAction(
+                                            onPressed: (_) => _deleteExercise(ex),
+                                            backgroundColor: Colors.red,
+                                            foregroundColor: Colors.white,
+                                            icon: LucideIcons.trash2,
+                                            label: 'Delete',
+                                            borderRadius: const BorderRadius.horizontal(right: Radius.circular(12)),
                                           ),
                                         ],
                                       )
@@ -254,12 +264,17 @@ class _ExercisesScreenState extends ConsumerState<ExercisesScreen> {
                                         child: Text(
                                           ex.name,
                                           style: const TextStyle(fontWeight: FontWeight.bold),
+                                          overflow: TextOverflow.ellipsis,
+                                          maxLines: 1,
                                         ),
                                       ),
                                     ),
                                     subtitle: Padding(
                                       padding: const EdgeInsets.only(top: 4),
-                                      child: Row(
+                                      child: Wrap(
+                                        spacing: 8,
+                                        runSpacing: 4,
+                                        crossAxisAlignment: WrapCrossAlignment.center,
                                         children: [
                                           Container(
                                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
@@ -276,19 +291,23 @@ class _ExercisesScreenState extends ConsumerState<ExercisesScreen> {
                                               ),
                                             ),
                                           ),
-                                          const SizedBox(width: 8),
-                                          Icon(
-                                            LucideIcons.activity,
-                                            size: 12,
-                                            color: Theme.of(context).colorScheme.outline,
-                                          ),
-                                          const SizedBox(width: 4),
-                                          Text(
-                                            ex.equipment,
-                                            style: TextStyle(
-                                              fontSize: 10,
-                                              color: Theme.of(context).colorScheme.outline,
-                                            ),
+                                          Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Icon(
+                                                LucideIcons.activity,
+                                                size: 12,
+                                                color: Theme.of(context).colorScheme.outline,
+                                              ),
+                                              const SizedBox(width: 4),
+                                              Text(
+                                                ex.equipment,
+                                                style: TextStyle(
+                                                  fontSize: 10,
+                                                  color: Theme.of(context).colorScheme.outline,
+                                                ),
+                                              ),
+                                            ],
                                           ),
                                         ],
                                       ),
@@ -337,6 +356,32 @@ class _ExercisesScreenState extends ConsumerState<ExercisesScreen> {
             icon: LucideIcons.arrowUpDown,
             label: 'Sort by Muscle',
             onTap: () {},
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _deleteExercise(Exercise exercise) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete Exercise?'),
+        content: Text('Are you sure you want to delete "${exercise.name}"? This action cannot be undone.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () async {
+              final db = ref.read(appDatabaseProvider);
+              await (db.delete(db.exercises)..where((t) => t.id.equals(exercise.id))).go();
+              ref.invalidate(allExercisesProvider);
+              if (mounted) Navigator.pop(context);
+            },
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Delete'),
           ),
         ],
       ),

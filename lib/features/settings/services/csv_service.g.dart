@@ -6,7 +6,7 @@ part of 'csv_service.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$csvServiceHash() => r'81e063d364b75fefc207d49716b150eb8c78f3c5';
+String _$csvServiceHash() => r'eee97f157dec52dd0592c3c0a98c1fa09ee143f3';
 
 /// See also [CsvService].
 @ProviderFor(CsvService)

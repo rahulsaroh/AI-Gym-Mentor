@@ -1,5 +1,7 @@
 import 'package:csv/csv.dart';
 import 'package:gym_gemini_pro/core/database/database.dart';
+import 'package:gym_gemini_pro/core/utils/weight_converter.dart';
+import 'package:gym_gemini_pro/features/settings/models/settings_state.dart';
 import 'package:intl/intl.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -15,6 +17,7 @@ class CsvService extends _$CsvService {
     required List<WorkoutSet> sets,
     required Map<int, String> exerciseNames,
     required Set<String> selectedColumns,
+    required WeightUnit unit,
     bool includeWarmup = true,
   }) async {
     final List<List<dynamic>> rows = [];
@@ -27,10 +30,12 @@ class CsvService extends _$CsvService {
     if (selectedColumns.contains('Exercise')) header.add('Exercise');
     if (selectedColumns.contains('Set#')) header.add('Set#');
     if (selectedColumns.contains('Set Type')) header.add('Set Type');
-    if (selectedColumns.contains('Weight')) header.add('Weight(kg)');
+    final unitStr = unit == WeightUnit.kg ? 'kg' : 'lbs';
+    if (selectedColumns.contains('Weight')) header.add('Weight($unitStr)');
     if (selectedColumns.contains('Reps')) header.add('Reps');
     if (selectedColumns.contains('RPE')) header.add('RPE');
-    if (selectedColumns.contains('Volume')) header.add('Volume(kg)');
+    if (selectedColumns.contains('Volume')) header.add('Volume($unitStr)');
+    if (selectedColumns.contains('Is PR')) header.add('Is PR');
     if (selectedColumns.contains('Notes')) header.add('Notes');
     rows.add(header);
 
@@ -49,10 +54,11 @@ class CsvService extends _$CsvService {
       if (selectedColumns.contains('Exercise')) row.add(exerciseNames[s.exerciseId] ?? 'Unknown');
       if (selectedColumns.contains('Set#')) row.add(s.setNumber);
       if (selectedColumns.contains('Set Type')) row.add(s.setType.name);
-      if (selectedColumns.contains('Weight')) row.add(s.weight);
+      if (selectedColumns.contains('Weight')) row.add(WeightConverter.toDisplay(s.weight, unit).toStringAsFixed(1));
       if (selectedColumns.contains('Reps')) row.add(s.reps);
       if (selectedColumns.contains('RPE')) row.add(s.rpe ?? '');
-      if (selectedColumns.contains('Volume')) row.add(s.weight * s.reps);
+      if (selectedColumns.contains('Volume')) row.add(WeightConverter.toDisplay(s.weight * s.reps, unit).toStringAsFixed(1));
+      if (selectedColumns.contains('Is PR')) row.add(s.isPr ? 'TRUE' : 'FALSE');
       if (selectedColumns.contains('Notes')) row.add(s.notes ?? '');
       rows.add(row);
     }

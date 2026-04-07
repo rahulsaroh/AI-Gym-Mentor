@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:gym_gemini_pro/core/database/database.dart';
 import 'package:uuid/uuid.dart';
@@ -12,18 +13,22 @@ import 'package:gym_gemini_pro/features/exercises/exercise_repository.dart';
 import 'package:confetti/confetti.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:gym_gemini_pro/core/services/shake_detector.dart';
+import 'package:gym_gemini_pro/services/sync_worker.dart';
 import 'package:gym_gemini_pro/core/widgets/speed_dial_fab.dart';
 import 'package:gym_gemini_pro/features/workout/components/pr_banner.dart';
-
 import 'package:gym_gemini_pro/features/workout/components/set_type_selector.dart';
+import 'package:gym_gemini_pro/services/progression_service.dart';
+import 'package:gym_gemini_pro/features/workout/providers/workout_home_notifier.dart';
+import 'package:gym_gemini_pro/features/workout/components/workout_summary_overlay.dart';
 import 'package:gym_gemini_pro/features/workout/components/superset_bracket_painter.dart';
 import 'package:gym_gemini_pro/features/workout/components/rest_timer_overlay.dart';
 import 'package:gym_gemini_pro/features/workout/providers/timer_notifier.dart';
-import 'package:gym_gemini_pro/features/workout/components/plate_calculator_dialog.dart';
-import 'package:gym_gemini_pro/features/workout/components/workout_summary_overlay.dart';
-import 'package:gym_gemini_pro/features/exercises/components/exercise_picker_overlay.dart';
-import 'package:gym_gemini_pro/services/progression_service.dart';
+import 'package:gym_gemini_pro/features/settings/settings_provider.dart';
+import 'package:gym_gemini_pro/core/utils/weight_converter.dart';
+import 'package:gym_gemini_pro/features/settings/models/settings_state.dart';
 import 'package:gym_gemini_pro/features/workout/providers/workout_duration_provider.dart';
+import 'package:gym_gemini_pro/features/workout/components/plate_calculator_dialog.dart';
+import 'package:gym_gemini_pro/features/exercises/components/exercise_picker_overlay.dart';
 
 class ActiveWorkoutScreen extends ConsumerStatefulWidget {
   final int workoutId;
@@ -55,10 +60,14 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen> with 
   WorkoutSet? _lastDeletedSet;
   ExerciseBlock? _lastDeletedExercise;
 
-  // History for ghost text
+  // Ghost text history
   Map<int, List<WorkoutSet>> _previousSessionSets = {}; // exerciseId -> sets
+  
+  late ScrollController _scrollController;
 
   // Input management
+  final TextEditingController _titleController = TextEditingController();
+  bool _isEditingTitle = false;
   final Map<int, TextEditingController> _weightControllers = {};
   final Map<int, TextEditingController> _repsControllers = {};
   final Map<int, TextEditingController> _rpeControllers = {};
@@ -85,6 +94,7 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen> with 
     _shakeDetector = ShakeDetector();
     _shakeDetector.onShake.listen((_) => _handleShake());
     _shakeDetector.start();
+    _scrollController = ScrollController();
   }
 
   @override
@@ -92,6 +102,7 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen> with 
     _confettiController.dispose();
     _glowController.dispose();
     _shakeDetector.dispose();
+    _titleController.dispose();
     for (var c in _weightControllers.values) c.dispose();
     for (var c in _repsControllers.values) c.dispose();
     for (var c in _rpeControllers.values) c.dispose();
@@ -99,6 +110,7 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen> with 
     for (var n in _weightNodes.values) n.dispose();
     for (var n in _repsNodes.values) n.dispose();
     for (var n in _rpeNodes.values) n.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -203,23 +215,61 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen> with 
               builder: (context, snapshot) {
                 final sets = snapshot.data ?? [];
                 final completedCount = sets.where((s) => s.completed).length;
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(workout.name, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold), overflow: TextOverflow.ellipsis),
-                    Row(
-                      children: [
-                        Consumer(
-                          builder: (context, ref, _) {
-                            final duration = ref.watch(workoutDurationProvider);
-                            return Text(_formatDuration(duration), style: const TextStyle(fontSize: 12));
-                          },
+                return GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _isEditingTitle = true;
+                      _titleController.text = workout.name;
+                    });
+                  },
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (_isEditingTitle)
+                        SizedBox(
+                          height: 32,
+                          child: TextField(
+                            controller: _titleController,
+                            autofocus: true,
+                            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                            decoration: const InputDecoration(
+                              isDense: true,
+                              contentPadding: EdgeInsets.zero,
+                              border: InputBorder.none,
+                            ),
+                            onSubmitted: (val) async {
+                              final db = ref.read(appDatabaseProvider);
+                              await (db.update(db.workouts)..where((t) => t.id.equals(widget.workoutId))).write(
+                                WorkoutsCompanion(name: Value(val)),
+                              );
+                              setState(() => _isEditingTitle = false);
+                            },
+                          ),
+                        )
+                      else
+                        Text(workout.name, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold), overflow: TextOverflow.ellipsis),
+                      Flexible(
+                        child: Row(
+                          children: [
+                            Consumer(
+                              builder: (context, ref, _) {
+                                final duration = ref.watch(workoutDurationProvider);
+                                return Text(_formatDuration(duration), style: const TextStyle(fontSize: 12));
+                              },
+                            ),
+                            const SizedBox(width: 8),
+                            Flexible(
+                              child: Text(
+                                '• $completedCount/${sets.length} sets',
+                                style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.primary),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
                         ),
-                        const SizedBox(width: 8),
-                        Text('• $completedCount/${sets.length} sets', style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.primary)),
-                      ],
-                    ),
-                  ],
+                      ),
+                    ],
+                  ),
                 );
               },
             ),
@@ -243,8 +293,12 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen> with 
                 stream: setsStream.watch(),
                 builder: (context, setsSnapshot) {
                   final sets = setsSnapshot.data ?? [];
+                  if (mounted) {
+                    HapticFeedback.mediumImpact();
+                  }
                   final exerciseBlocks = _groupSetsByExercise(sets);
                   return ReorderableListView.builder(
+                    scrollController: _scrollController,
                     padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
                     physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
                     itemCount: exerciseBlocks.length + 1,
@@ -285,13 +339,13 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen> with 
               ),
               Align(
                 alignment: Alignment.topCenter,
-                child: RepaintBoundary(
-                  child: ConfettiWidget(
-                    confettiController: _confettiController,
-                    blastDirectionality: BlastDirectionality.explosive,
-                    maxBlastForce: 20, minBlastForce: 8, numberOfParticles: 20, gravity: 0.1,
-                    colors: const [Colors.amber, Colors.orange, Colors.white],
-                  ),
+                child: ConfettiWidget(
+                  confettiController: _confettiController,
+                  blastDirectionality: BlastDirectionality.explosive,
+                  shouldLoop: false,
+                  colors: const [Colors.green, Colors.blue, Colors.pink, Colors.orange, Colors.purple],
+                  numberOfParticles: 20,
+                  gravity: 0.1,
                 ),
               ),
               if (_prExerciseName != null)
@@ -310,7 +364,22 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen> with 
             backgroundColor: Theme.of(context).colorScheme.primary,
             foregroundColor: Theme.of(context).colorScheme.onPrimary,
             children: [
-              SpeedDialChild(icon: LucideIcons.plus, label: 'Add Exercise', onTap: _showExercisePicker),
+              SpeedDialChild(
+                icon: LucideIcons.plus,
+                label: 'Add Exercise',
+                onTap: () {
+                  HapticFeedback.lightImpact();
+                  _showExercisePicker();
+                },
+              ),
+              SpeedDialChild(
+                icon: LucideIcons.plus,
+                label: 'New Library Exercise',
+                onTap: () {
+                  HapticFeedback.lightImpact();
+                  context.push('/exercises/create');
+                },
+              ),
               SpeedDialChild(icon: LucideIcons.layers, label: 'Add Superset', onTap: () {}),
               SpeedDialChild(icon: LucideIcons.check, label: 'Finish Workout', onTap: () => _showSummary(workout)),
             ],
@@ -331,6 +400,8 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen> with 
 
   Widget _buildExerciseBlock(ExerciseBlock block, List<ExerciseBlock> allBlocks) {
     final exercisesAsync = ref.watch(allExercisesProvider);
+    final settings = ref.watch(settingsProvider).value ?? const SettingsState();
+    final unit = settings.weightUnit;
     return exercisesAsync.when(
       data: (exercises) {
         if (exercises.isEmpty) return const Center(child: Text('No exercises found in library'));
@@ -369,10 +440,14 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen> with 
                       children: [
                         Text(exercise.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18), overflow: TextOverflow.ellipsis),
                         const SizedBox(height: 4),
-                        Row(children: [
-                          _buildMuscleChip(exercise.primaryMuscle),
-                          if (exercise.secondaryMuscle != null) ...[const SizedBox(width: 4), _buildMuscleChip(exercise.secondaryMuscle!, isSecondary: true)],
-                        ]),
+                        Wrap(
+                          spacing: 4,
+                          runSpacing: 4,
+                          children: [
+                            _buildMuscleChip(exercise.primaryMuscle),
+                            if (exercise.secondaryMuscle != null) _buildMuscleChip(exercise.secondaryMuscle!, isSecondary: true),
+                          ],
+                        ),
                       ],
                     )),
                     Semantics(
@@ -398,12 +473,12 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen> with 
                   onChanged: (val) => _updateSet(block.sets.first.id, notes: val),
                 ),
                 const SizedBox(height: 8),
-                const Row(children: [
-                  SizedBox(width: 30, child: Text('Set', textAlign: TextAlign.center, style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold))),
-                  Expanded(child: Text('kg', textAlign: TextAlign.center, style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold))),
-                  Expanded(child: Text('Reps', textAlign: TextAlign.center, style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold))),
-                  Expanded(child: Text('RPE', textAlign: TextAlign.center, style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold))),
-                  SizedBox(width: 48),
+                Row(children: [
+                  const SizedBox(width: 38, child: Text('Set', textAlign: TextAlign.center, style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold))),
+                  Expanded(child: Text(unit == WeightUnit.kg ? 'kg' : 'lbs', textAlign: TextAlign.center, style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold))),
+                  const Expanded(child: Text('Reps', textAlign: TextAlign.center, style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold))),
+                  const Expanded(child: Text('RPE', textAlign: TextAlign.center, style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold))),
+                  const SizedBox(width: 48),
                 ]),
                 const Divider(),
                 ...block.sets.asMap().entries.map((entry) => _buildSetRow(entry.value, entry.key + 1, exercise, block, allBlocks)),
@@ -442,7 +517,9 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen> with 
   }
 
   Widget _buildSetRow(WorkoutSet set, int index, Exercise exercise, ExerciseBlock block, List<ExerciseBlock> allBlocks) {
-    final bool isCompleted = set.completed;
+    final isCompleted = set.completed;
+    final settings = ref.watch(settingsProvider).value ?? const SettingsState();
+    final unit = settings.weightUnit;
     final Color rowColor = isCompleted 
         ? Colors.green.withOpacity(0.1) 
         : (set.setType == SetType.warmup ? Colors.orange.withOpacity(0.05) : Colors.transparent);
@@ -490,40 +567,36 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen> with 
                   child: _buildCellInput(
                     setId: set.id,
                     type: 'weight',
-                    value: set.weight == 0 ? '' : set.weight.toString(),
-                    hint: _getPreviousValue(set.exerciseId, set.setNumber, 'weight'),
-                    onChanged: (val) => _updateSet(set.id, weight: double.tryParse(val) ?? 0),
+                    value: set.weight == 0 ? '' : WeightConverter.toDisplay(set.weight, unit).toStringAsFixed(1),
+                    hint: _getPreviousValue(set.exerciseId, set.setNumber, 'weight', unit),
+                    onChanged: (val) => _updateSet(set.id, weight: WeightConverter.toStorage(double.tryParse(val) ?? 0, unit)),
                     isCompleted: isCompleted,
-                    onLongPress: () => _showPlateCalculator(set.weight),
+                    onLongPress: () => _showPlateCalculator(WeightConverter.toDisplay(set.weight, unit)),
                   ),
                 ),
-                const SizedBox(width: 8),
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 4),
+                  child: Text('×', style: TextStyle(color: Colors.grey, fontSize: 12)),
+                ),
                 Expanded(
                   child: _buildCellInput(
                     setId: set.id,
                     type: 'reps',
                     value: set.reps == 0 ? '' : set.reps.toInt().toString(),
-                    hint: _getPreviousValue(set.exerciseId, set.setNumber, 'reps'),
+                    hint: _getPreviousValue(set.exerciseId, set.setNumber, 'reps', unit),
                     onChanged: (val) => _updateSet(set.id, reps: double.tryParse(val) ?? 0),
                     isCompleted: isCompleted,
                   ),
                 ),
                 const SizedBox(width: 8),
                 Expanded(
-                  child: _buildCellInput(
-                    setId: set.id,
-                    type: 'rpe',
-                    value: set.rpe == null ? '' : set.rpe.toString(),
-                    hint: _getPreviousValue(set.exerciseId, set.setNumber, 'rpe'),
-                    onChanged: (val) => _updateSet(set.id, rpe: double.tryParse(val)),
-                    isCompleted: isCompleted,
-                  ),
+                  child: _buildRpePicker(set, isCompleted),
                 ),
                 const SizedBox(width: 8),
                 GestureDetector(
                   onTap: () => _toggleSet(set, exercise, block, allBlocks),
                   child: Container(
-                    width: 40,
+                    width: 48,
                     height: 32,
                     decoration: BoxDecoration(
                       color: isCompleted ? Colors.green : Theme.of(context).colorScheme.surfaceContainerHighest,
@@ -541,6 +614,79 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen> with 
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildRpePicker(WorkoutSet set, bool isCompleted) {
+    return GestureDetector(
+      onTap: isCompleted ? null : () => _showRpePicker(set),
+      child: Container(
+        height: 32,
+        decoration: BoxDecoration(
+          color: isCompleted ? Colors.transparent : Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.3),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        alignment: Alignment.center,
+        child: Text(
+          set.rpe == null ? 'RPE' : set.rpe.toString(),
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.bold,
+            color: set.rpe == null ? Theme.of(context).colorScheme.outline.withOpacity(0.5) : (isCompleted ? Theme.of(context).colorScheme.outline : null),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showRpePicker(WorkoutSet set) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          color: Theme.of(context).scaffoldBackgroundColor,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Select RPE', style: GoogleFonts.outfit(fontSize: 20, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 8),
+            Text('Rate of Perceived Exertion (1-10)', style: TextStyle(color: Theme.of(context).colorScheme.outline)),
+            const SizedBox(height: 24),
+            SizedBox(
+              height: 50,
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                itemCount: 11,
+                separatorBuilder: (context, index) => const SizedBox(width: 8),
+                itemBuilder: (context, index) {
+                  if (index == 0) return _buildRpeChip(set, null);
+                  return _buildRpeChip(set, index.toDouble());
+                },
+              ),
+            ),
+            const SizedBox(height: 24),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildRpeChip(WorkoutSet set, double? value) {
+    final isSelected = set.rpe == value;
+    return ChoiceChip(
+      label: Text(value == null ? 'None' : value.toString()),
+      selected: isSelected,
+      onSelected: (selected) {
+        if (selected) {
+          _updateSet(set.id, rpe: value);
+          Navigator.pop(context);
+        }
+      },
     );
   }
 
@@ -565,6 +711,7 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen> with 
             fontSize: 14,
             fontWeight: FontWeight.bold,
             color: isCompleted ? Theme.of(context).colorScheme.outline : null,
+            decoration: isCompleted ? TextDecoration.lineThrough : null,
           ),
           decoration: InputDecoration(
             isDense: true,
@@ -579,6 +726,7 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen> with 
             hintStyle: TextStyle(fontSize: 11, color: Theme.of(context).colorScheme.outline.withOpacity(0.4)),
           ),
           controller: _getController(setId, type, value),
+          textInputAction: TextInputAction.next,
           onChanged: onChanged,
         ),
       ),
@@ -598,6 +746,17 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen> with 
           setType: Value(lastSet.setType),
         ));
     _loadHistory();
+    
+    // Auto-scroll slightly to show the new set
+    Future.delayed(const Duration(milliseconds: 100), () {
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(
+          _scrollController.offset + 60,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      }
+    });
   }
 
   Future<void> _loadHistory() async {
@@ -616,13 +775,13 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen> with 
     if (mounted) setState(() => _previousSessionSets = historyMap);
   }
 
-  String _getPreviousValue(int exerciseId, int setNumber, String type) {
+  String _getPreviousValue(int exerciseId, int setNumber, String type, WeightUnit unit) {
     if (!_previousSessionSets.containsKey(exerciseId)) return '-';
     final sets = _previousSessionSets[exerciseId]!;
     final match = sets.where((s) => s.setNumber == setNumber).firstOrNull ?? sets.lastOrNull;
     if (match == null) return '-';
     switch (type) {
-      case 'weight': return match.weight == 0 ? '-' : match.weight.toString();
+      case 'weight': return match.weight == 0 ? '-' : WeightConverter.toDisplay(match.weight, unit).toStringAsFixed(1);
       case 'reps': return match.reps == 0 ? '-' : match.reps.toInt().toString();
       case 'rpe': return match.rpe == null ? '-' : match.rpe.toString();
       default: return '-';
@@ -717,8 +876,22 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen> with 
     }
     if (currentRM > bestPastRM && bestPastRM > 0) {
       if (mounted) {
-        setState(() { _prExerciseName = exercise.name; _prAchievement = '${set.weight}kg x ${set.reps.toInt()}'; _prsAchieved++; _glowingExerciseId = exercise.id; });
-        _confettiController.play(); _glowController.forward(); SystemSound.play(SystemSoundType.click); HapticFeedback.heavyImpact();
+        setState(() { 
+          _prExerciseName = exercise.name; 
+          _prAchievement = '${set.weight}kg x ${set.reps.toInt()}'; 
+          _prsAchieved++; 
+          _glowingExerciseId = exercise.id; 
+        });
+        _confettiController.play(); 
+        _glowController.forward(); 
+        SystemSound.play(SystemSoundType.click); 
+        HapticFeedback.heavyImpact();
+        
+        // Persist PR status to database
+        final db = ref.read(appDatabaseProvider);
+        await (db.update(db.workoutSets)..where((t) => t.id.equals(set.id))).write(
+          WorkoutSetsCompanion(isPr: const Value(true)),
+        );
       }
       Future.delayed(const Duration(seconds: 4), () {
         if (mounted) { setState(() { _glowingExerciseId = null; }); _glowController.stop(); }
@@ -762,14 +935,47 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen> with 
   }
 
   Future<void> _removeExercise(ExerciseBlock block) async {
-    if (mounted) { setState(() { _lastDeletedExercise = block; _lastDeletedSet = null; }); }
-    final db = ref.read(appDatabaseProvider);
-    await (db.delete(db.workoutSets)..where((t) => t.workoutId.equals(widget.workoutId) & t.exerciseOrder.equals(block.exerciseOrder))).go();
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Remove Exercise?'),
+        content: const Text('This will remove the exercise and all its sets from this session.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('Remove', style: TextStyle(color: Colors.red))),
+        ],
+      ),
+    );
+
+    if (confirm == true) {
+      if (mounted) { setState(() { _lastDeletedExercise = block; _lastDeletedSet = null; }); }
+      final db = ref.read(appDatabaseProvider);
+      await (db.delete(db.workoutSets)..where((t) => t.workoutId.equals(widget.workoutId) & t.exerciseOrder.equals(block.exerciseOrder))).go();
+    }
   }
 
-  void _showRestTimer(int seconds, String currentExName, String? nextExName) {
-    ref.read(timerNotifierProvider.notifier).start(seconds, currentExName);
-    showModalBottomSheet(context: context, backgroundColor: Colors.transparent, isScrollControlled: true, builder: (context) => RestTimerOverlay(nextExerciseName: nextExName, onClose: () => Navigator.pop(context)));
+  Future<void> _showRestTimer(int seconds, String currentExName, String? nextExName) async {
+    final notifier = ref.read(timerNotifierProvider.notifier);
+    final hasPermission = await notifier.checkPermissions();
+    
+    if (!hasPermission && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Notifications are required for the rest timer to work in background.')),
+      );
+    }
+
+    notifier.start(seconds, currentExName);
+    if (mounted) {
+      showModalBottomSheet(
+        context: context, 
+        backgroundColor: Colors.transparent, 
+        isScrollControlled: true, 
+        builder: (context) => RestTimerOverlay(
+          nextExerciseName: nextExName, 
+          onClose: () => Navigator.pop(context),
+        ),
+      );
+    }
   }
 
   void _showPlateCalculator(double weight) {
@@ -939,67 +1145,6 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen> with 
     );
   }
 
-  Widget _buildSuggestionChip(int exerciseId, ExerciseBlock block) {
-    return FutureBuilder<ProgressionSuggestion?>(
-      future: ref.read(progressionServiceProvider.notifier).getSuggestion(exerciseId),
-      builder: (context, snapshot) {
-        if (!snapshot.hasData || snapshot.data == null) return const SizedBox.shrink();
-        final suggestion = snapshot.data!;
-        
-        final isIncrease = suggestion.suggestedWeight > suggestion.lastSessionWeight;
-        final isDecrease = suggestion.suggestedWeight < suggestion.lastSessionWeight;
-        
-        final color = isIncrease ? Colors.green : (isDecrease ? Colors.orange : Colors.grey);
-        final icon = isIncrease ? LucideIcons.trendingUp : (isDecrease ? LucideIcons.trendingDown : LucideIcons.minus);
-
-        return GestureDetector(
-          onTap: () => _applySuggestion(block, suggestion.suggestedWeight),
-          child: Container(
-            margin: const EdgeInsets.only(top: 8),
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: color.withOpacity(0.3)),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(icon, size: 14, color: color),
-                const SizedBox(width: 8),
-                Text(
-                  isIncrease 
-                    ? 'Suggested: ${suggestion.suggestedWeight}kg (+${(suggestion.suggestedWeight - suggestion.lastSessionWeight).toStringAsFixed(1)})'
-                    : isDecrease 
-                      ? 'Try ${suggestion.suggestedWeight}kg (deload)'
-                      : 'Maintain: ${suggestion.suggestedWeight}kg',
-                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: color),
-                ),
-                const SizedBox(width: 4),
-                const Icon(LucideIcons.mousePointerClick, size: 12, color: Colors.grey),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  void _applySuggestion(ExerciseBlock block, double weight) async {
-    final db = ref.read(appDatabaseProvider);
-    await db.transaction(() async {
-      for (var s in block.sets) {
-        if (!s.completed) {
-           await (db.update(db.workoutSets)..where((t) => t.id.equals(s.id))).write(
-            WorkoutSetsCompanion(weight: Value(weight)),
-          );
-          // Update controllers if they exist
-          _weightControllers[s.id]?.text = weight.toString();
-        }
-      }
-    });
-    HapticFeedback.lightImpact();
-  }
   void _showSummary(Workout workout) async {
     final db = ref.read(appDatabaseProvider);
     final sets = await (db.select(db.workoutSets)..where((t) => t.workoutId.equals(widget.workoutId))).get();
@@ -1044,7 +1189,70 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen> with 
       ));
       await db.into(db.syncQueue).insert(SyncQueueCompanion.insert(workoutId: Value(workout.id), type: 'workout', createdAt: DateTime.now()));
     });
-    if (mounted) context.go('/history');
+    
+    // Trigger Sync
+    ref.read(syncWorkerProvider.notifier).processQueue();
+
+    if (mounted) {
+      ref.invalidate(workoutHomeNotifierProvider);
+      context.go('/app');
+    }
+  }
+
+  Widget _buildSuggestionChip(int exerciseId, ExerciseBlock block) {
+    return Consumer(
+      builder: (context, ref, _) {
+        final suggestionAsync = ref.watch(exerciseSuggestionProvider(exerciseId));
+        final settings = ref.watch(settingsProvider).value ?? const SettingsState();
+        final unit = settings.weightUnit;
+        return suggestionAsync.when(
+          data: (suggestion) {
+            if (suggestion == null) return const SizedBox.shrink();
+            return Padding(
+              padding: const EdgeInsets.only(top: 8),
+              child: GestureDetector(
+                onTap: () {
+                  // Find first incomplete set and update its weight
+                  final firstIncomplete = block.sets.firstWhere((s) => !s.completed, orElse: () => block.sets.first);
+                  _updateSet(firstIncomplete.id, weight: suggestion.suggestedWeight);
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.5),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: Theme.of(context).colorScheme.secondary.withOpacity(0.2)),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        suggestion.trendArrow == 'up' ? LucideIcons.trendingUp : (suggestion.trendArrow == 'down' ? LucideIcons.trendingDown : LucideIcons.dot),
+                        size: 14,
+                        color: Theme.of(context).colorScheme.secondary,
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        'Suggested: ${WeightConverter.format(suggestion.suggestedWeight, unit)}',
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).colorScheme.secondary,
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      Icon(LucideIcons.mousePointerClick, size: 10, color: Theme.of(context).colorScheme.secondary.withOpacity(0.5)),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+          loading: () => const SizedBox.shrink(),
+          error: (_, __) => const SizedBox.shrink(),
+        );
+      },
+    );
   }
 
   Future<void> _discardWorkout() async {

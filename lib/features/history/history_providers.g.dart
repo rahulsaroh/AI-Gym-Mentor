@@ -40,12 +40,12 @@ final heatmapSetsProvider =
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef HeatmapSetsRef = AutoDisposeFutureProviderRef<List<WorkoutSet>>;
-String _$historyListHash() => r'76b6d80f4570392b35f2da9d31111c37da9570e9';
+String _$historyListHash() => r'c9b5586f85779e8e8b5f214a9e748b56c740f59d';
 
 /// See also [HistoryList].
 @ProviderFor(HistoryList)
 final historyListProvider =
-    AutoDisposeAsyncNotifierProvider<HistoryList, List<Workout>>.internal(
+    AutoDisposeAsyncNotifierProvider<HistoryList, List<HistoryItem>>.internal(
   HistoryList.new,
   name: r'historyListProvider',
   debugGetCreateSourceHash:
@@ -54,6 +54,6 @@ final historyListProvider =
   allTransitiveDependencies: null,
 );
 
-typedef _$HistoryList = AutoDisposeAsyncNotifier<List<Workout>>;
+typedef _$HistoryList = AutoDisposeAsyncNotifier<List<HistoryItem>>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

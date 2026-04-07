@@ -3,6 +3,17 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
+import 'package:flutter_background_service/flutter_background_service.dart';
+
+@pragma('vm:entry-point')
+void onDidReceiveBackgroundNotificationResponse(NotificationResponse details) {
+  final service = FlutterBackgroundService();
+  if (details.actionId == 'skip_rest') {
+    service.invoke('skip');
+  } else if (details.actionId == 'add_30s') {
+    service.invoke('add_30s');
+  }
+}
 
 class NotificationService {
   static final NotificationService _instance = NotificationService._internal();
@@ -32,8 +43,13 @@ class NotificationService {
     await _notificationsPlugin.initialize(
       initializationSettings,
       onDidReceiveNotificationResponse: (details) {
-        // Handle notification tap or action buttons
+        if (details.actionId == 'skip_rest') {
+          FlutterBackgroundService().invoke('skip');
+        } else if (details.actionId == 'add_30s') {
+          FlutterBackgroundService().invoke('add_30s');
+        }
       },
+      onDidReceiveBackgroundNotificationResponse: onDidReceiveBackgroundNotificationResponse,
     );
   }
 

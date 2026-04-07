@@ -91,4 +91,9 @@ class SettingsRepository {
       lastSynced: map['lastSynced'] != null ? DateTime.parse(map['lastSynced']) : null,
     );
   }
+
+  Future<void> clearAll() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
+  }
 }

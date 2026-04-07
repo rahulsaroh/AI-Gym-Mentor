@@ -4,8 +4,10 @@ import 'package:gym_gemini_pro/core/database/database.dart';
 import 'package:gym_gemini_pro/core/widgets/number_ticker.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:lottie/lottie.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gym_gemini_pro/services/sync_worker.dart';
 
-class WorkoutSummaryOverlay extends StatefulWidget {
+class WorkoutSummaryOverlay extends ConsumerStatefulWidget {
   final Workout workout;
   final List<WorkoutSet> sets;
   final List<Exercise> exercises;
@@ -26,10 +28,10 @@ class WorkoutSummaryOverlay extends StatefulWidget {
   });
 
   @override
-  State<WorkoutSummaryOverlay> createState() => _WorkoutSummaryOverlayState();
+  ConsumerState<WorkoutSummaryOverlay> createState() => _WorkoutSummaryOverlayState();
 }
 
-class _WorkoutSummaryOverlayState extends State<WorkoutSummaryOverlay>
+class _WorkoutSummaryOverlayState extends ConsumerState<WorkoutSummaryOverlay>
     with TickerProviderStateMixin {
   late TextEditingController _notesController;
   late ConfettiController _confettiController;
@@ -141,11 +143,18 @@ class _WorkoutSummaryOverlayState extends State<WorkoutSummaryOverlay>
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      'Workout Complete! 🎉',
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Workout Complete! 🎉',
+                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
+                        ),
+                        const SizedBox(height: 4),
+                        const _SyncStatusChip(),
+                      ],
                     ),
                     IconButton(
                       onPressed: () => Navigator.pop(context),
@@ -240,9 +249,14 @@ class _WorkoutSummaryOverlayState extends State<WorkoutSummaryOverlay>
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(ex.name,
-                              style:
-                                  const TextStyle(fontWeight: FontWeight.w500)),
+                          Expanded(
+                            child: Text(
+                              ex.name,
+                              style: const TextStyle(fontWeight: FontWeight.w500),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
                           Text(
                             '${entry.value.length} sets • Best: ${maxWeight.toStringAsFixed(1)}kg',
                             style: TextStyle(
@@ -398,6 +412,77 @@ class _WorkoutSummaryOverlayState extends State<WorkoutSummaryOverlay>
                       ? Theme.of(context).colorScheme.tertiary
                       : null,
                 ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+class _SyncStatusChip extends ConsumerWidget {
+  const _SyncStatusChip();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final syncStatus = ref.watch(syncWorkerProvider);
+    
+    Color color;
+    String label;
+    IconData icon;
+    bool spinning = false;
+
+    switch (syncStatus) {
+      case SyncStatus.syncing:
+        color = Colors.blue;
+        label = 'Syncing...';
+        icon = LucideIcons.refreshCw;
+        spinning = true;
+        break;
+      case SyncStatus.success:
+        color = Colors.green;
+        label = 'Synced to Sheets';
+        icon = LucideIcons.circleCheck;
+        break;
+      case SyncStatus.failed:
+        color = Colors.orange;
+        label = 'Sync Pending';
+        icon = LucideIcons.clock;
+        break;
+      case SyncStatus.authenticationRequired:
+        color = Colors.grey;
+        label = 'Not Connected';
+        icon = LucideIcons.cloudOff;
+        break;
+      case SyncStatus.idle:
+      default:
+        return const SizedBox.shrink();
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color.withOpacity(0.3)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (spinning)
+            SizedBox(
+              width: 12,
+              height: 12,
+              child: CircularProgressIndicator(strokeWidth: 2, color: color),
+            )
+          else
+            Icon(icon, size: 12, color: color),
+          const SizedBox(width: 6),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.bold,
+              color: color,
+            ),
           ),
         ],
       ),

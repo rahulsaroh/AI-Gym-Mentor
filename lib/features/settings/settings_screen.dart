@@ -7,9 +7,9 @@ import 'package:gym_gemini_pro/features/settings/models/settings_state.dart';
 import 'package:gym_gemini_pro/features/settings/settings_provider.dart';
 import 'package:gym_gemini_pro/core/auth/auth_provider.dart';
 import 'package:gym_gemini_pro/services/backup_service.dart';
-import 'package:gym_gemini_pro/services/background_worker.dart';
 import 'package:gym_gemini_pro/features/settings/csv_export_screen.dart';
 import 'package:gym_gemini_pro/features/settings/import_wizard_screen.dart';
+import 'package:gym_gemini_pro/services/sync_worker.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -100,9 +100,11 @@ class SettingsScreen extends ConsumerWidget {
             ),
 
             const Divider(height: 32),
-            _buildSectionHeader(context, 'Backup & Portability'),
-            _buildDriveSection(context, ref, settings),
+            _buildSectionHeader(context, 'Google Sheets Sync'),
+            _buildSheetsSyncSection(context, ref, settings),
             
+            const Divider(height: 32),
+            _buildSectionHeader(context, 'Data Management'),
             _buildTile(
               context,
               title: 'Export JSON Backup',
@@ -187,12 +189,12 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildDriveSection(BuildContext context, WidgetRef ref, SettingsState settings) {
+  Widget _buildSheetsSyncSection(BuildContext context, WidgetRef ref, SettingsState settings) {
     if (settings.googleDriveEmail == null) {
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         child: FilledButton.icon(
-          onPressed: () => context.push('/settings/setup-sheets'), 
+          onPressed: () => context.push('/settings/sheets-setup'),
           icon: const Icon(LucideIcons.cloud),
           label: const Text('Connect Google Account'),
           style: FilledButton.styleFrom(minimumSize: const Size(double.infinity, 48)),
@@ -200,58 +202,98 @@ class SettingsScreen extends ConsumerWidget {
       );
     }
 
+    final syncStatus = ref.watch(syncWorkerProvider);
+    final isSyncing = syncStatus == SyncStatus.syncing;
+
     return Column(
       children: [
         ListTile(
           leading: const CircleAvatar(child: Icon(LucideIcons.user, size: 20)),
           title: Text(settings.googleDriveEmail!),
-          subtitle: const Text('Drive Account Connected'),
+          subtitle: Text(settings.lastSynced != null 
+            ? 'Last synced: ${DateFormat.yMd().add_jm().format(settings.lastSynced!)}'
+            : 'Not synced yet'),
         ),
         _buildSwitchTile(
           context,
-          title: 'Weekly Auto-Backup',
+          title: 'Auto-Sync Workouts',
+          subtitle: 'Syncs automatically after finishing',
           value: settings.autoBackup,
-          onChanged: (v) async {
-            await ref.read(settingsProvider.notifier).updateSettings(settings.copyWith(autoBackup: v));
-            if (v) {
-              await BackgroundWorker.scheduleWeeklyBackup();
-            } else {
-              await BackgroundWorker.cancelWeeklyBackup();
-            }
-          },
+          onChanged: (v) => ref.read(settingsProvider.notifier).updateSettings(settings.copyWith(autoBackup: v)),
         ),
-        _buildTile(
-          context,
-          title: 'Manual Drive Backup',
-          subtitle: settings.lastDriveBackup != null 
-            ? 'Last: ${DateFormat.yMd().add_jm().format(settings.lastDriveBackup!)}'
-            : 'Never backed up to cloud',
-          icon: LucideIcons.cloudUpload,
-          onTap: () async {
-             final client = await ref.read(googleSignInProvider).getAuthenticatedClient();
-             if (client != null) {
-                await ref.read(backupServiceProvider.notifier).uploadToDrive(client);
-                ref.read(settingsProvider.notifier).updateSettings(
-                  settings.copyWith(lastDriveBackup: DateTime.now())
-                );
-             }
-          },
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: Row(
+            children: [
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: isSyncing ? null : () => ref.read(syncWorkerProvider.notifier).processQueue(),
+                  icon: isSyncing 
+                    ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
+                    : const Icon(LucideIcons.refreshCw, size: 18),
+                  label: Text(isSyncing ? 'Syncing...' : 'Sync Now'),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: () => _showSignOutConfirmation(context, ref),
+                  icon: const Icon(LucideIcons.logOut, size: 18),
+                  label: const Text('Sign Out'),
+                  style: OutlinedButton.styleFrom(foregroundColor: Colors.red),
+                ),
+              ),
+            ],
+          ),
         ),
-        const SizedBox(height: 12),
+        ListTile(
+          leading: const Icon(LucideIcons.history, size: 20),
+          title: const Text('View Sync History'),
+          subtitle: const Text('Detailed logs of recent cloud syncs'),
+          trailing: const Icon(Icons.chevron_right, size: 20),
+          onTap: () => context.push('/settings/sync-log'),
+        ),
       ],
+    );
+  }
+
+  void _showSignOutConfirmation(BuildContext context, WidgetRef ref) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Sign Out?'),
+        content: const Text('Your local data will remain, but automatic sync to Google Sheets will stop.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+          FilledButton(
+            onPressed: () async {
+              await ref.read(googleSignInProvider).signOut();
+              await ref.read(settingsProvider.notifier).updateSettings(
+                (await ref.read(settingsProvider.future)).copyWith(googleDriveEmail: null)
+              );
+              if (context.mounted) Navigator.pop(context);
+            },
+            child: const Text('Sign Out'),
+          ),
+        ],
+      ),
     );
   }
 
   Widget _buildUnitSegmented(BuildContext context, WidgetRef ref, SettingsState settings) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: SegmentedButton<WeightUnit>(
-        segments: const [
-          ButtonSegment(value: WeightUnit.kg, label: Text('KG')),
-          ButtonSegment(value: WeightUnit.lbs, label: Text('LBS')),
-        ],
-        selected: {settings.weightUnit},
-        onSelectionChanged: (set) => ref.read(settingsProvider.notifier).updateWeightUnit(set.first),
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        alignment: Alignment.centerLeft,
+        child: SegmentedButton<WeightUnit>(
+          segments: const [
+            ButtonSegment(value: WeightUnit.kg, label: Text('KG')),
+            ButtonSegment(value: WeightUnit.lbs, label: Text('LBS')),
+          ],
+          selected: {settings.weightUnit},
+          onSelectionChanged: (set) => ref.read(settingsProvider.notifier).updateWeightUnit(set.first),
+        ),
       ),
     );
   }
@@ -264,14 +306,18 @@ class SettingsScreen extends ConsumerWidget {
         children: [
           const Text('Theme Mode', style: TextStyle(fontSize: 14)),
           const SizedBox(height: 8),
-          SegmentedButton<ThemeMode>(
-            segments: const [
-              ButtonSegment(value: ThemeMode.light, icon: Icon(LucideIcons.sun, size: 16), label: Text('Light')),
-              ButtonSegment(value: ThemeMode.dark, icon: Icon(LucideIcons.moon, size: 16), label: Text('Dark')),
-              ButtonSegment(value: ThemeMode.system, icon: Icon(LucideIcons.smartphone, size: 16), label: Text('System')),
-            ],
-            selected: {settings.themeMode},
-            onSelectionChanged: (set) => ref.read(settingsProvider.notifier).updateTheme(set.first),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: SegmentedButton<ThemeMode>(
+              segments: const [
+                ButtonSegment(value: ThemeMode.light, icon: Icon(LucideIcons.sun, size: 16), label: Text('Light')),
+                ButtonSegment(value: ThemeMode.dark, icon: Icon(LucideIcons.moon, size: 16), label: Text('Dark')),
+                ButtonSegment(value: ThemeMode.system, icon: Icon(LucideIcons.smartphone, size: 16), label: Text('System')),
+              ],
+              selected: {settings.themeMode},
+              onSelectionChanged: (set) => ref.read(settingsProvider.notifier).updateTheme(set.first),
+            ),
           ),
         ],
       ),
@@ -286,13 +332,17 @@ class SettingsScreen extends ConsumerWidget {
         children: [
           const Text('Font Size', style: TextStyle(fontSize: 14)),
           const SizedBox(height: 8),
-          SegmentedButton<FontSize>(
-            segments: const [
-              ButtonSegment(value: FontSize.normal, label: Text('Normal')),
-              ButtonSegment(value: FontSize.large, label: Text('Large')),
-            ],
-            selected: {settings.fontSize},
-            onSelectionChanged: (set) => ref.read(settingsProvider.notifier).updateSettings(settings.copyWith(fontSize: set.first)),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: SegmentedButton<FontSize>(
+              segments: const [
+                ButtonSegment(value: FontSize.normal, label: Text('Normal')),
+                ButtonSegment(value: FontSize.large, label: Text('Large')),
+              ],
+              selected: {settings.fontSize},
+              onSelectionChanged: (set) => ref.read(settingsProvider.notifier).updateSettings(settings.copyWith(fontSize: set.first)),
+            ),
           ),
         ],
       ),
@@ -308,25 +358,31 @@ class SettingsScreen extends ConsumerWidget {
         children: [
           const Text('Accent Color', style: TextStyle(fontSize: 14)),
           const SizedBox(height: 12),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: colors.map((c) {
-              final isSelected = settings.accentColor.value == c.value;
-              return GestureDetector(
-                onTap: () => ref.read(settingsProvider.notifier).updateAccentColor(c),
-                child: Container(
-                  width: 44,
-                  height: 44,
-                  decoration: BoxDecoration(
-                    color: c,
-                    shape: BoxShape.circle,
-                    border: isSelected ? Border.all(color: Colors.white, width: 3) : null,
-                    boxShadow: isSelected ? [BoxShadow(color: c.withOpacity(0.4), blurRadius: 8, spreadRadius: 2)] : null,
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: colors.map((c) {
+                final isSelected = settings.accentColor.value == c.value;
+                return Padding(
+                  padding: const EdgeInsets.only(right: 12),
+                  child: GestureDetector(
+                    onTap: () => ref.read(settingsProvider.notifier).updateAccentColor(c),
+                    child: Container(
+                      width: 44,
+                      height: 44,
+                      decoration: BoxDecoration(
+                        color: c,
+                        shape: BoxShape.circle,
+                        border: isSelected ? Border.all(color: Colors.white, width: 3) : null,
+                        boxShadow: isSelected ? [BoxShadow(color: c.withOpacity(0.4), blurRadius: 8, spreadRadius: 2)] : null,
+                      ),
+                      child: isSelected ? const Icon(Icons.check, color: Colors.white) : null,
+                    ),
                   ),
-                  child: isSelected ? const Icon(Icons.check, color: Colors.white) : null,
-                ),
-              );
-            }).toList(),
+                );
+              }).toList(),
+            ),
           ),
         ],
       ),
@@ -508,7 +564,7 @@ class SettingsScreen extends ConsumerWidget {
                 final backupNotifier = ref.read(backupServiceProvider.notifier);
                 if (isReset) {
                   await backupNotifier.factoryReset();
-                  if (context.mounted) context.go('/setup');
+                  if (context.mounted) context.go('/');
                 } else {
                   await backupNotifier.clearWorkoutHistory();
                   if (context.mounted) {

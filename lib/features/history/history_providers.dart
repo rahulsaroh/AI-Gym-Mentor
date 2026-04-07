@@ -4,6 +4,13 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'history_providers.g.dart';
 
+class HistoryItem {
+  final Workout workout;
+  final double volume;
+  final int setCount;
+  HistoryItem({required this.workout, required this.volume, required this.setCount});
+}
+
 @riverpod
 Future<Map<String, dynamic>> historyStats(HistoryStatsRef ref) async {
   final repo = ref.watch(workoutRepositoryProvider);
@@ -15,9 +22,14 @@ class HistoryList extends _$HistoryList {
   static const int _pageSize = 20;
 
   @override
-  Future<List<Workout>> build() async {
+  Future<List<HistoryItem>> build() async {
     final repo = ref.watch(workoutRepositoryProvider);
-    return await repo.getHistory(limit: _pageSize, offset: 0);
+    final data = await repo.getHistoryWithVolume(limit: _pageSize, offset: 0);
+    return data.map((d) => HistoryItem(
+      workout: d['workout'], 
+      volume: d['volume'],
+      setCount: d['setCount'],
+    )).toList();
   }
 
   Future<void> loadMore() async {
@@ -25,7 +37,12 @@ class HistoryList extends _$HistoryList {
 
     final currentList = state.value!;
     final repo = ref.read(workoutRepositoryProvider);
-    final more = await repo.getHistory(limit: _pageSize, offset: currentList.length);
+    final moreData = await repo.getHistoryWithVolume(limit: _pageSize, offset: currentList.length);
+    final more = moreData.map((d) => HistoryItem(
+      workout: d['workout'], 
+      volume: d['volume'],
+      setCount: d['setCount'],
+    )).toList();
     
     if (more.isNotEmpty) {
       state = AsyncValue.data([...currentList, ...more]);
@@ -37,7 +54,7 @@ class HistoryList extends _$HistoryList {
     final currentList = state.value ?? [];
     
     // Optimistic UI update
-    state = AsyncValue.data(currentList.where((w) => w.id != id).toList());
+    state = AsyncValue.data(currentList.where((item) => item.workout.id != id).toList());
 
     try {
       await repo.deleteWorkout(id);

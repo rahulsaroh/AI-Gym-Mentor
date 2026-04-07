@@ -2107,6 +2107,15 @@ class $WorkoutSetsTable extends WorkoutSets
   late final GeneratedColumn<DateTime> completedAt = GeneratedColumn<DateTime>(
       'completed_at', aliasedName, true,
       type: DriftSqlType.dateTime, requiredDuringInsert: false);
+  static const VerificationMeta _isPrMeta = const VerificationMeta('isPr');
+  @override
+  late final GeneratedColumn<bool> isPr = GeneratedColumn<bool>(
+      'is_pr', aliasedName, false,
+      type: DriftSqlType.bool,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('CHECK ("is_pr" IN (0, 1))'),
+      defaultValue: const Constant(false));
   static const VerificationMeta _supersetGroupIdMeta =
       const VerificationMeta('supersetGroupId');
   @override
@@ -2133,6 +2142,7 @@ class $WorkoutSetsTable extends WorkoutSets
         notes,
         completed,
         completedAt,
+        isPr,
         supersetGroupId,
         subSetsJson
       ];
@@ -2207,6 +2217,10 @@ class $WorkoutSetsTable extends WorkoutSets
           completedAt.isAcceptableOrUnknown(
               data['completed_at']!, _completedAtMeta));
     }
+    if (data.containsKey('is_pr')) {
+      context.handle(
+          _isPrMeta, isPr.isAcceptableOrUnknown(data['is_pr']!, _isPrMeta));
+    }
     if (data.containsKey('superset_group_id')) {
       context.handle(
           _supersetGroupIdMeta,
@@ -2253,6 +2267,8 @@ class $WorkoutSetsTable extends WorkoutSets
           .read(DriftSqlType.bool, data['${effectivePrefix}completed'])!,
       completedAt: attachedDatabase.typeMapping
           .read(DriftSqlType.dateTime, data['${effectivePrefix}completed_at']),
+      isPr: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}is_pr'])!,
       supersetGroupId: attachedDatabase.typeMapping.read(
           DriftSqlType.string, data['${effectivePrefix}superset_group_id']),
       subSetsJson: attachedDatabase.typeMapping
@@ -2282,6 +2298,7 @@ class WorkoutSet extends DataClass implements Insertable<WorkoutSet> {
   final String? notes;
   final bool completed;
   final DateTime? completedAt;
+  final bool isPr;
   final String? supersetGroupId;
   final String? subSetsJson;
   const WorkoutSet(
@@ -2297,6 +2314,7 @@ class WorkoutSet extends DataClass implements Insertable<WorkoutSet> {
       this.notes,
       required this.completed,
       this.completedAt,
+      required this.isPr,
       this.supersetGroupId,
       this.subSetsJson});
   @override
@@ -2323,6 +2341,7 @@ class WorkoutSet extends DataClass implements Insertable<WorkoutSet> {
     if (!nullToAbsent || completedAt != null) {
       map['completed_at'] = Variable<DateTime>(completedAt);
     }
+    map['is_pr'] = Variable<bool>(isPr);
     if (!nullToAbsent || supersetGroupId != null) {
       map['superset_group_id'] = Variable<String>(supersetGroupId);
     }
@@ -2349,6 +2368,7 @@ class WorkoutSet extends DataClass implements Insertable<WorkoutSet> {
       completedAt: completedAt == null && nullToAbsent
           ? const Value.absent()
           : Value(completedAt),
+      isPr: Value(isPr),
       supersetGroupId: supersetGroupId == null && nullToAbsent
           ? const Value.absent()
           : Value(supersetGroupId),
@@ -2375,6 +2395,7 @@ class WorkoutSet extends DataClass implements Insertable<WorkoutSet> {
       notes: serializer.fromJson<String?>(json['notes']),
       completed: serializer.fromJson<bool>(json['completed']),
       completedAt: serializer.fromJson<DateTime?>(json['completedAt']),
+      isPr: serializer.fromJson<bool>(json['isPr']),
       supersetGroupId: serializer.fromJson<String?>(json['supersetGroupId']),
       subSetsJson: serializer.fromJson<String?>(json['subSetsJson']),
     );
@@ -2396,6 +2417,7 @@ class WorkoutSet extends DataClass implements Insertable<WorkoutSet> {
       'notes': serializer.toJson<String?>(notes),
       'completed': serializer.toJson<bool>(completed),
       'completedAt': serializer.toJson<DateTime?>(completedAt),
+      'isPr': serializer.toJson<bool>(isPr),
       'supersetGroupId': serializer.toJson<String?>(supersetGroupId),
       'subSetsJson': serializer.toJson<String?>(subSetsJson),
     };
@@ -2414,6 +2436,7 @@ class WorkoutSet extends DataClass implements Insertable<WorkoutSet> {
           Value<String?> notes = const Value.absent(),
           bool? completed,
           Value<DateTime?> completedAt = const Value.absent(),
+          bool? isPr,
           Value<String?> supersetGroupId = const Value.absent(),
           Value<String?> subSetsJson = const Value.absent()}) =>
       WorkoutSet(
@@ -2429,6 +2452,7 @@ class WorkoutSet extends DataClass implements Insertable<WorkoutSet> {
         notes: notes.present ? notes.value : this.notes,
         completed: completed ?? this.completed,
         completedAt: completedAt.present ? completedAt.value : this.completedAt,
+        isPr: isPr ?? this.isPr,
         supersetGroupId: supersetGroupId.present
             ? supersetGroupId.value
             : this.supersetGroupId,
@@ -2452,6 +2476,7 @@ class WorkoutSet extends DataClass implements Insertable<WorkoutSet> {
       completed: data.completed.present ? data.completed.value : this.completed,
       completedAt:
           data.completedAt.present ? data.completedAt.value : this.completedAt,
+      isPr: data.isPr.present ? data.isPr.value : this.isPr,
       supersetGroupId: data.supersetGroupId.present
           ? data.supersetGroupId.value
           : this.supersetGroupId,
@@ -2475,6 +2500,7 @@ class WorkoutSet extends DataClass implements Insertable<WorkoutSet> {
           ..write('notes: $notes, ')
           ..write('completed: $completed, ')
           ..write('completedAt: $completedAt, ')
+          ..write('isPr: $isPr, ')
           ..write('supersetGroupId: $supersetGroupId, ')
           ..write('subSetsJson: $subSetsJson')
           ..write(')'))
@@ -2495,6 +2521,7 @@ class WorkoutSet extends DataClass implements Insertable<WorkoutSet> {
       notes,
       completed,
       completedAt,
+      isPr,
       supersetGroupId,
       subSetsJson);
   @override
@@ -2513,6 +2540,7 @@ class WorkoutSet extends DataClass implements Insertable<WorkoutSet> {
           other.notes == this.notes &&
           other.completed == this.completed &&
           other.completedAt == this.completedAt &&
+          other.isPr == this.isPr &&
           other.supersetGroupId == this.supersetGroupId &&
           other.subSetsJson == this.subSetsJson);
 }
@@ -2530,6 +2558,7 @@ class WorkoutSetsCompanion extends UpdateCompanion<WorkoutSet> {
   final Value<String?> notes;
   final Value<bool> completed;
   final Value<DateTime?> completedAt;
+  final Value<bool> isPr;
   final Value<String?> supersetGroupId;
   final Value<String?> subSetsJson;
   const WorkoutSetsCompanion({
@@ -2545,6 +2574,7 @@ class WorkoutSetsCompanion extends UpdateCompanion<WorkoutSet> {
     this.notes = const Value.absent(),
     this.completed = const Value.absent(),
     this.completedAt = const Value.absent(),
+    this.isPr = const Value.absent(),
     this.supersetGroupId = const Value.absent(),
     this.subSetsJson = const Value.absent(),
   });
@@ -2561,6 +2591,7 @@ class WorkoutSetsCompanion extends UpdateCompanion<WorkoutSet> {
     this.notes = const Value.absent(),
     this.completed = const Value.absent(),
     this.completedAt = const Value.absent(),
+    this.isPr = const Value.absent(),
     this.supersetGroupId = const Value.absent(),
     this.subSetsJson = const Value.absent(),
   })  : workoutId = Value(workoutId),
@@ -2582,6 +2613,7 @@ class WorkoutSetsCompanion extends UpdateCompanion<WorkoutSet> {
     Expression<String>? notes,
     Expression<bool>? completed,
     Expression<DateTime>? completedAt,
+    Expression<bool>? isPr,
     Expression<String>? supersetGroupId,
     Expression<String>? subSetsJson,
   }) {
@@ -2598,6 +2630,7 @@ class WorkoutSetsCompanion extends UpdateCompanion<WorkoutSet> {
       if (notes != null) 'notes': notes,
       if (completed != null) 'completed': completed,
       if (completedAt != null) 'completed_at': completedAt,
+      if (isPr != null) 'is_pr': isPr,
       if (supersetGroupId != null) 'superset_group_id': supersetGroupId,
       if (subSetsJson != null) 'sub_sets_json': subSetsJson,
     });
@@ -2616,6 +2649,7 @@ class WorkoutSetsCompanion extends UpdateCompanion<WorkoutSet> {
       Value<String?>? notes,
       Value<bool>? completed,
       Value<DateTime?>? completedAt,
+      Value<bool>? isPr,
       Value<String?>? supersetGroupId,
       Value<String?>? subSetsJson}) {
     return WorkoutSetsCompanion(
@@ -2631,6 +2665,7 @@ class WorkoutSetsCompanion extends UpdateCompanion<WorkoutSet> {
       notes: notes ?? this.notes,
       completed: completed ?? this.completed,
       completedAt: completedAt ?? this.completedAt,
+      isPr: isPr ?? this.isPr,
       supersetGroupId: supersetGroupId ?? this.supersetGroupId,
       subSetsJson: subSetsJson ?? this.subSetsJson,
     );
@@ -2676,6 +2711,9 @@ class WorkoutSetsCompanion extends UpdateCompanion<WorkoutSet> {
     if (completedAt.present) {
       map['completed_at'] = Variable<DateTime>(completedAt.value);
     }
+    if (isPr.present) {
+      map['is_pr'] = Variable<bool>(isPr.value);
+    }
     if (supersetGroupId.present) {
       map['superset_group_id'] = Variable<String>(supersetGroupId.value);
     }
@@ -2700,6 +2738,7 @@ class WorkoutSetsCompanion extends UpdateCompanion<WorkoutSet> {
           ..write('notes: $notes, ')
           ..write('completed: $completed, ')
           ..write('completedAt: $completedAt, ')
+          ..write('isPr: $isPr, ')
           ..write('supersetGroupId: $supersetGroupId, ')
           ..write('subSetsJson: $subSetsJson')
           ..write(')'))
@@ -6304,6 +6343,7 @@ typedef $$WorkoutSetsTableCreateCompanionBuilder = WorkoutSetsCompanion
   Value<String?> notes,
   Value<bool> completed,
   Value<DateTime?> completedAt,
+  Value<bool> isPr,
   Value<String?> supersetGroupId,
   Value<String?> subSetsJson,
 });
@@ -6321,6 +6361,7 @@ typedef $$WorkoutSetsTableUpdateCompanionBuilder = WorkoutSetsCompanion
   Value<String?> notes,
   Value<bool> completed,
   Value<DateTime?> completedAt,
+  Value<bool> isPr,
   Value<String?> supersetGroupId,
   Value<String?> subSetsJson,
 });
@@ -6400,6 +6441,9 @@ class $$WorkoutSetsTableFilterComposer
 
   ColumnFilters<DateTime> get completedAt => $composableBuilder(
       column: $table.completedAt, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<bool> get isPr => $composableBuilder(
+      column: $table.isPr, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<String> get supersetGroupId => $composableBuilder(
       column: $table.supersetGroupId,
@@ -6489,6 +6533,9 @@ class $$WorkoutSetsTableOrderingComposer
   ColumnOrderings<DateTime> get completedAt => $composableBuilder(
       column: $table.completedAt, builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<bool> get isPr => $composableBuilder(
+      column: $table.isPr, builder: (column) => ColumnOrderings(column));
+
   ColumnOrderings<String> get supersetGroupId => $composableBuilder(
       column: $table.supersetGroupId,
       builder: (column) => ColumnOrderings(column));
@@ -6576,6 +6623,9 @@ class $$WorkoutSetsTableAnnotationComposer
   GeneratedColumn<DateTime> get completedAt => $composableBuilder(
       column: $table.completedAt, builder: (column) => column);
 
+  GeneratedColumn<bool> get isPr =>
+      $composableBuilder(column: $table.isPr, builder: (column) => column);
+
   GeneratedColumn<String> get supersetGroupId => $composableBuilder(
       column: $table.supersetGroupId, builder: (column) => column);
 
@@ -6658,6 +6708,7 @@ class $$WorkoutSetsTableTableManager extends RootTableManager<
             Value<String?> notes = const Value.absent(),
             Value<bool> completed = const Value.absent(),
             Value<DateTime?> completedAt = const Value.absent(),
+            Value<bool> isPr = const Value.absent(),
             Value<String?> supersetGroupId = const Value.absent(),
             Value<String?> subSetsJson = const Value.absent(),
           }) =>
@@ -6674,6 +6725,7 @@ class $$WorkoutSetsTableTableManager extends RootTableManager<
             notes: notes,
             completed: completed,
             completedAt: completedAt,
+            isPr: isPr,
             supersetGroupId: supersetGroupId,
             subSetsJson: subSetsJson,
           ),
@@ -6690,6 +6742,7 @@ class $$WorkoutSetsTableTableManager extends RootTableManager<
             Value<String?> notes = const Value.absent(),
             Value<bool> completed = const Value.absent(),
             Value<DateTime?> completedAt = const Value.absent(),
+            Value<bool> isPr = const Value.absent(),
             Value<String?> supersetGroupId = const Value.absent(),
             Value<String?> subSetsJson = const Value.absent(),
           }) =>
@@ -6706,6 +6759,7 @@ class $$WorkoutSetsTableTableManager extends RootTableManager<
             notes: notes,
             completed: completed,
             completedAt: completedAt,
+            isPr: isPr,
             supersetGroupId: supersetGroupId,
             subSetsJson: subSetsJson,
           ),
@@ -7850,11 +7904,11 @@ class $AppDatabaseManager {
 // RiverpodGenerator
 // **************************************************************************
 
-String _$appDatabaseHash() => r'4c20f914a3c547001c20f44f1138a1d70037da2d';
+String _$appDatabaseHash() => r'96b544ff7ce456f0fc1edbdafdf332306a9affed';
 
 /// See also [appDatabase].
 @ProviderFor(appDatabase)
-final appDatabaseProvider = AutoDisposeProvider<AppDatabase>.internal(
+final appDatabaseProvider = Provider<AppDatabase>.internal(
   appDatabase,
   name: r'appDatabaseProvider',
   debugGetCreateSourceHash:
@@ -7865,6 +7919,6 @@ final appDatabaseProvider = AutoDisposeProvider<AppDatabase>.internal(
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-typedef AppDatabaseRef = AutoDisposeProviderRef<AppDatabase>;
+typedef AppDatabaseRef = ProviderRef<AppDatabase>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

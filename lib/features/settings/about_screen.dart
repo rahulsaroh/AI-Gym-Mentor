@@ -46,10 +46,10 @@ class AboutScreen extends StatelessWidget {
                 'v1.0.0 - Phase 7 Release', 
                 [
                   'Complete Settings & Personalization Hub',
-                  'Dynamic Material 3 Thoming & Accent Colors',
-                  'Plate inventory & Barbell calculation support',
+                  'Google Sheets Cloud Sync (Phase 6)',
+                  'Personal Record (PR) Persistence',
+                  'Dynamic Material 3 Theme & Accent Colors',
                   'JSON/CSV Export capabilities',
-                  'Analytics Dashboard v1 (Phase 6 features)',
                 ]
               ),
               _buildChangelogItem(

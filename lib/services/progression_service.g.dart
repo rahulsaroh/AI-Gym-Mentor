@@ -7,7 +7,7 @@ part of 'progression_service.dart';
 // **************************************************************************
 
 String _$progressionServiceHash() =>
-    r'631e7bc65ef4181cb9583f1cdf08393e3c71d9d1';
+    r'96ddb7e1bd7d113277d8c6ba6cb7f2b56a66b8a6';
 
 /// See also [ProgressionService].
 @ProviderFor(ProgressionService)

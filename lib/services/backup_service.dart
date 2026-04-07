@@ -1,10 +1,11 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:drift/drift.dart';
 import 'package:gym_gemini_pro/core/database/database.dart';
 import 'package:gym_gemini_pro/features/settings/settings_provider.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart' as p;
+import 'package:gym_gemini_pro/features/settings/settings_repository.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:googleapis/drive/v3.dart' as drive;
 import 'package:http/http.dart' as http;
@@ -142,17 +143,17 @@ class BackupService extends _$BackupService {
   }
 
   Future<void> factoryReset() async {
+    // 1. Clear SharedPreferences
+    await SettingsRepository().clearAll();
+    
+    // 2. Clear Database (Delete file for re-seed)
     final db = ref.read(appDatabaseProvider);
-    await db.transaction(() async {
-      await db.delete(db.exerciseProgressionSettings).go();
-      await db.delete(db.syncQueue).go();
-      await db.delete(db.bodyMeasurements).go();
-      await db.delete(db.workoutSets).go();
-      await db.delete(db.workouts).go();
-      await db.delete(db.templateExercises).go();
-      await db.delete(db.templateDays).go();
-      await db.delete(db.workoutTemplates).go();
-      await db.delete(db.exercises).go();
-    });
+    await db.close();
+    
+    final dbFolder = await getApplicationDocumentsDirectory();
+    final dbFile = File(p.join(dbFolder.path, 'gym_log.sqlite'));
+    if (await dbFile.exists()) {
+      await dbFile.delete();
+    }
   }
 }

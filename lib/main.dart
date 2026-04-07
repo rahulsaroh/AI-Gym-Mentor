@@ -1,7 +1,6 @@
-import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:gym_gemini_pro/core/router/router.dart';
 import 'package:gym_gemini_pro/core/widgets/global_error_handler.dart';
@@ -46,14 +45,22 @@ void main() async {
     return GlobalErrorScreen(details: details);
   };
 
-  debugPrint('--- APP STARTUP ---');
+  if (kDebugMode) debugPrint('--- APP STARTUP ---');
   
   try {
-    debugPrint('Step 1: Initializing Notifications...');
+    if (kDebugMode) debugPrint('Step 1: Initializing Notifications...');
     await NotificationService().init();
-    debugPrint('Notifications Initialized Successfully');
+    if (kDebugMode) debugPrint('Notifications Initialized Successfully');
   } catch (e) {
     debugPrint('Notifications Initialization Failed: $e');
+  }
+
+  try {
+    if (kDebugMode) debugPrint('Step 2: Initializing Timer Service...');
+    await TimerService.initialize();
+    if (kDebugMode) debugPrint('Timer Service Initialized Successfully');
+  } catch (e) {
+    debugPrint('Timer Service Initialization Failed: $e');
   }
 
   // Firebase initialization is disabled for now as the plugin/config is missing.
@@ -169,12 +176,10 @@ class GymGeminiApp extends ConsumerWidget {
         primary: accentColor,
       ),
       scaffoldBackgroundColor: baseColor,
-      textTheme: GoogleFonts.interTextTheme(
-        baseTheme.textTheme.apply(
+      textTheme: baseTheme.textTheme.apply(
           bodyColor: isDark ? Colors.white : Colors.black87,
           displayColor: isDark ? Colors.white : Colors.black87,
           fontSizeFactor: fontSize == FontSize.large ? 1.2 : 1.0,
-        ),
       ),
       cardTheme: CardThemeData(
         color: surfaceColor,

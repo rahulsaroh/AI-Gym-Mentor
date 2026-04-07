@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:go_router/go_router.dart';
 import 'package:gym_gemini_pro/core/database/database.dart';
 import 'package:gym_gemini_pro/features/exercises/exercises_provider.dart';
 import 'package:gym_gemini_pro/services/progression_service.dart';
@@ -10,7 +10,8 @@ import 'package:drift/drift.dart' show Value;
 
 class ExerciseDetailScreen extends ConsumerStatefulWidget {
   final int exerciseId;
-  const ExerciseDetailScreen({super.key, required this.exerciseId});
+  final bool isEditing;
+  const ExerciseDetailScreen({super.key, required this.exerciseId, this.isEditing = false});
 
   @override
   ConsumerState<ExerciseDetailScreen> createState() => _ExerciseDetailScreenState();
@@ -19,6 +20,11 @@ class ExerciseDetailScreen extends ConsumerStatefulWidget {
 class _ExerciseDetailScreenState extends ConsumerState<ExerciseDetailScreen> {
   final TextEditingController _weightController = TextEditingController(text: '100');
   final TextEditingController _repsController = TextEditingController(text: '10');
+  
+  String _selectedMuscle = 'Chest';
+  String _selectedEquipment = 'Barbell';
+  final TextEditingController _nameController = TextEditingController();
+  bool _initialized = false;
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +32,28 @@ class _ExerciseDetailScreenState extends ConsumerState<ExerciseDetailScreen> {
 
     return exercisesAsync.when(
       data: (exercises) {
-        final exercise = exercises.firstWhere((e) => e.id == widget.exerciseId);
+        final exercise = widget.exerciseId > 0 
+            ? exercises.firstWhere((e) => e.id == widget.exerciseId, orElse: () => exercises.first)
+            : null;
+            
+        if (exercise != null && !_initialized && (widget.isEditing || widget.exerciseId == 0)) {
+          _nameController.text = exercise.name;
+          _selectedMuscle = exercise.primaryMuscle;
+          _selectedEquipment = exercise.equipment;
+          _initialized = true;
+        }
+
+        if (widget.exerciseId == 0 || widget.isEditing) {
+          return _buildFormScreen(exercise);
+        }
+        
+        if (exercise == null) {
+          return Scaffold(
+            appBar: AppBar(title: const Text('Exercise Not Found')),
+            body: const Center(child: Text('Could not find this exercise')),
+          );
+        }
+        
         return Scaffold(
           body: CustomScrollView(
             slivers: [
@@ -150,7 +177,7 @@ class _ExerciseDetailScreenState extends ConsumerState<ExerciseDetailScreen> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(label, style: const TextStyle(fontSize: 14)),
+            Expanded(child: Text(label, style: const TextStyle(fontSize: 14), overflow: TextOverflow.ellipsis)),
             Row(
               children: [
                 Text(value, style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.primary)),
@@ -237,7 +264,7 @@ class _ExerciseDetailScreenState extends ConsumerState<ExerciseDetailScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(e.key, style: const TextStyle(color: Colors.grey)),
+              Expanded(child: Text(e.key, style: const TextStyle(color: Colors.grey), overflow: TextOverflow.ellipsis)),
               Text('${e.value.toStringAsFixed(1)}kg', style: const TextStyle(fontWeight: FontWeight.bold)),
             ],
           ),
@@ -325,6 +352,88 @@ class _ExerciseDetailScreenState extends ConsumerState<ExerciseDetailScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildFormScreen(Exercise? exercise) {
+    final muscleGroups = ['Chest', 'Back', 'Shoulders', 'Biceps', 'Triceps', 'Quads', 'Hamstrings', 'Glutes', 'Calves', 'Core', 'Cardio', 'Full Body'];
+    final equipmentTypes = ['Barbell', 'Dumbbell', 'Machine', 'Cable', 'Bodyweight', 'Kettlebell', 'Bands', 'Other'];
+    
+    final isNew = widget.exerciseId == 0;
+    
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(isNew ? 'Create Exercise' : 'Edit Exercise'),
+      ),
+      body: ListView(
+        padding: const EdgeInsets.all(20),
+        children: [
+          TextField(
+            controller: _nameController,
+            autofocus: isNew,
+            decoration: const InputDecoration(
+              labelText: 'Exercise Name',
+              border: OutlineInputBorder(),
+            ),
+          ),
+          const SizedBox(height: 16),
+          DropdownButtonFormField<String>(
+            value: _selectedMuscle,
+            decoration: const InputDecoration(
+              labelText: 'Primary Muscle',
+              border: OutlineInputBorder(),
+            ),
+            items: muscleGroups
+                .map((m) => DropdownMenuItem(value: m, child: Text(m))).toList(),
+            onChanged: (val) => setState(() => _selectedMuscle = val ?? 'Chest'),
+          ),
+          const SizedBox(height: 16),
+          DropdownButtonFormField<String>(
+            value: _selectedEquipment,
+            decoration: const InputDecoration(
+              labelText: 'Equipment',
+              border: OutlineInputBorder(),
+            ),
+            items: equipmentTypes
+                .map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
+            onChanged: (val) => setState(() => _selectedEquipment = val ?? 'Barbell'),
+          ),
+          const SizedBox(height: 32),
+          FilledButton(
+            onPressed: () async {
+              if (_nameController.text.trim().isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Please enter an exercise name')),
+                );
+                return;
+              }
+              final db = ref.read(appDatabaseProvider);
+              
+              if (isNew) {
+                await db.into(db.exercises).insert(ExercisesCompanion.insert(
+                  name: _nameController.text.trim(),
+                  primaryMuscle: _selectedMuscle,
+                  equipment: _selectedEquipment,
+                  setType: 'Straight',
+                  isCustom: const Value(true),
+                ));
+              } else {
+                await (db.update(db.exercises)..where((t) => t.id.equals(widget.exerciseId))).write(
+                  ExercisesCompanion(
+                    name: Value(_nameController.text.trim()),
+                    primaryMuscle: Value(_selectedMuscle),
+                    equipment: Value(_selectedEquipment),
+                  ),
+                );
+              }
+              
+              ref.invalidate(allExercisesProvider);
+              if (mounted) context.pop();
+            },
+            child: Text(isNew ? 'Create Exercise' : 'Save Changes'),
+          ),
+        ],
       ),
     );
   }

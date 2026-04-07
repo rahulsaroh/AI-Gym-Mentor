@@ -6,7 +6,7 @@ part of 'plateau_service.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$plateauServiceHash() => r'e54ed984080f2e8818ec26e77ac7671eede63704';
+String _$plateauServiceHash() => r'7ab0904866792ec1f250cc8437cb7215574034fb';
 
 /// See also [PlateauService].
 @ProviderFor(PlateauService)

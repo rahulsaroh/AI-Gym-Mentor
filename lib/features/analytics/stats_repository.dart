@@ -1,5 +1,6 @@
 import 'package:drift/drift.dart';
 import 'package:gym_gemini_pro/core/database/database.dart';
+import 'package:gym_gemini_pro/features/workout/workout_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'stats_repository.g.dart';
@@ -39,10 +40,14 @@ class StatsRepository {
       avgDuration = totalSecs / workouts.length / 60; // in minutes
     }
 
+    final workoutRepo = WorkoutRepository(db);
+    final globalStats = await workoutRepo.getStats();
+
     return {
       'monthlyVolume': totalVolume,
       'workoutCount': workouts.length,
       'avgDuration': avgDuration.round(),
+      'activeStreak': globalStats['currentStreak'],
     };
   }
 
@@ -114,7 +119,13 @@ class StatsRepository {
     final thisMonthStart = DateTime(now.year, now.month, 1);
     final lastMonthStart = DateTime(now.year, now.month - 1, 1);
     
-    final muscles = ['Chest', 'Back', 'Shoulders', 'Biceps', 'Triceps', 'Quads', 'Hamstrings', 'Core'];
+    // Discover muscles dynamically
+    final muscleQuery = db.selectOnly(db.exercises)
+      ..addColumns([db.exercises.primaryMuscle])
+      ..groupBy([db.exercises.primaryMuscle]);
+    final muscleRows = await muscleQuery.get();
+    final muscles = muscleRows.map((r) => r.read(db.exercises.primaryMuscle)).whereType<String>().toList();
+    if (muscles.isEmpty) muscles.addAll(['Chest', 'Back', 'Legs', 'Shoulders', 'Arms']);
     
     Future<Map<String, double>> fetchVolume(DateTime start, DateTime end) async {
       final query = db.select(db.workoutSets).join([

@@ -3,7 +3,6 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:gym_gemini_pro/core/database/database.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:gym_gemini_pro/features/workout/workout_repository.dart';
-import 'package:gym_gemini_pro/features/analytics/stats_repository.dart';
 import 'package:gym_gemini_pro/features/analytics/measurements_repository.dart';
 import 'package:gym_gemini_pro/features/settings/settings_provider.dart';
 
@@ -30,6 +29,7 @@ class WorkoutHomeState with _$WorkoutHomeState {
     Workout? activeDraft,
     @Default({}) Map<int, double> weeklyVolume, // millisecondsSinceEpoch -> volume
     BodyMeasurement? lastWeight,
+    String? lastWorkoutSummary,
     @Default(false) bool isRestDay,
     String? todayDayName,
     @Default([]) List<String> todayExercises,
@@ -51,6 +51,7 @@ class WorkoutHomeNotifier extends _$WorkoutHomeNotifier {
     final stats = await workoutRepo.getStats();
     final lastWorkout = await workoutRepo.getLastWorkout();
     final activeDraft = await workoutRepo.getActiveWorkoutDraft();
+    bool isRestDay = false;
     
     final now = DateTime.now();
     final startOfWeek = now.subtract(Duration(days: now.weekday - 1));
@@ -60,6 +61,18 @@ class WorkoutHomeNotifier extends _$WorkoutHomeNotifier {
       DateTime(startOfWeek.year, startOfWeek.month, startOfWeek.day),
       DateTime(endOfWeek.year, endOfWeek.month, endOfWeek.day, 23, 59, 59),
     );
+
+    // Get real summary for last workout
+    String? lastWorkoutSummary;
+    if (lastWorkout != null) {
+      final summaryData = await workoutRepo.getWorkoutSummary(lastWorkout.id);
+      if (summaryData.isNotEmpty) {
+        lastWorkoutSummary = summaryData.entries
+            .take(2)
+            .map((e) => '${e.key}: ${e.value.weight}kg x ${e.value.reps}')
+            .join(' | ');
+      }
+    }
 
     final measurementsRepo = ref.read(measurementsRepositoryProvider);
     final measurements = await measurementsRepo.getAllMeasurements();
@@ -104,11 +117,19 @@ class WorkoutHomeNotifier extends _$WorkoutHomeNotifier {
         final lastTemplateWorkout = await workoutRepo.getLastWorkoutOfTemplate(activeTemplate.id);
         
         int nextDayIndex = 0;
-        if (lastTemplateWorkout != null && lastTemplateWorkout.dayId != null) {
-          // Find the index of the last day and move to next
-          final lastDayIndex = templateDays.indexWhere((d) => d.id == lastTemplateWorkout.dayId);
-          if (lastDayIndex != -1) {
-            nextDayIndex = (lastDayIndex + 1) % templateDays.length;
+        bool completedToday = false;
+        
+        if (lastTemplateWorkout != null) {
+          final workoutDate = lastTemplateWorkout.date;
+          if (workoutDate.year == now.year && workoutDate.month == now.month && workoutDate.day == now.day) {
+            completedToday = true;
+          }
+          
+          if (lastTemplateWorkout.dayId != null) {
+            final lastDayIndex = templateDays.indexWhere((d) => d.id == lastTemplateWorkout.dayId);
+            if (lastDayIndex != -1) {
+              nextDayIndex = (lastDayIndex + 1) % templateDays.length;
+            }
           }
         }
         
@@ -119,7 +140,17 @@ class WorkoutHomeNotifier extends _$WorkoutHomeNotifier {
         final templateExercises = await workoutRepo.getTemplateExercises(nextDay.id);
         todayExercises = templateExercises.map((te) => te.exercise.name).toList();
         estimatedDuration = templateExercises.length * 12; // Estimate: 12 mins per exercise
+        
+        isRestDay = completedToday;
       }
+    }
+    
+    // Fallback: If no workout completed today but no template, it's not a rest day yet
+    if (activeTemplate == null && lastWorkout != null) {
+       final workoutDate = lastWorkout.date;
+       if (workoutDate.year == now.year && workoutDate.month == now.month && workoutDate.day == now.day) {
+         isRestDay = true;
+       }
     }
 
     return WorkoutHomeState(
@@ -132,7 +163,8 @@ class WorkoutHomeNotifier extends _$WorkoutHomeNotifier {
       activeDraft: activeDraft,
       weeklyVolume: weeklyVolume,
       lastWeight: lastWeight,
-      isRestDay: false, 
+      lastWorkoutSummary: lastWorkoutSummary,
+      isRestDay: isRestDay, 
       todayDayName: todayDayName,
       todayExercises: todayExercises,
       estimatedDuration: estimatedDuration,

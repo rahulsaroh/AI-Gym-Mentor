@@ -1,23 +1,45 @@
 import 'package:googleapis/sheets/v4.dart' as sheets;
+import 'package:googleapis/drive/v3.dart' as drive;
 import 'package:http/http.dart' as http;
 import 'package:gym_gemini_pro/core/database/database.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter/foundation.dart';
 
 class SheetsService {
   final http.Client client;
   final sheets.SheetsApi api;
+  final drive.DriveApi _driveApi;
   
   static const String spreadSheetIdKey = 'google_spreadsheet_id';
 
-  SheetsService(this.client) : api = sheets.SheetsApi(client);
+  SheetsService(this.client) 
+    : api = sheets.SheetsApi(client),
+      _driveApi = drive.DriveApi(client);
 
-  Future<String?> _getSpreadsheetId() async {
+  Future<String?> getSpreadsheetId() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString(spreadSheetIdKey);
   }
 
   Future<String?> createSpreadsheet() async {
+    // First, try to find an existing "GYM Kilo" spreadsheet
+    try {
+      final query = "name = 'GYM Kilo' and mimeType = 'application/vnd.google-apps.spreadsheet' and trashed = false";
+      final files = await _driveApi.files.list(q: query, spaces: 'drive', $fields: 'files(id, name)');
+      
+      if (files.files != null && files.files!.isNotEmpty) {
+        final existingId = files.files!.first.id;
+        if (existingId != null) {
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setString(spreadSheetIdKey, existingId);
+          return existingId;
+        }
+      }
+    } catch (e) {
+      debugPrint('SheetsService: Error searching for existing spreadsheet: $e');
+    }
+
     final spreadsheet = sheets.Spreadsheet(
       properties: sheets.SpreadsheetProperties(title: 'GYM Kilo'),
       sheets: [
@@ -108,7 +130,7 @@ class SheetsService {
   }
 
   Future<void> appendWorkoutsBatch(List<Map<String, dynamic>> workoutDataList) async {
-    final spreadsheetId = await _getSpreadsheetId();
+    final spreadsheetId = await getSpreadsheetId();
     if (spreadsheetId == null) return;
 
     final allRows = <List<dynamic>>[];
@@ -128,7 +150,7 @@ class SheetsService {
           dateStr, dayStr, workout.name, exerciseNames[s.exerciseId] ?? 'Unknown',
           s.setNumber, s.setType.name, s.weight, s.reps, s.rpe ?? '',
           est1rm.toStringAsFixed(1), volume.toStringAsFixed(1),
-          false, s.notes ?? '', workout.notes ?? '',
+          s.isPr, s.notes ?? '', workout.notes ?? '',
         ]);
       }
     }
@@ -144,7 +166,7 @@ class SheetsService {
   }
 
   Future<void> appendMeasurementsBatch(List<BodyMeasurement> measurements) async {
-    final spreadsheetId = await _getSpreadsheetId();
+    final spreadsheetId = await getSpreadsheetId();
     if (spreadsheetId == null) return;
 
     final rows = measurements.map((m) {

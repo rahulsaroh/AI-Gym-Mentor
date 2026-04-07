@@ -3,9 +3,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:gym_gemini_pro/core/database/database.dart';
 import 'package:gym_gemini_pro/core/widgets/skeleton_card.dart';
+import 'package:gym_gemini_pro/core/widgets/number_ticker.dart';
 import 'package:gym_gemini_pro/features/history/history_providers.dart';
+import 'package:gym_gemini_pro/features/settings/settings_provider.dart';
+import 'package:gym_gemini_pro/core/utils/weight_converter.dart';
 import 'package:intl/intl.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:gym_gemini_pro/features/settings/models/settings_state.dart';
 import 'package:go_router/go_router.dart';
 
 class HistoryScreen extends ConsumerStatefulWidget {
@@ -115,51 +119,48 @@ class _HistoryHeaderStats extends StatelessWidget {
         children: [
           _StatChip(
             label: 'Current Streak',
-            value: '${stats['currentStreak']}',
+            value: (stats['currentStreak'] as num).toDouble(),
             icon: LucideIcons.flame,
             color: Colors.orange,
           ),
           _StatChip(
             label: 'Longest Streak',
-            value: '${stats['longestStreak']}',
+            value: (stats['longestStreak'] as num).toDouble(),
             icon: LucideIcons.award,
             color: Colors.purple,
           ),
           _StatChip(
             label: 'Total Workouts',
-            value: '${stats['totalWorkouts']}',
+            value: (stats['totalWorkouts'] as num).toDouble(),
             icon: LucideIcons.dumbbell,
             color: Colors.blue,
           ),
           _StatChip(
             label: 'Total Volume',
-            value: _formatVolume(stats['totalVolume']),
+            value: (stats['totalVolume'] as num).toDouble(),
             icon: LucideIcons.trendingUp,
             color: const Color(0xFF10B981),
+            isVolume: true,
           ),
         ],
       ),
     );
   }
-
-  String _formatVolume(dynamic vol) {
-    double v = (vol as num).toDouble();
-    if (v >= 1000) return '${(v / 1000).toStringAsFixed(1)}k';
-    return v.toStringAsFixed(0);
-  }
 }
 
 class _StatChip extends StatelessWidget {
   final String label;
-  final String value;
+  final double value;
   final IconData icon;
   final Color color;
+  final bool isVolume;
 
   const _StatChip({
     required this.label,
     required this.value,
     required this.icon,
     required this.color,
+    this.isVolume = false,
   });
 
   @override
@@ -180,7 +181,12 @@ class _StatChip extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(value, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                NumberTicker(
+                  value: value,
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  decimalPlaces: 0,
+                  suffix: isVolume && value >= 1000 ? 'kg' : (isVolume ? ' kg' : ''),
+                ),
                 Text(label, style: TextStyle(fontSize: 10, color: Theme.of(context).colorScheme.outline)),
               ],
             ),
@@ -202,15 +208,18 @@ class _HeatmapHeader extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text('Activity', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-          Row(
-            children: [
-              _IntensityKey(label: 'Less', color: Colors.transparent),
-              _IntensityKey(color: Color(0xFFBBDEFB)), // Lightest Blue
-              _IntensityKey(color: Color(0xFF64B5F6)), // Light Blue
-              _IntensityKey(color: Color(0xFF1E88E5)), // Blue
-              _IntensityKey(color: Color(0xFF0D47A1)), // Dark Blue
-              _IntensityKey(label: 'More', color: Colors.transparent),
-            ],
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                _IntensityKey(label: 'Less', color: Colors.transparent),
+                _IntensityKey(color: Color(0xFFBBDEFB)), // Lightest Blue
+                _IntensityKey(color: Color(0xFF64B5F6)), // Light Blue
+                _IntensityKey(color: Color(0xFF1E88E5)), // Blue
+                _IntensityKey(color: Color(0xFF0D47A1)), // Dark Blue
+                _IntensityKey(label: 'More', color: Colors.transparent),
+              ],
+            ),
           ),
         ],
       ),
@@ -346,7 +355,7 @@ class _MonthGrid extends StatelessWidget {
 }
 
 class _WorkoutSliverList extends ConsumerWidget {
-  final List<Workout> workouts;
+  final List<HistoryItem> workouts;
   const _WorkoutSliverList({required this.workouts});
 
   @override
@@ -354,7 +363,8 @@ class _WorkoutSliverList extends ConsumerWidget {
     return SliverList(
       delegate: SliverChildBuilderDelegate(
         (context, index) {
-          final workout = workouts[index];
+          final item = workouts[index];
+          final workout = item.workout;
           // Simple grouping by inserting headers (ideally pre-computed)
           bool showHeader = false;
           String headerText = '';
@@ -364,7 +374,7 @@ class _WorkoutSliverList extends ConsumerWidget {
             showHeader = true;
             headerText = _getGroupLabel(date);
           } else {
-            final prevDate = workouts[index - 1].date;
+            final prevDate = workouts[index - 1].workout.date;
             if (date.month != prevDate.month || date.year != prevDate.year) {
               showHeader = true;
               headerText = _getGroupLabel(date);
@@ -379,7 +389,7 @@ class _WorkoutSliverList extends ConsumerWidget {
                   padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
                   child: Text(headerText, style: TextStyle(color: Theme.of(context).colorScheme.primary, fontWeight: FontWeight.bold, fontSize: 12)),
                 ),
-              _WorkoutCard(workout: workout),
+              _WorkoutCard(item: item),
             ],
           );
         },
@@ -392,7 +402,6 @@ class _WorkoutSliverList extends ConsumerWidget {
     final now = DateTime.now();
     if (date.year == now.year && date.month == now.month) {
       if (DateUtils.isSameDay(date, now)) return 'Today';
-      // Week logic...
       return 'This Month';
     }
     return DateFormat.yMMMM().format(date);
@@ -400,11 +409,14 @@ class _WorkoutSliverList extends ConsumerWidget {
 }
 
 class _WorkoutCard extends ConsumerWidget {
-  final Workout workout;
-  const _WorkoutCard({required this.workout});
+  final HistoryItem item;
+  const _WorkoutCard({required this.item});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final workout = item.workout;
+    final settings = ref.watch(settingsProvider).value ?? const SettingsState();
+    final unit = settings.weightUnit;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       child: Slidable(
@@ -490,9 +502,11 @@ class _WorkoutCard extends ConsumerWidget {
                   const Divider(height: 24),
                   Row(
                     children: [
-                      _CompactStat(icon: LucideIcons.clock, label: '${(workout.duration ?? 0) ~/ 60} min'),
-                      const SizedBox(width: 16),
-                      const _CompactStat(icon: LucideIcons.trendingUp, label: '--- kg'),
+                      Expanded(child: _CompactStat(icon: LucideIcons.clock, label: _formatDuration(workout.duration ?? 0))),
+                      const SizedBox(width: 8),
+                      Expanded(child: _CompactStat(icon: LucideIcons.trendingUp, label: WeightConverter.format(item.volume, unit, decimals: 0))),
+                      const SizedBox(width: 8),
+                      Expanded(child: _CompactStat(icon: LucideIcons.layers, label: '${item.setCount} sets')),
                     ],
                   ),
                 ],
@@ -502,6 +516,14 @@ class _WorkoutCard extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  String _formatDuration(int seconds) {
+    if (seconds < 60) return '${seconds}s';
+    final minutes = seconds ~/ 60;
+    final remainingSeconds = seconds % 60;
+    if (remainingSeconds == 0) return '${minutes}m';
+    return '${minutes}m ${remainingSeconds}s';
   }
 
   Future<bool?> _showDeleteConfirmation(BuildContext context) {

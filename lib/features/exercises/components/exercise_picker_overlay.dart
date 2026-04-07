@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -14,18 +15,28 @@ class ExercisePickerOverlay extends ConsumerStatefulWidget {
 
 class _ExercisePickerOverlayState extends ConsumerState<ExercisePickerOverlay> {
   final TextEditingController _searchController = TextEditingController();
+  final List<String> _muscles = [
+    'All', 'Chest', 'Back', 'Shoulders', 'Quads', 'Hamstrings', 'Glutes', 'Calves', 'Biceps', 'Triceps', 'Abs'
+  ];
+  String _selectedMuscle = 'All';
+  Timer? _debounce;
 
   @override
   void initState() {
     super.initState();
-    _searchController.addListener(() {
-      ref.read(exerciseFiltersProvider.notifier).setSearch(_searchController.text);
+  }
+
+  void _onSearchChanged(String query) {
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
+    _debounce = Timer(const Duration(milliseconds: 300), () {
+      ref.read(exerciseFiltersProvider.notifier).setSearch(query);
     });
   }
 
   @override
   void dispose() {
     _searchController.dispose();
+    _debounce?.cancel();
     super.dispose();
   }
 
@@ -68,6 +79,7 @@ class _ExercisePickerOverlayState extends ConsumerState<ExercisePickerOverlay> {
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: TextField(
                   controller: _searchController,
+                  onChanged: _onSearchChanged,
                   decoration: InputDecoration(
                     hintText: 'Search exercises...',
                     prefixIcon: const Icon(LucideIcons.search),
@@ -78,6 +90,33 @@ class _ExercisePickerOverlayState extends ConsumerState<ExercisePickerOverlay> {
                       borderSide: BorderSide.none,
                     ),
                   ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              SizedBox(
+                height: 35,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  itemCount: _muscles.length,
+                  itemBuilder: (context, index) {
+                    final muscle = _muscles[index];
+                    final isSelected = _selectedMuscle == muscle;
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: FilterChip(
+                        label: Text(muscle, style: TextStyle(fontSize: 12, color: isSelected ? Colors.white : null)),
+                        selected: isSelected,
+                        onSelected: (val) {
+                          setState(() => _selectedMuscle = muscle);
+                          ref.read(exerciseFiltersProvider.notifier).setMuscle(muscle == 'All' ? 'All Muscles' : muscle);
+                        },
+                        showCheckmark: false,
+                        padding: EdgeInsets.zero,
+                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      ),
+                    );
+                  },
                 ),
               ),
               const SizedBox(height: 16),

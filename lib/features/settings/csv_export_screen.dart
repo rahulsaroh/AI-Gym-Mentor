@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gym_gemini_pro/core/database/database.dart';
 import 'package:gym_gemini_pro/features/exercises/exercises_provider.dart';
 import 'package:gym_gemini_pro/features/settings/services/csv_service.dart';
+import 'package:gym_gemini_pro/features/settings/settings_provider.dart';
+import 'package:gym_gemini_pro/features/settings/models/settings_state.dart';
 import 'package:intl/intl.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:drift/drift.dart' hide Column;
@@ -28,7 +30,7 @@ class _CsvExportScreenState extends ConsumerState<CsvExportScreen> {
   };
 
   final List<String> _allColumns = [
-    'Date', 'Day', 'Workout Name', 'Exercise', 'Set#', 'Set Type', 'Weight', 'Reps', 'RPE', 'Volume', 'Notes'
+    'Date', 'Day', 'Workout Name', 'Exercise', 'Set#', 'Set Type', 'Weight', 'Reps', 'RPE', 'Volume', 'Is PR', 'Notes'
   ];
 
   bool _includeWarmup = true;
@@ -192,6 +194,7 @@ class _CsvExportScreenState extends ConsumerState<CsvExportScreen> {
       sets: sets,
       exerciseNames: exerciseMap,
       selectedColumns: _selectedColumns,
+      unit: ref.read(settingsProvider).value?.weightUnit ?? WeightUnit.kg,
       includeWarmup: _includeWarmup,
     );
 
@@ -231,6 +234,7 @@ class _CsvExportScreenState extends ConsumerState<CsvExportScreen> {
         sets: sets,
         exerciseNames: exerciseMap,
         selectedColumns: _selectedColumns,
+        unit: ref.read(settingsProvider).value?.weightUnit ?? WeightUnit.kg,
         includeWarmup: _includeWarmup,
       );
 

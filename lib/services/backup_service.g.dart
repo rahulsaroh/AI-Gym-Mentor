@@ -6,7 +6,7 @@ part of 'backup_service.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$backupServiceHash() => r'2a728d6ae0367c86fd06550b9f0d4263bc4a8e9f';
+String _$backupServiceHash() => r'b40dfec6faa2b1d193c7ea2f28479f33aa94d4d5';
 
 /// See also [BackupService].
 @ProviderFor(BackupService)

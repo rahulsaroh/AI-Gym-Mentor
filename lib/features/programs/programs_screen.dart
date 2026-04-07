@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:gym_gemini_pro/features/programs/providers/programs_notifier.dart';
 import 'package:gym_gemini_pro/core/database/database.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:gym_gemini_pro/features/workout/workout_repository.dart';
+import 'package:gym_gemini_pro/features/workout/providers/workout_home_notifier.dart';
 
 class ProgramsScreen extends ConsumerWidget {
   const ProgramsScreen({super.key});
@@ -31,7 +34,7 @@ class ProgramsScreen extends ConsumerWidget {
       body: stateAsync.when(
         data: (state) {
           if (state.templates.isEmpty) {
-            return _buildEmptyState(ref);
+            return _buildEmptyState(context, ref);
           }
           return RefreshIndicator(
             onRefresh: () => ref.read(programsNotifierProvider.notifier).refresh(),
@@ -48,10 +51,14 @@ class ProgramsScreen extends ConsumerWidget {
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, s) => Center(child: Text('Error: $e')),
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => context.push('/programs/create'),
+        child: const Icon(LucideIcons.plus),
+      ),
     );
   }
 
-  Widget _buildEmptyState(WidgetRef ref) {
+  Widget _buildEmptyState(BuildContext context, WidgetRef ref) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -68,10 +75,21 @@ class ProgramsScreen extends ConsumerWidget {
             style: GoogleFonts.outfit(color: Colors.grey),
           ),
           const SizedBox(height: 24),
-          ElevatedButton.icon(
-            onPressed: () => ref.read(programsNotifierProvider.notifier).importTemplate(),
-            icon: const Icon(LucideIcons.download),
-            label: const Text('Import JSON Plan'),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ElevatedButton.icon(
+                onPressed: () => context.push('/programs/create'),
+                icon: const Icon(LucideIcons.plus),
+                label: const Text('Create New'),
+              ),
+              const SizedBox(width: 12),
+              OutlinedButton.icon(
+                onPressed: () => ref.read(programsNotifierProvider.notifier).importTemplate(),
+                icon: const Icon(LucideIcons.download),
+                label: const Text('Import'),
+              ),
+            ],
           ),
         ],
       ),
@@ -93,9 +111,7 @@ class _ProgramCard extends ConsumerWidget {
         side: BorderSide(color: Theme.of(context).colorScheme.outlineVariant.withOpacity(0.5)),
       ),
       child: InkWell(
-        onTap: () {
-          // Future: Navigate to template details
-        },
+        onTap: () => context.push('/programs/edit/${template.id}'),
         borderRadius: BorderRadius.circular(16),
         child: Padding(
           padding: const EdgeInsets.all(16),
@@ -158,6 +174,30 @@ class _ProgramCard extends ConsumerWidget {
                   _buildStat(context, LucideIcons.layers, 'Unlimited'),
                   const SizedBox(width: 24),
                   _buildStat(context, LucideIcons.zap, 'Pro'),
+                  const Spacer(),
+                  ElevatedButton.icon(
+                    onPressed: () async {
+                      final repo = ref.read(workoutRepositoryProvider);
+                      final days = await repo.getTemplateDays(template.id);
+                      if (days.isNotEmpty && context.mounted) {
+                        final id = await ref.read(workoutHomeNotifierProvider.notifier).startWorkout(
+                          templateId: template.id,
+                          dayId: days.first.id,
+                          name: template.name,
+                        );
+                        if (context.mounted) {
+                          context.push('/app/workout/active?id=$id');
+                        }
+                      }
+                    },
+                    icon: const Icon(LucideIcons.play, size: 14),
+                    label: const Text('Start'),
+                    style: ElevatedButton.styleFrom(
+                      elevation: 0,
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      minimumSize: const Size(0, 36),
+                    ),
+                  ),
                 ],
               ),
             ],

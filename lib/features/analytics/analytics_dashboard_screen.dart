@@ -1,9 +1,12 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gym_gemini_pro/core/utils/weight_converter.dart';
 import 'package:gym_gemini_pro/core/widgets/number_ticker.dart';
 import 'package:gym_gemini_pro/core/widgets/skeleton_card.dart';
 import 'package:gym_gemini_pro/features/analytics/analytics_providers.dart';
+import 'package:gym_gemini_pro/features/settings/models/settings_state.dart';
+import 'package:gym_gemini_pro/features/settings/settings_provider.dart';
 import 'package:intl/intl.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:go_router/go_router.dart';
@@ -15,6 +18,8 @@ class AnalyticsDashboardScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final statsAsync = ref.watch(dashboardStatsProvider);
+    final settings = ref.watch(settingsProvider).value ?? const SettingsState();
+    final unit = settings.weightUnit;
     final alertsAsync = ref.watch(plateauAlertsProvider);
     final prsAsync = ref.watch(recentPRsProvider);
 
@@ -46,7 +51,7 @@ class AnalyticsDashboardScreen extends ConsumerWidget {
             children: [
               // 1. Overview Stats Row
               statsAsync.when(
-                data: (stats) => _OverviewRow(stats: stats),
+                data: (stats) => _OverviewRow(stats: stats, unit: unit),
                 loading: () => const _SkeletonRow(),
                 error: (e, _) => const SizedBox.shrink(),
               ),
@@ -55,7 +60,7 @@ class AnalyticsDashboardScreen extends ConsumerWidget {
               _SectionHeader(title: 'Weekly Volume Trend', subtitle: 'Last 12 weeks'),
               _LazyChart(
                 builder: (ref) => ref.watch(volumeTrendProvider).when(
-                  data: (data) => _VolumeChart(data: data),
+                  data: (data) => _VolumeChart(data: data, unit: unit),
                   loading: () => const _SkeletonChart(),
                   error: (e, _) => Center(child: Text('Error: $e')),
                 ),
@@ -131,12 +136,14 @@ class _SectionHeader extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              Text(subtitle, style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.outline)),
-            ],
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold), overflow: TextOverflow.ellipsis),
+                Text(subtitle, style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.outline), overflow: TextOverflow.ellipsis),
+              ],
+            ),
           ),
           if (onTrailingTap != null)
             TextButton(
@@ -151,7 +158,8 @@ class _SectionHeader extends StatelessWidget {
 
 class _OverviewRow extends StatelessWidget {
   final Map<String, dynamic> stats;
-  const _OverviewRow({required this.stats});
+  final WeightUnit unit;
+  const _OverviewRow({required this.stats, required this.unit});
 
   @override
   Widget build(BuildContext context) {
@@ -162,8 +170,10 @@ class _OverviewRow extends StatelessWidget {
         children: [
           _StatCard(
             label: 'This Month',
-            numericValue: (stats['monthlyVolume'] as num).toDouble() / 1000,
-            suffix: 'T',
+            numericValue: unit == WeightUnit.kg 
+                ? (stats['monthlyVolume'] as num).toDouble() / 1000 
+                : WeightConverter.toDisplay((stats['monthlyVolume'] as num).toDouble(), unit) / 1000,
+            suffix: unit == WeightUnit.kg ? 'T' : 'k lbs',
             icon: LucideIcons.trendingUp,
             color: Colors.blue,
           ),
@@ -182,7 +192,7 @@ class _OverviewRow extends StatelessWidget {
           ),
           _StatCard(
             label: 'Active Streak',
-            numericValue: 5,
+            numericValue: (stats['activeStreak'] as num?)?.toDouble() ?? 0,
             suffix: '🔥',
             icon: LucideIcons.flame,
             color: Colors.red,
@@ -232,7 +242,8 @@ class _StatCard extends StatelessWidget {
 
 class _VolumeChart extends StatelessWidget {
   final List<Map<String, dynamic>> data;
-  const _VolumeChart({required this.data});
+  final WeightUnit unit;
+  const _VolumeChart({required this.data, required this.unit});
 
   @override
   Widget build(BuildContext context) {
@@ -245,7 +256,12 @@ class _VolumeChart extends StatelessWidget {
         LineChartData(
           lineBarsData: [
             LineChartBarData(
-              spots: data.asMap().entries.map((e) => FlSpot(e.key.toDouble(), e.value['volume'] / 1000)).toList(),
+              spots: data.asMap().entries.map((e) => FlSpot(
+                e.key.toDouble(), 
+                unit == WeightUnit.kg 
+                    ? e.value['volume'] / 1000 
+                    : WeightConverter.toDisplay(e.value['volume'], unit) / 1000
+              )).toList(),
               isCurved: true,
               color: Theme.of(context).colorScheme.primary,
               barWidth: 3,
@@ -284,7 +300,7 @@ class _FrequencyChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (data.isEmpty) return const SizedBox.shrink();
+    if (data.isEmpty) return const _EmptyChartTip(message: 'Complete workouts regularly to see your frequency.');
 
     return Container(
       height: 200,
@@ -338,8 +354,12 @@ class _MuscleRadarChart extends StatelessWidget {
     final thisMonth = data['thisMonth'] as List<double>;
     final lastMonth = data['lastMonth'] as List<double>;
 
+    if (labels.isEmpty) return const _EmptyChartTip(message: 'No muscle data available for comparisons.');
+
     // Find max value for normalization
-    double maxVal = ([...thisMonth, ...lastMonth]).reduce((a, b) => a > b ? a : b);
+    double maxVal = ([...thisMonth, ...lastMonth]).isEmpty 
+        ? 1.0 
+        : ([...thisMonth, ...lastMonth]).reduce((a, b) => a > b ? a : b);
     if (maxVal == 0) maxVal = 1;
 
     return Column(
@@ -445,9 +465,16 @@ class _PlateauSection extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        TextButton(
-                          onPressed: () {}, // TODO: Dismiss logic
-                          child: const Text('Dismiss', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                        Consumer(
+                          builder: (context, ref, _) => TextButton(
+                            onPressed: () async {
+                              final prefs = await SharedPreferences.getInstance();
+                              final until = DateTime.now().add(const Duration(days: 14)).millisecondsSinceEpoch;
+                              await prefs.setInt('plateau_dismissed_${alert['exerciseId']}', until);
+                              ref.invalidate(plateauAlertsProvider);
+                            },
+                            child: const Text('Dismiss', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                          ),
                         ),
                       ],
                     ),
@@ -507,13 +534,17 @@ class _SkeletonRow extends StatelessWidget {
   const _SkeletonRow();
   @override
   Widget build(BuildContext context) {
-    return const Row(
-      children: [
-        SkeletonCard(height: 100, width: 120, margin: EdgeInsets.only(left: 16, right: 8)),
-        SkeletonCard(height: 100, width: 120, margin: EdgeInsets.only(right: 8)),
-        SkeletonCard(height: 100, width: 120, margin: EdgeInsets.only(right: 8)),
-        SkeletonCard(height: 100, width: 120, margin: EdgeInsets.zero),
-      ],
+    return const SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      physics: NeverScrollableScrollPhysics(),
+      child: Row(
+        children: [
+          SkeletonCard(height: 100, width: 120, margin: EdgeInsets.only(left: 16, right: 8)),
+          SkeletonCard(height: 100, width: 120, margin: EdgeInsets.only(right: 8)),
+          SkeletonCard(height: 100, width: 120, margin: EdgeInsets.only(right: 8)),
+          SkeletonCard(height: 100, width: 120, margin: EdgeInsets.zero),
+        ],
+      ),
     );
   }
 }

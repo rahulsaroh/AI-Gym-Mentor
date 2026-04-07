@@ -23,6 +23,13 @@ class RestTimerOverlay extends ConsumerWidget {
         ? timerState.remainingSeconds / timerState.initialDuration 
         : 0;
 
+    // Auto-close overlay when timer finishes or stops
+    ref.listen(timerNotifierProvider, (previous, next) {
+      if (!next.isRunning && next.remainingSeconds == 0) {
+        onClose();
+      }
+    });
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
       decoration: BoxDecoration(

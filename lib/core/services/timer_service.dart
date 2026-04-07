@@ -22,6 +22,19 @@ Future<bool> onStart(ServiceInstance service) async {
   service.on('stopService').listen((event) {
     service.stopSelf();
   });
+  
+  service.on('skip').listen((event) {
+    service.stopSelf();
+  });
+
+  service.on('add_30s').listen((event) async {
+    final prefs = await SharedPreferences.getInstance();
+    final endTimeStr = prefs.getString('rest_timer_end_timestamp');
+    if (endTimeStr != null) {
+      final endTime = DateTime.parse(endTimeStr).add(const Duration(seconds: 30));
+      await prefs.setString('rest_timer_end_timestamp', endTime.toIso8601String());
+    }
+  });
 
   // Timer logic
   Timer.periodic(const Duration(seconds: 1), (timer) async {
@@ -37,10 +50,13 @@ Future<bool> onStart(ServiceInstance service) async {
           
           if (endTime.isAfter(now)) {
             final remaining = endTime.difference(now).inSeconds;
+            // Fetch initial duration to calculate progress
+            final initialDuration = prefs.getInt('rest_timer_initial_duration') ?? 60;
+
             // Update notification
             NotificationService().showTimerNotification(
               remainingSeconds: remaining,
-              maxDuration: 60, // Simplified; normally track this too
+              maxDuration: initialDuration,
               exerciseName: exName,
             );
             
@@ -50,7 +66,8 @@ Future<bool> onStart(ServiceInstance service) async {
             });
           } else {
             // Timer complete
-            NotificationService().showTimerCompleteNotification(nextExercise: null);
+            final nextEx = prefs.getString('rest_timer_next_exercise');
+            NotificationService().showTimerCompleteNotification(nextExercise: nextEx);
             service.stopSelf();
             timer.cancel();
           }

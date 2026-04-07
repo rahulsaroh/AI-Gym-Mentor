@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gym_gemini_pro/features/workout/workout_screen.dart';
 import 'package:gym_gemini_pro/features/shell/placeholder_screens.dart' hide SplashScreen, OnboardingScreen, ExerciseLibraryScreen, WorkoutScreen, HistoryScreen, SettingsScreen;
@@ -18,6 +19,9 @@ import 'package:gym_gemini_pro/features/settings/plates_config_screen.dart';
 import 'package:gym_gemini_pro/features/settings/about_screen.dart';
 import 'package:gym_gemini_pro/features/settings/sheets_setup_screen.dart';
 import 'package:gym_gemini_pro/features/programs/programs_screen.dart';
+import 'package:gym_gemini_pro/features/programs/create_edit_program_screen.dart';
+import 'package:gym_gemini_pro/features/workout/start_workout_screen.dart';
+import 'package:gym_gemini_pro/features/settings/sync_log_screen.dart';
 
 final router = GoRouter(
   initialLocation: '/',
@@ -34,6 +38,21 @@ final router = GoRouter(
       path: '/setup',
       builder: (context, state) => const SetupScreen(),
     ),
+    GoRoute(
+      path: '/active-workout',
+      builder: (context, state) => const StartWorkoutScreen(),
+    ),
+    GoRoute(
+      path: '/programs/create',
+      builder: (context, state) => const CreateEditProgramScreen(),
+    ),
+    GoRoute(
+      path: '/programs/edit/:id',
+      builder: (context, state) {
+        final id = int.tryParse(state.pathParameters['id'] ?? '0') ?? 0;
+        return CreateEditProgramScreen(templateId: id);
+      },
+    ),
     StatefulShellRoute.indexedStack(
       builder: (context, state, navigationShell) {
         return MainShell(child: navigationShell);
@@ -48,9 +67,13 @@ final router = GoRouter(
                 GoRoute(
                   path: 'workout/active',
                   builder: (context, state) {
-                    final id = int.parse(state.uri.queryParameters['id']!);
+                    final idStr = state.uri.queryParameters['id'];
+                    if (idStr == null) {
+                      return const Scaffold(body: Center(child: Text('Invalid workout ID')));
+                    }
+                    final id = int.tryParse(idStr) ?? 0;
                     final dayId = state.uri.queryParameters['dayId'] != null 
-                        ? int.parse(state.uri.queryParameters['dayId']!) 
+                        ? int.tryParse(state.uri.queryParameters['dayId']!) 
                         : null;
                     return ActiveWorkoutScreen(workoutId: id, dayId: dayId);
                   },
@@ -66,16 +89,31 @@ final router = GoRouter(
               builder: (context, state) => const ExercisesScreen(),
               routes: [
                 GoRoute(
+                  path: 'create',
+                  builder: (context, state) => const ExerciseDetailScreen(exerciseId: 0),
+                ),
+                GoRoute(
                   path: ':id',
                   builder: (context, state) {
-                    final id = int.parse(state.pathParameters['id']!);
+                    final idStr = state.pathParameters['id'];
+                    if (idStr == 'create') {
+                      return const ExerciseDetailScreen(exerciseId: 0);
+                    }
+                    final id = int.tryParse(idStr ?? '0') ?? 0;
                     return ExerciseDetailScreen(exerciseId: id);
+                  },
+                ),
+                GoRoute(
+                  path: ':id/edit',
+                  builder: (context, state) {
+                    final id = int.tryParse(state.pathParameters['id'] ?? '0') ?? 0;
+                    return ExerciseDetailScreen(exerciseId: id, isEditing: true);
                   },
                 ),
                 GoRoute(
                   path: 'history/:id',
                   builder: (context, state) {
-                    final id = int.parse(state.pathParameters['id']!);
+                    final id = int.tryParse(state.pathParameters['id'] ?? '0') ?? 0;
                     return ExerciseHistoryScreen(exerciseId: id);
                   },
                 ),
@@ -92,7 +130,7 @@ final router = GoRouter(
                 GoRoute(
                   path: 'workout/:id',
                   builder: (context, state) {
-                    final id = int.parse(state.pathParameters['id']!);
+                    final id = int.tryParse(state.pathParameters['id'] ?? '0') ?? 0;
                     return WorkoutDetailScreen(workoutId: id);
                   },
                 ),
@@ -150,6 +188,10 @@ final router = GoRouter(
                     final id = state.extra as String;
                     return SheetsSuccessScreen(spreadsheetId: id);
                   },
+                ),
+                GoRoute(
+                  path: 'sync-log',
+                  builder: (context, state) => const SyncLogScreen(),
                 ),
               ],
             ),

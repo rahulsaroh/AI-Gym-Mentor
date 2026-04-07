@@ -1,0 +1,266 @@
+[
+  {
+    "name": "Barbell Bench Press",
+    "primaryMuscle": "Chest",
+    "equipment": "Barbell",
+    "setType": "Straight",
+    "restTime": 90,
+    "instructions": "Lie on a flat bench, grab bar with a medium-width grip, lower to chest, then push up."
+  },
+  {
+    "name": "Dumbbell Flyes",
+    "primaryMuscle": "Chest",
+    "equipment": "Dumbbell",
+    "setType": "Straight",
+    "restTime": 60,
+    "instructions": "Lie on a flat bench, lower dumbbells in an arc to the sides, then bring back together."
+  },
+  {
+    "name": "Push-ups",
+    "primaryMuscle": "Chest",
+    "equipment": "Bodyweight",
+    "setType": "Straight",
+    "restTime": 60,
+    "instructions": "Place hands slightly wider than shoulders, lower body until chest nearly touches floor, push up."
+  },
+  {
+    "name": "Incline DB Press",
+    "primaryMuscle": "Chest",
+    "equipment": "Dumbbell",
+    "setType": "Straight",
+    "restTime": 90,
+    "instructions": "Lie on an incline bench, press dumbbells up from shoulder level."
+  },
+  {
+    "name": "Cable Crossover",
+    "primaryMuscle": "Chest",
+    "equipment": "Cable",
+    "setType": "Straight",
+    "restTime": 60,
+    "instructions": "Pull cables together in front of chest in a downward or forward arc."
+  },
+  {
+    "name": "Pull-ups",
+    "primaryMuscle": "Back",
+    "equipment": "Bodyweight",
+    "setType": "Straight",
+    "restTime": 90,
+    "instructions": "Hang from a bar, pull body up until chin is over the bar."
+  },
+  {
+    "name": "Deadlift",
+    "primaryMuscle": "Back",
+    "equipment": "Barbell",
+    "setType": "Straight",
+    "restTime": 120,
+    "instructions": "Lift a weighted barbell off the ground to hip level, then lower it back down."
+  },
+  {
+    "name": "Barbell Row",
+    "primaryMuscle": "Back",
+    "equipment": "Barbell",
+    "setType": "Straight",
+    "restTime": 90,
+    "instructions": "Bend at hips with straight back, pull bar to lower chest."
+  },
+  {
+    "name": "Lat Pulldown",
+    "primaryMuscle": "Back",
+    "equipment": "Cable",
+    "setType": "Straight",
+    "restTime": 90,
+    "instructions": "Pull a wide bar down to upper chest while seated."
+  },
+  {
+    "name": "Seated Cable Row",
+    "primaryMuscle": "Back",
+    "equipment": "Cable",
+    "setType": "Straight",
+    "restTime": 90,
+    "instructions": "Pull cable handle toward abdomen while seated."
+  },
+  {
+    "name": "Overhead Press",
+    "primaryMuscle": "Shoulders",
+    "equipment": "Barbell",
+    "setType": "Straight",
+    "restTime": 90,
+    "instructions": "Press a barbell from upper chest to arm's length overhead."
+  },
+  {
+    "name": "Lateral Raises",
+    "primaryMuscle": "Shoulders",
+    "equipment": "Dumbbell",
+    "setType": "Straight",
+    "restTime": 60,
+    "instructions": "Raise dumbbells out to the sides until arms are parallel to the floor."
+  },
+  {
+    "name": "Front Raises",
+    "primaryMuscle": "Shoulders",
+    "equipment": "Dumbbell",
+    "setType": "Straight",
+    "restTime": 60,
+    "instructions": "Raise dumbbells forward to shoulder height."
+  },
+  {
+    "name": "Reverse Flyes",
+    "primaryMuscle": "Shoulders",
+    "equipment": "Dumbbell",
+    "setType": "Straight",
+    "restTime": 60,
+    "instructions": "Bend forward, raise dumbbells to the sides focusing on rear delts."
+  },
+  {
+    "name": "Face Pulls",
+    "primaryMuscle": "Shoulders",
+    "equipment": "Cable",
+    "setType": "Straight",
+    "restTime": 60,
+    "instructions": "Pull cable rope toward forehead, flaring elbows out."
+  },
+  {
+    "name": "Barbell Curl",
+    "primaryMuscle": "Biceps",
+    "equipment": "Barbell",
+    "setType": "Straight",
+    "restTime": 60,
+    "instructions": "Curl a barbell from hips toward shoulders."
+  },
+  {
+    "name": "Hammer Curls",
+    "primaryMuscle": "Biceps",
+    "equipment": "Dumbbell",
+    "setType": "Straight",
+    "restTime": 60,
+    "instructions": "Curl dumbbells with a neutral grip (palms facing each other)."
+  },
+  {
+    "name": "Preacher Curls",
+    "primaryMuscle": "Biceps",
+    "equipment": "Barbell",
+    "setType": "Straight",
+    "restTime": 60,
+    "instructions": "Curl bar while arms are supported on a preacher bench incline."
+  },
+  {
+    "name": "Concentration Curls",
+    "primaryMuscle": "Biceps",
+    "equipment": "Dumbbell",
+    "setType": "Straight",
+    "restTime": 60,
+    "instructions": "Curl dumbbell while seated, elbow pressed against inner thigh."
+  },
+  {
+    "name": "Triceps Pushdown",
+    "primaryMuscle": "Triceps",
+    "equipment": "Cable",
+    "setType": "Straight",
+    "restTime": 60,
+    "instructions": "Push a cable bar or rope down until arms are straight."
+  },
+  {
+    "name": "Skull Crushers",
+    "primaryMuscle": "Triceps",
+    "equipment": "Barbell",
+    "setType": "Straight",
+    "restTime": 90,
+    "instructions": "Lie on bench, lower bar toward forehead by bending elbows, then extend."
+  },
+  {
+    "name": "Dips",
+    "primaryMuscle": "Triceps",
+    "equipment": "Bodyweight",
+    "setType": "Straight",
+    "restTime": 90,
+    "instructions": "Lower and raise body using parallel bars, focusing on triceps."
+  },
+  {
+    "name": "Overhead Extension",
+    "primaryMuscle": "Triceps",
+    "equipment": "Dumbbell",
+    "setType": "Straight",
+    "restTime": 60,
+    "instructions": "Hold dumbbell overhead and lower behind head by bending elbows."
+  },
+  {
+    "name": "Squat",
+    "primaryMuscle": "Quads",
+    "equipment": "Barbell",
+    "setType": "Straight",
+    "restTime": 120,
+    "instructions": "Lower hips until thighs are parallel to floor, then return to standing."
+  },
+  {
+    "name": "Leg Press",
+    "primaryMuscle": "Quads",
+    "equipment": "Machine",
+    "setType": "Straight",
+    "restTime": 120,
+    "instructions": "Push the weighted platform away using your legs, then lower controlled."
+  },
+  {
+    "name": "Lunges",
+    "primaryMuscle": "Quads",
+    "equipment": "Bodyweight",
+    "setType": "Straight",
+    "restTime": 90,
+    "instructions": "Step forward and lower hips until both knees are bent at about 90 degrees."
+  },
+  {
+    "name": "Leg Extensions",
+    "primaryMuscle": "Quads",
+    "equipment": "Machine",
+    "setType": "Straight",
+    "restTime": 60,
+    "instructions": "Extend legs from a 90-degree angle to straight while seated on machine."
+  },
+  {
+    "name": "Leg Curls",
+    "primaryMuscle": "Hamstrings",
+    "equipment": "Machine",
+    "setType": "Straight",
+    "restTime": 60,
+    "instructions": "Curl legs toward glutes while lying or seated on machine."
+  },
+  {
+    "name": "Calf Raises",
+    "primaryMuscle": "Calves",
+    "equipment": "Bodyweight",
+    "setType": "Straight",
+    "restTime": 60,
+    "instructions": "Rise up onto the balls of your feet, then lower down."
+  },
+  {
+    "name": "Plank",
+    "primaryMuscle": "Core",
+    "equipment": "Bodyweight",
+    "setType": "Timed",
+    "restTime": 60,
+    "instructions": "Hold a push-up position but with weight on forearms instead of hands."
+  },
+  {
+    "name": "Crunches",
+    "primaryMuscle": "Core",
+    "equipment": "Bodyweight",
+    "setType": "Straight",
+    "restTime": 60,
+    "instructions": "Lie on back, knees bent, lift shoulders off floor using abdominal muscles."
+  },
+  {
+    "name": "Leg Raises",
+    "primaryMuscle": "Core",
+    "equipment": "Bodyweight",
+    "setType": "Straight",
+    "restTime": 60,
+    "instructions": "Lie on back, lift straight legs toward vertical, then lower slowly."
+  },
+  {
+    "name": "Russian Twists",
+    "primaryMuscle": "Core",
+    "equipment": "Bodyweight",
+    "setType": "Straight",
+    "restTime": 60,
+    "instructions": "Seated with feet off floor, rotate torso from side to side."
+  }
+]

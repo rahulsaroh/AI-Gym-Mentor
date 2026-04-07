@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -6,6 +7,8 @@ import 'package:intl/intl.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:go_router/go_router.dart';
 import 'package:drift/drift.dart' hide Column, Table;
+import 'package:gym_gemini_pro/features/history/history_providers.dart';
+import 'package:gym_gemini_pro/features/workout/workout_repository.dart';
 
 class WorkoutDetailScreen extends ConsumerStatefulWidget {
   final int workoutId;
@@ -62,17 +65,37 @@ class _WorkoutDetailScreenState extends ConsumerState<WorkoutDetailScreen> {
               ),
             ),
             actions: [
+              if (!_isEditing)
+                IconButton(
+                  icon: const Icon(LucideIcons.trash2, color: Colors.red),
+                  onPressed: _confirmDelete,
+                ),
               TextButton(
                 onPressed: () => setState(() => _isEditing = !_isEditing),
                 child: Text(_isEditing ? 'Done' : 'Edit'),
               ),
             ],
           ),
+          floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+          floatingActionButton: _isEditing ? null : Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: SizedBox(
+              width: double.infinity,
+              child: FloatingActionButton.extended(
+                onPressed: _repeatWorkout,
+                label: const Text('Repeat Workout', style: TextStyle(fontWeight: FontWeight.bold)),
+                icon: const Icon(LucideIcons.rotateCcw),
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                foregroundColor: Theme.of(context).colorScheme.onPrimary,
+              ),
+            ),
+          ),
           body: StreamBuilder<List<TypedResult>>(
             stream: setsStream.watch(),
             builder: (context, setsSnapshot) {
               final rows = setsSnapshot.data ?? [];
               final muscleVolume = _calculateMuscleVolume(rows);
+              final exerciseRows = _groupRowsByExercise(rows);
 
               return CustomScrollView(
                 slivers: [
@@ -84,19 +107,20 @@ class _WorkoutDetailScreenState extends ConsumerState<WorkoutDetailScreen> {
                     sliver: SliverList(
                       delegate: SliverChildBuilderDelegate(
                         (context, index) {
-                          final exerciseRows = _groupRowsByExercise(rows);
                           final exerciseId = exerciseRows.keys.elementAt(index);
                           final exerciseSets = exerciseRows[exerciseId]!;
                           final exercise = exerciseSets.first.readTable(db.exercises);
+                          final setId = exerciseSets.first.readTable(db.workoutSets).id;
                           
                           return _ExerciseDetailBlock(
+                            key: ValueKey('exercise_block_$setId'),
                             exercise: exercise,
                             rows: exerciseSets,
                             isEditing: _isEditing,
                             onUpdate: (setId, weight, reps) => _updateSet(setId, weight, reps),
                           );
                         },
-                        childCount: _groupRowsByExercise(rows).length,
+                        childCount: exerciseRows.length,
                       ),
                     ),
                   ),
@@ -139,6 +163,35 @@ class _WorkoutDetailScreenState extends ConsumerState<WorkoutDetailScreen> {
         reps: Value(reps),
       ),
     );
+  }
+
+  Future<void> _confirmDelete() async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete Workout?'),
+        content: const Text('This will permanently remove this session from your history.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('Delete', style: TextStyle(color: Colors.red))),
+        ],
+      ),
+    );
+
+    if (confirm == true) {
+      final repo = ref.read(workoutRepositoryProvider);
+      await repo.deleteWorkout(widget.workoutId);
+      ref.invalidate(historyListProvider);
+      if (mounted) context.pop();
+    }
+  }
+
+  Future<void> _repeatWorkout() async {
+    final repo = ref.read(workoutRepositoryProvider);
+    final newId = await repo.repeatWorkout(widget.workoutId);
+    if (mounted) {
+      context.push('/app/workout/active?id=$newId');
+    }
   }
 }
 
@@ -221,13 +274,14 @@ class _SummaryStat extends StatelessWidget {
   }
 }
 
-class _ExerciseDetailBlock extends StatelessWidget {
+class _ExerciseDetailBlock extends ConsumerWidget {
   final Exercise exercise;
   final List<TypedResult> rows;
   final bool isEditing;
   final Function(int, double, double) onUpdate;
 
   const _ExerciseDetailBlock({
+    super.key,
     required this.exercise,
     required this.rows,
     required this.isEditing,
@@ -235,8 +289,8 @@ class _ExerciseDetailBlock extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    final db = ProviderScope.containerOf(context).read(appDatabaseProvider);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final db = ref.read(appDatabaseProvider);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

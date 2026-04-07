@@ -45,29 +45,31 @@ class ProgressionService extends _$ProgressionService {
     // Most recent working weight
     final lastWeight = lastSessionSets.first.weight;
     
-    // 2. Check success: did all working sets hit targetReps?
-    final allHitTarget = lastSessionSets.every((s) => s.reps >= targetReps);
-    final failCount = lastSessionSets.where((s) => s.reps < targetReps).length;
-    final isFail = failCount > (lastSessionSets.length / 2);
-
-    // 3. Get increment
+    // 3. Get settings and overrides
     final settings = await (db.select(db.exerciseProgressionSettings)
           ..where((t) => t.exerciseId.equals(exerciseId)))
         .getSingleOrNull();
+    
+    final currentTargetReps = settings?.targetReps.toDouble() ?? targetReps;
     final increment = settings?.incrementOverride ?? 2.5;
+
+    // 4. Check success against actual target
+    final allHitTarget = lastSessionSets.every((s) => s.reps >= currentTargetReps);
+    final failCount = lastSessionSets.where((s) => s.reps < currentTargetReps).length;
+    final isFail = failCount > (lastSessionSets.length / 2);
 
     double suggestedWeight = lastWeight;
     String reason = 'Maintain weight to perfect form.';
 
     if (allHitTarget) {
       suggestedWeight = lastWeight + increment;
-      reason = 'All sets hit target! Increasing by ${increment}kg.';
+      reason = 'Hit target of ${currentTargetReps.toInt()} reps! Increasing by ${increment}kg.';
     } else if (isFail) {
       suggestedWeight = max(0.0, lastWeight - increment);
-      reason = 'Missed reps on most sets. Reducing by ${increment}kg.';
+      reason = 'Missed target reps of ${currentTargetReps.toInt()} on most sets. Reducing by ${increment}kg.';
     } else {
       suggestedWeight = lastWeight;
-      reason = 'Passed some sets, missed others. Maintain and push harder.';
+      reason = 'Maintain and focus on hitting your ${currentTargetReps.toInt()} rep target.';
     }
 
     // 4. Trend Arrow (last 5 sessions 1RM)
@@ -117,3 +119,7 @@ class ProgressionService extends _$ProgressionService {
     };
   }
 }
+
+final exerciseSuggestionProvider = FutureProvider.autoDispose.family<ProgressionSuggestion?, int>((ref, exerciseId) {
+  return ref.watch(progressionServiceProvider.notifier).getSuggestion(exerciseId);
+});

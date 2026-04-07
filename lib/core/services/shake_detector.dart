@@ -25,7 +25,7 @@ class ShakeDetector {
   });
 
   void start() {
-    _subscription = accelerometerEventStream().listen((event) {
+    _subscription = accelerometerEvents.listen((event) {
       final magnitude = sqrt(
         event.x * event.x + event.y * event.y + event.z * event.z,
       ) / 9.81; // Convert to G

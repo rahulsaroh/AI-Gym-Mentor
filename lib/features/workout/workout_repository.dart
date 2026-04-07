@@ -10,12 +10,30 @@ class WorkoutRepository {
 
   WorkoutRepository(this._db);
 
-  Future<List<Workout>> getHistory({int limit = 20, int offset = 0}) async {
-    return await (_db.select(_db.workouts)
+  Future<List<Map<String, dynamic>>> getHistoryWithVolume({int limit = 20, int offset = 0}) async {
+    final workouts = await (_db.select(_db.workouts)
           ..where((t) => t.status.equals('completed'))
           ..orderBy([(t) => OrderingTerm(expression: t.date, mode: OrderingMode.desc)])
           ..limit(limit, offset: offset))
         .get();
+
+    final List<Map<String, dynamic>> result = [];
+    for (final w in workouts) {
+      final setsQuery = _db.select(_db.workoutSets)
+        ..where((t) => t.workoutId.equals(w.id));
+      
+      final sets = await setsQuery.get();
+      double volume = 0;
+      int completedSets = 0;
+      for (final s in sets) {
+        if (s.completed) {
+          volume += s.weight * s.reps;
+          completedSets++;
+        }
+      }
+      result.add({'workout': w, 'volume': volume, 'setCount': completedSets});
+    }
+    return result;
   }
 
   Future<Map<String, dynamic>> getStats() async {
@@ -107,6 +125,67 @@ class WorkoutRepository {
     await _db.transaction(() async {
       await (_db.delete(_db.workoutSets)..where((t) => t.workoutId.equals(workoutId))).go();
       await (_db.delete(_db.workouts)..where((t) => t.id.equals(workoutId))).go();
+    });
+  }
+
+  Future<Map<String, WorkoutSet>> getWorkoutSummary(int workoutId) async {
+    final query = _db.select(_db.workoutSets).join([
+      innerJoin(_db.exercises, _db.exercises.id.equalsExp(_db.workoutSets.exerciseId)),
+    ])
+      ..where(_db.workoutSets.workoutId.equals(workoutId) & _db.workoutSets.completed.equals(true))
+      ..orderBy([
+        OrderingTerm(expression: _db.workoutSets.exerciseOrder, mode: OrderingMode.asc),
+        OrderingTerm(expression: _db.workoutSets.setNumber, mode: OrderingMode.asc)
+      ]);
+
+    final rows = await query.get();
+    final Map<String, WorkoutSet> summary = {};
+
+    for (final row in rows) {
+      final exerciseName = row.readTable(_db.exercises).name;
+      final set = row.readTable(_db.workoutSets);
+
+      if (!summary.containsKey(exerciseName)) {
+        summary[exerciseName] = set;
+      } else {
+        final existing = summary[exerciseName]!;
+        if ((set.weight * set.reps) > (existing.weight * existing.reps)) {
+          summary[exerciseName] = set;
+        }
+      }
+    }
+    return summary;
+  }
+
+  Future<int> repeatWorkout(int sourceWorkoutId) async {
+    final sourceWorkout = await (_db.select(_db.workouts)..where((t) => t.id.equals(sourceWorkoutId))).getSingle();
+    final sourceSets = await (_db.select(_db.workoutSets)..where((t) => t.workoutId.equals(sourceWorkoutId))).get();
+    
+    return await _db.transaction(() async {
+      final newWorkoutId = await _db.into(_db.workouts).insert(WorkoutsCompanion.insert(
+        name: '${sourceWorkout.name} (Repeat)',
+        date: DateTime.now(),
+        startTime: Value(DateTime.now()),
+        status: const Value('draft'),
+        templateId: Value(sourceWorkout.templateId),
+        dayId: Value(sourceWorkout.dayId),
+      ));
+
+      for (var s in sourceSets) {
+        await _db.into(_db.workoutSets).insert(WorkoutSetsCompanion.insert(
+          workoutId: newWorkoutId,
+          exerciseId: s.exerciseId,
+          exerciseOrder: s.exerciseOrder,
+          setNumber: s.setNumber,
+          reps: s.reps,
+          weight: s.weight,
+          setType: Value(s.setType),
+          rpe: Value(s.rpe),
+          notes: Value(s.notes),
+          supersetGroupId: Value(s.supersetGroupId),
+        ));
+      }
+      return newWorkoutId;
     });
   }
 

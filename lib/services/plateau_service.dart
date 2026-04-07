@@ -7,11 +7,13 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'plateau_service.g.dart';
 
 class PlateauResult {
+  final int exerciseId;
   final String exerciseName;
   final int weeksStuck;
   final double deloadWeight;
 
   PlateauResult({
+    required this.exerciseId,
     required this.exerciseName,
     required this.weeksStuck,
     required this.deloadWeight,
@@ -66,6 +68,7 @@ class PlateauService extends _$PlateauService {
     if (isStagnant && isBelowPeak) {
       final currentWeight = sessions.first.weight;
       return PlateauResult(
+        exerciseId: exerciseId,
         exerciseName: exercise.name,
         weeksStuck: 3, // Approximation based on 5 sessions
         deloadWeight: (currentWeight * 0.7).roundToDouble(),
