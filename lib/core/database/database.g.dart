@@ -2079,6 +2079,11 @@ class $WorkoutSetsTable extends WorkoutSets
   late final GeneratedColumn<double> rpe = GeneratedColumn<double>(
       'rpe', aliasedName, true,
       type: DriftSqlType.double, requiredDuringInsert: false);
+  static const VerificationMeta _rirMeta = const VerificationMeta('rir');
+  @override
+  late final GeneratedColumn<int> rir = GeneratedColumn<int>(
+      'rir', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
   @override
   late final GeneratedColumnWithTypeConverter<SetType, int> setType =
       GeneratedColumn<int>('set_type', aliasedName, false,
@@ -2138,6 +2143,7 @@ class $WorkoutSetsTable extends WorkoutSets
         reps,
         weight,
         rpe,
+        rir,
         setType,
         notes,
         completed,
@@ -2203,6 +2209,10 @@ class $WorkoutSetsTable extends WorkoutSets
       context.handle(
           _rpeMeta, rpe.isAcceptableOrUnknown(data['rpe']!, _rpeMeta));
     }
+    if (data.containsKey('rir')) {
+      context.handle(
+          _rirMeta, rir.isAcceptableOrUnknown(data['rir']!, _rirMeta));
+    }
     if (data.containsKey('notes')) {
       context.handle(
           _notesMeta, notes.isAcceptableOrUnknown(data['notes']!, _notesMeta));
@@ -2258,6 +2268,8 @@ class $WorkoutSetsTable extends WorkoutSets
           .read(DriftSqlType.double, data['${effectivePrefix}weight'])!,
       rpe: attachedDatabase.typeMapping
           .read(DriftSqlType.double, data['${effectivePrefix}rpe']),
+      rir: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}rir']),
       setType: $WorkoutSetsTable.$convertersetType.fromSql(attachedDatabase
           .typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}set_type'])!),
@@ -2294,6 +2306,7 @@ class WorkoutSet extends DataClass implements Insertable<WorkoutSet> {
   final double reps;
   final double weight;
   final double? rpe;
+  final int? rir;
   final SetType setType;
   final String? notes;
   final bool completed;
@@ -2310,6 +2323,7 @@ class WorkoutSet extends DataClass implements Insertable<WorkoutSet> {
       required this.reps,
       required this.weight,
       this.rpe,
+      this.rir,
       required this.setType,
       this.notes,
       required this.completed,
@@ -2329,6 +2343,9 @@ class WorkoutSet extends DataClass implements Insertable<WorkoutSet> {
     map['weight'] = Variable<double>(weight);
     if (!nullToAbsent || rpe != null) {
       map['rpe'] = Variable<double>(rpe);
+    }
+    if (!nullToAbsent || rir != null) {
+      map['rir'] = Variable<int>(rir);
     }
     {
       map['set_type'] =
@@ -2361,6 +2378,7 @@ class WorkoutSet extends DataClass implements Insertable<WorkoutSet> {
       reps: Value(reps),
       weight: Value(weight),
       rpe: rpe == null && nullToAbsent ? const Value.absent() : Value(rpe),
+      rir: rir == null && nullToAbsent ? const Value.absent() : Value(rir),
       setType: Value(setType),
       notes:
           notes == null && nullToAbsent ? const Value.absent() : Value(notes),
@@ -2390,6 +2408,7 @@ class WorkoutSet extends DataClass implements Insertable<WorkoutSet> {
       reps: serializer.fromJson<double>(json['reps']),
       weight: serializer.fromJson<double>(json['weight']),
       rpe: serializer.fromJson<double?>(json['rpe']),
+      rir: serializer.fromJson<int?>(json['rir']),
       setType: $WorkoutSetsTable.$convertersetType
           .fromJson(serializer.fromJson<int>(json['setType'])),
       notes: serializer.fromJson<String?>(json['notes']),
@@ -2412,6 +2431,7 @@ class WorkoutSet extends DataClass implements Insertable<WorkoutSet> {
       'reps': serializer.toJson<double>(reps),
       'weight': serializer.toJson<double>(weight),
       'rpe': serializer.toJson<double?>(rpe),
+      'rir': serializer.toJson<int?>(rir),
       'setType': serializer
           .toJson<int>($WorkoutSetsTable.$convertersetType.toJson(setType)),
       'notes': serializer.toJson<String?>(notes),
@@ -2432,6 +2452,7 @@ class WorkoutSet extends DataClass implements Insertable<WorkoutSet> {
           double? reps,
           double? weight,
           Value<double?> rpe = const Value.absent(),
+          Value<int?> rir = const Value.absent(),
           SetType? setType,
           Value<String?> notes = const Value.absent(),
           bool? completed,
@@ -2448,6 +2469,7 @@ class WorkoutSet extends DataClass implements Insertable<WorkoutSet> {
         reps: reps ?? this.reps,
         weight: weight ?? this.weight,
         rpe: rpe.present ? rpe.value : this.rpe,
+        rir: rir.present ? rir.value : this.rir,
         setType: setType ?? this.setType,
         notes: notes.present ? notes.value : this.notes,
         completed: completed ?? this.completed,
@@ -2471,6 +2493,7 @@ class WorkoutSet extends DataClass implements Insertable<WorkoutSet> {
       reps: data.reps.present ? data.reps.value : this.reps,
       weight: data.weight.present ? data.weight.value : this.weight,
       rpe: data.rpe.present ? data.rpe.value : this.rpe,
+      rir: data.rir.present ? data.rir.value : this.rir,
       setType: data.setType.present ? data.setType.value : this.setType,
       notes: data.notes.present ? data.notes.value : this.notes,
       completed: data.completed.present ? data.completed.value : this.completed,
@@ -2496,6 +2519,7 @@ class WorkoutSet extends DataClass implements Insertable<WorkoutSet> {
           ..write('reps: $reps, ')
           ..write('weight: $weight, ')
           ..write('rpe: $rpe, ')
+          ..write('rir: $rir, ')
           ..write('setType: $setType, ')
           ..write('notes: $notes, ')
           ..write('completed: $completed, ')
@@ -2517,6 +2541,7 @@ class WorkoutSet extends DataClass implements Insertable<WorkoutSet> {
       reps,
       weight,
       rpe,
+      rir,
       setType,
       notes,
       completed,
@@ -2536,6 +2561,7 @@ class WorkoutSet extends DataClass implements Insertable<WorkoutSet> {
           other.reps == this.reps &&
           other.weight == this.weight &&
           other.rpe == this.rpe &&
+          other.rir == this.rir &&
           other.setType == this.setType &&
           other.notes == this.notes &&
           other.completed == this.completed &&
@@ -2554,6 +2580,7 @@ class WorkoutSetsCompanion extends UpdateCompanion<WorkoutSet> {
   final Value<double> reps;
   final Value<double> weight;
   final Value<double?> rpe;
+  final Value<int?> rir;
   final Value<SetType> setType;
   final Value<String?> notes;
   final Value<bool> completed;
@@ -2570,6 +2597,7 @@ class WorkoutSetsCompanion extends UpdateCompanion<WorkoutSet> {
     this.reps = const Value.absent(),
     this.weight = const Value.absent(),
     this.rpe = const Value.absent(),
+    this.rir = const Value.absent(),
     this.setType = const Value.absent(),
     this.notes = const Value.absent(),
     this.completed = const Value.absent(),
@@ -2587,6 +2615,7 @@ class WorkoutSetsCompanion extends UpdateCompanion<WorkoutSet> {
     required double reps,
     required double weight,
     this.rpe = const Value.absent(),
+    this.rir = const Value.absent(),
     this.setType = const Value.absent(),
     this.notes = const Value.absent(),
     this.completed = const Value.absent(),
@@ -2609,6 +2638,7 @@ class WorkoutSetsCompanion extends UpdateCompanion<WorkoutSet> {
     Expression<double>? reps,
     Expression<double>? weight,
     Expression<double>? rpe,
+    Expression<int>? rir,
     Expression<int>? setType,
     Expression<String>? notes,
     Expression<bool>? completed,
@@ -2626,6 +2656,7 @@ class WorkoutSetsCompanion extends UpdateCompanion<WorkoutSet> {
       if (reps != null) 'reps': reps,
       if (weight != null) 'weight': weight,
       if (rpe != null) 'rpe': rpe,
+      if (rir != null) 'rir': rir,
       if (setType != null) 'set_type': setType,
       if (notes != null) 'notes': notes,
       if (completed != null) 'completed': completed,
@@ -2645,6 +2676,7 @@ class WorkoutSetsCompanion extends UpdateCompanion<WorkoutSet> {
       Value<double>? reps,
       Value<double>? weight,
       Value<double?>? rpe,
+      Value<int?>? rir,
       Value<SetType>? setType,
       Value<String?>? notes,
       Value<bool>? completed,
@@ -2661,6 +2693,7 @@ class WorkoutSetsCompanion extends UpdateCompanion<WorkoutSet> {
       reps: reps ?? this.reps,
       weight: weight ?? this.weight,
       rpe: rpe ?? this.rpe,
+      rir: rir ?? this.rir,
       setType: setType ?? this.setType,
       notes: notes ?? this.notes,
       completed: completed ?? this.completed,
@@ -2698,6 +2731,9 @@ class WorkoutSetsCompanion extends UpdateCompanion<WorkoutSet> {
     if (rpe.present) {
       map['rpe'] = Variable<double>(rpe.value);
     }
+    if (rir.present) {
+      map['rir'] = Variable<int>(rir.value);
+    }
     if (setType.present) {
       map['set_type'] = Variable<int>(
           $WorkoutSetsTable.$convertersetType.toSql(setType.value));
@@ -2734,6 +2770,7 @@ class WorkoutSetsCompanion extends UpdateCompanion<WorkoutSet> {
           ..write('reps: $reps, ')
           ..write('weight: $weight, ')
           ..write('rpe: $rpe, ')
+          ..write('rir: $rir, ')
           ..write('setType: $setType, ')
           ..write('notes: $notes, ')
           ..write('completed: $completed, ')
@@ -6339,6 +6376,7 @@ typedef $$WorkoutSetsTableCreateCompanionBuilder = WorkoutSetsCompanion
   required double reps,
   required double weight,
   Value<double?> rpe,
+  Value<int?> rir,
   Value<SetType> setType,
   Value<String?> notes,
   Value<bool> completed,
@@ -6357,6 +6395,7 @@ typedef $$WorkoutSetsTableUpdateCompanionBuilder = WorkoutSetsCompanion
   Value<double> reps,
   Value<double> weight,
   Value<double?> rpe,
+  Value<int?> rir,
   Value<SetType> setType,
   Value<String?> notes,
   Value<bool> completed,
@@ -6427,6 +6466,9 @@ class $$WorkoutSetsTableFilterComposer
 
   ColumnFilters<double> get rpe => $composableBuilder(
       column: $table.rpe, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get rir => $composableBuilder(
+      column: $table.rir, builder: (column) => ColumnFilters(column));
 
   ColumnWithTypeConverterFilters<SetType, SetType, int> get setType =>
       $composableBuilder(
@@ -6521,6 +6563,9 @@ class $$WorkoutSetsTableOrderingComposer
   ColumnOrderings<double> get rpe => $composableBuilder(
       column: $table.rpe, builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<int> get rir => $composableBuilder(
+      column: $table.rir, builder: (column) => ColumnOrderings(column));
+
   ColumnOrderings<int> get setType => $composableBuilder(
       column: $table.setType, builder: (column) => ColumnOrderings(column));
 
@@ -6610,6 +6655,9 @@ class $$WorkoutSetsTableAnnotationComposer
 
   GeneratedColumn<double> get rpe =>
       $composableBuilder(column: $table.rpe, builder: (column) => column);
+
+  GeneratedColumn<int> get rir =>
+      $composableBuilder(column: $table.rir, builder: (column) => column);
 
   GeneratedColumnWithTypeConverter<SetType, int> get setType =>
       $composableBuilder(column: $table.setType, builder: (column) => column);
@@ -6704,6 +6752,7 @@ class $$WorkoutSetsTableTableManager extends RootTableManager<
             Value<double> reps = const Value.absent(),
             Value<double> weight = const Value.absent(),
             Value<double?> rpe = const Value.absent(),
+            Value<int?> rir = const Value.absent(),
             Value<SetType> setType = const Value.absent(),
             Value<String?> notes = const Value.absent(),
             Value<bool> completed = const Value.absent(),
@@ -6721,6 +6770,7 @@ class $$WorkoutSetsTableTableManager extends RootTableManager<
             reps: reps,
             weight: weight,
             rpe: rpe,
+            rir: rir,
             setType: setType,
             notes: notes,
             completed: completed,
@@ -6738,6 +6788,7 @@ class $$WorkoutSetsTableTableManager extends RootTableManager<
             required double reps,
             required double weight,
             Value<double?> rpe = const Value.absent(),
+            Value<int?> rir = const Value.absent(),
             Value<SetType> setType = const Value.absent(),
             Value<String?> notes = const Value.absent(),
             Value<bool> completed = const Value.absent(),
@@ -6755,6 +6806,7 @@ class $$WorkoutSetsTableTableManager extends RootTableManager<
             reps: reps,
             weight: weight,
             rpe: rpe,
+            rir: rir,
             setType: setType,
             notes: notes,
             completed: completed,

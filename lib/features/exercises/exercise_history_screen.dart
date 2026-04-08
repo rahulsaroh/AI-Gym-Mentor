@@ -82,11 +82,15 @@ class _ExerciseHistoryScreenState extends ConsumerState<ExerciseHistoryScreen> {
                           children: [
                             Icon(diff > 0 ? LucideIcons.trendingUp : LucideIcons.minus, size: 16, color: diff > 0 ? Colors.green : Colors.grey),
                             const SizedBox(width: 8),
-                            Text(
-                              diff > 0 
-                                ? "You've gained ~${diff.toStringAsFixed(1)}kg est. 1RM over this period"
-                                : "No significant 1RM gain detected in this range",
-                              style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: diff > 0 ? Colors.green : Colors.grey),
+                            Expanded(
+                              child: Text(
+                                diff > 0 
+                                  ? "You've gained ~${diff.toStringAsFixed(1)}kg est. 1RM over this period"
+                                  : "No significant 1RM gain detected in this range",
+                                style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: diff > 0 ? Colors.green : Colors.grey),
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                              ),
                             ),
                           ],
                         ),
@@ -299,13 +303,21 @@ class _SessionCard extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(DateFormat('MMM d, yyyy').format(session['date'] as DateTime), style: const TextStyle(fontWeight: FontWeight.bold)),
-                      Text(session['workoutName'] as String, style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.outline)),
-                    ],
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(DateFormat('MMM d, yyyy').format(session['date'] as DateTime), style: const TextStyle(fontWeight: FontWeight.bold)),
+                        Text(
+                          session['workoutName'] as String, 
+                          style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.outline),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                        ),
+                      ],
+                    ),
                   ),
+                  const SizedBox(width: 8),
                   Text('${volume.toStringAsFixed(0)}kg total', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
                 ],
               ),

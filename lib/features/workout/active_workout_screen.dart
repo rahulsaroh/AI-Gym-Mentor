@@ -248,25 +248,21 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen> with 
                         )
                       else
                         Text(workout.name, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold), overflow: TextOverflow.ellipsis),
-                      Flexible(
-                        child: Row(
-                          children: [
-                            Consumer(
-                              builder: (context, ref, _) {
-                                final duration = ref.watch(workoutDurationProvider);
-                                return Text(_formatDuration(duration), style: const TextStyle(fontSize: 12));
-                              },
-                            ),
-                            const SizedBox(width: 8),
-                            Flexible(
-                              child: Text(
-                                '• $completedCount/${sets.length} sets',
-                                style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.primary),
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ],
-                        ),
+                      Row(
+                        children: [
+                          Consumer(
+                            builder: (context, ref, _) {
+                              final duration = ref.watch(workoutDurationProvider);
+                              return Text(_formatDuration(duration), style: const TextStyle(fontSize: 12));
+                            },
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            '• $completedCount/${sets.length} sets',
+                            style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.primary),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
                       ),
                     ],
                   ),
@@ -382,6 +378,16 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen> with 
               ),
               SpeedDialChild(icon: LucideIcons.layers, label: 'Add Superset', onTap: () {}),
               SpeedDialChild(icon: LucideIcons.check, label: 'Finish Workout', onTap: () => _showSummary(workout)),
+              SpeedDialChild(
+                icon: LucideIcons.trash2, 
+                label: 'Discard Workout', 
+                backgroundColor: Colors.red.withOpacity(0.1),
+                foregroundColor: Colors.red,
+                onTap: () {
+                  HapticFeedback.heavyImpact();
+                  _discardWorkout();
+                },
+              ),
             ],
           ),
         );
@@ -460,6 +466,33 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen> with 
                     ),
                   ],
                 ),
+                if (exercise.instructions != null && exercise.instructions!.isNotEmpty) ...[
+                  const SizedBox(height: 8),
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.primary.withOpacity(0.05),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Theme.of(context).colorScheme.primary.withOpacity(0.1)),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(LucideIcons.lightbulb, size: 14, color: Theme.of(context).colorScheme.primary),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            exercise.instructions!,
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontStyle: FontStyle.italic,
+                              color: Theme.of(context).colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
                 _buildSuggestionChip(exercise.id, block),
                 const SizedBox(height: 12),
                 TextField(
@@ -588,9 +621,12 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen> with 
                     isCompleted: isCompleted,
                   ),
                 ),
-                const SizedBox(width: 8),
                 Expanded(
                   child: _buildRpePicker(set, isCompleted),
+                ),
+                const SizedBox(width: 4),
+                Expanded(
+                  child: _buildRirPicker(set, isCompleted),
                 ),
                 const SizedBox(width: 8),
                 GestureDetector(
@@ -619,7 +655,7 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen> with 
 
   Widget _buildRpePicker(WorkoutSet set, bool isCompleted) {
     return GestureDetector(
-      onTap: isCompleted ? null : () => _showRpePicker(set),
+      onTap: isCompleted ? null : () => _showIntensityPicker(set, true),
       child: Container(
         height: 32,
         decoration: BoxDecoration(
@@ -630,7 +666,7 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen> with 
         child: Text(
           set.rpe == null ? 'RPE' : set.rpe.toString(),
           style: TextStyle(
-            fontSize: 12,
+            fontSize: 11,
             fontWeight: FontWeight.bold,
             color: set.rpe == null ? Theme.of(context).colorScheme.outline.withOpacity(0.5) : (isCompleted ? Theme.of(context).colorScheme.outline : null),
           ),
@@ -639,7 +675,29 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen> with 
     );
   }
 
-  void _showRpePicker(WorkoutSet set) {
+  Widget _buildRirPicker(WorkoutSet set, bool isCompleted) {
+    return GestureDetector(
+      onTap: isCompleted ? null : () => _showIntensityPicker(set, false),
+      child: Container(
+        height: 32,
+        decoration: BoxDecoration(
+          color: isCompleted ? Colors.transparent : Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.3),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        alignment: Alignment.center,
+        child: Text(
+          set.rir == null ? 'RIR' : set.rir.toString(),
+          style: TextStyle(
+            fontSize: 11,
+            fontWeight: FontWeight.bold,
+            color: set.rir == null ? Theme.of(context).colorScheme.outline.withOpacity(0.5) : (isCompleted ? Theme.of(context).colorScheme.outline : null),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showIntensityPicker(WorkoutSet set, bool forRpe) {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -653,19 +711,20 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen> with 
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Select RPE', style: GoogleFonts.outfit(fontSize: 20, fontWeight: FontWeight.bold)),
+            Text(forRpe ? 'Select RPE' : 'Select RIR', style: GoogleFonts.outfit(fontSize: 20, fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
-            Text('Rate of Perceived Exertion (1-10)', style: TextStyle(color: Theme.of(context).colorScheme.outline)),
+            Text(forRpe ? 'Rate of Perceived Exertion (1-10)' : 'Reps In Reserve (How many more could you do?)', 
+                 style: TextStyle(color: Theme.of(context).colorScheme.outline)),
             const SizedBox(height: 24),
             SizedBox(
               height: 50,
               child: ListView.separated(
                 scrollDirection: Axis.horizontal,
-                itemCount: 11,
+                itemCount: forRpe ? 11 : 6,
                 separatorBuilder: (context, index) => const SizedBox(width: 8),
                 itemBuilder: (context, index) {
-                  if (index == 0) return _buildRpeChip(set, null);
-                  return _buildRpeChip(set, index.toDouble());
+                  if (index == 0) return _buildIntensityChip(set, null, forRpe);
+                  return _buildIntensityChip(set, (index - (forRpe ? 0 : 0)).toDouble(), forRpe);
                 },
               ),
             ),
@@ -676,14 +735,19 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen> with 
     );
   }
 
-  Widget _buildRpeChip(WorkoutSet set, double? value) {
-    final isSelected = set.rpe == value;
+  Widget _buildIntensityChip(WorkoutSet set, double? value, bool forRpe) {
+    final double? currentValue = forRpe ? set.rpe : (set.rir?.toDouble());
+    final isSelected = currentValue == value;
     return ChoiceChip(
-      label: Text(value == null ? 'None' : value.toString()),
+      label: Text(value == null ? 'None' : (forRpe ? value.toString() : value.toInt().toString())),
       selected: isSelected,
       onSelected: (selected) {
         if (selected) {
-          _updateSet(set.id, rpe: value);
+          if (forRpe) {
+            _updateSet(set.id, rpe: value);
+          } else {
+            _updateSet(set.id, rir: value?.toInt());
+          }
           Navigator.pop(context);
         }
       },
@@ -784,17 +848,19 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen> with 
       case 'weight': return match.weight == 0 ? '-' : WeightConverter.toDisplay(match.weight, unit).toStringAsFixed(1);
       case 'reps': return match.reps == 0 ? '-' : match.reps.toInt().toString();
       case 'rpe': return match.rpe == null ? '-' : match.rpe.toString();
+      case 'rir': return match.rir == null ? '-' : match.rir.toString();
       default: return '-';
     }
   }
 
-  Future<void> _updateSet(int setId, {double? weight, double? reps, double? rpe, String? notes}) async {
+  Future<void> _updateSet(int setId, {double? weight, double? reps, double? rpe, int? rir, String? notes}) async {
     final db = ref.read(appDatabaseProvider);
     await (db.update(db.workoutSets)..where((t) => t.id.equals(setId))).write(
       WorkoutSetsCompanion(
         weight: weight != null ? Value(weight) : const Value.absent(),
         reps: reps != null ? Value(reps) : const Value.absent(),
         rpe: rpe != null ? Value(rpe) : const Value.absent(),
+        rir: rir != null ? Value(rir) : const Value.absent(),
         notes: notes != null ? Value(notes) : const Value.absent(),
       ),
     );

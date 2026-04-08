@@ -1,3 +1,4 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -12,102 +13,104 @@ import 'package:gym_gemini_pro/features/settings/settings_provider.dart';
 import 'package:gym_gemini_pro/services/connectivity_service.dart';
 import 'package:gym_gemini_pro/services/sync_worker.dart';
 import 'package:gym_gemini_pro/services/background_worker.dart';
-
-/*
-  PHASE 8 SETUP INSTRUCTIONS:
-  1. Go to Google Cloud Console: https://console.cloud.google.com/
-  2. Create Project: 'my-gym-mentor-ai'
-  3. Enable APIs: 'Google Sheets API' & 'Google Drive API'
-  4. OAuth Consent Screen: Set up User Type as External.
-  5. Credentials: Create OAuth 2.0 Client IDs for:
-     - Android: Use Package Name 'com.gymgemini.pro.gym_gemini_pro' and your SHA-1.
-     - iOS: Use Bundle ID 'com.gymgemini.pro.gym_gemini_pro'.
-  6. Firebase: Go to Firebase Console, add Android/iOS apps, and download google-services.json.
-*/
+import 'package:gym_gemini_pro/firebase_options.dart';
 
 void main() async {
+  // Ensure Flutter is initialized before any async code
   WidgetsFlutterBinding.ensureInitialized();
-  
-  // 1. Framework errors
-  FlutterError.onError = (details) {
-    FlutterError.presentError(details);
-    debugPrint('FLUTTER ERROR: ${details.exception}');
-  };
 
-  // 2. Async errors
-  PlatformDispatcher.instance.onError = (error, stack) {
-    debugPrint('ASYNC ERROR: $error');
-    return true;
-  };
-
-  // 3. UI Error Widget
-  ErrorWidget.builder = (details) {
-    return GlobalErrorScreen(details: details);
-  };
-
-  if (kDebugMode) debugPrint('--- APP STARTUP ---');
-  
+  // 1. Firebase Initialization (Wrap in try/catch to maintain offline functionality)
+  bool firebaseInitialized = false;
   try {
-    if (kDebugMode) debugPrint('Step 1: Initializing Notifications...');
+    if (kDebugMode) debugPrint('Step 1: Initializing Firebase...');
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    ).timeout(const Duration(seconds: 5));
+    firebaseInitialized = true;
+    if (kDebugMode) debugPrint('Firebase Initialized Successfully');
+  } catch (e) {
+    debugPrint('Firebase Initialization Failed (App will run in offline mode): $e');
+  }
+
+  // 2. Notification Service Initialization
+  try {
+    if (kDebugMode) debugPrint('Step 2: Initializing Notifications...');
     await NotificationService().init();
     if (kDebugMode) debugPrint('Notifications Initialized Successfully');
   } catch (e) {
     debugPrint('Notifications Initialization Failed: $e');
   }
 
+  // 3. Timer Service Initialization
   try {
-    if (kDebugMode) debugPrint('Step 2: Initializing Timer Service...');
+    if (kDebugMode) debugPrint('Step 3: Initializing Timer Service...');
     await TimerService.initialize();
     if (kDebugMode) debugPrint('Timer Service Initialized Successfully');
   } catch (e) {
     debugPrint('Timer Service Initialization Failed: $e');
   }
 
-  // Firebase initialization is disabled for now as the plugin/config is missing.
-  // This allows the app to reach the dashboard without native hangs or crashes.
-  /*
+  // Background workers initialization
   try {
-    debugPrint('Step 2: Checking Firebase configuration...');
-    await Firebase.initializeApp().timeout(const Duration(seconds: 2));
-    debugPrint('Firebase Initialized Successfully');
-  } catch (e) {
-    debugPrint('Firebase Initialization Skipped or Failed: $e');
-  }
-  */
-
-  // Services that might start foreground services are disabled for this debug run.
-  /*
-  try {
-    debugPrint('Initializing Sync Worker...');
-    await ref.read(syncWorkerProvider.notifier).init();
-    debugPrint('Sync Worker Initialized');
-  } catch (e) {
-    debugPrint('Sync Worker Initialization Failed: $e');
-  }
-
-  try {
-    debugPrint('Initializing Background Worker...');
+    if (kDebugMode) debugPrint('Step 4: Initializing Background Worker...');
     await BackgroundWorker.initialize();
-    debugPrint('Background Worker Initialized');
+    if (kDebugMode) debugPrint('Background Worker Initialized Successfully');
   } catch (e) {
     debugPrint('Background Worker Initialization Failed: $e');
   }
-  */
 
-  debugPrint('Running App...');
+  // 4. Framework error catchers
+  FlutterError.onError = (details) {
+    FlutterError.presentError(details);
+    debugPrint('FLUTTER ERROR: ${details.exception}');
+  };
+
+  PlatformDispatcher.instance.onError = (error, stack) {
+    debugPrint('ASYNC ERROR: $error');
+    return true;
+  };
+
+  ErrorWidget.builder = (details) {
+    return GlobalErrorScreen(details: details);
+  };
+
+  if (kDebugMode) debugPrint('--- APP STARTUP COMPLETE ---');
+
   runApp(
-    const ProviderScope(
-      child: ConnectivityInitializer(child: GymGeminiApp()),
+    ProviderScope(
+      child: ConnectivityInitializer(
+        firebaseInitialized: firebaseInitialized,
+        child: const GymGeminiApp(),
+      ),
     ),
   );
 }
 
 class ConnectivityInitializer extends ConsumerWidget {
   final Widget child;
-  const ConnectivityInitializer({super.key, required this.child});
+  final bool firebaseInitialized;
+  
+  const ConnectivityInitializer({
+    super.key, 
+    required this.child, 
+    required this.firebaseInitialized,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Show a small warning if Firebase failed only after first frame
+    if (!firebaseInitialized) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Firebase not connected. Some cloud features may be unavailable.'),
+            backgroundColor: Colors.orange,
+            duration: Duration(seconds: 5),
+          ),
+        );
+      });
+    }
+
     // Initialize connectivity listener
     ref.listen(connectivityServiceProvider, (prev, next) {
       final status = next.value;
@@ -151,8 +154,16 @@ class GymGeminiApp extends ConsumerWidget {
           );
         },
       ),
-      loading: () => const MaterialApp(home: Scaffold(body: Center(child: CircularProgressIndicator()))),
-      error: (e, _) => MaterialApp(home: Scaffold(body: Center(child: Text('Error: $e')))),
+      loading: () => const MaterialApp(
+        home: Scaffold(
+          body: Center(child: CircularProgressIndicator()),
+        ),
+      ),
+      error: (e, stack) => MaterialApp(
+        home: GlobalErrorScreen(
+          details: FlutterErrorDetails(exception: e, stack: stack),
+        ),
+      ),
     );
   }
 

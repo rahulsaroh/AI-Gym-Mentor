@@ -353,6 +353,11 @@ class _ExercisesScreenState extends ConsumerState<ExercisesScreen> {
             onTap: () {},
           ),
           SpeedDialChild(
+            icon: LucideIcons.globe,
+            label: 'Browse Global Library',
+            onTap: () => context.push('/exercises/library'),
+          ),
+          SpeedDialChild(
             icon: LucideIcons.arrowUpDown,
             label: 'Sort by Muscle',
             onTap: () {},

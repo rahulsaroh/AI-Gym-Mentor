@@ -8,6 +8,7 @@ import 'package:gym_gemini_pro/core/database/database.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:drift/drift.dart' show OrderingTerm, OrderingMode;
 import 'package:gym_gemini_pro/features/workout/providers/workout_home_notifier.dart';
+import 'package:gym_gemini_pro/features/workout/components/begin_session_sheet.dart';
 import 'package:gym_gemini_pro/services/plateau_service.dart';
 import 'package:gym_gemini_pro/services/sync_worker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -334,27 +335,31 @@ class _TodayPlanSection extends ConsumerWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          state.isRestDay ? 'REST DAY' : 'TODAY\'S PLAN',
-                          style: GoogleFonts.outfit(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: 1.5,
-                            color: Colors.white.withOpacity(0.7),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            state.isRestDay ? 'REST DAY' : 'TODAY\'S PLAN',
+                            style: GoogleFonts.outfit(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 1.5,
+                              color: Colors.white.withOpacity(0.7),
+                            ),
                           ),
-                        ),
-                        Text(
-                          state.isRestDay ? 'Time to Recover' : (state.todayDayName ?? "Push Day A"),
-                          style: GoogleFonts.outfit(
-                            fontSize: 24,
-                            fontWeight: FontWeight.w900,
-                            color: Colors.white,
+                          Text(
+                            state.isRestDay ? 'Time to Recover' : (state.todayDayName ?? "Push Day A"),
+                            style: GoogleFonts.outfit(
+                              fontSize: 24,
+                              fontWeight: FontWeight.w900,
+                              color: Colors.white,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                     Container(
                       padding: const EdgeInsets.all(10),
@@ -391,17 +396,13 @@ class _TodayPlanSection extends ConsumerWidget {
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: () async {
-                      if (state.activeDraft != null) {
-                        context.push('/app/workout/active?id=${state.activeDraft!.id}');
-                        return;
-                      }
-                      final id = await ref.read(workoutHomeNotifierProvider.notifier).startWorkout(
-                        templateId: state.templateId,
-                        dayId: state.nextDayId,
-                        name: state.todayDayName ?? 'New Workout',
+                    onPressed: () {
+                      showModalBottomSheet(
+                        context: context,
+                        isScrollControlled: true,
+                        backgroundColor: Colors.transparent,
+                        builder: (context) => const BeginSessionSheet(),
                       );
-                      context.push('/app/workout/active?id=$id');
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white,
@@ -479,7 +480,14 @@ class _QuickActionSection extends StatelessWidget {
               icon: LucideIcons.play,
               label: 'START',
               color: Colors.green.shade400,
-              onTap: () => context.push('/active-workout'),
+              onTap: () {
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  backgroundColor: Colors.transparent,
+                  builder: (context) => const BeginSessionSheet(),
+                );
+              },
             ),
             const SizedBox(width: 12),
             _QuickActionItem(
@@ -589,6 +597,8 @@ class _LastWorkoutSection extends StatelessWidget {
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
               ),
               const SizedBox(height: 4),
               Text(
@@ -862,6 +872,8 @@ class _PlateauAlertSectionState extends ConsumerState<_PlateauAlertSection> {
           Text(
             '${plateau.exerciseName} hasn\'t improved in ${plateau.weeksStuck} sessions.',
             style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+            overflow: TextOverflow.ellipsis,
+            maxLines: 1,
           ),
           const SizedBox(height: 4),
           Text(
@@ -1000,30 +1012,72 @@ class _FloatingWorkoutBannerState extends State<_FloatingWorkoutBanner> with Sin
             child: child,
           );
         },
-        child: GestureDetector(
-          onTap: () => context.push('/app/workout/active?id=${widget.workout.id}'),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.95),
-              borderRadius: BorderRadius.circular(30),
-              border: Border.all(
-                color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
-                width: 1.5,
-              ),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.95),
+            borderRadius: BorderRadius.circular(30),
+            border: Border.all(
+              color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+              width: 1.5,
             ),
-            child: Row(
-              children: [
-                const Icon(LucideIcons.activity, color: Colors.green),
-                const SizedBox(width: 12),
-                Text(
-                  'Workout in progress — tap to resume',
-                  style: GoogleFonts.outfit(fontWeight: FontWeight.w800, fontSize: 13),
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: GestureDetector(
+                  onTap: () => context.push('/app/workout/active?id=${widget.workout.id}'),
+                  behavior: HitTestBehavior.opaque,
+                  child: Row(
+                    children: [
+                      const Icon(LucideIcons.activity, color: Colors.green),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          'Workout in progress — tap to resume',
+                          style: GoogleFonts.outfit(fontWeight: FontWeight.w800, fontSize: 13),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-                const Spacer(),
-                const Icon(LucideIcons.chevronRight, size: 16),
-              ],
-            ),
+              ),
+              const SizedBox(
+                height: 24,
+                child: VerticalDivider(width: 24, thickness: 1),
+              ),
+              Consumer(
+                builder: (context, ref, _) {
+                  return IconButton(
+                    icon: const Icon(LucideIcons.trash2, size: 18, color: Colors.red),
+                    onPressed: () async {
+                      final confirm = await showDialog<bool>(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: const Text('Discard Workout?'),
+                          content: const Text('All progress in the current active session will be lost.'),
+                          actions: [
+                            TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Keep')),
+                            TextButton(
+                              onPressed: () => Navigator.pop(context, true), 
+                              child: const Text('Discard', style: TextStyle(color: Colors.red))
+                            ),
+                          ],
+                        ),
+                      );
+                      if (confirm == true) {
+                        ref.read(workoutHomeNotifierProvider.notifier).deleteWorkout(widget.workout.id);
+                      }
+                    },
+                    tooltip: 'Discard workout',
+                    visualDensity: VisualDensity.compact,
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                  );
+                },
+              ),
+            ],
           ),
         ),
       ),

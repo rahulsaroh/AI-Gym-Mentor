@@ -7,7 +7,7 @@ part of 'workout_home_notifier.dart';
 // **************************************************************************
 
 String _$workoutHomeNotifierHash() =>
-    r'021751088f825fa3a93c8e15c65f0b28eafcc87b';
+    r'c46f8a3949a6f0d974eb85214f3f45ae2fa9d9f6';
 
 /// See also [WorkoutHomeNotifier].
 @ProviderFor(WorkoutHomeNotifier)

@@ -173,6 +173,12 @@ class WorkoutHomeNotifier extends _$WorkoutHomeNotifier {
     );
   }
 
+  Future<void> deleteWorkout(int id) async {
+    final repo = ref.read(workoutRepositoryProvider);
+    await repo.deleteWorkout(id);
+    ref.invalidateSelf();
+  }
+
   Future<int> startWorkout({int? templateId, int? dayId, String? name}) async {
     final repo = ref.read(workoutRepositoryProvider);
     final id = await repo.createWorkout(

@@ -35,3 +35,23 @@ extension GoogleSignInAuthExt on GoogleSignIn {
     return GoogleAuthClient(headers);
   }
 }
+
+final authProvider = NotifierProvider<Auth, void>(Auth.new);
+
+class Auth extends Notifier<void> {
+  @override
+  void build() {}
+
+  Future<bool> signIn() async {
+    try {
+      final user = await ref.read(googleSignInProvider).signIn();
+      return user != null;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  Future<void> signOut() async {
+    await ref.read(googleSignInProvider).signOut();
+  }
+}

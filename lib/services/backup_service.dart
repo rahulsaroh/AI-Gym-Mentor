@@ -7,9 +7,9 @@ import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
 import 'package:gym_gemini_pro/features/settings/settings_repository.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:googleapis/drive/v3.dart' as drive;
 import 'package:http/http.dart' as http;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:gym_gemini_pro/services/sheets_api_client.dart';
 
 part 'backup_service.g.dart';
 
@@ -38,7 +38,6 @@ class BackupService extends _$BackupService {
         'name': settings.userName,
         'unit': settings.weightUnit.name,
         'experience_level': settings.experienceLevel.name,
-        // Using a placeholder for created_at if not in settings yet
         'created_at': DateTime.now().toIso8601String(), 
       },
       'custom_exercises': exercises.where((e) => e.isCustom).map((e) => e.toJson()).toList(),
@@ -53,7 +52,7 @@ class BackupService extends _$BackupService {
       'settings': {
         'weight_unit': settings.weightUnit.name,
         'theme_mode': settings.themeMode.name,
-        'rest_time': 90, // Default or from global settings
+        'rest_time': 90, 
         'accent_color': settings.accentColor.value,
       }
     };
@@ -63,7 +62,7 @@ class BackupService extends _$BackupService {
     final backup = await createFullBackup();
     final jsonStr = jsonEncode(backup);
     
-    final date = DateFormat('yyyy_MM_DD').format(DateTime.now());
+    final date = DateFormat('yyyy_MM_dd').format(DateTime.now());
     final directory = await getApplicationDocumentsDirectory();
     final file = File('${directory.path}/gymlog_backup_$date.json');
     
@@ -75,61 +74,45 @@ class BackupService extends _$BackupService {
     );
   }
 
-  // Google Drive Integration
+  // Google Drive Integration (Lightweight)
   Future<void> uploadToDrive(http.Client client) async {
-    final driveApi = drive.DriveApi(client);
+    final apiClient = SheetsApiClient(client);
     final backup = await createFullBackup();
     final jsonStr = jsonEncode(backup);
     
-    final fileMetadata = drive.File()
-      ..name = 'GYM Kilo Backup'
-      ..mimeType = 'application/json';
-
     // Check if file already exists
-    final list = await driveApi.files.list(
-      q: "name = 'GYM Kilo Backup' and trashed = false",
-      spaces: 'drive',
-    );
-
-    final media = drive.Media(
-      Stream.value(utf8.encode(jsonStr)),
-      jsonStr.length,
-    );
-
-    if (list.files != null && list.files!.isNotEmpty) {
-      // Update existing
-      final fileId = list.files!.first.id!;
-      await driveApi.files.update(fileMetadata, fileId, uploadMedia: media);
-    } else {
-      // Create new
-      await driveApi.files.create(fileMetadata, uploadMedia: media);
+    final files = await apiClient.listFiles("name = 'GYM Kilo Backup' and trashed = false");
+    String? existingId;
+    if (files.isNotEmpty) {
+      existingId = files.first['id'] as String?;
     }
+
+    await apiClient.uploadFile(
+      name: 'GYM Kilo Backup',
+      mimeType: 'application/json',
+      content: jsonStr,
+      fileId: existingId,
+    );
   }
 
-  Future<List<drive.File>> listDriveBackups(http.Client client) async {
-    final driveApi = drive.DriveApi(client);
-    final list = await driveApi.files.list(
-      q: "name contains 'Backup' and trashed = false",
+  Future<List<Map<String, dynamic>>> listDriveBackups(http.Client client) async {
+    final apiClient = SheetsApiClient(client);
+    final files = await apiClient.listFiles(
+      "name contains 'Backup' and trashed = false",
       orderBy: 'modifiedTime desc',
     );
-    return list.files ?? [];
+    return files.cast<Map<String, dynamic>>();
   }
 
   Future<Map<String, dynamic>> downloadFromDrive(http.Client client, String fileId) async {
-    final driveApi = drive.DriveApi(client);
-    final response = await driveApi.files.get(
-      fileId,
-      downloadOptions: drive.DownloadOptions.metadata,
-    ) as drive.File;
+    final apiClient = SheetsApiClient(client);
+    final content = await apiClient.downloadFile(fileId);
     
-    final media = await driveApi.files.get(
-      fileId,
-      downloadOptions: drive.DownloadOptions.fullMedia,
-    ) as drive.Media;
-
-    final bytes = await media.stream.fold<List<int>>([], (p, e) => p..addAll(e));
-    final jsonStr = utf8.decode(bytes);
-    return jsonDecode(jsonStr);
+    if (content == null) {
+      throw Exception('Failed to download backup from Drive');
+    }
+    
+    return jsonDecode(content);
   }
 
   // Data Management
@@ -143,10 +126,8 @@ class BackupService extends _$BackupService {
   }
 
   Future<void> factoryReset() async {
-    // 1. Clear SharedPreferences
     await SettingsRepository().clearAll();
     
-    // 2. Clear Database (Delete file for re-seed)
     final db = ref.read(appDatabaseProvider);
     await db.close();
     

@@ -10,7 +10,9 @@ import 'package:gym_gemini_pro/features/settings/settings_provider.dart';
 import 'package:intl/intl.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:visibility_detector/visibility_detector.dart';
+import 'package:gym_gemini_pro/features/analytics/components/fitness_wrapped_card.dart';
 
 class AnalyticsDashboardScreen extends ConsumerWidget {
   const AnalyticsDashboardScreen({super.key});
@@ -49,6 +51,7 @@ class AnalyticsDashboardScreen extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              const FitnessWrappedCard(),
               // 1. Overview Stats Row
               statsAsync.when(
                 data: (stats) => _OverviewRow(stats: stats, unit: unit),
@@ -79,10 +82,10 @@ class AnalyticsDashboardScreen extends ConsumerWidget {
               // 4. Muscle Group Balance
               _SectionHeader(title: 'Muscle Balance', subtitle: 'This month vs Last month'),
               _LazyChart(
-                height: 300,
+                height: 350,
                 builder: (ref) => ref.watch(muscleBalanceProvider).when(
-                  data: (data) => _MuscleRadarChart(data: data),
-                  loading: () => const _SkeletonChart(height: 300),
+                  data: (data) => _MuscleBarChart(data: data),
+                  loading: () => const _SkeletonChart(height: 350),
                   error: (e, _) => Center(child: Text('Error: $e')),
                 ),
               ),
@@ -344,58 +347,127 @@ class _FrequencyChart extends StatelessWidget {
   }
 }
 
-class _MuscleRadarChart extends StatelessWidget {
+class _MuscleBarChart extends StatelessWidget {
   final Map<String, dynamic> data;
-  const _MuscleRadarChart({required this.data});
+  const _MuscleBarChart({required this.data});
 
   @override
   Widget build(BuildContext context) {
-    final labels = data['labels'] as List<String>;
-    final thisMonth = data['thisMonth'] as List<double>;
-    final lastMonth = data['lastMonth'] as List<double>;
+    final labels = (data['labels'] as List? ?? []).cast<String>();
+    final thisMonth = (data['thisMonth'] as List? ?? []).cast<double>();
+    final lastMonth = (data['lastMonth'] as List? ?? []).cast<double>();
 
     if (labels.isEmpty) return const _EmptyChartTip(message: 'No muscle data available for comparisons.');
 
-    // Find max value for normalization
-    double maxVal = ([...thisMonth, ...lastMonth]).isEmpty 
-        ? 1.0 
-        : ([...thisMonth, ...lastMonth]).reduce((a, b) => a > b ? a : b);
-    if (maxVal == 0) maxVal = 1;
-
     return Column(
       children: [
-        SizedBox(
-          height: 300,
-          child: RadarChart(
-            RadarChartData(
-              dataSets: [
-                RadarDataSet(
-                  dataEntries: lastMonth.map((v) => RadarEntry(value: v / maxVal)).toList(),
-                  borderColor: Colors.blue.withOpacity(0.5),
-                  fillColor: Colors.blue.withOpacity(0.1),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Column(
+            children: List.generate(labels.length, (index) {
+              final label = labels[index];
+              final current = thisMonth[index];
+              final previous = lastMonth[index];
+              final maxVal = ([...thisMonth, ...lastMonth]).reduce((a, b) => a > b ? a : b);
+              
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(label, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                        Text(
+                          '${current.toInt()} vs ${previous.toInt()} kg',
+                          style: TextStyle(fontSize: 11, color: Theme.of(context).colorScheme.outline),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    _HorizontalProgressBar(
+                      value: current,
+                      backgroundValue: previous,
+                      maxValue: maxVal == 0 ? 1 : maxVal,
+                    ),
+                  ],
                 ),
-                RadarDataSet(
-                  dataEntries: thisMonth.map((v) => RadarEntry(value: v / maxVal)).toList(),
-                  borderColor: Theme.of(context).colorScheme.primary,
-                  fillColor: Theme.of(context).colorScheme.primary.withOpacity(0.2),
-                  entryRadius: 3,
-                ),
-              ],
-              getTitle: (index, angle) => RadarChartTitle(text: labels[index], angle: angle),
-              tickCount: 3,
-              ticksTextStyle: const TextStyle(color: Colors.transparent),
-              gridBorderData: BorderSide(color: Theme.of(context).colorScheme.outlineVariant, width: 1),
-            ),
+              );
+            }),
           ),
         ),
         const SizedBox(height: 16),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            _LegendItem(label: 'Last Month', color: Colors.blue.withOpacity(0.5)),
+            _LegendItem(label: 'Last Month', color: Colors.blue.withOpacity(0.3)),
             const SizedBox(width: 24),
             _LegendItem(label: 'This Month', color: Theme.of(context).colorScheme.primary),
           ],
+        ),
+      ],
+    );
+  }
+}
+
+class _HorizontalProgressBar extends StatelessWidget {
+  final double value;
+  final double backgroundValue;
+  final double maxValue;
+
+  const _HorizontalProgressBar({
+    required this.value,
+    required this.backgroundValue,
+    required this.maxValue,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        // Background bar (Previous Month)
+        Container(
+          height: 12,
+          width: double.infinity,
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.3),
+            borderRadius: BorderRadius.circular(6),
+          ),
+        ),
+        // Previous month indicator
+        FractionallySizedBox(
+          widthFactor: (backgroundValue / maxValue).clamp(0.0, 1.0),
+          child: Container(
+            height: 12,
+            decoration: BoxDecoration(
+              color: Colors.blue.withOpacity(0.3),
+              borderRadius: BorderRadius.circular(6),
+            ),
+          ),
+        ),
+        // Current month bar
+        FractionallySizedBox(
+          widthFactor: (value / maxValue).clamp(0.0, 1.0),
+          child: Container(
+            height: 12,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Theme.of(context).colorScheme.primary.withOpacity(0.8),
+                  Theme.of(context).colorScheme.primary,
+                ],
+              ),
+              borderRadius: BorderRadius.circular(6),
+              boxShadow: [
+                BoxShadow(
+                  color: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+          ),
         ),
       ],
     );

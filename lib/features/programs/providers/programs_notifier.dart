@@ -2,8 +2,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:gym_gemini_pro/core/database/database.dart';
 import 'package:gym_gemini_pro/features/workout/workout_repository.dart';
+import 'package:gym_gemini_pro/features/workout/providers/workout_home_notifier.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'dart:convert';
 import 'package:share_plus/share_plus.dart';
 import 'package:file_picker/file_picker.dart';
 import 'dart:io';
@@ -79,5 +79,13 @@ class ProgramsNotifier extends _$ProgramsNotifier {
       await repo.importTemplateFromJson(jsonStr);
       await refresh();
     }
+  }
+
+  Future<void> makeDefault(int id) async {
+    final repo = ref.read(workoutRepositoryProvider);
+    await repo.setActiveTemplate(id);
+    // Invalidate workout home to show the new template
+    ref.invalidate(workoutHomeNotifierProvider);
+    await refresh();
   }
 }

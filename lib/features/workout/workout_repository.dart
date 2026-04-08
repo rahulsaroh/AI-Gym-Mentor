@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:drift/drift.dart';
 import 'package:gym_gemini_pro/core/database/database.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 part 'workout_repository.g.dart';
 
@@ -234,7 +235,21 @@ class WorkoutRepository {
   }
 
   Future<WorkoutTemplate?> getActiveTemplate() async {
+    final prefs = await SharedPreferences.getInstance();
+    final activeId = prefs.getInt('active_template_id');
+    
+    if (activeId != null) {
+      final template = await (_db.select(_db.workoutTemplates)..where((t) => t.id.equals(activeId))).getSingleOrNull();
+      if (template != null) return template;
+    }
+    
+    // Fallback to first if none set
     return await (_db.select(_db.workoutTemplates)..limit(1)).getSingleOrNull();
+  }
+
+  Future<void> setActiveTemplate(int id) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('active_template_id', id);
   }
 
   Future<List<TemplateDay>> getTemplateDays(int templateId) async {

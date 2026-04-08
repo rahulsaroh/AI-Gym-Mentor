@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:gym_gemini_pro/core/auth/auth_provider.dart';
+import 'package:gym_gemini_pro/services/sync_worker.dart';
 
 class OnboardingSlide {
   final String title;
@@ -34,8 +36,13 @@ final List<OnboardingSlide> slides = [
   ),
   OnboardingSlide(
     title: 'Your data, your Google Sheet',
-    subtitle: 'Sync seamlessly with Google Sheets for ultimate control.',
+    subtitle: 'Sync seamlessly with Google Sheets for ultimate control and ownership.',
     icon: LucideIcons.tableProperties,
+  ),
+  OnboardingSlide(
+    title: 'Connect Cloud Sync',
+    subtitle: 'Securely backup your workouts to your personal Google Drive automatically.',
+    icon: LucideIcons.cloud,
   ),
 ];
 
@@ -126,6 +133,10 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                                 color: Theme.of(context).colorScheme.onSurfaceVariant,
                               ),
                         ),
+                        if (index == slides.length - 1) ...[
+                          const SizedBox(height: 32),
+                          _GoogleSignInButton(onSuccess: _onNext),
+                        ],
                       ],
                     ),
                   );
@@ -184,6 +195,33 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _GoogleSignInButton extends ConsumerWidget {
+  final VoidCallback onSuccess;
+  const _GoogleSignInButton({required this.onSuccess});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return SizedBox(
+      width: double.infinity,
+      child: OutlinedButton.icon(
+        onPressed: () async {
+          final success = await ref.read(authProvider.notifier).signIn();
+          if (success) {
+            ref.read(syncWorkerProvider.notifier).processQueue();
+            onSuccess();
+          }
+        },
+        icon: const Icon(LucideIcons.chrome, size: 20),
+        label: const Text('Connect Google Drive'),
+        style: OutlinedButton.styleFrom(
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         ),
       ),
     );

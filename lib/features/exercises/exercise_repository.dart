@@ -21,20 +21,23 @@ class ExerciseRepository {
     return (_db.select(_db.exercises)..where((t) => t.id.equals(id))).getSingleOrNull();
   }
 
-  Future<int> createExercise(ExercisesCompanion companion) async {
+  Future<int> saveExercise(ExercisesCompanion companion) async {
     return _db.transaction(() async {
-      final id = await _db.into(_db.exercises).insert(companion);
-      // For simplicity, we queue all new exercises to the spreadsheet if they are created by the user
+      int id;
+      if (companion.id.present) {
+        await _db.update(_db.exercises).replace(companion);
+        id = companion.id.value;
+      } else {
+        id = await _db.into(_db.exercises).insert(companion);
+      }
+      
+      // Queue for sync if it's a custom exercise or being modified
       await _db.into(_db.syncQueue).insert(SyncQueueCompanion.insert(
             type: 'exercise',
             createdAt: DateTime.now(),
           ));
       return id;
     });
-  }
-
-  Future<bool> updateExercise(ExercisesCompanion companion) {
-    return _db.update(_db.exercises).replace(companion);
   }
 
   Future<int> deleteExercise(int id) {

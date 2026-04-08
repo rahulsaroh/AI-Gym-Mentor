@@ -44,6 +44,7 @@ dependencies:
   # Database
   drift: ^2.16.0
   sqlite3_flutter_libs: 0.5.20
+  sqflite: ^2.3.0
   path_provider: ^2.1.2
   path: ^1.9.0
 
@@ -60,19 +61,21 @@ dependencies:
   share_plus: ^10.0.0
   file_picker: ^8.0.5
   csv: ^6.0.0
+  pdf: ^3.10.8
+  printing: ^5.11.1
   package_info_plus: ^8.0.2
   firebase_core: ^2.27.0
   google_sign_in: ^6.2.1
-  googleapis: ^13.1.0
-  googleapis_auth: ^1.4.1
-  extension_google_sign_in_as_googleapis_auth: ^2.0.1
   connectivity_plus: ^5.0.2
-  http: ^1.2.0
+  http: ^1.2.1
+  url_launcher: ^6.2.5
   permission_handler: ^11.3.1
   flutter_background_service: ^5.1.0
 
   # Phase 11: Animations & Gestures
   shimmer: ^3.0.0
+  cached_network_image: ^3.3.1
+  flutter_cache_manager: ^3.3.1
   confetti: ^0.7.0
   sensors_plus: ^5.0.0
   audioplayers: ^5.2.1

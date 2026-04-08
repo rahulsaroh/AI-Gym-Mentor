@@ -125,9 +125,38 @@ class _ProgramCard extends ConsumerWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          template.name,
-                          style: GoogleFonts.outfit(fontSize: 18, fontWeight: FontWeight.bold),
+                        Row(
+                          children: [
+                            Text(
+                              template.name,
+                              style: GoogleFonts.outfit(fontSize: 18, fontWeight: FontWeight.bold),
+                            ),
+                            const SizedBox(width: 8),
+                            FutureBuilder<bool>(
+                              future: ref.read(workoutRepositoryProvider).getActiveTemplate().then((t) => t?.id == template.id),
+                              builder: (context, snapshot) {
+                                if (snapshot.data == true) {
+                                  return Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                    decoration: BoxDecoration(
+                                      color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                                      borderRadius: BorderRadius.circular(4),
+                                      border: Border.all(color: Theme.of(context).colorScheme.primary.withOpacity(0.5)),
+                                    ),
+                                    child: Text(
+                                      'ACTIVE',
+                                      style: TextStyle(
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.bold,
+                                        color: Theme.of(context).colorScheme.primary,
+                                      ),
+                                    ),
+                                  );
+                                }
+                                return const SizedBox.shrink();
+                              },
+                            ),
+                          ],
                         ),
                         if (template.description != null) ...[
                           const SizedBox(height: 4),
@@ -146,6 +175,10 @@ class _ProgramCard extends ConsumerWidget {
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     itemBuilder: (context) => [
                       const PopupMenuItem(
+                        value: 'default',
+                        child: Row(children: [Icon(LucideIcons.star, size: 18), SizedBox(width: 8), Text('Set as Default')]),
+                      ),
+                      const PopupMenuItem(
                         value: 'export',
                         child: Row(children: [Icon(LucideIcons.share, size: 18), SizedBox(width: 8), Text('Export JSON')]),
                       ),
@@ -155,7 +188,9 @@ class _ProgramCard extends ConsumerWidget {
                       ),
                     ],
                     onSelected: (val) {
-                      if (val == 'export') {
+                      if (val == 'default') {
+                        ref.read(programsNotifierProvider.notifier).makeDefault(template.id);
+                      } else if (val == 'export') {
                         ref.read(programsNotifierProvider.notifier).exportTemplate(template.id);
                       } else if (val == 'delete') {
                         _showDeleteDialog(context, ref);

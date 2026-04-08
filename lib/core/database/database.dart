@@ -1,9 +1,8 @@
 import 'dart:io';
-
+import 'dart:convert';
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:flutter/foundation.dart';
-import 'dart:convert';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
@@ -16,7 +15,7 @@ enum SetType { straight, warmup, superset, dropSet, amrap, timed, restPause, clu
 
 class Exercises extends Table {
   IntColumn get id => integer().autoIncrement()();
-  TextColumn get name => text().withLength(min: 1, max: 100)();
+  TextColumn get name => text().withLength(min: 1, max: 255)();
   TextColumn get primaryMuscle => text()();
   TextColumn get secondaryMuscle => text().nullable()();
   TextColumn get equipment => text()();
@@ -75,6 +74,7 @@ class WorkoutSets extends Table {
   RealColumn get reps => real()();
   RealColumn get weight => real()();
   RealColumn get rpe => real().nullable()();
+  IntColumn get rir => integer().nullable()();
   IntColumn get setType => intEnum<SetType>().withDefault(const Constant(0))();
   TextColumn get notes => text().nullable()();
   BoolColumn get completed => boolean().withDefault(const Constant(false))();
@@ -131,10 +131,10 @@ class ExerciseProgressionSettings extends Table {
   ExerciseProgressionSettings,
 ])
 class AppDatabase extends _$AppDatabase {
-  AppDatabase() : super(_openConnection());
+  AppDatabase([QueryExecutor? e]) : super(e ?? _openConnection());
 
   @override
-  int get schemaVersion => 8;
+  int get schemaVersion => 9;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -193,6 +193,11 @@ class AppDatabase extends _$AppDatabase {
               await m.addColumn(workoutSets, workoutSets.isPr);
             }
           }
+          if (from < 9) {
+            if (!await hasColumn('workout_sets', 'rir')) {
+              await m.addColumn(workoutSets, workoutSets.rir);
+            }
+          }
         },
         beforeOpen: (details) async {
           await customStatement('PRAGMA foreign_keys = ON');
@@ -201,9 +206,10 @@ class AppDatabase extends _$AppDatabase {
             await batch((b) async {
               await _seedInitialData(b);
             });
-            await _seedSampleProgram();
+            await _seedSamplePrograms();
           } else {
             await seedExercisesIfEmpty();
+            await _seedProgramsIfMissing();
           }
         },
       );
@@ -233,32 +239,39 @@ class AppDatabase extends _$AppDatabase {
     }
   }
 
-  Future<void> _seedSampleProgram() async {
+  Future<void> _seedSamplePrograms() async {
     final allExercises = await select(exercises).get();
     final exerciseMap = {for (var e in allExercises) e.name: e.id};
 
+    await _seedProgram(samplePPLProgram, exerciseMap);
+    await _seedProgram(elitePPLProgram, exerciseMap);
+    await _seedImportedPrograms(exerciseMap);
+  }
+
+  Future<void> _seedProgram(SampleProgram program, Map<String, int> exerciseMap) async {
     final templateId = await into(workoutTemplates).insert(WorkoutTemplatesCompanion.insert(
-      name: samplePPLProgram.name,
-      description: Value(samplePPLProgram.description),
+      name: program.name,
+      description: Value(program.description),
     ));
 
-    for (int i = 0; i < samplePPLProgram.days.length; i++) {
-      final day = samplePPLProgram.days[i];
+    for (int i = 0; i < program.days.length; i++) {
+      final day = program.days[i];
       final dayId = await into(templateDays).insert(TemplateDaysCompanion.insert(
         templateId: templateId,
         name: day.name,
         order: i,
       ));
 
-      for (int j = 0; j < day.exerciseNames.length; j++) {
-        final exName = day.exerciseNames[j];
-        final exId = exerciseMap[exName];
+      for (int j = 0; j < day.exercises.length; j++) {
+        final ex = day.exercises[j];
+        final exId = exerciseMap[ex.name];
         if (exId != null) {
           await into(templateExercises).insert(TemplateExercisesCompanion.insert(
             dayId: dayId,
             exerciseId: exId,
             order: j,
-            setsJson: '[]',
+            setsJson: ex.setsJson,
+            notes: Value(ex.notes),
           ));
         }
       }
@@ -267,11 +280,111 @@ class AppDatabase extends _$AppDatabase {
 
   Future<void> seedExercisesIfEmpty() async {
     final allEx = await select(exercises).get();
-    if (allEx.isEmpty) {
-      debugPrint('Database: Exercises table is empty. Seeding initial data...');
+    final existingNames = allEx.map((e) => e.name).toSet();
+    
+    final missingExercises = initialExercises.where((e) => !existingNames.contains(e.name.value)).toList();
+    
+    if (missingExercises.isNotEmpty) {
+      debugPrint('Database: Adding ${missingExercises.length} missing exercises...');
       await batch((b) async {
-        await _seedInitialData(b);
+        b.insertAll(exercises, missingExercises);
       });
+    }
+  }
+
+  Future<void> _seedProgramsIfMissing() async {
+    final allTemplates = await select(workoutTemplates).get();
+    final templateNames = allTemplates.map((t) => t.name).toSet();
+
+    final allExercises = await select(exercises).get();
+    final exerciseMap = {for (var e in allExercises) e.name: e.id};
+
+    if (!templateNames.contains(samplePPLProgram.name)) {
+      await _seedProgram(samplePPLProgram, exerciseMap);
+    }
+    if (!templateNames.contains(elitePPLProgram.name)) {
+      await _seedProgram(elitePPLProgram, exerciseMap);
+    }
+    await _seedImportedPrograms(exerciseMap);
+  }
+
+  Future<void> _seedImportedPrograms(Map<String, int> exerciseMap) async {
+    final templateNames = await select(workoutTemplates).get();
+    if (templateNames.any((t) => t.name == '6 Day PPL')) return;
+
+    try {
+      final jsonStr = await rootBundle.loadString('assets/data/imported_ppl.json');
+      final data = jsonDecode(jsonStr);
+      final name = data['name'] as String;
+      final description = data['description'] as String?;
+      final days = data['days'] as List;
+
+      await transaction(() async {
+        final templateId = await into(workoutTemplates).insert(WorkoutTemplatesCompanion.insert(
+          name: name,
+          description: Value(description),
+        ));
+
+        for (final dayData in days) {
+          final dayId = await into(templateDays).insert(TemplateDaysCompanion.insert(
+            templateId: templateId,
+            name: dayData['name'],
+            order: dayData['order'],
+          ));
+
+          final exercisesArr = dayData['exercises'] as List;
+          
+          // Also create a "Completed Workout" for history for each Day in the Excel
+          final workoutId = await into(workouts).insert(WorkoutsCompanion.insert(
+            name: 'PPL History: ${dayData['name']}',
+            date: DateTime.now().subtract(const Duration(days: 7)),
+            status: const Value('completed'),
+            templateId: Value(templateId),
+            dayId: Value(dayId),
+          ));
+
+          for (final exData in exercisesArr) {
+            final exerciseName = exData['exerciseName'] as String;
+            final exId = exerciseMap[exerciseName];
+            
+            // If exercise not in Drift, we insert it as custom
+            final finalExId = exId ?? await into(exercises).insert(ExercisesCompanion.insert(
+              name: exerciseName,
+              primaryMuscle: 'Full Body',
+              equipment: 'None',
+              setType: 'Straight',
+            ));
+            
+            exerciseMap[exerciseName] = finalExId;
+
+            // Add to template
+            await into(templateExercises).insert(TemplateExercisesCompanion.insert(
+              dayId: dayId,
+              exerciseId: finalExId,
+              order: exData['order'],
+              setsJson: exData['setsJson'],
+              notes: Value(exData['notes']),
+            ));
+
+            // Add to session history (Logs)
+            final setsData = jsonDecode(exData['setsJson']) as List;
+            for (int k = 0; k < setsData.length; k++) {
+              final setData = setsData[k];
+              await into(workoutSets).insert(WorkoutSetsCompanion.insert(
+                workoutId: workoutId,
+                exerciseId: finalExId,
+                exerciseOrder: exData['order'],
+                setNumber: k + 1,
+                reps: (setData['reps'] as num).toDouble(),
+                weight: (setData['weight'] as num).toDouble(),
+                completed: const Value(true),
+              ));
+            }
+          }
+        }
+      });
+    } catch (e) {
+      debugPrint('Database: Error seeding imported program: $e');
     }
   }
 }

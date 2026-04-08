@@ -11,6 +11,7 @@ import 'package:intl/intl.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:gym_gemini_pro/features/settings/models/settings_state.dart';
 import 'package:go_router/go_router.dart';
+import 'package:gym_gemini_pro/services/export_service.dart';
 
 class HistoryScreen extends ConsumerStatefulWidget {
   const HistoryScreen({super.key});
@@ -55,6 +56,13 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
             title: const Text('History'),
             floating: true,
             pinned: true,
+            actions: [
+              IconButton(
+                icon: const Icon(LucideIcons.share2),
+                onPressed: () => _showExportMenu(context),
+              ),
+              const SizedBox(width: 8),
+            ],
           ),
           SliverToBoxAdapter(
             child: statsAsync.when(
@@ -96,6 +104,55 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
           ),
           const SliverPadding(padding: EdgeInsets.only(bottom: 100)),
         ],
+      ),
+    );
+  }
+
+  void _showExportMenu(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        padding: const EdgeInsets.symmetric(vertical: 24),
+        decoration: BoxDecoration(
+          color: Theme.of(context).scaffoldBackgroundColor,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+              child: Row(
+                children: [
+                  const Icon(LucideIcons.download, size: 20),
+                  const SizedBox(width: 12),
+                  Text('Export History', style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+            ListTile(
+              leading: const Icon(LucideIcons.fileSpreadsheet, color: Colors.green),
+              title: const Text('Export as CSV'),
+              subtitle: const Text('Best for Excel or Google Sheets'),
+              onTap: () {
+                Navigator.pop(context);
+                ref.read(exportServiceProvider).exportToCsv();
+              },
+            ),
+            ListTile(
+              leading: const Icon(LucideIcons.fileText, color: Colors.red),
+              title: const Text('Export as PDF'),
+              subtitle: const Text('Professional training report'),
+              onTap: () {
+                Navigator.pop(context);
+                ref.read(exportServiceProvider).exportToPdf();
+              },
+            ),
+            const SizedBox(height: 24),
+          ],
+        ),
       ),
     );
   }
@@ -552,7 +609,14 @@ class _CompactStat extends StatelessWidget {
       children: [
         Icon(icon, size: 14, color: Theme.of(context).colorScheme.outline),
         const SizedBox(width: 4),
-        Text(label, style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.outline)),
+        Expanded(
+          child: Text(
+            label, 
+            style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.outline),
+            overflow: TextOverflow.ellipsis,
+            maxLines: 1,
+          ),
+        ),
       ],
     );
   }

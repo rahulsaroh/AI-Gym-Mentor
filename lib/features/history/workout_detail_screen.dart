@@ -300,7 +300,14 @@ class _ExerciseDetailBlock extends ConsumerWidget {
           onTap: () => context.push('/exercises/history/${exercise.id}'),
           child: Row(
             children: [
-              Text(exercise.name, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.blue)),
+              Expanded(
+                child: Text(
+                  exercise.name, 
+                  style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.blue),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                ),
+              ),
               const SizedBox(width: 4),
               const Icon(LucideIcons.externalLink, size: 14, color: Colors.blue),
             ],

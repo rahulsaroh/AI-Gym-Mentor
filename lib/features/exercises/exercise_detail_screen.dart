@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:gym_gemini_pro/core/database/database.dart';
 import 'package:gym_gemini_pro/features/exercises/exercises_provider.dart';
 import 'package:gym_gemini_pro/services/progression_service.dart';
+import 'package:gym_gemini_pro/features/exercises/exercise_repository.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:drift/drift.dart' show Value;
 
@@ -408,25 +409,23 @@ class _ExerciseDetailScreenState extends ConsumerState<ExerciseDetailScreen> {
                 );
                 return;
               }
-              final db = ref.read(appDatabaseProvider);
-              
-              if (isNew) {
-                await db.into(db.exercises).insert(ExercisesCompanion.insert(
-                  name: _nameController.text.trim(),
-                  primaryMuscle: _selectedMuscle,
-                  equipment: _selectedEquipment,
-                  setType: 'Straight',
-                  isCustom: const Value(true),
-                ));
-              } else {
-                await (db.update(db.exercises)..where((t) => t.id.equals(widget.exerciseId))).write(
-                  ExercisesCompanion(
-                    name: Value(_nameController.text.trim()),
-                    primaryMuscle: Value(_selectedMuscle),
-                    equipment: Value(_selectedEquipment),
-                  ),
-                );
-              }
+              final repository = ref.read(exerciseRepositoryProvider);
+              final companion = isNew
+                  ? ExercisesCompanion.insert(
+                      name: _nameController.text.trim(),
+                      primaryMuscle: _selectedMuscle,
+                      equipment: _selectedEquipment,
+                      setType: 'Straight',
+                      isCustom: const Value(true),
+                    )
+                  : ExercisesCompanion(
+                      id: Value(widget.exerciseId),
+                      name: Value(_nameController.text.trim()),
+                      primaryMuscle: Value(_selectedMuscle),
+                      equipment: Value(_selectedEquipment),
+                    );
+
+              await repository.saveExercise(companion);
               
               ref.invalidate(allExercisesProvider);
               if (mounted) context.pop();

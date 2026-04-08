@@ -22,6 +22,9 @@ import 'package:gym_gemini_pro/features/programs/programs_screen.dart';
 import 'package:gym_gemini_pro/features/programs/create_edit_program_screen.dart';
 import 'package:gym_gemini_pro/features/workout/start_workout_screen.dart';
 import 'package:gym_gemini_pro/features/settings/sync_log_screen.dart';
+import 'package:gym_gemini_pro/features/exercises/exercise_library_screen.dart';
+import 'package:gym_gemini_pro/features/exercises/exercise_library_detail_screen.dart';
+
 
 final router = GoRouter(
   initialLocation: '/',
@@ -116,6 +119,19 @@ final router = GoRouter(
                     final id = int.tryParse(state.pathParameters['id'] ?? '0') ?? 0;
                     return ExerciseHistoryScreen(exerciseId: id);
                   },
+                ),
+                GoRoute(
+                  path: 'library',
+                  builder: (context, state) => const ExerciseLibraryScreen(),
+                  routes: [
+                    GoRoute(
+                      path: ':id',
+                      builder: (context, state) {
+                        final id = state.pathParameters['id'] ?? '';
+                        return ExerciseLibraryDetailScreen(exerciseId: id);
+                      },
+                    ),
+                  ],
                 ),
               ],
             ),
