@@ -105,12 +105,14 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
                         decoration: InputDecoration(
                           hintText: "e.g. Alex",
                           filled: true,
-                          fillColor: colorScheme.surfaceContainerHighest.withOpacity(0.3),
+                          fillColor: colorScheme.surfaceContainerHighest
+                              .withOpacity(0.3),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: BorderSide.none,
                           ),
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                          contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 16),
                         ),
                       ),
                       const SizedBox(height: 24),
@@ -121,7 +123,8 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
                         width: double.infinity,
                         padding: const EdgeInsets.all(4),
                         decoration: BoxDecoration(
-                          color: colorScheme.surfaceContainerHighest.withOpacity(0.3),
+                          color: colorScheme.surfaceContainerHighest
+                              .withOpacity(0.3),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Row(
@@ -130,16 +133,21 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
                               final isSelected = _selectedUnit == unit;
                               return Expanded(
                                 child: GestureDetector(
-                                  onTap: () => setState(() => _selectedUnit = unit),
+                                  onTap: () =>
+                                      setState(() => _selectedUnit = unit),
                                   child: Container(
-                                    padding: const EdgeInsets.symmetric(vertical: 12),
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 12),
                                     decoration: BoxDecoration(
-                                      color: isSelected ? colorScheme.surface : Colors.transparent,
+                                      color: isSelected
+                                          ? colorScheme.surface
+                                          : Colors.transparent,
                                       borderRadius: BorderRadius.circular(8),
                                       boxShadow: isSelected
                                           ? [
                                               BoxShadow(
-                                                color: Colors.black.withOpacity(0.05),
+                                                color: Colors.black
+                                                    .withOpacity(0.05),
                                                 blurRadius: 4,
                                                 offset: const Offset(0, 2),
                                               )
@@ -151,7 +159,9 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
                                       textAlign: TextAlign.center,
                                       style: TextStyle(
                                         fontWeight: FontWeight.bold,
-                                        color: isSelected ? colorScheme.onSurface : colorScheme.onSurfaceVariant,
+                                        color: isSelected
+                                            ? colorScheme.onSurface
+                                            : colorScheme.onSurfaceVariant,
                                       ),
                                     ),
                                   ),
@@ -170,24 +180,32 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
                         return Padding(
                           padding: const EdgeInsets.only(bottom: 12.0),
                           child: InkWell(
-                            onTap: () => setState(() => _selectedExperience = exp),
+                            onTap: () =>
+                                setState(() => _selectedExperience = exp),
                             borderRadius: BorderRadius.circular(12),
                             child: Container(
                               width: double.infinity,
                               padding: const EdgeInsets.all(16),
                               decoration: BoxDecoration(
                                 border: Border.all(
-                                  color: isSelected ? colorScheme.primary : colorScheme.outlineVariant,
+                                  color: isSelected
+                                      ? colorScheme.primary
+                                      : colorScheme.outlineVariant,
                                   width: 2,
                                 ),
                                 borderRadius: BorderRadius.circular(12),
-                                color: isSelected ? colorScheme.primary.withOpacity(0.05) : Colors.transparent,
+                                color: isSelected
+                                    ? colorScheme.primary.withOpacity(0.05)
+                                    : Colors.transparent,
                               ),
                               child: Text(
-                                exp.name[0].toUpperCase() + exp.name.substring(1),
+                                exp.name[0].toUpperCase() +
+                                    exp.name.substring(1),
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
-                                  color: isSelected ? colorScheme.primary : colorScheme.onSurface,
+                                  color: isSelected
+                                      ? colorScheme.primary
+                                      : colorScheme.onSurface,
                                 ),
                               ),
                             ),
@@ -204,15 +222,19 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
                   width: double.infinity,
                   height: 56,
                   child: FilledButton(
-                    onPressed: _nameController.text.trim().isEmpty || _isSaving ? null : _handleComplete,
+                    onPressed: _nameController.text.trim().isEmpty || _isSaving
+                        ? null
+                        : _handleComplete,
                     style: FilledButton.styleFrom(
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12)),
                     ),
                     child: _isSaving
                         ? const CircularProgressIndicator(color: Colors.white)
                         : const Text(
                             "Complete Setup",
-                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                            style: TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.bold),
                           ),
                   ),
                 ),

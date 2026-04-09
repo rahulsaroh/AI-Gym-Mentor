@@ -6,15 +6,19 @@ import 'package:flutter/foundation.dart';
 /// Uses raw HTTP calls to reduce APK size.
 class SheetsApiClient {
   final http.Client client;
-  static const String _sheetsBaseUrl = 'https://sheets.googleapis.com/v4/spreadsheets';
-  static const String _driveBaseUrl = 'https://www.googleapis.com/drive/v3/files';
+  static const String _sheetsBaseUrl =
+      'https://sheets.googleapis.com/v4/spreadsheets';
+  static const String _driveBaseUrl =
+      'https://www.googleapis.com/drive/v3/files';
 
   SheetsApiClient(this.client);
 
   /// Search for an existing spreadsheet by name.
   Future<String?> findSpreadsheetId(String name) async {
-    final query = "name = '$name' and mimeType = 'application/vnd.google-apps.spreadsheet' and trashed = false";
-    final url = Uri.parse('$_driveBaseUrl?q=${Uri.encodeComponent(query)}&spaces=drive&fields=files(id,name)');
+    final query =
+        "name = '$name' and mimeType = 'application/vnd.google-apps.spreadsheet' and trashed = false";
+    final url = Uri.parse(
+        '$_driveBaseUrl?q=${Uri.encodeComponent(query)}&spaces=drive&fields=files(id,name)');
 
     try {
       final response = await client.get(url);
@@ -25,7 +29,8 @@ class SheetsApiClient {
           return files.first['id'] as String?;
         }
       } else {
-        debugPrint('SheetsApiClient: findSpreadsheetId failed (${response.statusCode}): ${response.body}');
+        debugPrint(
+            'SheetsApiClient: findSpreadsheetId failed (${response.statusCode}): ${response.body}');
       }
     } catch (e) {
       debugPrint('SheetsApiClient: Error finding spreadsheet: $e');
@@ -34,11 +39,16 @@ class SheetsApiClient {
   }
 
   /// Create a new spreadsheet with the given title and sheets.
-  Future<Map<String, dynamic>?> createSpreadsheet(String title, List<String> sheetTitles) async {
+  Future<Map<String, dynamic>?> createSpreadsheet(
+      String title, List<String> sheetTitles) async {
     final url = Uri.parse(_sheetsBaseUrl);
     final body = {
       'properties': {'title': title},
-      'sheets': sheetTitles.map((t) => {'properties': {'title': t}}).toList(),
+      'sheets': sheetTitles
+          .map((t) => {
+                'properties': {'title': t}
+              })
+          .toList(),
     };
 
     try {
@@ -51,7 +61,8 @@ class SheetsApiClient {
       if (response.statusCode == 200) {
         return jsonDecode(response.body);
       } else {
-        debugPrint('SheetsApiClient: createSpreadsheet failed (${response.statusCode}): ${response.body}');
+        debugPrint(
+            'SheetsApiClient: createSpreadsheet failed (${response.statusCode}): ${response.body}');
       }
     } catch (e) {
       debugPrint('SheetsApiClient: Error creating spreadsheet: $e');
@@ -60,7 +71,8 @@ class SheetsApiClient {
   }
 
   /// Batch update spreadsheet (formatting, freezing rows, etc).
-  Future<void> batchUpdate(String spreadsheetId, List<Map<String, dynamic>> requests) async {
+  Future<void> batchUpdate(
+      String spreadsheetId, List<Map<String, dynamic>> requests) async {
     final url = Uri.parse('$_sheetsBaseUrl/$spreadsheetId:batchUpdate');
     final body = {'requests': requests};
 
@@ -72,7 +84,8 @@ class SheetsApiClient {
       );
 
       if (response.statusCode != 200) {
-        debugPrint('SheetsApiClient: batchUpdate failed (${response.statusCode}): ${response.body}');
+        debugPrint(
+            'SheetsApiClient: batchUpdate failed (${response.statusCode}): ${response.body}');
       }
     } catch (e) {
       debugPrint('SheetsApiClient: Error in batchUpdate: $e');
@@ -80,8 +93,10 @@ class SheetsApiClient {
   }
 
   /// Append rows to a specific range.
-  Future<void> appendValues(String spreadsheetId, String range, List<List<dynamic>> values) async {
-    final url = Uri.parse('$_sheetsBaseUrl/$spreadsheetId/values/$range:append?valueInputOption=USER_ENTERED');
+  Future<void> appendValues(
+      String spreadsheetId, String range, List<List<dynamic>> values) async {
+    final url = Uri.parse(
+        '$_sheetsBaseUrl/$spreadsheetId/values/$range:append?valueInputOption=USER_ENTERED');
     final body = {'values': values};
 
     try {
@@ -95,7 +110,8 @@ class SheetsApiClient {
         if (response.statusCode == 429) {
           throw Exception('RATE_LIMIT_EXCEEDED');
         }
-        debugPrint('SheetsApiClient: appendValues failed (${response.statusCode}): ${response.body}');
+        debugPrint(
+            'SheetsApiClient: appendValues failed (${response.statusCode}): ${response.body}');
         throw Exception('Sheets API Error: ${response.statusCode}');
       }
     } catch (e) {
@@ -112,8 +128,10 @@ class SheetsApiClient {
     String? fileId,
   }) async {
     final url = fileId == null
-        ? Uri.parse('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart')
-        : Uri.parse('https://www.googleapis.com/upload/drive/v3/files/$fileId?uploadType=multipart');
+        ? Uri.parse(
+            'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart')
+        : Uri.parse(
+            'https://www.googleapis.com/upload/drive/v3/files/$fileId?uploadType=multipart');
 
     final boundary = '-------314159265358979323846';
     final delimiter = "\r\n--$boundary\r\n";
@@ -145,7 +163,8 @@ class SheetsApiClient {
 
       if (response.statusCode != 200) {
         final resBody = await response.stream.bytesToString();
-        debugPrint('SheetsApiClient: uploadFile failed (${response.statusCode}): $resBody');
+        debugPrint(
+            'SheetsApiClient: uploadFile failed (${response.statusCode}): $resBody');
       }
     } catch (e) {
       debugPrint('SheetsApiClient: Error uploading file: $e');
@@ -154,7 +173,8 @@ class SheetsApiClient {
 
   /// List files matching a query.
   Future<List<dynamic>> listFiles(String query, {String? orderBy}) async {
-    var urlStr = '$_driveBaseUrl?q=${Uri.encodeComponent(query)}&spaces=drive&fields=files(id,name,modifiedTime)';
+    var urlStr =
+        '$_driveBaseUrl?q=${Uri.encodeComponent(query)}&spaces=drive&fields=files(id,name,modifiedTime)';
     if (orderBy != null) {
       urlStr += '&orderBy=${Uri.encodeComponent(orderBy)}';
     }

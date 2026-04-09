@@ -18,9 +18,9 @@ class RestTimerOverlay extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final timerState = ref.watch(timerNotifierProvider);
     final notifier = ref.read(timerNotifierProvider.notifier);
-    
-    final double progress = timerState.initialDuration > 0 
-        ? timerState.remainingSeconds / timerState.initialDuration 
+
+    final double progress = timerState.initialDuration > 0
+        ? timerState.remainingSeconds / timerState.initialDuration
         : 0;
 
     // Auto-close overlay when timer finishes or stops
@@ -92,7 +92,8 @@ class RestTimerOverlay extends ConsumerWidget {
     );
   }
 
-  Widget _buildTimerCircle(BuildContext context, int remaining, double progress) {
+  Widget _buildTimerCircle(
+      BuildContext context, int remaining, double progress) {
     return Stack(
       alignment: Alignment.center,
       children: [
@@ -102,8 +103,9 @@ class RestTimerOverlay extends ConsumerWidget {
           child: CustomPaint(
             painter: TimerPainter(
               progress: progress,
-              color: Theme.of(context).colorScheme.primary,
-              backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+              color: Theme.of(context).primaryColor,
+              backgroundColor:
+                  Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
             ),
           ),
         ),
@@ -113,11 +115,11 @@ class RestTimerOverlay extends ConsumerWidget {
             Text(
               _formatTime(remaining),
               style: Theme.of(context).textTheme.displayLarge?.copyWith(
-                    fontWeight: FontWeight.w900,
-                    fontSize: 56,
-                    letterSpacing: -2,
-                    fontFeatures: [const FontFeature.tabularFigures()],
-                  ),
+                fontWeight: FontWeight.w900,
+                fontSize: 56,
+                letterSpacing: -2,
+                fontFeatures: [const FontFeature.tabularFigures()],
+              ),
             ),
             Text(
               'REMAINING',
@@ -133,7 +135,8 @@ class RestTimerOverlay extends ConsumerWidget {
     );
   }
 
-  Widget _buildControls(BuildContext context, TimerNotifier notifier, bool isRunning) {
+  Widget _buildControls(
+      BuildContext context, TimerNotifier notifier, bool isRunning) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -169,7 +172,8 @@ class RestTimerOverlay extends ConsumerWidget {
     );
   }
 
-  Widget _buildSkipButton(BuildContext context, TimerNotifier notifier, VoidCallback onClose) {
+  Widget _buildSkipButton(
+      BuildContext context, TimerNotifier notifier, VoidCallback onClose) {
     return TextButton(
       onPressed: () {
         notifier.stop();

@@ -11,7 +11,15 @@ class PlateCalculatorDialog extends StatelessWidget {
     this.barWeight = 20.0,
   });
 
-  static const List<double> availablePlates = [25.0, 20.0, 15.0, 10.0, 5.0, 2.5, 1.25];
+  static const List<double> availablePlates = [
+    25.0,
+    20.0,
+    15.0,
+    10.0,
+    5.0,
+    2.5,
+    1.25
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -54,7 +62,8 @@ class PlateCalculatorDialog extends StatelessWidget {
             const SizedBox(height: 16),
             Column(
               children: [
-                Text('Target Weight', style: Theme.of(context).textTheme.bodySmall),
+                Text('Target Weight',
+                    style: Theme.of(context).textTheme.bodySmall),
                 Text(
                   '${targetWeight.toStringAsFixed(1)} kg',
                   style: Theme.of(context).textTheme.headlineMedium?.copyWith(
@@ -75,7 +84,10 @@ class PlateCalculatorDialog extends StatelessWidget {
               Container(
                 height: 100,
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.3),
+                  color: Theme.of(context)
+                      .colorScheme
+                      .surfaceContainerHighest
+                      .withOpacity(0.3),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Center(
@@ -85,12 +97,16 @@ class PlateCalculatorDialog extends StatelessWidget {
                       Container(
                         width: 8,
                         height: 40,
-                        color: Theme.of(context).colorScheme.outline.withOpacity(0.5),
+                        color: Theme.of(context)
+                            .colorScheme
+                            .outline
+                            .withOpacity(0.5),
                       ),
                       const SizedBox(width: 4),
                       ...platesNeeded.expand((p) {
                         return List.generate(p['count'], (index) {
-                          final double h = (p['weight'] * 2.0).clamp(30.0, 80.0);
+                          final double h =
+                              (p['weight'] * 2.0).clamp(30.0, 80.0);
                           final double w = (p['weight'] * 0.8).clamp(8.0, 20.0);
                           return Container(
                             margin: const EdgeInsets.symmetric(horizontal: 1),
@@ -135,9 +151,12 @@ class PlateCalculatorDialog extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text('${p['weight']} kg',
-                              style: const TextStyle(fontWeight: FontWeight.bold)),
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.bold)),
                           Text('x ${p['count']}',
-                              style: TextStyle(color: Theme.of(context).colorScheme.outline)),
+                              style: TextStyle(
+                                  color:
+                                      Theme.of(context).colorScheme.outline)),
                         ],
                       ),
                     );

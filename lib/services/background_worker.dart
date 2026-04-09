@@ -10,7 +10,7 @@ void callbackDispatcher() {
     try {
       if (task == 'weeklyBackup') {
         final googleSignIn = container.read(googleSignInProvider);
-        
+
         // Ensure user is signed in
         final user = await googleSignIn.signInSilently();
         if (user == null) return false;
@@ -18,7 +18,9 @@ void callbackDispatcher() {
         final client = await googleSignIn.getAuthenticatedClient();
         if (client == null) return false;
 
-        await container.read(backupServiceProvider.notifier).uploadToDrive(client);
+        await container
+            .read(backupServiceProvider.notifier)
+            .uploadToDrive(client);
       }
       return true;
     } catch (e) {
@@ -55,8 +57,9 @@ class BackgroundWorker {
     final now = DateTime.now();
     int daysUntilSunday = (DateTime.sunday - now.weekday) % 7;
     if (daysUntilSunday == 0 && now.hour >= 8) daysUntilSunday = 7;
-    
-    final nextSunday = DateTime(now.year, now.month, now.day + daysUntilSunday, 8);
+
+    final nextSunday =
+        DateTime(now.year, now.month, now.day + daysUntilSunday, 8);
     return nextSunday.difference(now);
   }
 }

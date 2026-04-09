@@ -23,7 +23,8 @@ class WorkoutHomeScreen extends ConsumerWidget {
 
     return Scaffold(
       body: RefreshIndicator(
-        onRefresh: () => ref.read(workoutHomeNotifierProvider.notifier).refresh(),
+        onRefresh: () =>
+            ref.read(workoutHomeNotifierProvider.notifier).refresh(),
         child: homeState.when(
           data: (state) => Stack(
             children: [
@@ -42,7 +43,8 @@ class WorkoutHomeScreen extends ConsumerWidget {
               ),
               Consumer(
                 builder: (context, ref, _) {
-                  final activeDraft = ref.watch(workoutHomeNotifierProvider.select((s) => s.asData?.value.activeDraft));
+                  final activeDraft = ref.watch(workoutHomeNotifierProvider
+                      .select((s) => s.asData?.value.activeDraft));
                   if (activeDraft != null) {
                     return _FloatingWorkoutBanner(workout: activeDraft);
                   }
@@ -115,7 +117,7 @@ class _HeaderSection extends StatelessWidget {
                   fontSize: 11,
                   fontWeight: FontWeight.w800,
                   letterSpacing: 1.2,
-                  color: Theme.of(context).colorScheme.primary.withOpacity(0.7),
+                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.7),
                 ),
               ),
             ],
@@ -132,7 +134,7 @@ class _SyncIndicator extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final syncStatus = ref.watch(syncWorkerProvider);
-    
+
     switch (syncStatus) {
       case SyncStatus.syncing:
         return _buildChip(
@@ -140,7 +142,8 @@ class _SyncIndicator extends ConsumerWidget {
           icon: const SizedBox(
             width: 12,
             height: 12,
-            child: CircularProgressIndicator(strokeWidth: 2, color: Colors.blue),
+            child:
+                CircularProgressIndicator(strokeWidth: 2, color: Colors.blue),
           ),
           label: 'Syncing...',
           color: Colors.blue,
@@ -150,7 +153,8 @@ class _SyncIndicator extends ConsumerWidget {
           onTap: () => ref.read(syncWorkerProvider.notifier).processQueue(),
           child: _buildChip(
             context,
-            icon: const Icon(LucideIcons.cloudAlert, size: 14, color: Colors.orange),
+            icon: const Icon(LucideIcons.cloudAlert,
+                size: 14, color: Colors.orange),
             label: 'Retry Sync',
             color: Colors.orange,
           ),
@@ -160,7 +164,8 @@ class _SyncIndicator extends ConsumerWidget {
           onTap: () => context.push('/settings/sheets-setup'),
           child: _buildChip(
             context,
-            icon: const Icon(LucideIcons.cloudAlert, size: 14, color: Colors.orange),
+            icon: const Icon(LucideIcons.cloudAlert,
+                size: 14, color: Colors.orange),
             label: 'Fix Connection',
             color: Colors.orange,
           ),
@@ -177,13 +182,14 @@ class _SyncIndicator extends ConsumerWidget {
     }
   }
 
-  Widget _buildChip(BuildContext context, {required Widget icon, required String label, required Color color}) {
+  Widget _buildChip(BuildContext context,
+      {required Widget icon, required String label, required Color color}) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: color.withOpacity(0.5), width: 1),
+        border: Border.all(color: color.withValues(alpha: 0.5), width: 1),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -215,14 +221,14 @@ class _StreakBadge extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: hasStreak 
-            ? [Colors.orange.shade700, Colors.orange.shade500] 
-            : [Colors.blue.shade700, Colors.blue.shade500],
+          colors: hasStreak
+              ? [Colors.orange.shade700, Colors.orange.shade500]
+              : [Colors.blue.shade700, Colors.blue.shade500],
         ),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: (hasStreak ? Colors.orange : Colors.blue).withOpacity(0.3),
+            color: (hasStreak ? Colors.orange : Colors.blue).withValues(alpha: 0.3),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -257,7 +263,8 @@ class _AnimatedFlame extends StatefulWidget {
   State<_AnimatedFlame> createState() => _AnimatedFlameState();
 }
 
-class _AnimatedFlameState extends State<_AnimatedFlame> with SingleTickerProviderStateMixin {
+class _AnimatedFlameState extends State<_AnimatedFlame>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
 
   @override
@@ -284,7 +291,11 @@ class _AnimatedFlameState extends State<_AnimatedFlame> with SingleTickerProvide
           scale: 0.9 + (_controller.value * 0.2),
           child: ShaderMask(
             shaderCallback: (bounds) => LinearGradient(
-              colors: [Colors.yellow.shade400, Colors.orange.shade600, Colors.red.shade700],
+              colors: [
+                Colors.yellow.shade400,
+                Colors.orange.shade600,
+                Colors.red.shade700
+              ],
               begin: Alignment.bottomCenter,
               end: Alignment.topCenter,
               stops: [0.0, 0.5 + (_controller.value * 0.5), 1.0],
@@ -323,7 +334,7 @@ class _TodayPlanSection extends ConsumerWidget {
               borderRadius: BorderRadius.circular(30),
               boxShadow: [
                 BoxShadow(
-                  color: Theme.of(context).colorScheme.primary.withOpacity(0.4),
+                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.4),
                   blurRadius: 25,
                   offset: const Offset(0, 12),
                 ),
@@ -345,11 +356,13 @@ class _TodayPlanSection extends ConsumerWidget {
                               fontSize: 12,
                               fontWeight: FontWeight.w800,
                               letterSpacing: 1.5,
-                              color: Colors.white.withOpacity(0.7),
+                              color: Colors.white.withValues(alpha: 0.7),
                             ),
                           ),
                           Text(
-                            state.isRestDay ? 'Time to Recover' : (state.todayDayName ?? "Push Day A"),
+                            state.isRestDay
+                                ? 'Time to Recover'
+                                : (state.todayDayName ?? "Push Day A"),
                             style: GoogleFonts.outfit(
                               fontSize: 24,
                               fontWeight: FontWeight.w900,
@@ -364,10 +377,11 @@ class _TodayPlanSection extends ConsumerWidget {
                     Container(
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
+                        color: Colors.white.withValues(alpha: 0.2),
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(LucideIcons.calendar, color: Colors.white, size: 20),
+                      child: const Icon(LucideIcons.calendar,
+                          color: Colors.white, size: 20),
                     ),
                   ],
                 ),
@@ -375,22 +389,36 @@ class _TodayPlanSection extends ConsumerWidget {
                 if (!state.isRestDay) ...[
                   Row(
                     children: [
-                      _StatChip(icon: LucideIcons.dumbbell, label: '${state.todayExercises.length} Exercises'),
+                      _StatChip(
+                          icon: LucideIcons.dumbbell,
+                          label: '${state.todayExercises.length} Exercises'),
                       const SizedBox(width: 12),
-                      _StatChip(icon: LucideIcons.clock, label: '${state.estimatedDuration} mins'),
+                      _StatChip(
+                          icon: LucideIcons.clock,
+                          label: '${state.estimatedDuration} mins'),
                     ],
                   ),
                   const SizedBox(height: 20),
                   Wrap(
                     spacing: 8,
                     runSpacing: 8,
-                    children: state.todayExercises.take(3).map((e) => _ExerciseChip(label: e)).toList() 
-                      + (state.todayExercises.length > 3 ? [_ExerciseChip(label: '+${state.todayExercises.length - 3} more')] : []),
+                    children: state.todayExercises
+                            .take(3)
+                            .map((e) => _ExerciseChip(label: e))
+                            .toList() +
+                        (state.todayExercises.length > 3
+                            ? [
+                                _ExerciseChip(
+                                    label:
+                                        '+${state.todayExercises.length - 3} more')
+                              ]
+                            : []),
                   ),
                 ] else
                   Text(
                     '💪 Recharge and let your muscles grow. You\'ve earned it!',
-                    style: GoogleFonts.outfit(color: Colors.white.withOpacity(0.9), fontSize: 15),
+                    style: GoogleFonts.outfit(
+                        color: Colors.white.withValues(alpha: 0.9), fontSize: 15),
                   ),
                 const SizedBox(height: 24),
                 SizedBox(
@@ -414,8 +442,13 @@ class _TodayPlanSection extends ConsumerWidget {
                       ),
                     ),
                     child: Text(
-                      state.activeDraft != null ? 'RESUME WORKOUT' : (state.isRestDay ? 'START QUICK WORKOUT' : 'START TODAY\'S WORKOUT'),
-                      style: GoogleFonts.outfit(fontWeight: FontWeight.w900, letterSpacing: 1),
+                      state.activeDraft != null
+                          ? 'RESUME WORKOUT'
+                          : (state.isRestDay
+                              ? 'START QUICK WORKOUT'
+                              : 'START TODAY\'S WORKOUT'),
+                      style: GoogleFonts.outfit(
+                          fontWeight: FontWeight.w900, letterSpacing: 1),
                     ),
                   ),
                 ),
@@ -441,7 +474,8 @@ class _StatChip extends StatelessWidget {
         const SizedBox(width: 4),
         Text(
           label,
-          style: GoogleFonts.outfit(color: Colors.white70, fontSize: 13, fontWeight: FontWeight.w500),
+          style: GoogleFonts.outfit(
+              color: Colors.white70, fontSize: 13, fontWeight: FontWeight.w500),
         ),
       ],
     );
@@ -457,7 +491,7 @@ class _ExerciseChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.15),
+        color: Colors.white.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Text(
@@ -532,10 +566,13 @@ class _QuickActionItem extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 16),
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.5),
+            color: Theme.of(context)
+                .colorScheme
+                .surfaceContainerHighest
+                .withValues(alpha: 0.5),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: Theme.of(context).dividerColor.withOpacity(0.1),
+              color: Theme.of(context).dividerColor.withValues(alpha: 0.1),
             ),
           ),
           child: Column(
@@ -563,7 +600,8 @@ class _LastWorkoutSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (state.lastWorkout == null) return const SliverToBoxAdapter(child: SizedBox());
+    if (state.lastWorkout == null)
+      return const SliverToBoxAdapter(child: SizedBox());
 
     final timeAgo = DateFormat.yMMMd().format(state.lastWorkout!.date);
 
@@ -575,7 +613,8 @@ class _LastWorkoutSection extends StatelessWidget {
           decoration: BoxDecoration(
             color: Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.1)),
+            border: Border.all(
+                color: Theme.of(context).dividerColor.withValues(alpha: 0.1)),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -608,12 +647,16 @@ class _LastWorkoutSection extends StatelessWidget {
               const SizedBox(height: 12),
               Text(
                 state.lastWorkoutSummary ?? 'No summary available',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontStyle: FontStyle.italic),
+                style: Theme.of(context)
+                    .textTheme
+                    .bodyMedium
+                    ?.copyWith(fontStyle: FontStyle.italic),
               ),
               Align(
                 alignment: Alignment.centerRight,
                 child: TextButton(
-                  onPressed: () => context.push('/history/workout/${state.lastWorkout!.id}'),
+                  onPressed: () =>
+                      context.push('/history/workout/${state.lastWorkout!.id}'),
                   child: const Text('View Details →'),
                 ),
               ),
@@ -635,75 +678,84 @@ class _WeeklyVolumeSection extends StatelessWidget {
       child: RepaintBoundary(
         child: Padding(
           padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'This Week\'s Volume',
-              style: GoogleFonts.outfit(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 20),
-            SizedBox(
-              height: 120,
-              child: BarChart(
-                BarChartData(
-                  alignment: BarChartAlignment.spaceAround,
-                  maxY: 5000, // Adjust based on data
-                  barTouchData: BarTouchData(enabled: false),
-                  titlesData: FlTitlesData(
-                    show: true,
-                    bottomTitles: AxisTitles(
-                      sideTitles: SideTitles(
-                        showTitles: true,
-                        getTitlesWidget: (value, meta) {
-                          const days = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
-                          return Padding(
-                            padding: const EdgeInsets.only(top: 8.0),
-                            child: Text(days[value.toInt()]),
-                          );
-                        },
-                      ),
-                    ),
-                    leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                    rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                    topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                  ),
-                  gridData: const FlGridData(show: false),
-                  borderData: FlBorderData(show: false),
-                  barGroups: List.generate(7, (i) {
-                    final day = DateTime.now().subtract(Duration(days: DateTime.now().weekday - 1 - i));
-                    final dayKey = DateTime(day.year, day.month, day.day).millisecondsSinceEpoch;
-                    final volume = state.weeklyVolume[dayKey] ?? 0;
-                    
-                    return BarChartGroupData(
-                      x: i,
-                      barRods: [
-                        BarChartRodData(
-                          toY: volume, 
-                          color: i == DateTime.now().weekday - 1 
-                            ? Theme.of(context).colorScheme.primary 
-                            : Theme.of(context).colorScheme.surfaceContainerHighest,
-                          width: 16,
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                      ],
-                    );
-                  }),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'This Week\'s Volume',
+                style: GoogleFonts.outfit(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Total this week: ${state.weeklyVolume.values.fold(0.0, (a, b) => a + b).toStringAsFixed(0)} kg',
-              style: const TextStyle(color: Colors.grey, fontSize: 12),
-            ),
-          ],
+              const SizedBox(height: 20),
+              SizedBox(
+                height: 120,
+                child: BarChart(
+                  BarChartData(
+                    alignment: BarChartAlignment.spaceAround,
+                    maxY: 5000, // Adjust based on data
+                    barTouchData: BarTouchData(enabled: false),
+                    titlesData: FlTitlesData(
+                      show: true,
+                      bottomTitles: AxisTitles(
+                        sideTitles: SideTitles(
+                          showTitles: true,
+                          getTitlesWidget: (value, meta) {
+                            const days = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+                            return Padding(
+                              padding: const EdgeInsets.only(top: 8.0),
+                              child: Text(days[value.toInt()]),
+                            );
+                          },
+                        ),
+                      ),
+                      leftTitles: const AxisTitles(
+                          sideTitles: SideTitles(showTitles: false)),
+                      rightTitles: const AxisTitles(
+                          sideTitles: SideTitles(showTitles: false)),
+                      topTitles: const AxisTitles(
+                          sideTitles: SideTitles(showTitles: false)),
+                    ),
+                    gridData: const FlGridData(show: false),
+                    borderData: FlBorderData(show: false),
+                    barGroups: List.generate(7, (i) {
+                      final day = DateTime.now().subtract(
+                          Duration(days: DateTime.now().weekday - 1 - i));
+                      final dayKey = DateTime(day.year, day.month, day.day)
+                          .millisecondsSinceEpoch;
+                      final volume = state.weeklyVolume[dayKey] ?? 0;
+
+                      return BarChartGroupData(
+                        x: i,
+                        barRods: [
+                          BarChartRodData(
+                            toY: volume,
+                            color: (i == DateTime.now().weekday - 1
+                                ? Theme.of(context).colorScheme.primary
+                                : Theme.of(context)
+                                    .colorScheme
+                                    .surfaceContainerHighest)
+                        .withValues(alpha: 0.8),
+                            width: 16,
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                        ],
+                      );
+                    }),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Total this week: ${state.weeklyVolume.values.fold(0.0, (a, b) => a + b).toStringAsFixed(0)} kg',
+                style: const TextStyle(color: Colors.grey, fontSize: 12),
+              ),
+            ],
+          ),
         ),
       ),
-    ),);
+    );
   }
 }
 
@@ -720,7 +772,9 @@ class _BodyweightSection extends StatelessWidget {
           child: ListTile(
             leading: const Icon(LucideIcons.scale, color: Colors.blue),
             title: const Text('Log today\'s weight'),
-            subtitle: Text(state.lastWeight != null ? 'Last: ${state.lastWeight!.weight} kg' : 'No recorded weight yet'),
+            subtitle: Text(state.lastWeight != null
+                ? 'Last: ${state.lastWeight!.weight} kg'
+                : 'No recorded weight yet'),
             trailing: const Icon(LucideIcons.chevronRight),
             onTap: () => _showWeightSheet(context),
           ),
@@ -735,12 +789,15 @@ class _BodyweightSection extends StatelessWidget {
       context: context,
       isScrollControlled: true,
       builder: (context) => Padding(
-        padding: EdgeInsets.fromLTRB(20, 20, 20, MediaQuery.of(context).viewInsets.bottom + 20),
+        padding: EdgeInsets.fromLTRB(
+            20, 20, 20, MediaQuery.of(context).viewInsets.bottom + 20),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Daily Bodyweight', style: GoogleFonts.outfit(fontSize: 20, fontWeight: FontWeight.bold)),
+            Text('Daily Bodyweight',
+                style: GoogleFonts.outfit(
+                    fontSize: 20, fontWeight: FontWeight.bold)),
             const SizedBox(height: 20),
             TextField(
               controller: controller,
@@ -759,7 +816,9 @@ class _BodyweightSection extends StatelessWidget {
                   onPressed: () {
                     final weight = double.tryParse(controller.text);
                     if (weight != null) {
-                      ref.read(workoutHomeNotifierProvider.notifier).logWeight(weight);
+                      ref
+                          .read(workoutHomeNotifierProvider.notifier)
+                          .logWeight(weight);
                       Navigator.pop(context);
                     }
                   },
@@ -776,7 +835,8 @@ class _BodyweightSection extends StatelessWidget {
 
 class _PlateauAlertSection extends ConsumerStatefulWidget {
   @override
-  ConsumerState<_PlateauAlertSection> createState() => _PlateauAlertSectionState();
+  ConsumerState<_PlateauAlertSection> createState() =>
+      _PlateauAlertSectionState();
 }
 
 class _PlateauAlertSectionState extends ConsumerState<_PlateauAlertSection> {
@@ -797,7 +857,9 @@ class _PlateauAlertSectionState extends ConsumerState<_PlateauAlertSection> {
     // Get last 10 used exercises to check
     final recentExercises = await (db.select(db.exercises)
           ..where((t) => t.lastUsed.isNotNull())
-          ..orderBy([(t) => OrderingTerm(expression: t.lastUsed, mode: OrderingMode.desc)])
+          ..orderBy([
+            (t) => OrderingTerm(expression: t.lastUsed, mode: OrderingMode.desc)
+          ])
           ..limit(10))
         .get();
 
@@ -821,7 +883,8 @@ class _PlateauAlertSectionState extends ConsumerState<_PlateauAlertSection> {
 
   @override
   Widget build(BuildContext context) {
-    if (_loading || _plateaus.isEmpty) return const SliverToBoxAdapter(child: SizedBox.shrink());
+    if (_loading || _plateaus.isEmpty)
+      return const SliverToBoxAdapter(child: SizedBox.shrink());
 
     return SliverToBoxAdapter(
       child: Column(
@@ -842,7 +905,10 @@ class _PlateauAlertSectionState extends ConsumerState<_PlateauAlertSection> {
         ),
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
-          BoxShadow(color: Colors.orange.withOpacity(0.3), blurRadius: 10, offset: const Offset(0, 4)),
+          BoxShadow(
+              color: Colors.orange.withValues(alpha: 0.3),
+              blurRadius: 10,
+              offset: const Offset(0, 4)),
         ],
       ),
       child: Column(
@@ -855,13 +921,18 @@ class _PlateauAlertSectionState extends ConsumerState<_PlateauAlertSection> {
               const Expanded(
                 child: Text(
                   'PLATEAU DETECTED',
-                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12, letterSpacing: 1.2),
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12,
+                      letterSpacing: 1.2),
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
               const Spacer(),
               IconButton(
-                icon: const Icon(LucideIcons.x, color: Colors.white70, size: 16),
+                icon:
+                    const Icon(LucideIcons.x, color: Colors.white70, size: 16),
                 onPressed: () => _dismiss(plateau),
                 constraints: const BoxConstraints(),
                 padding: EdgeInsets.zero,
@@ -871,27 +942,31 @@ class _PlateauAlertSectionState extends ConsumerState<_PlateauAlertSection> {
           const SizedBox(height: 12),
           Text(
             '${plateau.exerciseName} hasn\'t improved in ${plateau.weeksStuck} sessions.',
-            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+            style: const TextStyle(
+                color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
             overflow: TextOverflow.ellipsis,
             maxLines: 1,
           ),
           const SizedBox(height: 4),
           Text(
             'Your CNS might need a break. Try a light session at ${plateau.deloadWeight}kg (70%) today.',
-            style: TextStyle(color: Colors.white.withOpacity(0.9), fontSize: 13),
+            style:
+                TextStyle(color: Colors.white.withValues(alpha: 0.9), fontSize: 13),
           ),
           const SizedBox(height: 16),
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
-               onPressed: () {}, // Handled by standard workout flow
-               style: ElevatedButton.styleFrom(
+              onPressed: () {}, // Handled by standard workout flow
+              style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.white,
                 foregroundColor: Colors.orange.shade900,
                 elevation: 0,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8)),
               ),
-              child: const Text('Target Deload Next Session', style: TextStyle(fontWeight: FontWeight.bold)),
+              child: const Text('Target Deload Next Session',
+                  style: TextStyle(fontWeight: FontWeight.bold)),
             ),
           ),
         ],
@@ -902,10 +977,11 @@ class _PlateauAlertSectionState extends ConsumerState<_PlateauAlertSection> {
   Future<void> _dismiss(PlateauResult p) async {
     final prefs = await SharedPreferences.getInstance();
     // Dismiss for 2 weeks
-    final until = DateTime.now().add(const Duration(days: 14)).millisecondsSinceEpoch;
+    final until =
+        DateTime.now().add(const Duration(days: 14)).millisecondsSinceEpoch;
     final dismissedKey = 'plateau_dismissed_${p.exerciseId}';
     await prefs.setInt(dismissedKey, until);
-    
+
     setState(() {
       _plateaus.remove(p);
     });
@@ -924,9 +1000,10 @@ class _MotivationSection extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.primary.withOpacity(0.05),
+            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.05),
             borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: Theme.of(context).colorScheme.primary.withOpacity(0.1)),
+            border: Border.all(
+                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1)),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -934,7 +1011,7 @@ class _MotivationSection extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
@@ -971,7 +1048,8 @@ class _FloatingWorkoutBanner extends StatefulWidget {
   State<_FloatingWorkoutBanner> createState() => _FloatingWorkoutBannerState();
 }
 
-class _FloatingWorkoutBannerState extends State<_FloatingWorkoutBanner> with SingleTickerProviderStateMixin {
+class _FloatingWorkoutBannerState extends State<_FloatingWorkoutBanner>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
 
   @override
@@ -1003,7 +1081,10 @@ class _FloatingWorkoutBannerState extends State<_FloatingWorkoutBanner> with Sin
               borderRadius: BorderRadius.circular(30),
               boxShadow: [
                 BoxShadow(
-                  color: Theme.of(context).colorScheme.primary.withOpacity(0.2 * _controller.value),
+                  color: Theme.of(context)
+                      .colorScheme
+                      .primary
+                      .withValues(alpha: 0.2 * _controller.value),
                   blurRadius: 15 * _controller.value,
                   spreadRadius: 2 * _controller.value,
                 ),
@@ -1015,7 +1096,10 @@ class _FloatingWorkoutBannerState extends State<_FloatingWorkoutBanner> with Sin
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.95),
+            color: Theme.of(context)
+                .colorScheme
+                .secondaryContainer
+                .withOpacity(0.95),
             borderRadius: BorderRadius.circular(30),
             border: Border.all(
               color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
@@ -1026,7 +1110,8 @@ class _FloatingWorkoutBannerState extends State<_FloatingWorkoutBanner> with Sin
             children: [
               Expanded(
                 child: GestureDetector(
-                  onTap: () => context.push('/app/workout/active?id=${widget.workout.id}'),
+                  onTap: () => context
+                      .push('/app/workout/active?id=${widget.workout.id}'),
                   behavior: HitTestBehavior.opaque,
                   child: Row(
                     children: [
@@ -1035,7 +1120,8 @@ class _FloatingWorkoutBannerState extends State<_FloatingWorkoutBanner> with Sin
                       Expanded(
                         child: Text(
                           'Workout in progress — tap to resume',
-                          style: GoogleFonts.outfit(fontWeight: FontWeight.w800, fontSize: 13),
+                          style: GoogleFonts.outfit(
+                              fontWeight: FontWeight.w800, fontSize: 13),
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
@@ -1050,24 +1136,30 @@ class _FloatingWorkoutBannerState extends State<_FloatingWorkoutBanner> with Sin
               Consumer(
                 builder: (context, ref, _) {
                   return IconButton(
-                    icon: const Icon(LucideIcons.trash2, size: 18, color: Colors.red),
+                    icon: const Icon(LucideIcons.trash2,
+                        size: 18, color: Colors.red),
                     onPressed: () async {
                       final confirm = await showDialog<bool>(
                         context: context,
                         builder: (context) => AlertDialog(
                           title: const Text('Discard Workout?'),
-                          content: const Text('All progress in the current active session will be lost.'),
+                          content: const Text(
+                              'All progress in the current active session will be lost.'),
                           actions: [
-                            TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Keep')),
                             TextButton(
-                              onPressed: () => Navigator.pop(context, true), 
-                              child: const Text('Discard', style: TextStyle(color: Colors.red))
-                            ),
+                                onPressed: () => Navigator.pop(context, false),
+                                child: const Text('Keep')),
+                            TextButton(
+                                onPressed: () => Navigator.pop(context, true),
+                                child: const Text('Discard',
+                                    style: TextStyle(color: Colors.red))),
                           ],
                         ),
                       );
                       if (confirm == true) {
-                        ref.read(workoutHomeNotifierProvider.notifier).deleteWorkout(widget.workout.id);
+                        ref
+                            .read(workoutHomeNotifierProvider.notifier)
+                            .deleteWorkout(widget.workout.id);
                       }
                     },
                     tooltip: 'Discard workout',

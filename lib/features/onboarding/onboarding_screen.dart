@@ -36,12 +36,14 @@ final List<OnboardingSlide> slides = [
   ),
   OnboardingSlide(
     title: 'Your data, your Google Sheet',
-    subtitle: 'Sync seamlessly with Google Sheets for ultimate control and ownership.',
+    subtitle:
+        'Sync seamlessly with Google Sheets for ultimate control and ownership.',
     icon: LucideIcons.tableProperties,
   ),
   OnboardingSlide(
     title: 'Connect Cloud Sync',
-    subtitle: 'Securely backup your workouts to your personal Google Drive automatically.',
+    subtitle:
+        'Securely backup your workouts to your personal Google Drive automatically.',
     icon: LucideIcons.cloud,
   ),
 ];
@@ -88,7 +90,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 onPressed: _finishOnboarding,
                 child: Text(
                   'Skip',
-                  style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
+                  style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant),
                 ),
               ),
             ),
@@ -107,7 +110,10 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                         Container(
                           padding: const EdgeInsets.all(32),
                           decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.primaryContainer.withOpacity(0.3),
+                            color: Theme.of(context)
+                                .colorScheme
+                                .primaryContainer
+                                .withOpacity(0.3),
                             shape: BoxShape.circle,
                           ),
                           child: const Icon(
@@ -120,7 +126,10 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                         Text(
                           slide.title,
                           textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                          style: Theme.of(context)
+                              .textTheme
+                              .headlineMedium
+                              ?.copyWith(
                                 fontWeight: FontWeight.bold,
                                 color: Theme.of(context).colorScheme.onSurface,
                               ),
@@ -129,9 +138,12 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                         Text(
                           slide.subtitle,
                           textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                color: Theme.of(context).colorScheme.onSurfaceVariant,
-                              ),
+                          style:
+                              Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurfaceVariant,
+                                  ),
                         ),
                         if (index == slides.length - 1) ...[
                           const SizedBox(height: 32),
@@ -159,7 +171,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                         decoration: BoxDecoration(
                           color: index == _currentSlide
                               ? Theme.of(context).colorScheme.primary
-                              : Theme.of(context).colorScheme.surfaceContainerHighest,
+                              : Theme.of(context)
+                                  .colorScheme
+                                  .surfaceContainerHighest,
                           borderRadius: BorderRadius.circular(4),
                         ),
                       ),
@@ -180,8 +194,11 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            _currentSlide == slides.length - 1 ? 'Get Started' : 'Next',
-                            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                            _currentSlide == slides.length - 1
+                                ? 'Get Started'
+                                : 'Next',
+                            style: const TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.bold),
                           ),
                           if (_currentSlide < slides.length - 1) ...[
                             const SizedBox(width: 8),
@@ -221,7 +238,8 @@ class _GoogleSignInButton extends ConsumerWidget {
         label: const Text('Connect Google Drive'),
         style: OutlinedButton.styleFrom(
           padding: const EdgeInsets.symmetric(vertical: 16),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         ),
       ),
     );

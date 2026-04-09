@@ -2,8 +2,10 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:gym_gemini_pro/core/utils/timer_utils.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:gym_gemini_pro/core/services/notification_service.dart';
 
 part 'timer_notifier.g.dart';
 
@@ -68,7 +70,7 @@ class TimerNotifier extends _$TimerNotifier {
       final endTime = DateTime.parse(endTimeStr);
       final now = DateTime.now();
       if (endTime.isAfter(now)) {
-        final remaining = endTime.difference(now).inSeconds;
+        final remaining = TimerUtils.calculateRemainingSeconds(endTime);
         state = state.copyWith(
           isRunning: true,
           remainingSeconds: remaining,
@@ -100,7 +102,16 @@ class TimerNotifier extends _$TimerNotifier {
 
     _startTicker();
 
-    // Start Foreground Service
+    // 2. Schedule fail-safe completion notification (Zoned Schedule)
+    // This ensures the alarm fires even if the background service is killed.
+    await NotificationService().scheduleNotification(
+      id: NotificationService.timerNotificationId + 1,
+      title: 'Rest Complete!',
+      body: exerciseName != null ? 'Next: $exerciseName' : 'Get back to work!',
+      scheduledTime: endTime,
+    );
+
+    // 3. Start Foreground Service for ongoing updates
     final service = FlutterBackgroundService();
     final isRunning = await service.isRunning();
     if (!isRunning) {
@@ -110,9 +121,20 @@ class TimerNotifier extends _$TimerNotifier {
 
   void _startTicker() {
     _ticker?.cancel();
-    _ticker = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (state.remainingSeconds > 0) {
-        state = state.copyWith(remainingSeconds: state.remainingSeconds - 1);
+    _ticker = Timer.periodic(const Duration(seconds: 1), (timer) async {
+      final prefs = await SharedPreferences.getInstance();
+      final endTimeStr = prefs.getString(_endTimeKey);
+      
+      if (endTimeStr == null) {
+        stop();
+        return;
+      }
+
+      final endTime = DateTime.parse(endTimeStr);
+      final remaining = TimerUtils.calculateRemainingSeconds(endTime);
+      
+      if (remaining > 0) {
+        state = state.copyWith(remainingSeconds: remaining);
       } else {
         stop();
       }
@@ -123,9 +145,13 @@ class TimerNotifier extends _$TimerNotifier {
     _ticker?.cancel();
     state = TimerState();
     _clearState();
-    
+
     final service = FlutterBackgroundService();
     service.invoke('stopService');
+
+    // Cancel fail-safe notification
+    await NotificationService()
+        .cancelNotification(NotificationService.timerNotificationId + 1);
   }
 
   Future<void> _clearState() async {
@@ -149,14 +175,25 @@ class TimerNotifier extends _$TimerNotifier {
   void extend(int seconds) async {
     final newRemaining = state.remainingSeconds + seconds;
     final newEndTime = DateTime.now().add(Duration(seconds: newRemaining));
-    
+
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_endTimeKey, newEndTime.toIso8601String());
-    
+
     state = state.copyWith(remainingSeconds: newRemaining);
-    
-    // Notify service if running
-    FlutterBackgroundService().invoke('add_30s'); // Service also updates its internal endTime
+
+    // 2. Update fail-safe notification
+    await NotificationService().scheduleNotification(
+      id: NotificationService.timerNotificationId + 1,
+      title: 'Rest Complete!',
+      body: state.exerciseName != null
+          ? 'Next: ${state.exerciseName}'
+          : 'Get back to work!',
+      scheduledTime: newEndTime,
+    );
+
+    // 3. Notify service if running
+    FlutterBackgroundService()
+        .invoke('add_30s'); // Service also updates its internal endTime
   }
 
   Future<bool> checkPermissions() async {

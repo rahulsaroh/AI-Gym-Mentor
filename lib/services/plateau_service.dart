@@ -31,8 +31,12 @@ class PlateauService extends _$PlateauService {
 
     // 1. Fetch last 5 completed sessions
     final sessions = await (db.select(db.workoutSets)
-          ..where((t) => t.exerciseId.equals(exerciseId) & t.completed.equals(true))
-          ..orderBy([(t) => OrderingTerm(expression: t.completedAt, mode: OrderingMode.desc)]))
+          ..where(
+              (t) => t.exerciseId.equals(exerciseId) & t.completed.equals(true))
+          ..orderBy([
+            (t) =>
+                OrderingTerm(expression: t.completedAt, mode: OrderingMode.desc)
+          ]))
         .get();
 
     if (sessions.length < 5) return null;
@@ -41,27 +45,33 @@ class PlateauService extends _$PlateauService {
     final workoutIds = sessions.map((s) => s.workoutId).toSet().toList();
     if (workoutIds.length < 5) return null;
 
-    final exercise = await (db.select(db.exercises)..where((t) => t.id.equals(exerciseId))).getSingle();
+    final exercise = await (db.select(db.exercises)
+          ..where((t) => t.id.equals(exerciseId)))
+        .getSingle();
 
     // 2. Compute 1RMs for each session
     final session1RMs = <double>[];
     for (var i = 0; i < 5; i++) {
-        final id = workoutIds[i];
+      final id = workoutIds[i];
       final sets = sessions.where((s) => s.workoutId == id).toList();
       if (sets.isNotEmpty) {
-        final max1RM = sets.map((s) => progression.calculateEpley(s.weight, s.reps)).reduce(max);
+        final max1RM = sets
+            .map((s) => progression.calculateEpley(s.weight, s.reps))
+            .reduce(max);
         session1RMs.add(max1RM);
       }
     }
 
     // 3. Peak 1RM (all time)
     final allSets = sessions;
-    final allTimePeak = allSets.map((s) => progression.calculateEpley(s.weight, s.reps)).reduce(max);
+    final allTimePeak = allSets
+        .map((s) => progression.calculateEpley(s.weight, s.reps))
+        .reduce(max);
 
     // 4. Algorithm check
     final max1RM = session1RMs.reduce(max);
     final min1RM = session1RMs.reduce(min);
-    
+
     final isStagnant = (max1RM - min1RM) < 2.5;
     final isBelowPeak = session1RMs.every((rm) => rm < allTimePeak * 0.98);
 

@@ -48,16 +48,22 @@ class CsvService extends _$CsvService {
       if (workout == null) continue;
 
       final List<dynamic> row = [];
-      if (selectedColumns.contains('Date')) row.add(DateFormat('yyyy-MM-dd').format(workout.date));
-      if (selectedColumns.contains('Day')) row.add(DateFormat('EEEE').format(workout.date));
+      if (selectedColumns.contains('Date'))
+        row.add(DateFormat('yyyy-MM-dd').format(workout.date));
+      if (selectedColumns.contains('Day'))
+        row.add(DateFormat('EEEE').format(workout.date));
       if (selectedColumns.contains('Workout Name')) row.add(workout.name);
-      if (selectedColumns.contains('Exercise')) row.add(exerciseNames[s.exerciseId] ?? 'Unknown');
+      if (selectedColumns.contains('Exercise'))
+        row.add(exerciseNames[s.exerciseId] ?? 'Unknown');
       if (selectedColumns.contains('Set#')) row.add(s.setNumber);
       if (selectedColumns.contains('Set Type')) row.add(s.setType.name);
-      if (selectedColumns.contains('Weight')) row.add(WeightConverter.toDisplay(s.weight, unit).toStringAsFixed(1));
+      if (selectedColumns.contains('Weight'))
+        row.add(WeightConverter.toDisplay(s.weight, unit).toStringAsFixed(1));
       if (selectedColumns.contains('Reps')) row.add(s.reps);
       if (selectedColumns.contains('RPE')) row.add(s.rpe ?? '');
-      if (selectedColumns.contains('Volume')) row.add(WeightConverter.toDisplay(s.weight * s.reps, unit).toStringAsFixed(1));
+      if (selectedColumns.contains('Volume'))
+        row.add(WeightConverter.toDisplay(s.weight * s.reps, unit)
+            .toStringAsFixed(1));
       if (selectedColumns.contains('Is PR')) row.add(s.isPr ? 'TRUE' : 'FALSE');
       if (selectedColumns.contains('Notes')) row.add(s.notes ?? '');
       rows.add(row);

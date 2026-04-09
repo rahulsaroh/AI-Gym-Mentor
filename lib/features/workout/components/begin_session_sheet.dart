@@ -41,13 +41,14 @@ class BeginSessionSheet extends ConsumerWidget {
                 onPressed: () => Navigator.pop(context),
                 icon: const Icon(LucideIcons.x),
                 style: IconButton.styleFrom(
-                  backgroundColor: colorScheme.surfaceContainerHighest.withOpacity(0.5),
+                  backgroundColor:
+                      colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
                 ),
               ),
             ],
           ),
           const SizedBox(height: 24),
-          
+
           // 1. Active / Resume Session
           homeState.when(
             data: (state) {
@@ -59,9 +60,9 @@ class BeginSessionSheet extends ConsumerWidget {
             loading: () => const SizedBox.shrink(),
             error: (_, __) => const SizedBox.shrink(),
           ),
-          
+
           const SizedBox(height: 16),
-          
+
           // 2. My Programs
           Text(
             'MY PROGRAMS',
@@ -86,7 +87,8 @@ class BeginSessionSheet extends ConsumerWidget {
                   separatorBuilder: (_, __) => const SizedBox(width: 12),
                   itemBuilder: (context, index) => _ProgramCard(
                     template: templates[index],
-                    onSelect: () => _startTemplateWorkout(context, ref, templates[index]),
+                    onSelect: () =>
+                        _startTemplateWorkout(context, ref, templates[index]),
                   ),
                 );
               },
@@ -94,9 +96,9 @@ class BeginSessionSheet extends ConsumerWidget {
               error: (err, _) => Text('Error loading templates: $err'),
             ),
           ),
-          
+
           const SizedBox(height: 32),
-          
+
           // 3. Quick Actions
           Row(
             children: [
@@ -109,7 +111,8 @@ class BeginSessionSheet extends ConsumerWidget {
                     backgroundColor: colorScheme.primary,
                     foregroundColor: colorScheme.onPrimary,
                     padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16)),
                   ),
                 ),
               ),
@@ -124,7 +127,8 @@ class BeginSessionSheet extends ConsumerWidget {
                   label: const Text('EXPLORE'),
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16)),
                   ),
                 ),
               ),
@@ -136,13 +140,15 @@ class BeginSessionSheet extends ConsumerWidget {
     );
   }
 
-  Future<void> _startTemplateWorkout(BuildContext context, WidgetRef ref, WorkoutTemplate template) async {
-    // In a real app, we'd find the next day in the cycle. 
+  Future<void> _startTemplateWorkout(
+      BuildContext context, WidgetRef ref, WorkoutTemplate template) async {
+    // In a real app, we'd find the next day in the cycle.
     // For now, we use the startWorkout logic in the notifier which does this.
-    final id = await ref.read(workoutHomeNotifierProvider.notifier).startWorkout(
-      templateId: template.id,
-      name: '${template.name} - Session',
-    );
+    final id =
+        await ref.read(workoutHomeNotifierProvider.notifier).startWorkout(
+              templateId: template.id,
+              name: '${template.name} - Session',
+            );
     if (context.mounted) {
       Navigator.pop(context);
       context.push('/app/workout/active?id=$id');
@@ -150,9 +156,10 @@ class BeginSessionSheet extends ConsumerWidget {
   }
 
   Future<void> _startEmptyWorkout(BuildContext context, WidgetRef ref) async {
-    final id = await ref.read(workoutHomeNotifierProvider.notifier).startWorkout(
-      name: 'Quick Workout',
-    );
+    final id =
+        await ref.read(workoutHomeNotifierProvider.notifier).startWorkout(
+              name: 'Quick Workout',
+            );
     if (context.mounted) {
       Navigator.pop(context);
       context.push('/app/workout/active?id=$id');
@@ -176,9 +183,9 @@ class _ResumeCard extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 24),
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: colorScheme.primaryContainer.withOpacity(0.3),
+          color: colorScheme.primaryContainer.withValues(alpha: 0.3),
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: colorScheme.primary.withOpacity(0.3)),
+          border: Border.all(color: colorScheme.primary.withValues(alpha: 0.3)),
         ),
         child: Row(
           children: [
@@ -188,7 +195,8 @@ class _ResumeCard extends StatelessWidget {
                 color: colorScheme.primary,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(LucideIcons.play, color: Colors.white, size: 20),
+              child:
+                  const Icon(LucideIcons.play, color: Colors.white, size: 20),
             ),
             const SizedBox(width: 16),
             Expanded(
@@ -238,9 +246,10 @@ class _ProgramCard extends StatelessWidget {
         width: 160,
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: colorScheme.surfaceContainerHighest.withOpacity(0.3),
+          color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: colorScheme.outlineVariant.withOpacity(0.5)),
+          border:
+              Border.all(color: colorScheme.outlineVariant.withValues(alpha: 0.5)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -248,10 +257,11 @@ class _ProgramCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: colorScheme.secondary.withOpacity(0.1),
+                color: colorScheme.secondary.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
-              child: Icon(LucideIcons.clipboardList, color: colorScheme.secondary, size: 18),
+              child: Icon(LucideIcons.clipboardList,
+                  color: colorScheme.secondary, size: 18),
             ),
             const Spacer(),
             Text(
@@ -286,9 +296,11 @@ class _EmptyTemplatesPlaceholder extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerHighest.withOpacity(0.2),
+        color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: colorScheme.outlineVariant.withOpacity(0.5), style: BorderStyle.none),
+        border: Border.all(
+            color: colorScheme.outlineVariant.withValues(alpha: 0.5),
+            style: BorderStyle.none),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -297,7 +309,8 @@ class _EmptyTemplatesPlaceholder extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             'No programs yet',
-            style: TextStyle(color: colorScheme.outline, fontWeight: FontWeight.bold),
+            style: TextStyle(
+                color: colorScheme.outline, fontWeight: FontWeight.bold),
           ),
           Text(
             'Create one from templates',

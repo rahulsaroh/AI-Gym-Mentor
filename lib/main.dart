@@ -14,6 +14,7 @@ import 'package:gym_gemini_pro/services/connectivity_service.dart';
 import 'package:gym_gemini_pro/services/sync_worker.dart';
 import 'package:gym_gemini_pro/services/background_worker.dart';
 import 'package:gym_gemini_pro/firebase_options.dart';
+import 'package:gym_gemini_pro/core/cloud/cloud_integration_state.dart';
 
 void main() async {
   // Ensure Flutter is initialized before any async code
@@ -29,7 +30,8 @@ void main() async {
     firebaseInitialized = true;
     if (kDebugMode) debugPrint('Firebase Initialized Successfully');
   } catch (e) {
-    debugPrint('Firebase Initialization Failed (App will run in offline mode): $e');
+    debugPrint(
+        'Firebase Initialization Failed (App will run in offline mode): $e');
   }
 
   // 2. Notification Service Initialization
@@ -78,6 +80,10 @@ void main() async {
 
   runApp(
     ProviderScope(
+      overrides: [
+        // We can't easily override a Notifier state before it's created via ProviderScope,
+        // so we'll set it in the ConnectivityInitializer.
+      ],
       child: ConnectivityInitializer(
         firebaseInitialized: firebaseInitialized,
         child: const GymGeminiApp(),
@@ -86,28 +92,48 @@ void main() async {
   );
 }
 
-class ConnectivityInitializer extends ConsumerWidget {
+class ConnectivityInitializer extends ConsumerStatefulWidget {
   final Widget child;
   final bool firebaseInitialized;
-  
+
   const ConnectivityInitializer({
-    super.key, 
-    required this.child, 
+    super.key,
+    required this.child,
     required this.firebaseInitialized,
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    // Show a small warning if Firebase failed only after first frame
-    if (!firebaseInitialized) {
+  ConsumerState<ConnectivityInitializer> createState() =>
+      _ConnectivityInitializerState();
+}
+
+class _ConnectivityInitializerState extends ConsumerState<ConnectivityInitializer> {
+  @override
+  void initState() {
+    super.initState();
+    // Set initial status in the next frame
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref
+          .read(cloudIntegrationProvider.notifier)
+          .setFirebaseInitialized(widget.firebaseInitialized);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (!widget.firebaseInitialized) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Firebase not connected. Some cloud features may be unavailable.'),
-            backgroundColor: Colors.orange,
-            duration: Duration(seconds: 5),
-          ),
-        );
+        // Only show once
+        if (ScaffoldMessenger.maybeOf(context) != null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                  'Running in offline mode. Cloud features will be limited.'),
+              backgroundColor: Colors.orange,
+              duration: Duration(seconds: 4),
+            ),
+          );
+        }
       });
     }
 
@@ -115,6 +141,7 @@ class ConnectivityInitializer extends ConsumerWidget {
     ref.listen(connectivityServiceProvider, (prev, next) {
       final status = next.value;
       if (status != null && status != ConnectivityResult.none) {
+        // Trigger background sync when online
         ref.read(syncWorkerProvider.notifier).processQueue();
       }
     });
@@ -125,9 +152,13 @@ class ConnectivityInitializer extends ConsumerWidget {
       if (settings != null && settings.autoBackup) {
         BackgroundWorker.scheduleWeeklyBackup();
       }
+      
+      if (settings != null) {
+        ref.read(cloudIntegrationProvider.notifier).setSyncEnabled(settings.googleDriveEmail != null);
+      }
     });
-    
-    return child;
+
+    return widget.child;
   }
 }
 
@@ -143,8 +174,10 @@ class GymGeminiApp extends ConsumerWidget {
         title: 'Gym Gemini Pro',
         debugShowCheckedModeBanner: false,
         themeMode: settings.themeMode,
-        theme: _buildTheme(Brightness.light, settings.accentColor, settings.fontSize),
-        darkTheme: _buildTheme(Brightness.dark, settings.accentColor, settings.fontSize),
+        theme: _buildTheme(
+            Brightness.light, settings.accentColor, settings.fontSize),
+        darkTheme: _buildTheme(
+            Brightness.dark, settings.accentColor, settings.fontSize),
         routerConfig: router,
         builder: (context, child) {
           return AnimatedTheme(
@@ -167,13 +200,14 @@ class GymGeminiApp extends ConsumerWidget {
     );
   }
 
-  ThemeData _buildTheme(Brightness brightness, Color accentColor, FontSize fontSize) {
+  ThemeData _buildTheme(
+      Brightness brightness, Color accentColor, FontSize fontSize) {
     final isDark = brightness == Brightness.dark;
     final baseColor = isDark ? const Color(0xFF0F172A) : Colors.white;
     final surfaceColor = isDark ? const Color(0xFF1E293B) : Colors.grey[50]!;
-    
+
     final baseTheme = isDark ? ThemeData.dark() : ThemeData.light();
-    
+
     return ThemeData(
       useMaterial3: true,
       brightness: brightness,
@@ -188,9 +222,9 @@ class GymGeminiApp extends ConsumerWidget {
       ),
       scaffoldBackgroundColor: baseColor,
       textTheme: baseTheme.textTheme.apply(
-          bodyColor: isDark ? Colors.white : Colors.black87,
-          displayColor: isDark ? Colors.white : Colors.black87,
-          fontSizeFactor: fontSize == FontSize.large ? 1.2 : 1.0,
+        bodyColor: isDark ? Colors.white : Colors.black87,
+        displayColor: isDark ? Colors.white : Colors.black87,
+        fontSizeFactor: fontSize == FontSize.large ? 1.2 : 1.0,
       ),
       cardTheme: CardThemeData(
         color: surfaceColor,

@@ -30,7 +30,8 @@ class WorkoutSummaryOverlay extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<WorkoutSummaryOverlay> createState() => _WorkoutSummaryOverlayState();
+  ConsumerState<WorkoutSummaryOverlay> createState() =>
+      _WorkoutSummaryOverlayState();
 }
 
 class _WorkoutSummaryOverlayState extends ConsumerState<WorkoutSummaryOverlay>
@@ -51,10 +52,7 @@ class _WorkoutSummaryOverlayState extends ConsumerState<WorkoutSummaryOverlay>
         ConfettiController(duration: const Duration(seconds: 3));
 
     // Build stagger animations for each exercise row
-    final exerciseCount = widget.sets
-        .map((s) => s.exerciseId)
-        .toSet()
-        .length;
+    final exerciseCount = widget.sets.map((s) => s.exerciseId).toSet().length;
     _staggerControllers = List.generate(
       exerciseCount,
       (_) => AnimationController(
@@ -86,13 +84,13 @@ class _WorkoutSummaryOverlayState extends ConsumerState<WorkoutSummaryOverlay>
   Future<void> _fetchPlateaus() async {
     final service = ref.read(plateauServiceProvider.notifier);
     final results = <PlateauResult>[];
-    
+
     final exerciseIds = widget.sets.map((s) => s.exerciseId).toSet().toList();
     for (final id in exerciseIds) {
       final res = await service.checkExercise(id);
       if (res != null) results.add(res);
     }
-    
+
     if (mounted) {
       setState(() {
         _plateaus = results;
@@ -133,7 +131,7 @@ class _WorkoutSummaryOverlayState extends ConsumerState<WorkoutSummaryOverlay>
     return LayoutBuilder(
       builder: (context, constraints) {
         final isVerySmall = constraints.maxWidth < 380;
-        
+
         return Stack(
           children: [
             // Confetti at top center
@@ -158,7 +156,8 @@ class _WorkoutSummaryOverlayState extends ConsumerState<WorkoutSummaryOverlay>
               padding: EdgeInsets.all(isVerySmall ? 16 : 24),
               decoration: BoxDecoration(
                 color: Theme.of(context).colorScheme.surface,
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(24)),
               ),
               child: SingleChildScrollView(
                 physics: const BouncingScrollPhysics(
@@ -178,7 +177,10 @@ class _WorkoutSummaryOverlayState extends ConsumerState<WorkoutSummaryOverlay>
                                 fit: BoxFit.scaleDown,
                                 child: Text(
                                   'Workout Complete! 🎉',
-                                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .titleLarge
+                                      ?.copyWith(
                                         fontWeight: FontWeight.bold,
                                       ),
                                 ),
@@ -202,9 +204,10 @@ class _WorkoutSummaryOverlayState extends ConsumerState<WorkoutSummaryOverlay>
                         child: Lottie.asset(
                           'assets/animations/trophy.json',
                           repeat: false,
-                          errorBuilder: (_, __, ___) =>
-                              const Icon(LucideIcons.trophy,
-                                  size: 60, color: Color(0xFFFFD700)),
+                          errorBuilder: (_, __, ___) => const Icon(
+                              LucideIcons.trophy,
+                              size: 60,
+                              color: Color(0xFFFFD700)),
                         ),
                       ),
                     ),
@@ -246,7 +249,7 @@ class _WorkoutSummaryOverlayState extends ConsumerState<WorkoutSummaryOverlay>
                       ],
                     ),
                     const SizedBox(height: 24),
-                    
+
                     if (!_loadingPlateaus && _plateaus.isNotEmpty) ...[
                       _PlateauTransparencyCard(results: _plateaus),
                       const SizedBox(height: 24),
@@ -264,8 +267,8 @@ class _WorkoutSummaryOverlayState extends ConsumerState<WorkoutSummaryOverlay>
                     ...exerciseEntries.asMap().entries.map((mapEntry) {
                       final index = mapEntry.key;
                       final entry = mapEntry.value;
-                      final ex = widget.exercises
-                          .firstWhere((e) => e.id == entry.key);
+                      final ex =
+                          widget.exercises.firstWhere((e) => e.id == entry.key);
                       final maxWeight = entry.value.fold(
                           0.0, (prev, s) => s.weight > prev ? s.weight : prev);
 
@@ -290,7 +293,8 @@ class _WorkoutSummaryOverlayState extends ConsumerState<WorkoutSummaryOverlay>
                                 flex: 3,
                                 child: Text(
                                   ex.name,
-                                  style: const TextStyle(fontWeight: FontWeight.w500),
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.w500),
                                   overflow: TextOverflow.ellipsis,
                                 ),
                               ),
@@ -303,7 +307,9 @@ class _WorkoutSummaryOverlayState extends ConsumerState<WorkoutSummaryOverlay>
                                   child: Text(
                                     '${entry.value.length} sets • Best: ${maxWeight.toStringAsFixed(1)}kg',
                                     style: TextStyle(
-                                        color: Theme.of(context).colorScheme.outline,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .outline,
                                         fontSize: 13),
                                   ),
                                 ),
@@ -326,7 +332,7 @@ class _WorkoutSummaryOverlayState extends ConsumerState<WorkoutSummaryOverlay>
                         fillColor: Theme.of(context)
                             .colorScheme
                             .surfaceContainerHighest
-                            .withOpacity(0.3),
+                            .withValues(alpha: 0.3),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: BorderSide.none,
@@ -386,7 +392,10 @@ class _WorkoutSummaryOverlayState extends ConsumerState<WorkoutSummaryOverlay>
       decoration: BoxDecoration(
         color: isHighlight
             ? Theme.of(context).colorScheme.tertiaryContainer.withOpacity(0.5)
-            : Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.3),
+            : Theme.of(context)
+                .colorScheme
+                .surfaceContainerHighest
+                .withOpacity(0.3),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
@@ -394,7 +403,8 @@ class _WorkoutSummaryOverlayState extends ConsumerState<WorkoutSummaryOverlay>
         children: [
           Row(
             children: [
-              Icon(icon, size: 14, color: Theme.of(context).colorScheme.outline),
+              Icon(icon,
+                  size: 14, color: Theme.of(context).colorScheme.outline),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
@@ -439,7 +449,10 @@ class _WorkoutSummaryOverlayState extends ConsumerState<WorkoutSummaryOverlay>
       decoration: BoxDecoration(
         color: isHighlight
             ? Theme.of(context).colorScheme.tertiaryContainer.withOpacity(0.5)
-            : Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.3),
+            : Theme.of(context)
+                .colorScheme
+                .surfaceContainerHighest
+                .withOpacity(0.3),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
@@ -447,7 +460,8 @@ class _WorkoutSummaryOverlayState extends ConsumerState<WorkoutSummaryOverlay>
         children: [
           Row(
             children: [
-              Icon(icon, size: 14, color: Theme.of(context).colorScheme.outline),
+              Icon(icon,
+                  size: 14, color: Theme.of(context).colorScheme.outline),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
@@ -488,7 +502,7 @@ class _SyncStatusChip extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final syncStatus = ref.watch(syncWorkerProvider);
-    
+
     Color color;
     String label;
     IconData icon;
@@ -517,16 +531,15 @@ class _SyncStatusChip extends ConsumerWidget {
         icon = LucideIcons.cloudOff;
         break;
       case SyncStatus.idle:
-      default:
         return const SizedBox.shrink();
     }
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -569,14 +582,14 @@ class _PlateauTransparencyCard extends StatelessWidget {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            colorScheme.surfaceContainerHighest.withOpacity(0.5),
+            colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
             colorScheme.surface,
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: colorScheme.primary.withOpacity(0.1)),
+        border: Border.all(color: colorScheme.primary.withValues(alpha: 0.1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -586,10 +599,11 @@ class _PlateauTransparencyCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: colorScheme.primary.withOpacity(0.1),
+                  color: colorScheme.primary.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(LucideIcons.trendingDown, color: colorScheme.primary, size: 20),
+                child: Icon(LucideIcons.trendingDown,
+                    color: colorScheme.primary, size: 20),
               ),
               const SizedBox(width: 12),
               Column(
@@ -617,47 +631,53 @@ class _PlateauTransparencyCard extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           ...results.map((res) => Padding(
-            padding: const EdgeInsets.only(bottom: 12),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(res.exerciseName, style: const TextStyle(fontWeight: FontWeight.bold)),
-                      Text(
-                        'Stuck for ${res.weeksStuck} sessions',
-                        style: TextStyle(fontSize: 12, color: colorScheme.outline),
+                padding: const EdgeInsets.only(bottom: 12),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(res.exerciseName,
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.bold)),
+                          Text(
+                            'Stuck for ${res.weeksStuck} sessions',
+                            style: TextStyle(
+                                fontSize: 12, color: colorScheme.outline),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: colorScheme.secondary.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    'Try Deload: ${res.deloadWeight}kg',
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.bold,
-                      color: colorScheme.secondary,
                     ),
-                  ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: colorScheme.secondary.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        'Try Deload: ${res.deloadWeight}kg',
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                          color: colorScheme.secondary,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          )),
+              )),
           const Divider(height: 32),
           Text(
             'Common factors: Insufficient recovery, high volume, or nutritional deficit. Tap for details.',
-            style: TextStyle(fontSize: 12, color: colorScheme.outline, fontStyle: FontStyle.italic),
+            style: TextStyle(
+                fontSize: 12,
+                color: colorScheme.outline,
+                fontStyle: FontStyle.italic),
           ),
         ],
       ),
     );
   }
 }
-

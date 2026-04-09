@@ -15,7 +15,8 @@ class WorkoutDetailScreen extends ConsumerStatefulWidget {
   const WorkoutDetailScreen({super.key, required this.workoutId});
 
   @override
-  ConsumerState<WorkoutDetailScreen> createState() => _WorkoutDetailScreenState();
+  ConsumerState<WorkoutDetailScreen> createState() =>
+      _WorkoutDetailScreenState();
 }
 
 class _WorkoutDetailScreenState extends ConsumerState<WorkoutDetailScreen> {
@@ -30,26 +31,25 @@ class _WorkoutDetailScreenState extends ConsumerState<WorkoutDetailScreen> {
     super.dispose();
   }
 
-  TextEditingController _getController(int id, String initialValue) {
-    if (!_controllers.containsKey(id)) {
-      _controllers[id] = TextEditingController(text: initialValue);
-    }
-    return _controllers[id]!;
-  }
 
   @override
   Widget build(BuildContext context) {
     final db = ref.watch(appDatabaseProvider);
-    final workoutStream = db.select(db.workouts)..where((t) => t.id.equals(widget.workoutId));
+    final workoutStream = db.select(db.workouts)
+      ..where((t) => t.id.equals(widget.workoutId));
     final setsStream = db.select(db.workoutSets).join([
-      innerJoin(db.exercises, db.exercises.id.equalsExp(db.workoutSets.exerciseId)),
-    ])..where(db.workoutSets.workoutId.equals(widget.workoutId));
+      innerJoin(
+          db.exercises, db.exercises.id.equalsExp(db.workoutSets.exerciseId)),
+    ])
+      ..where(db.workoutSets.workoutId.equals(widget.workoutId));
 
     return StreamBuilder<List<Workout>>(
       stream: workoutStream.watch(),
       builder: (context, workoutSnapshot) {
         final workout = workoutSnapshot.data?.firstOrNull;
-        if (workout == null) return const Scaffold(body: Center(child: CircularProgressIndicator()));
+        if (workout == null)
+          return const Scaffold(
+              body: Center(child: CircularProgressIndicator()));
 
         return Scaffold(
           appBar: AppBar(
@@ -76,20 +76,24 @@ class _WorkoutDetailScreenState extends ConsumerState<WorkoutDetailScreen> {
               ),
             ],
           ),
-          floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-          floatingActionButton: _isEditing ? null : Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: SizedBox(
-              width: double.infinity,
-              child: FloatingActionButton.extended(
-                onPressed: _repeatWorkout,
-                label: const Text('Repeat Workout', style: TextStyle(fontWeight: FontWeight.bold)),
-                icon: const Icon(LucideIcons.rotateCcw),
-                backgroundColor: Theme.of(context).colorScheme.primary,
-                foregroundColor: Theme.of(context).colorScheme.onPrimary,
-              ),
-            ),
-          ),
+          floatingActionButtonLocation:
+              FloatingActionButtonLocation.centerFloat,
+          floatingActionButton: _isEditing
+              ? null
+              : Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: FloatingActionButton.extended(
+                      onPressed: _repeatWorkout,
+                      label: const Text('Repeat Workout',
+                          style: TextStyle(fontWeight: FontWeight.bold)),
+                      icon: const Icon(LucideIcons.rotateCcw),
+                      backgroundColor: Theme.of(context).colorScheme.primary,
+                      foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                    ),
+                  ),
+                ),
           body: StreamBuilder<List<TypedResult>>(
             stream: setsStream.watch(),
             builder: (context, setsSnapshot) {
@@ -100,7 +104,8 @@ class _WorkoutDetailScreenState extends ConsumerState<WorkoutDetailScreen> {
               return CustomScrollView(
                 slivers: [
                   SliverToBoxAdapter(
-                    child: _WorkoutSummaryHeader(workout: workout, muscleVolume: muscleVolume),
+                    child: _WorkoutSummaryHeader(
+                        workout: workout, muscleVolume: muscleVolume),
                   ),
                   SliverPadding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -109,15 +114,18 @@ class _WorkoutDetailScreenState extends ConsumerState<WorkoutDetailScreen> {
                         (context, index) {
                           final exerciseId = exerciseRows.keys.elementAt(index);
                           final exerciseSets = exerciseRows[exerciseId]!;
-                          final exercise = exerciseSets.first.readTable(db.exercises);
-                          final setId = exerciseSets.first.readTable(db.workoutSets).id;
-                          
+                          final exercise =
+                              exerciseSets.first.readTable(db.exercises);
+                          final setId =
+                              exerciseSets.first.readTable(db.workoutSets).id;
+
                           return _ExerciseDetailBlock(
                             key: ValueKey('exercise_block_$setId'),
                             exercise: exercise,
                             rows: exerciseSets,
                             isEditing: _isEditing,
-                            onUpdate: (setId, weight, reps) => _updateSet(setId, weight, reps),
+                            onUpdate: (setId, weight, reps) =>
+                                _updateSet(setId, weight, reps),
                           );
                         },
                         childCount: exerciseRows.length,
@@ -137,7 +145,8 @@ class _WorkoutDetailScreenState extends ConsumerState<WorkoutDetailScreen> {
   Map<int, List<TypedResult>> _groupRowsByExercise(List<TypedResult> rows) {
     final Map<int, List<TypedResult>> groups = {};
     for (final row in rows) {
-      final setId = row.readTable(ref.read(appDatabaseProvider).workoutSets).exerciseId;
+      final setId =
+          row.readTable(ref.read(appDatabaseProvider).workoutSets).exerciseId;
       groups.putIfAbsent(setId, () => []).add(row);
     }
     return groups;
@@ -170,10 +179,15 @@ class _WorkoutDetailScreenState extends ConsumerState<WorkoutDetailScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Delete Workout?'),
-        content: const Text('This will permanently remove this session from your history.'),
+        content: const Text(
+            'This will permanently remove this session from your history.'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
-          TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('Delete', style: TextStyle(color: Colors.red))),
+          TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Cancel')),
+          TextButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text('Delete', style: TextStyle(color: Colors.red))),
         ],
       ),
     );
@@ -199,7 +213,8 @@ class _WorkoutSummaryHeader extends StatelessWidget {
   final Workout workout;
   final Map<String, double> muscleVolume;
 
-  const _WorkoutSummaryHeader({required this.workout, required this.muscleVolume});
+  const _WorkoutSummaryHeader(
+      {required this.workout, required this.muscleVolume});
 
   @override
   Widget build(BuildContext context) {
@@ -212,20 +227,29 @@ class _WorkoutSummaryHeader extends StatelessWidget {
         children: [
           Row(
             children: [
-              _SummaryStat(label: 'Duration', value: '${(workout.duration ?? 0) ~/ 60}m'),
+              _SummaryStat(
+                  label: 'Duration',
+                  value: '${(workout.duration ?? 0) ~/ 60}m'),
               const SizedBox(width: 24),
-              _SummaryStat(label: 'Volume', value: '${totalVolume.toStringAsFixed(0)}kg'),
+              _SummaryStat(
+                  label: 'Volume',
+                  value: '${totalVolume.toStringAsFixed(0)}kg'),
               const SizedBox(width: 24),
-              const _SummaryStat(label: 'PRs', value: '🏆 2'), // Placeholder for logic
+              const _SummaryStat(
+                  label: 'PRs', value: '🏆 2'), // Placeholder for logic
             ],
           ),
           if (workout.notes != null && workout.notes!.isNotEmpty) ...[
             const SizedBox(height: 16),
-            Text('Notes', style: TextStyle(color: Theme.of(context).colorScheme.outline, fontSize: 12)),
+            Text('Notes',
+                style: TextStyle(
+                    color: Theme.of(context).colorScheme.outline,
+                    fontSize: 12)),
             Text(workout.notes!),
           ],
           const SizedBox(height: 24),
-          const Text('Muscle Distribution', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+          const Text('Muscle Distribution',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
           const SizedBox(height: 8),
           ...muscleVolume.entries.map((e) {
             final percent = totalVolume > 0 ? e.value / totalVolume : 0;
@@ -237,13 +261,15 @@ class _WorkoutSummaryHeader extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(e.key, style: const TextStyle(fontSize: 12)),
-                      Text('${(percent * 100).toStringAsFixed(0)}%', style: const TextStyle(fontSize: 12)),
+                      Text('${(percent * 100).toStringAsFixed(0)}%',
+                          style: const TextStyle(fontSize: 12)),
                     ],
                   ),
                   const SizedBox(height: 4),
                   LinearProgressIndicator(
                     value: percent.toDouble(),
-                    backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+                    backgroundColor:
+                        Theme.of(context).colorScheme.surfaceContainerHighest,
                     borderRadius: BorderRadius.circular(4),
                     minHeight: 6,
                   ),
@@ -267,8 +293,11 @@ class _SummaryStat extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: TextStyle(color: Theme.of(context).colorScheme.outline, fontSize: 10)),
-        Text(value, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+        Text(label,
+            style: TextStyle(
+                color: Theme.of(context).colorScheme.outline, fontSize: 10)),
+        Text(value,
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
       ],
     );
   }
@@ -302,14 +331,16 @@ class _ExerciseDetailBlock extends ConsumerWidget {
             children: [
               Expanded(
                 child: Text(
-                  exercise.name, 
-                  style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.blue),
+                  exercise.name,
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold, color: Colors.blue),
                   overflow: TextOverflow.ellipsis,
                   maxLines: 1,
                 ),
               ),
               const SizedBox(width: 4),
-              const Icon(LucideIcons.externalLink, size: 14, color: Colors.blue),
+              const Icon(LucideIcons.externalLink,
+                  size: 14, color: Colors.blue),
             ],
           ),
         ),
@@ -326,22 +357,44 @@ class _ExerciseDetailBlock extends ConsumerWidget {
                 TableCell(child: Text('Weight', style: _headerStyle)),
                 TableCell(child: Text('Reps', style: _headerStyle)),
                 TableCell(child: Text('RPE', style: _headerStyle)),
-                TableCell(child: Text('Volume', style: _headerStyle, textAlign: TextAlign.right)),
+                TableCell(
+                    child: Text('Volume',
+                        style: _headerStyle, textAlign: TextAlign.right)),
               ],
             ),
             ...rows.map((row) {
               final s = row.readTable(db.workoutSets);
               return TableRow(
                 children: [
-                  TableCell(child: Padding(padding: const EdgeInsets.symmetric(vertical: 8), child: Text('${s.setNumber}', style: const TextStyle(fontSize: 12)))),
-                  TableCell(child: isEditing 
-                      ? _EditCell(initialValue: '${s.weight}', onChanged: (v) => onUpdate(s.id, double.parse(v), s.reps))
-                      : Text('${s.weight}kg', style: const TextStyle(fontSize: 12))),
-                  TableCell(child: isEditing 
-                      ? _EditCell(initialValue: '${s.reps.toInt()}', onChanged: (v) => onUpdate(s.id, s.weight, double.parse(v)))
-                      : Text('${s.reps.toInt()}', style: const TextStyle(fontSize: 12))),
-                  TableCell(child: Text('${s.rpe ?? '-'}', style: const TextStyle(fontSize: 12))),
-                  TableCell(child: Text('${(s.weight * s.reps).toStringAsFixed(0)}', textAlign: TextAlign.right, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold))),
+                  TableCell(
+                      child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          child: Text('${s.setNumber}',
+                              style: const TextStyle(fontSize: 12)))),
+                  TableCell(
+                      child: isEditing
+                          ? _EditCell(
+                              initialValue: '${s.weight}',
+                              onChanged: (v) =>
+                                  onUpdate(s.id, double.parse(v), s.reps))
+                          : Text('${s.weight}kg',
+                              style: const TextStyle(fontSize: 12))),
+                  TableCell(
+                      child: isEditing
+                          ? _EditCell(
+                              initialValue: '${s.reps.toInt()}',
+                              onChanged: (v) =>
+                                  onUpdate(s.id, s.weight, double.parse(v)))
+                          : Text('${s.reps.toInt()}',
+                              style: const TextStyle(fontSize: 12))),
+                  TableCell(
+                      child: Text('${s.rpe ?? '-'}',
+                          style: const TextStyle(fontSize: 12))),
+                  TableCell(
+                      child: Text('${(s.weight * s.reps).toStringAsFixed(0)}',
+                          textAlign: TextAlign.right,
+                          style: const TextStyle(
+                              fontSize: 12, fontWeight: FontWeight.bold))),
                 ],
               );
             }),
@@ -351,7 +404,8 @@ class _ExerciseDetailBlock extends ConsumerWidget {
     );
   }
 
-  static const _headerStyle = TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.grey);
+  static const _headerStyle =
+      TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.grey);
 }
 
 class _EditCell extends StatelessWidget {

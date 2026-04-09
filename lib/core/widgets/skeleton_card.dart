@@ -26,19 +26,21 @@ class SkeletonCard extends StatelessWidget {
     final highlightColor = isDark ? Colors.grey[800]! : Colors.grey[100]!;
 
     return Padding(
-      padding: margin ?? const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+      padding:
+          margin ?? const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       child: Shimmer.fromColors(
         baseColor: baseColor,
         highlightColor: highlightColor,
         period: const Duration(milliseconds: 1500),
-        child: child ?? Container(
-          height: height,
-          width: width ?? double.infinity,
-          decoration: BoxDecoration(
-            color: baseColor,
-            borderRadius: BorderRadius.circular(borderRadius),
-          ),
-        ),
+        child: child ??
+            Container(
+              height: height,
+              width: width ?? double.infinity,
+              decoration: BoxDecoration(
+                color: baseColor,
+                borderRadius: BorderRadius.circular(borderRadius),
+              ),
+            ),
       ),
     );
   }
@@ -54,20 +56,34 @@ class SkeletonDashboard extends StatelessWidget {
       physics: const NeverScrollableScrollPhysics(),
       children: [
         const SizedBox(height: 60),
-        const SkeletonCard(height: 80, margin: EdgeInsets.symmetric(horizontal: 20)), // Header
+        const SkeletonCard(
+            height: 80, margin: EdgeInsets.symmetric(horizontal: 20)), // Header
         const SizedBox(height: 20),
-        const SkeletonCard(height: 200, borderRadius: 30, margin: EdgeInsets.symmetric(horizontal: 20)), // Today's Plan
+        const SkeletonCard(
+            height: 200,
+            borderRadius: 30,
+            margin: EdgeInsets.symmetric(horizontal: 20)), // Today's Plan
         const SizedBox(height: 20),
         Row(
           children: const [
-            Expanded(child: SkeletonCard(height: 100, margin: EdgeInsets.only(left: 20, right: 6))),
-            Expanded(child: SkeletonCard(height: 100, margin: EdgeInsets.symmetric(horizontal: 6))),
-            Expanded(child: SkeletonCard(height: 100, margin: EdgeInsets.only(left: 6, right: 20))),
+            Expanded(
+                child: SkeletonCard(
+                    height: 100, margin: EdgeInsets.only(left: 20, right: 6))),
+            Expanded(
+                child: SkeletonCard(
+                    height: 100, margin: EdgeInsets.symmetric(horizontal: 6))),
+            Expanded(
+                child: SkeletonCard(
+                    height: 100, margin: EdgeInsets.only(left: 6, right: 20))),
           ],
         ), // Quick Actions
         const SizedBox(height: 20),
-        const SkeletonCard(height: 150, margin: EdgeInsets.symmetric(horizontal: 20)), // Last Workout
-        const SkeletonCard(height: 150, margin: EdgeInsets.symmetric(horizontal: 20)), // Weekly Volume
+        const SkeletonCard(
+            height: 150,
+            margin: EdgeInsets.symmetric(horizontal: 20)), // Last Workout
+        const SkeletonCard(
+            height: 150,
+            margin: EdgeInsets.symmetric(horizontal: 20)), // Weekly Volume
       ],
     );
   }

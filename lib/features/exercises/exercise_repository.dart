@@ -1,5 +1,6 @@
 import 'package:drift/drift.dart';
 import 'package:gym_gemini_pro/core/database/database.dart';
+import 'package:gym_gemini_pro/core/domain/entities/exercise.dart' as entity;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'exercise_repository.g.dart';
@@ -9,16 +10,48 @@ class ExerciseRepository {
 
   ExerciseRepository(this._db);
 
-  Stream<List<Exercise>> watchAllExercises() {
-    return (_db.select(_db.exercises)..orderBy([(t) => OrderingTerm(expression: t.name)])).watch();
+  entity.Exercise _toEntity(Exercise row) {
+    return entity.Exercise(
+      id: row.id,
+      name: row.name,
+      description: row.description,
+      category: row.category,
+      difficulty: row.difficulty,
+      primaryMuscle: row.primaryMuscle,
+      secondaryMuscle: row.secondaryMuscle,
+      equipment: row.equipment,
+      setType: row.setType,
+      restTime: row.restTime,
+      instructions: row.instructions?.split('|'),
+      gifUrl: row.gifUrl,
+      imageUrl: row.imageUrl,
+      videoUrl: row.videoUrl,
+      mechanic: row.mechanic,
+      force: row.force,
+      source: row.source,
+      isCustom: row.isCustom,
+      lastUsed: row.lastUsed,
+    );
   }
 
-  Future<List<Exercise>> getAllExercises() {
-    return (_db.select(_db.exercises)..orderBy([(t) => OrderingTerm(expression: t.name)])).get();
+  Stream<List<entity.Exercise>> watchAllExercises() {
+    return (_db.select(_db.exercises)
+          ..orderBy([(t) => OrderingTerm(expression: t.name)]))
+        .watch()
+        .map((rows) => rows.map(_toEntity).toList());
   }
 
-  Future<Exercise?> getExerciseById(int id) {
-    return (_db.select(_db.exercises)..where((t) => t.id.equals(id))).getSingleOrNull();
+  Future<List<entity.Exercise>> getAllExercises() async {
+    final rows = await (_db.select(_db.exercises)
+          ..orderBy([(t) => OrderingTerm(expression: t.name)]))
+        .get();
+    return rows.map(_toEntity).toList();
+  }
+
+  Future<entity.Exercise?> getExerciseById(int id) async {
+    final row = await (_db.select(_db.exercises)..where((t) => t.id.equals(id)))
+        .getSingleOrNull();
+    return row != null ? _toEntity(row) : null;
   }
 
   Future<int> saveExercise(ExercisesCompanion companion) async {
@@ -30,8 +63,7 @@ class ExerciseRepository {
       } else {
         id = await _db.into(_db.exercises).insert(companion);
       }
-      
-      // Queue for sync if it's a custom exercise or being modified
+
       await _db.into(_db.syncQueue).insert(SyncQueueCompanion.insert(
             type: 'exercise',
             createdAt: DateTime.now(),

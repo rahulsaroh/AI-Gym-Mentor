@@ -1,4 +1,4 @@
-import 'package:gym_gemini_pro/core/database/database.dart';
+import 'package:gym_gemini_pro/core/domain/entities/exercise.dart';
 import 'package:gym_gemini_pro/features/exercises/exercise_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -50,9 +50,12 @@ Stream<List<Exercise>> filteredExercises(FilteredExercisesRef ref) {
   return allExercisesAsync.when(
     data: (exercises) {
       final filtered = exercises.where((ex) {
-        final matchesSearch = ex.name.toLowerCase().contains(filters['search']!.toLowerCase());
-        final matchesMuscle = filters['muscle'] == 'All Muscles' || ex.primaryMuscle == filters['muscle'];
-        final matchesEquipment = filters['equipment'] == 'All Equipment' || ex.equipment == filters['equipment'];
+        final matchesSearch =
+            ex.name.toLowerCase().contains(filters['search']!.toLowerCase());
+        final matchesMuscle = filters['muscle'] == 'All Muscles' ||
+            ex.primaryMuscle == filters['muscle'];
+        final matchesEquipment = filters['equipment'] == 'All Equipment' ||
+            ex.equipment == filters['equipment'];
         return matchesSearch && matchesMuscle && matchesEquipment;
       }).toList();
       return Stream.value(filtered);

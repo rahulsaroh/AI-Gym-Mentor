@@ -6,8 +6,8 @@ import 'package:url_launcher/url_launcher.dart';
 
 class ExerciseMediaWidget extends StatefulWidget {
   final String? animatedUrl; // e.g., GIF URL
-  final String? staticUrl;   // e.g., Thumbnail/Poster
-  final String? videoUrl;    // e.g., YouTube Link
+  final String? staticUrl; // e.g., Thumbnail/Poster
+  final String? videoUrl; // e.g., YouTube Link
   final double height;
   final BoxFit fit;
 
@@ -45,7 +45,7 @@ class _ExerciseMediaWidgetState extends State<ExerciseMediaWidget> {
               bottom: 8,
               child: FloatingActionButton.small(
                 onPressed: () => _launchVideo(widget.videoUrl!),
-                backgroundColor: Colors.red.withOpacity(0.8),
+                backgroundColor: Colors.red.withValues(alpha: 0.8),
                 child: const Icon(Icons.play_arrow, color: Colors.white),
               ),
             ),
@@ -62,9 +62,9 @@ class _ExerciseMediaWidgetState extends State<ExerciseMediaWidget> {
         cacheManager: _customCacheManager,
         fit: widget.fit,
         placeholder: (context, url) => _buildPlaceholder(),
-        errorWidget: (context, url, error) => widget.staticUrl != null 
-          ? _buildStaticImage() 
-          : _buildErrorPlaceholder(),
+        errorWidget: (context, url, error) => widget.staticUrl != null
+            ? _buildStaticImage()
+            : _buildErrorPlaceholder(),
       );
     } else if (widget.staticUrl != null && widget.staticUrl!.isNotEmpty) {
       return _buildStaticImage();

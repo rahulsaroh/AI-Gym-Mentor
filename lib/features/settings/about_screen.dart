@@ -8,14 +8,14 @@ class AboutScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Scaffold(
       appBar: AppBar(title: const Text('About GYM Kilo')),
       body: FutureBuilder<PackageInfo>(
         future: PackageInfo.fromPlatform(),
         builder: (context, snapshot) {
           final info = snapshot.data;
-          
+
           return ListView(
             padding: const EdgeInsets.all(24),
             children: [
@@ -29,39 +29,36 @@ class AboutScreen extends StatelessWidget {
                         color: theme.colorScheme.primary,
                         borderRadius: BorderRadius.circular(24),
                       ),
-                      child: const Icon(LucideIcons.dumbbell, color: Colors.white, size: 48),
+                      child: const Icon(LucideIcons.dumbbell,
+                          color: Colors.white, size: 48),
                     ),
                     const SizedBox(height: 16),
-                    Text('GYM Kilo Pro', style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold)),
-                    Text('Version ${info?.version ?? '1.0.0'} (${info?.buildNumber ?? '1'})', style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.outline)),
+                    Text('GYM Kilo Pro',
+                        style: theme.textTheme.headlineSmall
+                            ?.copyWith(fontWeight: FontWeight.bold)),
+                    Text(
+                        'Version ${info?.version ?? '1.0.0'} (${info?.buildNumber ?? '1'})',
+                        style: theme.textTheme.bodyMedium
+                            ?.copyWith(color: theme.colorScheme.outline)),
                   ],
                 ),
               ),
               const SizedBox(height: 48),
-              
-              const Text("What's New", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+              const Text("What's New",
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
               const SizedBox(height: 16),
-              _buildChangelogItem(
-                context, 
-                'v1.0.0 - Phase 7 Release', 
-                [
-                  'Complete Settings & Personalization Hub',
-                  'Google Sheets Cloud Sync (Phase 6)',
-                  'Personal Record (PR) Persistence',
-                  'Dynamic Material 3 Theme & Accent Colors',
-                  'JSON/CSV Export capabilities',
-                ]
-              ),
-              _buildChangelogItem(
-                context, 
-                'v0.9.0 - Alpha Phase', 
-                [
-                  'Core Workout Logging Engine',
-                  'Advanced Rest Timer',
-                  'Muscle Balance Radar Charts',
-                ]
-              ),
-              
+              _buildChangelogItem(context, 'v1.0.0 - Phase 7 Release', [
+                'Complete Settings & Personalization Hub',
+                'Google Sheets Cloud Sync (Phase 6)',
+                'Personal Record (PR) Persistence',
+                'Dynamic Material 3 Theme & Accent Colors',
+                'JSON/CSV Export capabilities',
+              ]),
+              _buildChangelogItem(context, 'v0.9.0 - Alpha Phase', [
+                'Core Workout Logging Engine',
+                'Advanced Rest Timer',
+                'Muscle Balance Radar Charts',
+              ]),
               const SizedBox(height: 32),
               const Divider(),
               ListTile(
@@ -75,7 +72,8 @@ class AboutScreen extends StatelessWidget {
               ),
               const SizedBox(height: 64),
               const Center(
-                child: Text('Made with ❤️ for the Fitness Community', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                child: Text('Made with ❤️ for the Fitness Community',
+                    style: TextStyle(fontSize: 12, color: Colors.grey)),
               ),
             ],
           );
@@ -84,24 +82,29 @@ class AboutScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildChangelogItem(BuildContext context, String version, List<String> changes) {
+  Widget _buildChangelogItem(
+      BuildContext context, String version, List<String> changes) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 24.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(version, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.grey)),
+          Text(version,
+              style: const TextStyle(
+                  fontWeight: FontWeight.bold, color: Colors.grey)),
           const SizedBox(height: 8),
           ...changes.map((c) => Padding(
-            padding: const EdgeInsets.only(bottom: 4.0),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text('• ', style: TextStyle(fontWeight: FontWeight.bold)),
-                Expanded(child: Text(c, style: const TextStyle(fontSize: 14))),
-              ],
-            ),
-          )),
+                padding: const EdgeInsets.only(bottom: 4.0),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('• ',
+                        style: TextStyle(fontWeight: FontWeight.bold)),
+                    Expanded(
+                        child: Text(c, style: const TextStyle(fontSize: 14))),
+                  ],
+                ),
+              )),
         ],
       ),
     );

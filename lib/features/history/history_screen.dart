@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:gym_gemini_pro/core/database/database.dart';
+import 'package:gym_gemini_pro/core/domain/entities/logged_set.dart' as ent;
+import 'package:gym_gemini_pro/core/domain/entities/workout_session.dart' as ent;
+import 'package:gym_gemini_pro/features/workout/workout_repository.dart';
 import 'package:gym_gemini_pro/core/widgets/skeleton_card.dart';
 import 'package:gym_gemini_pro/core/widgets/number_ticker.dart';
 import 'package:gym_gemini_pro/features/history/history_providers.dart';
@@ -36,7 +38,8 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
   }
 
   void _onScroll() {
-    if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 200) {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 200) {
       ref.read(historyListProvider.notifier).loadMore();
     }
   }
@@ -50,7 +53,8 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: CustomScrollView(
         controller: _scrollController,
-        physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+        physics: const BouncingScrollPhysics(
+            parent: AlwaysScrollableScrollPhysics()),
         slivers: [
           SliverAppBar.large(
             title: const Text('History'),
@@ -85,16 +89,55 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
           historyAsync.when(
             data: (workouts) {
               if (workouts.isEmpty) {
-                return const SliverFillRemaining(
+                return SliverFillRemaining(
                   hasScrollBody: false,
-                  child: Center(child: Text('No workouts logged yet.')),
+                  child: Center(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 32),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(LucideIcons.history,
+                              size: 64,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .primary
+                                  .withValues(alpha: 0.2)),
+                          const SizedBox(height: 16),
+                          Text(
+                            'Your fitness journey starts here!',
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleMedium
+                                ?.copyWith(fontWeight: FontWeight.bold),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Log your first workout to see your progress history and volume trends.',
+                            style: TextStyle(
+                                color: Theme.of(context).colorScheme.outline),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 24),
+                          FilledButton.icon(
+                            onPressed: () => context.go('/'),
+                            icon: const Icon(LucideIcons.play),
+                            label: const Text('Start Workout'),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 );
               }
               return _WorkoutSliverList(workouts: workouts);
             },
             loading: () => SliverList(
               delegate: SliverChildBuilderDelegate(
-                (_, __) => const SkeletonCard(height: 100, margin: EdgeInsets.symmetric(horizontal: 16, vertical: 6)),
+                (_, __) => const SkeletonCard(
+                    height: 100,
+                    margin: EdgeInsets.symmetric(horizontal: 16, vertical: 6)),
                 childCount: 6,
               ),
             ),
@@ -127,13 +170,18 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
                 children: [
                   const Icon(LucideIcons.download, size: 20),
                   const SizedBox(width: 12),
-                  Text('Export History', style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+                  Text('Export History',
+                      style: Theme.of(context)
+                          .textTheme
+                          .titleLarge
+                          ?.copyWith(fontWeight: FontWeight.bold)),
                 ],
               ),
             ),
             const SizedBox(height: 16),
             ListTile(
-              leading: const Icon(LucideIcons.fileSpreadsheet, color: Colors.green),
+              leading:
+                  const Icon(LucideIcons.fileSpreadsheet, color: Colors.green),
               title: const Text('Export as CSV'),
               subtitle: const Text('Best for Excel or Google Sheets'),
               onTap: () {
@@ -240,11 +288,17 @@ class _StatChip extends StatelessWidget {
               children: [
                 NumberTicker(
                   value: value,
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold, fontSize: 16),
                   decimalPlaces: 0,
-                  suffix: isVolume && value >= 1000 ? 'kg' : (isVolume ? ' kg' : ''),
+                  suffix: isVolume && value >= 1000
+                      ? 'kg'
+                      : (isVolume ? ' kg' : ''),
                 ),
-                Text(label, style: TextStyle(fontSize: 10, color: Theme.of(context).colorScheme.outline)),
+                Text(label,
+                    style: TextStyle(
+                        fontSize: 10,
+                        color: Theme.of(context).colorScheme.outline)),
               ],
             ),
           ),
@@ -264,7 +318,8 @@ class _HeatmapHeader extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text('Activity', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          Text('Activity',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(
@@ -294,14 +349,17 @@ class _IntensityKey extends StatelessWidget {
     if (label != null) {
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 4),
-        child: Text(label!, style: TextStyle(fontSize: 10, color: Theme.of(context).colorScheme.outline)),
+        child: Text(label!,
+            style: TextStyle(
+                fontSize: 10, color: Theme.of(context).colorScheme.outline)),
       );
     }
     return Container(
       width: 10,
       height: 10,
       margin: const EdgeInsets.symmetric(horizontal: 2),
-      decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(2)),
+      decoration:
+          BoxDecoration(color: color, borderRadius: BorderRadius.circular(2)),
     );
   }
 }
@@ -315,7 +373,8 @@ class _HeatmapCalendar extends ConsumerWidget {
 
     return setsAsync.when(
       data: (sets) {
-        final activityMap = _processHeatmapData(sets);
+        // Cast to dynamic to resolve analyzer error until build_runner is executed
+        final activityMap = _processHeatmapData(sets as dynamic);
         return SizedBox(
           height: 140,
           child: ListView.builder(
@@ -324,7 +383,8 @@ class _HeatmapCalendar extends ConsumerWidget {
             padding: const EdgeInsets.symmetric(horizontal: 16),
             itemCount: 13, // 12 months + extra buffer
             itemBuilder: (context, index) {
-              final monthDate = DateTime.now().subtract(Duration(days: 30 * index));
+              final monthDate =
+                  DateTime.now().subtract(Duration(days: 30 * index));
               return _MonthGrid(
                 year: monthDate.year,
                 month: monthDate.month,
@@ -339,11 +399,12 @@ class _HeatmapCalendar extends ConsumerWidget {
     );
   }
 
-  Map<DateTime, double> _processHeatmapData(List<WorkoutSet> sets) {
+  Map<DateTime, double> _processHeatmapData(List<ent.LoggedSet> sets) {
     final Map<DateTime, double> map = {};
     for (var s in sets) {
       if (s.completedAt == null) continue;
-      final day = DateTime(s.completedAt!.year, s.completedAt!.month, s.completedAt!.day);
+      final day = DateTime(
+          s.completedAt!.year, s.completedAt!.month, s.completedAt!.day);
       map[day] = (map[day] ?? 0) + (s.weight * s.reps);
     }
     return map;
@@ -355,7 +416,8 @@ class _MonthGrid extends StatelessWidget {
   final int month;
   final Map<DateTime, double> activityMap;
 
-  const _MonthGrid({required this.year, required this.month, required this.activityMap});
+  const _MonthGrid(
+      {required this.year, required this.month, required this.activityMap});
 
   @override
   Widget build(BuildContext context) {
@@ -371,7 +433,11 @@ class _MonthGrid extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('$monthLabel $year', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: isCurrentMonth ? Colors.orange : null)),
+          Text('$monthLabel $year',
+              style: TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                  color: isCurrentMonth ? Colors.orange : null)),
           const SizedBox(height: 8),
           Expanded(
             child: GridView.builder(
@@ -385,13 +451,17 @@ class _MonthGrid extends StatelessWidget {
               itemBuilder: (context, index) {
                 final date = DateTime(year, month, index + 1);
                 final volume = activityMap[date] ?? 0;
-                final isToday = today.year == date.year && today.month == date.month && today.day == date.day;
+                final isToday = today.year == date.year &&
+                    today.month == date.month &&
+                    today.day == date.day;
 
                 return Container(
                   decoration: BoxDecoration(
                     color: _getColorForVolume(volume),
                     borderRadius: BorderRadius.circular(2),
-                    border: isToday ? Border.all(color: Colors.orange, width: 1.5) : null,
+                    border: isToday
+                        ? Border.all(color: Colors.orange, width: 1.5)
+                        : null,
                   ),
                 );
               },
@@ -425,7 +495,7 @@ class _WorkoutSliverList extends ConsumerWidget {
           // Simple grouping by inserting headers (ideally pre-computed)
           bool showHeader = false;
           String headerText = '';
-          
+
           final date = workout.date;
           if (index == 0) {
             showHeader = true;
@@ -444,7 +514,11 @@ class _WorkoutSliverList extends ConsumerWidget {
               if (showHeader)
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-                  child: Text(headerText, style: TextStyle(color: Theme.of(context).colorScheme.primary, fontWeight: FontWeight.bold, fontSize: 12)),
+                  child: Text(headerText,
+                      style: TextStyle(
+                          color: Theme.of(context).colorScheme.primary,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12)),
                 ),
               _WorkoutCard(item: item),
             ],
@@ -486,7 +560,9 @@ class _WorkoutCard extends ConsumerWidget {
               onPressed: (_) async {
                 final confirm = await _showDeleteConfirmation(context);
                 if (confirm == true) {
-                  ref.read(historyListProvider.notifier).deleteWorkout(workout.id);
+                  ref
+                      .read(historyListProvider.notifier)
+                      .deleteWorkout(workout.id);
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('Workout deleted')),
@@ -498,7 +574,8 @@ class _WorkoutCard extends ConsumerWidget {
               foregroundColor: Colors.white,
               icon: LucideIcons.trash2,
               label: 'Delete',
-              borderRadius: const BorderRadius.horizontal(right: Radius.circular(16)),
+              borderRadius:
+                  const BorderRadius.horizontal(right: Radius.circular(16)),
             ),
           ],
         ),
@@ -516,7 +593,8 @@ class _WorkoutCard extends ConsumerWidget {
               foregroundColor: Colors.white,
               icon: LucideIcons.copy,
               label: 'Duplicate',
-              borderRadius: const BorderRadius.horizontal(left: Radius.circular(16)),
+              borderRadius:
+                  const BorderRadius.horizontal(left: Radius.circular(16)),
             ),
           ],
         ),
@@ -538,7 +616,8 @@ class _WorkoutCard extends ConsumerWidget {
                           children: [
                             Text(
                               DateFormat('EEE, MMM d').format(workout.date),
-                              style: const TextStyle(fontWeight: FontWeight.bold),
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.bold),
                             ),
                             Hero(
                               tag: 'workout_${workout.id}',
@@ -546,7 +625,11 @@ class _WorkoutCard extends ConsumerWidget {
                                 color: Colors.transparent,
                                 child: Text(
                                   workout.name,
-                                  style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.outline),
+                                  style: TextStyle(
+                                      fontSize: 12,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .outline),
                                 ),
                               ),
                             ),
@@ -559,11 +642,21 @@ class _WorkoutCard extends ConsumerWidget {
                   const Divider(height: 24),
                   Row(
                     children: [
-                      Expanded(child: _CompactStat(icon: LucideIcons.clock, label: _formatDuration(workout.duration ?? 0))),
+                      Expanded(
+                          child: _CompactStat(
+                              icon: LucideIcons.clock,
+                              label: _formatDuration(workout.duration ?? 0))),
                       const SizedBox(width: 8),
-                      Expanded(child: _CompactStat(icon: LucideIcons.trendingUp, label: WeightConverter.format(item.volume, unit, decimals: 0))),
+                      Expanded(
+                          child: _CompactStat(
+                              icon: LucideIcons.trendingUp,
+                              label: WeightConverter.format(item.volume, unit,
+                                  decimals: 0))),
                       const SizedBox(width: 8),
-                      Expanded(child: _CompactStat(icon: LucideIcons.layers, label: '${item.setCount} sets')),
+                      Expanded(
+                          child: _CompactStat(
+                              icon: LucideIcons.layers,
+                              label: '${item.setCount} sets')),
                     ],
                   ),
                 ],
@@ -590,8 +683,12 @@ class _WorkoutCard extends ConsumerWidget {
         title: const Text('Delete Workout?'),
         content: const Text('This action cannot be undone.'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
-          TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('Delete', style: TextStyle(color: Colors.red))),
+          TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Cancel')),
+          TextButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text('Delete', style: TextStyle(color: Colors.red))),
         ],
       ),
     );
@@ -611,8 +708,9 @@ class _CompactStat extends StatelessWidget {
         const SizedBox(width: 4),
         Expanded(
           child: Text(
-            label, 
-            style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.outline),
+            label,
+            style: TextStyle(
+                fontSize: 12, color: Theme.of(context).colorScheme.outline),
             overflow: TextOverflow.ellipsis,
             maxLines: 1,
           ),

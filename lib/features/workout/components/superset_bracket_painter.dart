@@ -20,14 +20,14 @@ class SupersetBracketPainter extends CustomPainter {
       ..strokeCap = StrokeCap.round;
 
     final path = Path();
-    
+
     // Draw top horizontal line
     path.moveTo(size.width, 0);
     path.lineTo(padding, 0);
-    
+
     // Draw vertical line
     path.lineTo(padding, size.height);
-    
+
     // Draw bottom horizontal line
     path.lineTo(size.width, size.height);
 
@@ -105,7 +105,7 @@ class _BracketSegmentPainter extends CustomPainter {
       ..strokeCap = StrokeCap.round;
 
     final double x = 8.0;
-    
+
     if (isFirst) {
       // Top corner and down
       canvas.drawLine(Offset(size.width, 0), Offset(x, 0), paint);
@@ -113,7 +113,8 @@ class _BracketSegmentPainter extends CustomPainter {
     } else if (isLast) {
       // Up and bottom corner
       canvas.drawLine(Offset(x, 0), Offset(x, size.height), paint);
-      canvas.drawLine(Offset(x, size.height), Offset(size.width, size.height), paint);
+      canvas.drawLine(
+          Offset(x, size.height), Offset(size.width, size.height), paint);
     } else if (isMiddle) {
       // Straight vertical line
       canvas.drawLine(Offset(x, 0), Offset(x, size.height), paint);

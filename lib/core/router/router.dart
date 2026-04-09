@@ -1,7 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gym_gemini_pro/features/workout/workout_screen.dart';
-import 'package:gym_gemini_pro/features/shell/placeholder_screens.dart' hide SplashScreen, OnboardingScreen, ExerciseLibraryScreen, WorkoutScreen, HistoryScreen, SettingsScreen;
+import 'package:gym_gemini_pro/features/shell/placeholder_screens.dart'
+    hide
+        SplashScreen,
+        OnboardingScreen,
+        ExerciseLibraryScreen,
+        WorkoutScreen,
+        HistoryScreen,
+        SettingsScreen;
 import 'package:gym_gemini_pro/features/splash/splash_screen.dart';
 import 'package:gym_gemini_pro/features/onboarding/onboarding_screen.dart';
 import 'package:gym_gemini_pro/features/setup/setup_screen.dart';
@@ -24,7 +31,6 @@ import 'package:gym_gemini_pro/features/workout/start_workout_screen.dart';
 import 'package:gym_gemini_pro/features/settings/sync_log_screen.dart';
 import 'package:gym_gemini_pro/features/exercises/exercise_library_screen.dart';
 import 'package:gym_gemini_pro/features/exercises/exercise_library_detail_screen.dart';
-
 
 final router = GoRouter(
   initialLocation: '/',
@@ -72,11 +78,12 @@ final router = GoRouter(
                   builder: (context, state) {
                     final idStr = state.uri.queryParameters['id'];
                     if (idStr == null) {
-                      return const Scaffold(body: Center(child: Text('Invalid workout ID')));
+                      return const Scaffold(
+                          body: Center(child: Text('Invalid workout ID')));
                     }
                     final id = int.tryParse(idStr) ?? 0;
-                    final dayId = state.uri.queryParameters['dayId'] != null 
-                        ? int.tryParse(state.uri.queryParameters['dayId']!) 
+                    final dayId = state.uri.queryParameters['dayId'] != null
+                        ? int.tryParse(state.uri.queryParameters['dayId']!)
                         : null;
                     return ActiveWorkoutScreen(workoutId: id, dayId: dayId);
                   },
@@ -93,7 +100,8 @@ final router = GoRouter(
               routes: [
                 GoRoute(
                   path: 'create',
-                  builder: (context, state) => const ExerciseDetailScreen(exerciseId: 0),
+                  builder: (context, state) =>
+                      const ExerciseDetailScreen(exerciseId: 0),
                 ),
                 GoRoute(
                   path: ':id',
@@ -109,14 +117,17 @@ final router = GoRouter(
                 GoRoute(
                   path: ':id/edit',
                   builder: (context, state) {
-                    final id = int.tryParse(state.pathParameters['id'] ?? '0') ?? 0;
-                    return ExerciseDetailScreen(exerciseId: id, isEditing: true);
+                    final id =
+                        int.tryParse(state.pathParameters['id'] ?? '0') ?? 0;
+                    return ExerciseDetailScreen(
+                        exerciseId: id, isEditing: true);
                   },
                 ),
                 GoRoute(
                   path: 'history/:id',
                   builder: (context, state) {
-                    final id = int.tryParse(state.pathParameters['id'] ?? '0') ?? 0;
+                    final id =
+                        int.tryParse(state.pathParameters['id'] ?? '0') ?? 0;
                     return ExerciseHistoryScreen(exerciseId: id);
                   },
                 ),
@@ -146,7 +157,8 @@ final router = GoRouter(
                 GoRoute(
                   path: 'workout/:id',
                   builder: (context, state) {
-                    final id = int.tryParse(state.pathParameters['id'] ?? '0') ?? 0;
+                    final id =
+                        int.tryParse(state.pathParameters['id'] ?? '0') ?? 0;
                     return WorkoutDetailScreen(workoutId: id);
                   },
                 ),

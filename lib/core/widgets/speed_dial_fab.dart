@@ -58,58 +58,74 @@ class _SpeedDialFabState extends State<SpeedDialFab>
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
         // Mini FABs
-        ...widget.children.asMap().entries.map((entry) {
-          final index = entry.key;
-          final child = entry.value;
-          final delay = reduceMotion ? 0.0 : (index * 0.15).clamp(0.0, 0.9);
-          final animation = CurvedAnimation(
-            parent: _controller,
-            curve: Interval(delay, 1.0, curve: Curves.easeOutBack),
-          );
-
-          return AnimatedBuilder(
-            animation: animation,
-            builder: (context, _) {
-              return Opacity(
-                opacity: animation.value.clamp(0.0, 1.0),
-                child: Transform.translate(
-                  offset: Offset(0, (1 - animation.value) * 40),
-                  child: Padding(
-                    padding: const EdgeInsets.only(bottom: 12, right: 4),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        if (child.label != null) ...[
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                            decoration: BoxDecoration(
-                              color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Text(child.label!, style: Theme.of(context).textTheme.labelMedium),
-                          ),
-                          const SizedBox(width: 8),
-                        ],
-                        FloatingActionButton.small(
-                          heroTag: 'speed_dial_${child.label ?? index}',
-                          onPressed: () {
-                            _toggle();
-                            child.onTap?.call();
-                          },
-                          backgroundColor: child.backgroundColor ??
-                              Theme.of(context).colorScheme.secondaryContainer,
-                          foregroundColor: child.foregroundColor ??
-                              Theme.of(context).colorScheme.onSecondaryContainer,
-                          child: Icon(child.icon),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
+        ...widget.children
+            .asMap()
+            .entries
+            .map((entry) {
+              final index = entry.key;
+              final child = entry.value;
+              final delay = reduceMotion ? 0.0 : (index * 0.15).clamp(0.0, 0.9);
+              final animation = CurvedAnimation(
+                parent: _controller,
+                curve: Interval(delay, 1.0, curve: Curves.easeOutBack),
               );
-            },
-          );
-        }).toList().reversed.toList(),
+
+              return AnimatedBuilder(
+                animation: animation,
+                builder: (context, _) {
+                  return Opacity(
+                    opacity: animation.value.clamp(0.0, 1.0),
+                    child: Transform.translate(
+                      offset: Offset(0, (1 - animation.value) * 40),
+                      child: Padding(
+                        padding: const EdgeInsets.only(bottom: 12, right: 4),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            if (child.label != null) ...[
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 10, vertical: 6),
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .surfaceContainerHighest,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Text(child.label!,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .labelMedium),
+                              ),
+                              const SizedBox(width: 8),
+                            ],
+                            FloatingActionButton.small(
+                              heroTag: 'speed_dial_${child.label ?? index}',
+                              onPressed: () {
+                                _toggle();
+                                child.onTap?.call();
+                              },
+                              backgroundColor: child.backgroundColor ??
+                                  Theme.of(context)
+                                      .colorScheme
+                                      .secondaryContainer,
+                              foregroundColor: child.foregroundColor ??
+                                  Theme.of(context)
+                                      .colorScheme
+                                      .onSecondaryContainer,
+                              child: Icon(child.icon),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              );
+            })
+            .toList()
+            .reversed
+            .toList(),
 
         // Main FAB
         GestureDetector(
@@ -124,8 +140,8 @@ class _SpeedDialFabState extends State<SpeedDialFab>
           child: FloatingActionButton(
             heroTag: 'speed_dial_main',
             onPressed: null,
-            backgroundColor: widget.backgroundColor ??
-                Theme.of(context).colorScheme.primary,
+            backgroundColor:
+                widget.backgroundColor ?? Theme.of(context).colorScheme.primary,
             foregroundColor: widget.foregroundColor ??
                 Theme.of(context).colorScheme.onPrimary,
             child: AnimatedBuilder(

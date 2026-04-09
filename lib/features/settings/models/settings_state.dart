@@ -1,18 +1,20 @@
 import 'package:flutter/material.dart';
 
 enum WeightUnit { kg, lbs }
+
 enum ExperienceLevel { beginner, intermediate, advanced }
+
 enum FontSize { normal, large }
 
 class SettingsState {
   final String userName;
   final ExperienceLevel experienceLevel;
   final WeightUnit weightUnit;
-  
+
   final ThemeMode themeMode;
   final Color accentColor;
   final FontSize fontSize;
-  
+
   final int restTimeStraight;
   final int restTimeSuperset;
   final int restTimeDropset;
@@ -20,14 +22,15 @@ class SettingsState {
   final bool timerVibration;
   final bool backgroundNotification;
   final bool autoBackup;
-  
+
   final double barbellWeight;
-  final Map<String, int> availablePlates; // Key is string weight to allow const constructors
-  
+  final Map<String, int>
+      availablePlates; // Key is string weight to allow const constructors
+
   final double autoIncrement;
   final bool showRpe;
   final bool showPreviousData;
-  
+
   final String? googleDriveEmail;
   final DateTime? lastSynced;
   final DateTime? lastDriveBackup;
@@ -48,12 +51,12 @@ class SettingsState {
     this.autoBackup = false,
     this.barbellWeight = 20.0,
     this.availablePlates = const {
-      '1.25': 4, 
-      '2.5': 4, 
-      '5.0': 4, 
-      '10.0': 2, 
-      '15.0': 2, 
-      '20.0': 2, 
+      '1.25': 4,
+      '2.5': 4,
+      '5.0': 4,
+      '10.0': 2,
+      '15.0': 2,
+      '20.0': 2,
       '25.0': 2
     },
     this.autoIncrement = 0.0,
@@ -99,7 +102,8 @@ class SettingsState {
       restTimeDropset: restTimeDropset ?? this.restTimeDropset,
       timerSound: timerSound ?? this.timerSound,
       timerVibration: timerVibration ?? this.timerVibration,
-      backgroundNotification: backgroundNotification ?? this.backgroundNotification,
+      backgroundNotification:
+          backgroundNotification ?? this.backgroundNotification,
       autoBackup: autoBackup ?? this.autoBackup,
       barbellWeight: barbellWeight ?? this.barbellWeight,
       availablePlates: availablePlates ?? this.availablePlates,

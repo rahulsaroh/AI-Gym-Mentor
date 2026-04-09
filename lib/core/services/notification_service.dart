@@ -4,6 +4,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:flutter_background_service/flutter_background_service.dart';
+import 'package:gym_gemini_pro/core/utils/timer_utils.dart';
 
 @pragma('vm:entry-point')
 void onDidReceiveBackgroundNotificationResponse(NotificationResponse details) {
@@ -20,11 +21,12 @@ class NotificationService {
   factory NotificationService() => _instance;
   NotificationService._internal();
 
-  final FlutterLocalNotificationsPlugin _notificationsPlugin = FlutterLocalNotificationsPlugin();
+  final FlutterLocalNotificationsPlugin _notificationsPlugin =
+      FlutterLocalNotificationsPlugin();
 
   Future<void> init() async {
     tz.initializeTimeZones();
-    
+
     const AndroidInitializationSettings initializationSettingsAndroid =
         AndroidInitializationSettings('@mipmap/ic_launcher');
 
@@ -35,7 +37,8 @@ class NotificationService {
       requestSoundPermission: true,
     );
 
-    const InitializationSettings initializationSettings = InitializationSettings(
+    const InitializationSettings initializationSettings =
+        InitializationSettings(
       android: initializationSettingsAndroid,
       iOS: initializationSettingsDarwin,
     );
@@ -49,7 +52,8 @@ class NotificationService {
           FlutterBackgroundService().invoke('add_30s');
         }
       },
-      onDidReceiveBackgroundNotificationResponse: onDidReceiveBackgroundNotificationResponse,
+      onDidReceiveBackgroundNotificationResponse:
+          onDidReceiveBackgroundNotificationResponse,
     );
   }
 
@@ -62,18 +66,16 @@ class NotificationService {
   }
 
   // --- Foreground Timer Notification ---
-  
+
   static const int timerNotificationId = 999;
-  
+
   Future<void> showTimerNotification({
     required int remainingSeconds,
     required int maxDuration,
     required String? exerciseName,
   }) async {
-    final minutes = remainingSeconds ~/ 60;
-    final seconds = remainingSeconds % 60;
-    final timeStr = '$minutes:${seconds.toString().padLeft(2, '0')}';
-    
+    final timeStr = TimerUtils.formatTime(remainingSeconds);
+
     final androidDetails = AndroidNotificationDetails(
       'rest_timer_service',
       'Rest Timer Service',
@@ -91,11 +93,16 @@ class NotificationService {
       ],
     );
 
+    const iosDetails = DarwinNotificationDetails(
+      presentAlert: false, // Don't interrupt the user for ongoing updates
+      presentSound: false,
+    );
+
     await _notificationsPlugin.show(
       timerNotificationId,
       'Resting: $timeStr',
       exerciseName != null ? 'Previous: $exerciseName' : 'Take a breath',
-      NotificationDetails(android: androidDetails),
+      NotificationDetails(android: androidDetails, iOS: iosDetails),
     );
   }
 
@@ -106,16 +113,22 @@ class NotificationService {
       channelDescription: 'Alert when rest period is over',
       importance: Importance.max,
       priority: Priority.high,
-      sound: RawResourceAndroidNotificationSound('timer_end'),
+      sound: const RawResourceAndroidNotificationSound('timer_end'),
       vibrationPattern: Int64List.fromList([0, 200, 100, 500]),
       enableVibration: true,
+    );
+
+    const iosDetails = DarwinNotificationDetails(
+      presentAlert: true,
+      presentSound: true,
+      presentBadge: true,
     );
 
     await _notificationsPlugin.show(
       timerNotificationId + 1,
       'Rest Complete!',
       nextExercise != null ? 'Time for $nextExercise' : 'Get back to work!',
-      NotificationDetails(android: androidDetails),
+      NotificationDetails(android: androidDetails, iOS: iosDetails),
     );
   }
 

@@ -1,14 +1,17 @@
 import 'package:gym_gemini_pro/core/database/database.dart';
+import 'package:gym_gemini_pro/core/domain/entities/logged_set.dart' as ent;
+import 'package:gym_gemini_pro/core/domain/entities/workout_session.dart' as ent;
 import 'package:gym_gemini_pro/features/workout/workout_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'history_providers.g.dart';
 
 class HistoryItem {
-  final Workout workout;
+  final ent.WorkoutSession workout;
   final double volume;
   final int setCount;
-  HistoryItem({required this.workout, required this.volume, required this.setCount});
+  HistoryItem(
+      {required this.workout, required this.volume, required this.setCount});
 }
 
 @riverpod
@@ -25,11 +28,13 @@ class HistoryList extends _$HistoryList {
   Future<List<HistoryItem>> build() async {
     final repo = ref.watch(workoutRepositoryProvider);
     final data = await repo.getHistoryWithVolume(limit: _pageSize, offset: 0);
-    return data.map((d) => HistoryItem(
-      workout: d['workout'], 
-      volume: d['volume'],
-      setCount: d['setCount'],
-    )).toList();
+    return data
+        .map((d) => HistoryItem(
+              workout: d['workout'],
+              volume: d['volume'],
+              setCount: d['setCount'],
+            ))
+        .toList();
   }
 
   Future<void> loadMore() async {
@@ -37,13 +42,16 @@ class HistoryList extends _$HistoryList {
 
     final currentList = state.value!;
     final repo = ref.read(workoutRepositoryProvider);
-    final moreData = await repo.getHistoryWithVolume(limit: _pageSize, offset: currentList.length);
-    final more = moreData.map((d) => HistoryItem(
-      workout: d['workout'], 
-      volume: d['volume'],
-      setCount: d['setCount'],
-    )).toList();
-    
+    final moreData = await repo.getHistoryWithVolume(
+        limit: _pageSize, offset: currentList.length);
+    final more = moreData
+        .map((d) => HistoryItem(
+              workout: d['workout'],
+              volume: d['volume'],
+              setCount: d['setCount'],
+            ))
+        .toList();
+
     if (more.isNotEmpty) {
       state = AsyncValue.data([...currentList, ...more]);
     }
@@ -52,9 +60,10 @@ class HistoryList extends _$HistoryList {
   Future<void> deleteWorkout(int id) async {
     final repo = ref.read(workoutRepositoryProvider);
     final currentList = state.value ?? [];
-    
+
     // Optimistic UI update
-    state = AsyncValue.data(currentList.where((item) => item.workout.id != id).toList());
+    state = AsyncValue.data(
+        currentList.where((item) => item.workout.id != id).toList());
 
     try {
       await repo.deleteWorkout(id);
@@ -68,7 +77,7 @@ class HistoryList extends _$HistoryList {
 }
 
 @riverpod
-Future<List<WorkoutSet>> heatmapSets(HeatmapSetsRef ref) async {
+Future<List<ent.LoggedSet>> heatmapSets(HeatmapSetsRef ref) async {
   final repo = ref.watch(workoutRepositoryProvider);
   return await repo.getSetsForHeatmap();
 }

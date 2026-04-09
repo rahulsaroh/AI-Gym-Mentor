@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:gym_gemini_pro/core/database/database.dart';
+import 'package:gym_gemini_pro/core/domain/entities/exercise.dart' as ent;
 import 'package:gym_gemini_pro/features/exercises/exercise_repository.dart';
 import 'package:drift/drift.dart' as drift;
-import 'models/exercise.dart' as model;
 import 'repositories/exercise_library_repository.dart';
 import 'widgets/exercise_media_widget.dart';
 
@@ -17,18 +16,21 @@ class ExerciseLibraryDetailScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final repository = ref.watch(exerciseLibraryRepositoryProvider);
-    
+    final id = int.tryParse(exerciseId) ?? 0;
+
     return Scaffold(
       backgroundColor: Colors.black,
-      body: FutureBuilder<model.Exercise?>(
-        future: repository.getExerciseById(exerciseId),
+      body: FutureBuilder<ent.Exercise?>(
+        future: repository.getExerciseById(id),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
           final exercise = snapshot.data;
           if (exercise == null) {
-            return const Center(child: Text('Exercise not found', style: TextStyle(color: Colors.white)));
+            return const Center(
+                child: Text('Exercise not found',
+                    style: TextStyle(color: Colors.white)));
           }
 
           return CustomScrollView(
@@ -59,7 +61,7 @@ class ExerciseLibraryDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildAppBar(BuildContext context, model.Exercise exercise) {
+  Widget _buildAppBar(BuildContext context, ent.Exercise exercise) {
     return SliverAppBar(
       expandedHeight: 350,
       pinned: true,
@@ -75,7 +77,7 @@ class ExerciseLibraryDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildHeader(BuildContext context, model.Exercise exercise) {
+  Widget _buildHeader(BuildContext context, ent.Exercise exercise) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -103,18 +105,19 @@ class ExerciseLibraryDetailScreen extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.2),
+        color: color.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: color.withOpacity(0.5)),
+        border: Border.all(color: color.withValues(alpha: 0.5)),
       ),
       child: Text(
         text,
-        style: TextStyle(color: color, fontSize: 12, fontWeight: FontWeight.bold),
+        style:
+            TextStyle(color: color, fontSize: 12, fontWeight: FontWeight.bold),
       ),
     );
   }
 
-  Widget _buildInfoGrid(BuildContext context, model.Exercise exercise) {
+  Widget _buildInfoGrid(BuildContext context, ent.Exercise exercise) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -125,13 +128,13 @@ class ExerciseLibraryDetailScreen extends ConsumerWidget {
         children: [
           _infoRow(LucideIcons.dumbbell, 'Equipment', exercise.equipment),
           const Divider(color: Colors.grey),
-          _infoRow(LucideIcons.activity, 'Primary Muscles', exercise.primaryMuscles.join(', ')),
-          if (exercise.secondaryMuscles.isNotEmpty) ...[
+          _infoRow(LucideIcons.activity, 'Primary Muscle', exercise.primaryMuscle),
+          if (exercise.secondaryMuscle != null) ...[
             const Divider(color: Colors.grey),
-            _infoRow(LucideIcons.layers, 'Secondary Muscles', exercise.secondaryMuscles.join(', ')),
+            _infoRow(LucideIcons.layers, 'Secondary Muscle', exercise.secondaryMuscle!),
           ],
           const Divider(color: Colors.grey),
-          _infoRow(LucideIcons.cog, 'Mechanic', exercise.mechanic),
+          _infoRow(LucideIcons.settings, 'Mechanic', exercise.mechanic ?? 'Unknown'),
         ],
       ),
     );
@@ -146,22 +149,32 @@ class ExerciseLibraryDetailScreen extends ConsumerWidget {
           const SizedBox(width: 12),
           Text(label, style: const TextStyle(color: Colors.grey, fontSize: 14)),
           const Spacer(),
-          Text(value, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
+          Text(value,
+              style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14)),
         ],
       ),
     );
   }
 
-  Widget _buildInstructions(BuildContext context, model.Exercise exercise) {
+  Widget _buildInstructions(BuildContext context, ent.Exercise exercise) {
+    final instructions = exercise.instructions ?? [];
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
           'INSTRUCTIONS',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, letterSpacing: 1.1),
+          style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1.1),
         ),
         const SizedBox(height: 16),
-        ...exercise.instructions.asMap().entries.map((entry) {
+        if (instructions.isEmpty)
+          const Text('No instructions available.', style: TextStyle(color: Colors.grey)),
+        ...instructions.asMap().entries.map((entry) {
           return Padding(
             padding: const EdgeInsets.only(bottom: 16),
             child: Row(
@@ -170,13 +183,16 @@ class ExerciseLibraryDetailScreen extends ConsumerWidget {
                 CircleAvatar(
                   radius: 12,
                   backgroundColor: Colors.blue,
-                  child: Text('${entry.key + 1}', style: const TextStyle(fontSize: 12, color: Colors.white)),
+                  child: Text('${entry.key + 1}',
+                      style:
+                          const TextStyle(fontSize: 12, color: Colors.white)),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
                     entry.value,
-                    style: const TextStyle(color: Colors.white70, fontSize: 14, height: 1.5),
+                    style: const TextStyle(
+                        color: Colors.white70, fontSize: 14, height: 1.5),
                   ),
                 ),
               ],
@@ -187,7 +203,8 @@ class ExerciseLibraryDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildAddButton(BuildContext context, WidgetRef ref, model.Exercise exercise) {
+  Widget _buildAddButton(
+      BuildContext context, WidgetRef ref, ent.Exercise exercise) {
     return SizedBox(
       width: double.infinity,
       child: FilledButton.icon(
@@ -195,24 +212,36 @@ class ExerciseLibraryDetailScreen extends ConsumerWidget {
         style: FilledButton.styleFrom(
           backgroundColor: Colors.blue[600],
           padding: const EdgeInsets.symmetric(vertical: 16),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         ),
         icon: const Icon(LucideIcons.plus),
-        label: const Text('ADD TO MY EXERCISES', style: TextStyle(fontWeight: FontWeight.bold)),
+        label: const Text('ADD TO MY EXERCISES',
+            style: TextStyle(fontWeight: FontWeight.bold)),
       ),
     );
   }
 
-  Future<void> _addToMyExercises(BuildContext context, WidgetRef ref, model.Exercise exercise) async {
+  Future<void> _addToMyExercises(
+      BuildContext context, WidgetRef ref, ent.Exercise exercise) async {
     final repository = ref.read(exerciseRepositoryProvider);
-    
+
     final companion = ExercisesCompanion.insert(
       name: exercise.name,
-      primaryMuscle: exercise.primaryMuscles.isNotEmpty ? exercise.primaryMuscles.first : 'None',
-      secondaryMuscle: drift.Value(exercise.secondaryMuscles.isNotEmpty ? exercise.secondaryMuscles.join(', ') : null),
+      primaryMuscle: exercise.primaryMuscle,
+      secondaryMuscle: drift.Value(exercise.secondaryMuscle),
       equipment: exercise.equipment,
-      setType: 'Straight',
-      instructions: drift.Value(exercise.instructions.join('\n')),
+      setType: exercise.setType,
+      instructions: drift.Value(exercise.instructions?.join('|')),
+      description: drift.Value(exercise.description),
+      category: drift.Value(exercise.category),
+      difficulty: drift.Value(exercise.difficulty),
+      gifUrl: drift.Value(exercise.gifUrl),
+      imageUrl: drift.Value(exercise.imageUrl),
+      videoUrl: drift.Value(exercise.videoUrl),
+      mechanic: drift.Value(exercise.mechanic),
+      force: drift.Value(exercise.force),
+      source: drift.Value(exercise.source),
       isCustom: const drift.Value(false),
     );
 
@@ -230,7 +259,9 @@ class ExerciseLibraryDetailScreen extends ConsumerWidget {
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to add exercise: $e'), backgroundColor: Colors.red),
+          SnackBar(
+              content: Text('Failed to add exercise: $e'),
+              backgroundColor: Colors.red),
         );
       }
     }

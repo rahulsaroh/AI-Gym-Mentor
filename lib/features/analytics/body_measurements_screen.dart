@@ -11,10 +11,12 @@ class BodyMeasurementsScreen extends ConsumerStatefulWidget {
   const BodyMeasurementsScreen({super.key});
 
   @override
-  ConsumerState<BodyMeasurementsScreen> createState() => _BodyMeasurementsScreenState();
+  ConsumerState<BodyMeasurementsScreen> createState() =>
+      _BodyMeasurementsScreenState();
 }
 
-class _BodyMeasurementsScreenState extends ConsumerState<BodyMeasurementsScreen> {
+class _BodyMeasurementsScreenState
+    extends ConsumerState<BodyMeasurementsScreen> {
   String _selectedMetric = 'weight';
 
   final Map<String, String> _metrics = {
@@ -52,8 +54,12 @@ class _BodyMeasurementsScreenState extends ConsumerState<BodyMeasurementsScreen>
                 SizedBox(
                   height: 250,
                   child: measurementsAsync.when(
-                    data: (data) => _MetricChart(data: data, metric: _selectedMetric, label: _metrics[_selectedMetric]!),
-                    loading: () => const Center(child: CircularProgressIndicator()),
+                    data: (data) => _MetricChart(
+                        data: data,
+                        metric: _selectedMetric,
+                        label: _metrics[_selectedMetric]!),
+                    loading: () =>
+                        const Center(child: CircularProgressIndicator()),
                     error: (e, _) => Center(child: Text('Error: $e')),
                   ),
                 ),
@@ -61,7 +67,9 @@ class _BodyMeasurementsScreenState extends ConsumerState<BodyMeasurementsScreen>
                   padding: EdgeInsets.fromLTRB(16, 24, 16, 8),
                   child: Row(
                     children: [
-                      Text('History', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                      Text('History',
+                          style: TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold)),
                     ],
                   ),
                 ),
@@ -75,8 +83,10 @@ class _BodyMeasurementsScreenState extends ConsumerState<BodyMeasurementsScreen>
                 childCount: data.length,
               ),
             ),
-            loading: () => const SliverFillRemaining(child: Center(child: CircularProgressIndicator())),
-            error: (e, _) => SliverFillRemaining(child: Center(child: Text('Error: $e'))),
+            loading: () => const SliverFillRemaining(
+                child: Center(child: CircularProgressIndicator())),
+            error: (e, _) =>
+                SliverFillRemaining(child: Center(child: Text('Error: $e'))),
           ),
         ],
       ),
@@ -93,7 +103,8 @@ class _BodyMeasurementsScreenState extends ConsumerState<BodyMeasurementsScreen>
       context: context,
       isScrollControlled: true,
       builder: (context) => _AddMeasurementSheet(
-        onAdd: (c) => ref.read(bodyMeasurementsListProvider.notifier).addMeasurement(c),
+        onAdd: (c) =>
+            ref.read(bodyMeasurementsListProvider.notifier).addMeasurement(c),
       ),
     );
   }
@@ -104,7 +115,8 @@ class _MetricSelector extends StatelessWidget {
   final Map<String, String> metrics;
   final ValueChanged<String> onChanged;
 
-  const _MetricSelector({required this.selected, required this.metrics, required this.onChanged});
+  const _MetricSelector(
+      {required this.selected, required this.metrics, required this.onChanged});
 
   @override
   Widget build(BuildContext context) {
@@ -112,14 +124,16 @@ class _MetricSelector extends StatelessWidget {
       scrollDirection: Axis.horizontal,
       padding: const EdgeInsets.all(16),
       child: Row(
-        children: metrics.entries.map((e) => Padding(
-          padding: const EdgeInsets.only(right: 8),
-          child: ChoiceChip(
-            label: Text(e.value),
-            selected: selected == e.key,
-            onSelected: (_) => onChanged(e.key),
-          ),
-        )).toList(),
+        children: metrics.entries
+            .map((e) => Padding(
+                  padding: const EdgeInsets.only(right: 8),
+                  child: ChoiceChip(
+                    label: Text(e.value),
+                    selected: selected == e.key,
+                    onSelected: (_) => onChanged(e.key),
+                  ),
+                ))
+            .toList(),
       ),
     );
   }
@@ -130,25 +144,41 @@ class _MetricChart extends StatelessWidget {
   final String metric;
   final String label;
 
-  const _MetricChart({required this.data, required this.metric, required this.label});
+  const _MetricChart(
+      {required this.data, required this.metric, required this.label});
 
   @override
   Widget build(BuildContext context) {
-    if (data.isEmpty) return const Center(child: Text('No data yet. Get tracking!'));
+    if (data.isEmpty) {
+      return const Center(child: Text('No data yet. Get tracking!'));
+    }
 
-    final filtered = data.where((m) => _getValue(m, metric) != null).toList().reversed.toList();
-    if (filtered.isEmpty) return const Center(child: Text('No entries for this metric.'));
+    final filtered = data
+        .where((m) => _getValue(m, metric) != null)
+        .toList()
+        .reversed
+        .toList();
+    if (filtered.isEmpty) {
+      return const Center(child: Text('No entries for this metric.'));
+    }
 
     return LineChart(
       LineChartData(
         lineBarsData: [
           LineChartBarData(
-            spots: filtered.asMap().entries.map((e) => FlSpot(e.key.toDouble(), _getValue(e.value, metric)!)).toList(),
+            spots: filtered
+                .asMap()
+                .entries
+                .map((e) =>
+                    FlSpot(e.key.toDouble(), _getValue(e.value, metric)!))
+                .toList(),
             isCurved: true,
             color: Theme.of(context).colorScheme.primary,
             barWidth: 3,
             dotData: const FlDotData(show: true),
-            belowBarData: BarAreaData(show: true, color: Theme.of(context).colorScheme.primary.withOpacity(0.1)),
+            belowBarData: BarAreaData(
+                show: true,
+                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1)),
           ),
         ],
         titlesData: FlTitlesData(
@@ -159,8 +189,13 @@ class _MetricChart extends StatelessWidget {
             sideTitles: SideTitles(
               showTitles: true,
               getTitlesWidget: (val, meta) {
-                if (val.toInt() >= filtered.length || val.toInt() % (filtered.length ~/ 3 + 1) != 0) return const SizedBox.shrink();
-                return Text(DateFormat('MM/dd').format(filtered[val.toInt()].date), style: const TextStyle(fontSize: 10));
+                if (val.toInt() >= filtered.length ||
+                    val.toInt() % (filtered.length ~/ 3 + 1) != 0) {
+                  return const SizedBox.shrink();
+                }
+                return Text(
+                    DateFormat('MM/dd').format(filtered[val.toInt()].date),
+                    style: const TextStyle(fontSize: 10));
               },
             ),
           ),
@@ -173,17 +208,28 @@ class _MetricChart extends StatelessWidget {
 
   double? _getValue(BodyMeasurement m, String key) {
     switch (key) {
-      case 'weight': return m.weight;
-      case 'bodyFat': return m.bodyFat;
-      case 'chest': return m.chest;
-      case 'waist': return m.waist;
-      case 'hips': return m.hips;
-      case 'leftArm': return m.leftArm;
-      case 'rightArm': return m.rightArm;
-      case 'leftThigh': return m.leftThigh;
-      case 'rightThigh': return m.rightThigh;
-      case 'calves': return m.calves;
-      default: return null;
+      case 'weight':
+        return m.weight;
+      case 'bodyFat':
+        return m.bodyFat;
+      case 'chest':
+        return m.chest;
+      case 'waist':
+        return m.waist;
+      case 'hips':
+        return m.hips;
+      case 'leftArm':
+        return m.leftArm;
+      case 'rightArm':
+        return m.rightArm;
+      case 'leftThigh':
+        return m.leftThigh;
+      case 'rightThigh':
+        return m.rightThigh;
+      case 'calves':
+        return m.calves;
+      default:
+        return null;
     }
   }
 }
@@ -196,10 +242,17 @@ class _MeasurementTile extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Dismissible(
       key: Key(measurement.id.toString()),
-      background: Container(color: Colors.red, alignment: Alignment.centerRight, padding: const EdgeInsets.only(right: 20), child: const Icon(LucideIcons.trash2, color: Colors.white)),
+      background: Container(
+          color: Colors.red,
+          alignment: Alignment.centerRight,
+          padding: const EdgeInsets.only(right: 20),
+          child: const Icon(LucideIcons.trash2, color: Colors.white)),
       onDismissed: (_) {
-        ref.read(bodyMeasurementsListProvider.notifier).deleteMeasurement(measurement.id);
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Measurement deleted')));
+        ref
+            .read(bodyMeasurementsListProvider.notifier)
+            .deleteMeasurement(measurement.id);
+        ScaffoldMessenger.of(context)
+            .showSnackBar(const SnackBar(content: Text('Measurement deleted')));
       },
       child: Card(
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
@@ -211,8 +264,13 @@ class _MeasurementTile extends ConsumerWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(DateFormat('MMMM d, yyyy').format(measurement.date), style: const TextStyle(fontWeight: FontWeight.bold)),
-                  Text('${measurement.weight ?? '--'}kg', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.blue)),
+                  Text(DateFormat('MMMM d, yyyy').format(measurement.date),
+                      style: const TextStyle(fontWeight: FontWeight.bold)),
+                  Text('${measurement.weight ?? '--'}kg',
+                      style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          color: Colors.blue)),
                 ],
               ),
               const SizedBox(height: 8),
@@ -241,7 +299,10 @@ class _MeasurementGrid extends StatelessWidget {
     return Wrap(
       spacing: 12,
       runSpacing: 4,
-      children: values.map((v) => Text(v, style: const TextStyle(fontSize: 12, color: Colors.grey))).toList(),
+      children: values
+          .map((v) =>
+              Text(v, style: const TextStyle(fontSize: 12, color: Colors.grey)))
+          .toList(),
     );
   }
 }
@@ -268,7 +329,8 @@ class _AddMeasurementSheetState extends State<_AddMeasurementSheet> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.fromLTRB(20, 20, 20, MediaQuery.of(context).viewInsets.bottom + 20),
+      padding: EdgeInsets.fromLTRB(
+          20, 20, 20, MediaQuery.of(context).viewInsets.bottom + 20),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -276,7 +338,8 @@ class _AddMeasurementSheetState extends State<_AddMeasurementSheet> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text('Add Body Entry', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+              const Text('Add Body Entry',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
               TextButton(
                 onPressed: () async {
                   final d = await showDatePicker(
@@ -294,9 +357,11 @@ class _AddMeasurementSheetState extends State<_AddMeasurementSheet> {
           const SizedBox(height: 20),
           Row(
             children: [
-              Expanded(child: _Field(controller: _weightC, label: 'Weight (kg)')),
+              Expanded(
+                  child: _Field(controller: _weightC, label: 'Weight (kg)')),
               const SizedBox(width: 12),
-              Expanded(child: _Field(controller: _bodyFatC, label: 'Body Fat %')),
+              Expanded(
+                  child: _Field(controller: _bodyFatC, label: 'Body Fat %')),
             ],
           ),
           const SizedBox(height: 12),

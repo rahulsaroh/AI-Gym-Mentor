@@ -5,7 +5,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:gym_gemini_pro/core/auth/auth_provider.dart';
 import 'package:gym_gemini_pro/features/settings/settings_provider.dart';
 import 'package:gym_gemini_pro/services/sheets_service.dart';
-import 'package:google_sign_in/google_sign_in.dart';
+
 import 'package:gym_gemini_pro/services/sync_worker.dart';
 
 class SheetsSetupScreen extends ConsumerStatefulWidget {
@@ -27,7 +27,7 @@ class _SheetsSetupScreenState extends ConsumerState<SheetsSetupScreen> {
 
     try {
       final googleSignIn = ref.read(googleSignInProvider);
-      
+
       // Sign in
       final user = await googleSignIn.signIn();
       if (user == null) {
@@ -44,7 +44,7 @@ class _SheetsSetupScreenState extends ConsumerState<SheetsSetupScreen> {
       // Create spreadsheet
       final sheetsService = SheetsService(client);
       final spreadsheetId = await sheetsService.createSpreadsheet();
-      
+
       if (spreadsheetId == null) {
         throw Exception('Failed to create spreadsheet');
       }
@@ -52,14 +52,15 @@ class _SheetsSetupScreenState extends ConsumerState<SheetsSetupScreen> {
       // Update settings
       final settings = await ref.read(settingsProvider.future);
       await ref.read(settingsProvider.notifier).updateSettings(
-        settings.copyWith(googleDriveEmail: user.email),
-      );
-      
+            settings.copyWith(googleDriveEmail: user.email),
+          );
+
       // Trigger sync for pending items
       ref.read(syncWorkerProvider.notifier).processQueue();
 
       if (mounted) {
-        context.pushReplacement('/settings/sheets-success', extra: spreadsheetId);
+        context.pushReplacement('/settings/sheets-success',
+            extra: spreadsheetId);
       }
     } catch (e) {
       setState(() {
@@ -96,9 +97,11 @@ class _SheetsSetupScreenState extends ConsumerState<SheetsSetupScreen> {
             const SizedBox(height: 48),
             _buildFeatureRow(LucideIcons.check, 'Auto-sync completed workouts'),
             const SizedBox(height: 12),
-            _buildFeatureRow(LucideIcons.check, 'Detailed breakdown of every set'),
+            _buildFeatureRow(
+                LucideIcons.check, 'Detailed breakdown of every set'),
             const SizedBox(height: 12),
-            _buildFeatureRow(LucideIcons.check, 'Track body measurements over time'),
+            _buildFeatureRow(
+                LucideIcons.check, 'Track body measurements over time'),
             const Spacer(),
             if (_error != null)
               Padding(
@@ -114,10 +117,15 @@ class _SheetsSetupScreenState extends ConsumerState<SheetsSetupScreen> {
               height: 56,
               child: FilledButton.icon(
                 onPressed: _isLoading ? null : _handleConnect,
-                icon: _isLoading 
-                    ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                icon: _isLoading
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                            strokeWidth: 2, color: Colors.white))
                     : const Icon(LucideIcons.logIn),
-                label: Text(_isLoading ? 'Connecting...' : 'Connect with Google'),
+                label:
+                    Text(_isLoading ? 'Connecting...' : 'Connect with Google'),
               ),
             ),
             const SizedBox(height: 16),

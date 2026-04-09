@@ -1,6 +1,5 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:gym_gemini_pro/core/database/database.dart';
+import 'package:gym_gemini_pro/core/domain/entities/workout_program.dart' as ent;
 import 'package:gym_gemini_pro/features/workout/workout_repository.dart';
 import 'package:gym_gemini_pro/features/workout/providers/workout_home_notifier.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
@@ -14,7 +13,7 @@ part 'programs_notifier.g.dart';
 @freezed
 class ProgramsState with _$ProgramsState {
   const factory ProgramsState({
-    @Default([]) List<WorkoutTemplate> templates,
+    @Default([]) List<ent.WorkoutProgram> templates,
     @Default(false) bool isLoading,
     String? errorMessage,
   }) = _ProgramsState;
@@ -48,7 +47,7 @@ class ProgramsNotifier extends _$ProgramsNotifier {
     final repo = ref.read(workoutRepositoryProvider);
     final jsonStr = await repo.exportTemplateToJson(id);
     final template = state.value?.templates.firstWhere((t) => t.id == id);
-    
+
     await Share.share(
       jsonStr,
       subject: 'GymLog Pro Program: ${template?.name ?? "Workout"}',
@@ -58,7 +57,7 @@ class ProgramsNotifier extends _$ProgramsNotifier {
   Future<void> exportSampleJson() async {
     final repo = ref.read(workoutRepositoryProvider);
     final jsonStr = repo.getSampleJson();
-    
+
     await Share.share(
       jsonStr,
       subject: 'GymLog Pro Sample Program Format',
@@ -74,7 +73,7 @@ class ProgramsNotifier extends _$ProgramsNotifier {
     if (result != null && result.files.single.path != null) {
       final file = File(result.files.single.path!);
       final jsonStr = await file.readAsString();
-      
+
       final repo = ref.read(workoutRepositoryProvider);
       await repo.importTemplateFromJson(jsonStr);
       await refresh();

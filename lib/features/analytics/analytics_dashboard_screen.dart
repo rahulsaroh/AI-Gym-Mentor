@@ -46,7 +46,8 @@ class AnalyticsDashboardScreen extends ConsumerWidget {
           ref.invalidate(recentPRsProvider);
         },
         child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+          physics: const BouncingScrollPhysics(
+              parent: AlwaysScrollableScrollPhysics()),
           padding: const EdgeInsets.only(bottom: 50),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -54,54 +55,64 @@ class AnalyticsDashboardScreen extends ConsumerWidget {
               const FitnessWrappedCard(),
               // 1. Overview Stats Row
               statsAsync.when(
-                data: (stats) => _OverviewRow(stats: stats, unit: unit),
+                data: (stats) {
+                  if (stats['totalWorkouts'] == 0) {
+                    return const _EmptyAnalyticsState();
+                  }
+                  return _OverviewRow(stats: stats, unit: unit);
+                },
                 loading: () => const _SkeletonRow(),
                 error: (e, _) => const SizedBox.shrink(),
               ),
 
               // 2. Weekly Volume Trend
-              _SectionHeader(title: 'Weekly Volume Trend', subtitle: 'Last 12 weeks'),
+              _SectionHeader(
+                  title: 'Weekly Volume Trend', subtitle: 'Last 12 weeks'),
               _LazyChart(
                 builder: (ref) => ref.watch(volumeTrendProvider).when(
-                  data: (data) => _VolumeChart(data: data, unit: unit),
-                  loading: () => const _SkeletonChart(),
-                  error: (e, _) => Center(child: Text('Error: $e')),
-                ),
+                      data: (data) => _VolumeChart(data: data, unit: unit),
+                      loading: () => const _SkeletonChart(),
+                      error: (e, _) => Center(child: Text('Error: $e')),
+                    ),
               ),
 
               // 3. Workout Frequency
-              _SectionHeader(title: 'Workout Frequency', subtitle: 'Target: 4 sessions/week'),
+              _SectionHeader(
+                  title: 'Workout Frequency',
+                  subtitle: 'Target: 4 sessions/week'),
               _LazyChart(
                 builder: (ref) => ref.watch(frequencyTrendProvider).when(
-                  data: (data) => _FrequencyChart(data: data, target: 4),
-                  loading: () => const _SkeletonChart(),
-                  error: (e, _) => Center(child: Text('Error: $e')),
-                ),
+                      data: (data) => _FrequencyChart(data: data, target: 4),
+                      loading: () => const _SkeletonChart(),
+                      error: (e, _) => Center(child: Text('Error: $e')),
+                    ),
               ),
 
               // 4. Muscle Group Balance
-              _SectionHeader(title: 'Muscle Balance', subtitle: 'This month vs Last month'),
+              _SectionHeader(
+                  title: 'Muscle Balance',
+                  subtitle: 'This month vs Last month'),
               _LazyChart(
                 height: 350,
                 builder: (ref) => ref.watch(muscleBalanceProvider).when(
-                  data: (data) => _MuscleBarChart(data: data),
-                  loading: () => const _SkeletonChart(height: 350),
-                  error: (e, _) => Center(child: Text('Error: $e')),
-                ),
+                      data: (data) => _MuscleBarChart(data: data),
+                      loading: () => const _SkeletonChart(height: 350),
+                      error: (e, _) => Center(child: Text('Error: $e')),
+                    ),
               ),
 
               // 5. Plateau Alerts
               alertsAsync.when(
-                data: (alerts) => alerts.isNotEmpty 
-                  ? _PlateauSection(alerts: alerts)
-                  : const SizedBox.shrink(),
+                data: (alerts) => alerts.isNotEmpty
+                    ? _PlateauSection(alerts: alerts)
+                    : const SizedBox.shrink(),
                 loading: () => const SizedBox.shrink(),
                 error: (_, __) => const SizedBox.shrink(),
               ),
 
               // 6. Recent PRs
               _SectionHeader(
-                title: 'Recent Records', 
+                title: 'Recent Records',
                 subtitle: 'Last 30 days',
                 onTrailingTap: () => context.push('/analytics/prs'),
                 trailingLabel: 'View All',
@@ -126,8 +137,8 @@ class _SectionHeader extends StatelessWidget {
   final String? trailingLabel;
 
   const _SectionHeader({
-    required this.title, 
-    required this.subtitle, 
+    required this.title,
+    required this.subtitle,
     this.onTrailingTap,
     this.trailingLabel,
   });
@@ -143,8 +154,15 @@ class _SectionHeader extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold), overflow: TextOverflow.ellipsis),
-                Text(subtitle, style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.outline), overflow: TextOverflow.ellipsis),
+                Text(title,
+                    style: const TextStyle(
+                        fontSize: 18, fontWeight: FontWeight.bold),
+                    overflow: TextOverflow.ellipsis),
+                Text(subtitle,
+                    style: TextStyle(
+                        fontSize: 12,
+                        color: Theme.of(context).colorScheme.outline),
+                    overflow: TextOverflow.ellipsis),
               ],
             ),
           ),
@@ -173,9 +191,11 @@ class _OverviewRow extends StatelessWidget {
         children: [
           _StatCard(
             label: 'This Month',
-            numericValue: unit == WeightUnit.kg 
-                ? (stats['monthlyVolume'] as num).toDouble() / 1000 
-                : WeightConverter.toDisplay((stats['monthlyVolume'] as num).toDouble(), unit) / 1000,
+            numericValue: unit == WeightUnit.kg
+                ? (stats['monthlyVolume'] as num).toDouble() / 1000
+                : WeightConverter.toDisplay(
+                        (stats['monthlyVolume'] as num).toDouble(), unit) /
+                    1000,
             suffix: unit == WeightUnit.kg ? 'T' : 'k lbs',
             icon: LucideIcons.trendingUp,
             color: Colors.blue,
@@ -213,7 +233,12 @@ class _StatCard extends StatelessWidget {
   final IconData icon;
   final Color color;
 
-  const _StatCard({required this.label, required this.numericValue, required this.icon, required this.color, this.suffix = ''});
+  const _StatCard(
+      {required this.label,
+      required this.numericValue,
+      required this.icon,
+      required this.color,
+      this.suffix = ''});
 
   @override
   Widget build(BuildContext context) {
@@ -222,9 +247,9 @@ class _StatCard extends StatelessWidget {
       margin: const EdgeInsets.only(right: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.05),
+        color: color.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: color.withOpacity(0.1)),
+        border: Border.all(color: color.withValues(alpha: 0.1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -250,7 +275,9 @@ class _VolumeChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (data.isEmpty) return const _EmptyChartTip(message: 'Log some workouts to see volume trends.');
+    if (data.isEmpty)
+      return const _EmptyChartTip(
+          message: 'Log some workouts to see volume trends.');
 
     return Container(
       height: 250,
@@ -259,17 +286,24 @@ class _VolumeChart extends StatelessWidget {
         LineChartData(
           lineBarsData: [
             LineChartBarData(
-              spots: data.asMap().entries.map((e) => FlSpot(
-                e.key.toDouble(), 
-                unit == WeightUnit.kg 
-                    ? e.value['volume'] / 1000 
-                    : WeightConverter.toDisplay(e.value['volume'], unit) / 1000
-              )).toList(),
+              spots: data
+                  .asMap()
+                  .entries
+                  .map((e) => FlSpot(
+                      e.key.toDouble(),
+                      unit == WeightUnit.kg
+                          ? e.value['volume'] / 1000
+                          : WeightConverter.toDisplay(e.value['volume'], unit) /
+                              1000))
+                  .toList(),
               isCurved: true,
               color: Theme.of(context).colorScheme.primary,
               barWidth: 3,
               dotData: const FlDotData(show: true),
-              belowBarData: BarAreaData(show: true, color: Theme.of(context).colorScheme.primary.withOpacity(0.1)),
+              belowBarData: BarAreaData(
+                  show: true,
+                  color:
+                      Theme.of(context).colorScheme.primary.withValues(alpha: 0.1)),
             ),
           ],
           titlesData: FlTitlesData(
@@ -281,9 +315,11 @@ class _VolumeChart extends StatelessWidget {
                 showTitles: true,
                 interval: 3, // Shows every 3 weeks
                 getTitlesWidget: (val, meta) {
-                  if (val.toInt() >= data.length) return const SizedBox.shrink();
+                  if (val.toInt() >= data.length)
+                    return const SizedBox.shrink();
                   final date = data[val.toInt()]['date'] as DateTime;
-                  return Text(DateFormat('MM/dd').format(date), style: const TextStyle(fontSize: 10));
+                  return Text(DateFormat('MM/dd').format(date),
+                      style: const TextStyle(fontSize: 10));
                 },
               ),
             ),
@@ -303,7 +339,9 @@ class _FrequencyChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (data.isEmpty) return const _EmptyChartTip(message: 'Complete workouts regularly to see your frequency.');
+    if (data.isEmpty)
+      return const _EmptyChartTip(
+          message: 'Complete workouts regularly to see your frequency.');
 
     return Container(
       height: 200,
@@ -319,7 +357,8 @@ class _FrequencyChart extends StatelessWidget {
                   toY: count,
                   color: count >= target ? Colors.green : Colors.orange,
                   width: 16,
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
+                  borderRadius:
+                      const BorderRadius.vertical(top: Radius.circular(4)),
                 ),
               ],
             );
@@ -332,9 +371,11 @@ class _FrequencyChart extends StatelessWidget {
               sideTitles: SideTitles(
                 showTitles: true,
                 getTitlesWidget: (val, meta) {
-                   if (val.toInt() >= data.length || val.toInt() % 4 != 0) return const SizedBox.shrink();
-                   final date = data[val.toInt()]['date'] as DateTime;
-                   return Text(DateFormat('MM/dd').format(date), style: const TextStyle(fontSize: 10));
+                  if (val.toInt() >= data.length || val.toInt() % 4 != 0)
+                    return const SizedBox.shrink();
+                  final date = data[val.toInt()]['date'] as DateTime;
+                  return Text(DateFormat('MM/dd').format(date),
+                      style: const TextStyle(fontSize: 10));
                 },
               ),
             ),
@@ -357,7 +398,9 @@ class _MuscleBarChart extends StatelessWidget {
     final thisMonth = (data['thisMonth'] as List? ?? []).cast<double>();
     final lastMonth = (data['lastMonth'] as List? ?? []).cast<double>();
 
-    if (labels.isEmpty) return const _EmptyChartTip(message: 'No muscle data available for comparisons.');
+    if (labels.isEmpty)
+      return const _EmptyChartTip(
+          message: 'No muscle data available for comparisons.');
 
     return Column(
       children: [
@@ -368,8 +411,9 @@ class _MuscleBarChart extends StatelessWidget {
               final label = labels[index];
               final current = thisMonth[index];
               final previous = lastMonth[index];
-              final maxVal = ([...thisMonth, ...lastMonth]).reduce((a, b) => a > b ? a : b);
-              
+              final maxVal = ([...thisMonth, ...lastMonth])
+                  .reduce((a, b) => a > b ? a : b);
+
               return Padding(
                 padding: const EdgeInsets.only(bottom: 16),
                 child: Column(
@@ -378,10 +422,14 @@ class _MuscleBarChart extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(label, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                        Text(label,
+                            style: const TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 13)),
                         Text(
                           '${current.toInt()} vs ${previous.toInt()} kg',
-                          style: TextStyle(fontSize: 11, color: Theme.of(context).colorScheme.outline),
+                          style: TextStyle(
+                              fontSize: 11,
+                              color: Theme.of(context).colorScheme.outline),
                         ),
                       ],
                     ),
@@ -401,9 +449,12 @@ class _MuscleBarChart extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            _LegendItem(label: 'Last Month', color: Colors.blue.withOpacity(0.3)),
+            _LegendItem(
+                label: 'Last Month', color: Colors.blue.withValues(alpha: 0.3)),
             const SizedBox(width: 24),
-            _LegendItem(label: 'This Month', color: Theme.of(context).colorScheme.primary),
+            _LegendItem(
+                label: 'This Month',
+                color: Theme.of(context).colorScheme.primary),
           ],
         ),
       ],
@@ -431,7 +482,10 @@ class _HorizontalProgressBar extends StatelessWidget {
           height: 12,
           width: double.infinity,
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.3),
+            color: Theme.of(context)
+                .colorScheme
+                .surfaceContainerHighest
+                .withValues(alpha: 0.3),
             borderRadius: BorderRadius.circular(6),
           ),
         ),
@@ -441,7 +495,7 @@ class _HorizontalProgressBar extends StatelessWidget {
           child: Container(
             height: 12,
             decoration: BoxDecoration(
-              color: Colors.blue.withOpacity(0.3),
+              color: Colors.blue.withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(6),
             ),
           ),
@@ -454,14 +508,14 @@ class _HorizontalProgressBar extends StatelessWidget {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  Theme.of(context).colorScheme.primary.withOpacity(0.8),
+                  Theme.of(context).colorScheme.primary.withValues(alpha: 0.8),
                   Theme.of(context).colorScheme.primary,
                 ],
               ),
               borderRadius: BorderRadius.circular(6),
               boxShadow: [
                 BoxShadow(
-                  color: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
                   blurRadius: 4,
                   offset: const Offset(0, 2),
                 ),
@@ -483,7 +537,10 @@ class _LegendItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Container(width: 12, height: 12, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
+        Container(
+            width: 12,
+            height: 12,
+            decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
         const SizedBox(width: 8),
         Text(label, style: const TextStyle(fontSize: 12)),
       ],
@@ -506,7 +563,8 @@ class _PlateauSection extends StatelessWidget {
             children: [
               Icon(Icons.warning_amber_rounded, color: Colors.amber, size: 18),
               SizedBox(width: 8),
-              Text('Progression Alerts', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              Text('Progression Alerts',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             ],
           ),
         ),
@@ -523,16 +581,20 @@ class _PlateauSection extends StatelessWidget {
                 margin: const EdgeInsets.only(right: 12),
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Colors.amber.withOpacity(0.05),
+                  color: Colors.amber.withValues(alpha: 0.05),
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: Colors.amber.withOpacity(0.3)),
+                  border: Border.all(color: Colors.amber.withValues(alpha: 0.3)),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(alert['name'], style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                    Text(alert['name'],
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 16)),
                     const SizedBox(height: 8),
-                    Text(alert['suggestion'], style: const TextStyle(fontSize: 13, color: Colors.black87)),
+                    Text(alert['suggestion'],
+                        style: const TextStyle(
+                            fontSize: 13, color: Colors.black87)),
                     const Spacer(),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
@@ -540,12 +602,19 @@ class _PlateauSection extends StatelessWidget {
                         Consumer(
                           builder: (context, ref, _) => TextButton(
                             onPressed: () async {
-                              final prefs = await SharedPreferences.getInstance();
-                              final until = DateTime.now().add(const Duration(days: 14)).millisecondsSinceEpoch;
-                              await prefs.setInt('plateau_dismissed_${alert['exerciseId']}', until);
+                              final prefs =
+                                  await SharedPreferences.getInstance();
+                              final until = DateTime.now()
+                                  .add(const Duration(days: 14))
+                                  .millisecondsSinceEpoch;
+                              await prefs.setInt(
+                                  'plateau_dismissed_${alert['exerciseId']}',
+                                  until);
                               ref.invalidate(plateauAlertsProvider);
                             },
-                            child: const Text('Dismiss', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                            child: const Text('Dismiss',
+                                style: TextStyle(
+                                    fontSize: 12, color: Colors.grey)),
                           ),
                         ),
                       ],
@@ -567,7 +636,9 @@ class _RecentPRsCarousel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (prs.isEmpty) return const _EmptyChartTip(message: 'New Personal Records will appear here!');
+    if (prs.isEmpty)
+      return const _EmptyChartTip(
+          message: 'New Personal Records will appear here!');
 
     return SizedBox(
       height: 120,
@@ -582,17 +653,28 @@ class _RecentPRsCarousel extends StatelessWidget {
             margin: const EdgeInsets.only(right: 12),
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              gradient: LinearGradient(colors: [Colors.blue.shade800, Colors.blue.shade600]),
+              gradient: LinearGradient(
+                  colors: [Colors.blue.shade800, Colors.blue.shade600]),
               borderRadius: BorderRadius.circular(16),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(pr['name'], style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
+                Text(pr['name'],
+                    style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14)),
                 const SizedBox(height: 4),
-                Text(pr['value'], style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-                Text(DateFormat('MMM d').format(pr['date']), style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 10)),
+                Text(pr['value'],
+                    style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold)),
+                Text(DateFormat('MMM d').format(pr['date']),
+                    style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.7), fontSize: 10)),
               ],
             ),
           );
@@ -611,11 +693,59 @@ class _SkeletonRow extends StatelessWidget {
       physics: NeverScrollableScrollPhysics(),
       child: Row(
         children: [
-          SkeletonCard(height: 100, width: 120, margin: EdgeInsets.only(left: 16, right: 8)),
-          SkeletonCard(height: 100, width: 120, margin: EdgeInsets.only(right: 8)),
-          SkeletonCard(height: 100, width: 120, margin: EdgeInsets.only(right: 8)),
+          SkeletonCard(
+              height: 100,
+              width: 120,
+              margin: EdgeInsets.only(left: 16, right: 8)),
+          SkeletonCard(
+              height: 100, width: 120, margin: EdgeInsets.only(right: 8)),
+          SkeletonCard(
+              height: 100, width: 120, margin: EdgeInsets.only(right: 8)),
           SkeletonCard(height: 100, width: 120, margin: EdgeInsets.zero),
         ],
+      ),
+    );
+  }
+}
+
+class _EmptyAnalyticsState extends StatelessWidget {
+  const _EmptyAnalyticsState();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(24.0),
+      child: Center(
+        child: Column(
+          children: [
+            const SizedBox(height: 20),
+            Icon(LucideIcons.layoutDashboard,
+                size: 64,
+                color: Theme.of(context)
+                    .colorScheme
+                    .primary
+                    .withValues(alpha: 0.1)),
+            const SizedBox(height: 16),
+            Text(
+              'No Analytics Data Yet',
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Complete your first workout to start tracking your volume and progress trends over time.',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Theme.of(context).colorScheme.outline),
+            ),
+            const SizedBox(height: 24),
+            FilledButton.icon(
+              onPressed: () => context.go('/'),
+              icon: const Icon(LucideIcons.play),
+              label: const Text('Log First Workout'),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -639,11 +769,15 @@ class _EmptyChartTip extends StatelessWidget {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32.0),
-        child: Text(message, textAlign: TextAlign.center, style: TextStyle(color: Theme.of(context).colorScheme.outline, fontSize: 12)),
+        child: Text(message,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+                color: Theme.of(context).colorScheme.outline, fontSize: 12)),
       ),
     );
   }
 }
+
 class _LazyChart extends ConsumerStatefulWidget {
   final Widget Function(WidgetRef ref) builder;
   final double height;
@@ -666,7 +800,9 @@ class _LazyChartState extends ConsumerState<_LazyChart> {
           if (mounted) setState(() => _isVisible = true);
         }
       },
-      child: _isVisible ? widget.builder(ref) : _SkeletonChart(height: widget.height),
+      child: _isVisible
+          ? widget.builder(ref)
+          : _SkeletonChart(height: widget.height),
     );
   }
 }

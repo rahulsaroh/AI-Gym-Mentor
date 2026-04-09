@@ -25,10 +25,11 @@ class ShakeDetector {
   });
 
   void start() {
-    _subscription = accelerometerEvents.listen((event) {
+    _subscription = accelerometerEventStream().listen((event) {
       final magnitude = sqrt(
-        event.x * event.x + event.y * event.y + event.z * event.z,
-      ) / 9.81; // Convert to G
+            event.x * event.x + event.y * event.y + event.z * event.z,
+          ) /
+          9.81; // Convert to G
 
       if (magnitude > threshold) {
         final now = DateTime.now();

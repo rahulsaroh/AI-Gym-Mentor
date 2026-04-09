@@ -11,17 +11,35 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'database.g.dart';
 
-enum SetType { straight, warmup, superset, dropSet, amrap, timed, restPause, cluster }
+enum SetType {
+  straight,
+  warmup,
+  superset,
+  dropSet,
+  amrap,
+  timed,
+  restPause,
+  cluster
+}
 
 class Exercises extends Table {
   IntColumn get id => integer().autoIncrement()();
   TextColumn get name => text().withLength(min: 1, max: 255)();
+  TextColumn get description => text().nullable()();
+  TextColumn get category => text().withDefault(const Constant('Strength'))();
+  TextColumn get difficulty => text().withDefault(const Constant('Beginner'))();
   TextColumn get primaryMuscle => text()();
   TextColumn get secondaryMuscle => text().nullable()();
   TextColumn get equipment => text()();
-  TextColumn get setType => text()();
+  TextColumn get setType => text()(); // e.g. Straight, Weighted, Bodyweight
   IntColumn get restTime => integer().withDefault(const Constant(90))();
-  TextColumn get instructions => text().nullable()();
+  TextColumn get instructions => text().nullable()(); // Pipe-separated or JSON
+  TextColumn get gifUrl => text().nullable()();
+  TextColumn get imageUrl => text().nullable()();
+  TextColumn get videoUrl => text().nullable()();
+  TextColumn get mechanic => text().nullable()(); // Compound or Isolation
+  TextColumn get force => text().nullable()(); // Push, Pull, Static
+  TextColumn get source => text().withDefault(const Constant('local'))();
   BoolColumn get isCustom => boolean().withDefault(const Constant(false))();
   DateTimeColumn get lastUsed => dateTime().nullable()();
 }
@@ -46,7 +64,8 @@ class TemplateExercises extends Table {
   IntColumn get exerciseId => integer().references(Exercises, #id)();
   IntColumn get order => integer()();
   IntColumn get setType => intEnum<SetType>().withDefault(const Constant(0))();
-  TextColumn get setsJson => text()(); // JSON representation of TemplateSet list
+  TextColumn get setsJson =>
+      text()(); // JSON representation of TemplateSet list
   IntColumn get restTime => integer().withDefault(const Constant(90))();
   TextColumn get notes => text().nullable()();
   TextColumn get supersetGroupId => text().nullable()();
@@ -59,10 +78,12 @@ class Workouts extends Table {
   DateTimeColumn get startTime => dateTime().nullable()();
   DateTimeColumn get endTime => dateTime().nullable()();
   IntColumn get duration => integer().nullable()(); // in minutes or seconds
-  IntColumn get templateId => integer().nullable().references(WorkoutTemplates, #id)();
+  IntColumn get templateId =>
+      integer().nullable().references(WorkoutTemplates, #id)();
   IntColumn get dayId => integer().nullable().references(TemplateDays, #id)();
   TextColumn get notes => text().nullable()();
-  TextColumn get status => text().withDefault(const Constant('draft'))(); // draft, completed
+  TextColumn get status =>
+      text().withDefault(const Constant('draft'))(); // draft, completed
 }
 
 class WorkoutSets extends Table {
@@ -102,9 +123,11 @@ class BodyMeasurements extends Table {
 class SyncQueue extends Table {
   IntColumn get id => integer().autoIncrement()();
   IntColumn get workoutId => integer().nullable().references(Workouts, #id)();
-  IntColumn get measurementId => integer().nullable().references(BodyMeasurements, #id)();
+  IntColumn get measurementId =>
+      integer().nullable().references(BodyMeasurements, #id)();
   TextColumn get type => text()(); // workout, measurement
-  TextColumn get status => text().withDefault(const Constant('pending'))(); // pending, done, failed
+  TextColumn get status =>
+      text().withDefault(const Constant('pending'))(); // pending, done, failed
   DateTimeColumn get createdAt => dateTime()();
   IntColumn get attempts => integer().withDefault(const Constant(0))();
   TextColumn get error => text().nullable()();
@@ -113,7 +136,8 @@ class SyncQueue extends Table {
 class ExerciseProgressionSettings extends Table {
   IntColumn get id => integer().autoIncrement()();
   IntColumn get exerciseId => integer().references(Exercises, #id)();
-  RealColumn get incrementOverride => real().nullable()(); // Exercise-specific increment
+  RealColumn get incrementOverride =>
+      real().nullable()(); // Exercise-specific increment
   IntColumn get targetReps => integer().withDefault(const Constant(10))();
   IntColumn get targetSets => integer().withDefault(const Constant(3))();
   BoolColumn get autoSuggest => boolean().withDefault(const Constant(true))();
@@ -134,14 +158,15 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? e]) : super(e ?? _openConnection());
 
   @override
-  int get schemaVersion => 9;
+  int get schemaVersion => 10;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
         onUpgrade: (m, from, to) async {
           // Helper to check if a column exists to avoid duplicate column errors
           Future<bool> hasColumn(String table, String column) async {
-            final result = await customSelect('PRAGMA table_info("$table")').get();
+            final result =
+                await customSelect('PRAGMA table_info("$table")').get();
             return result.any((row) => row.data['name'] == column);
           }
 
@@ -168,7 +193,8 @@ class AppDatabase extends _$AppDatabase {
               await m.addColumn(templateExercises, templateExercises.setType);
             }
             if (!await hasColumn('template_exercises', 'superset_group_id')) {
-              await m.addColumn(templateExercises, templateExercises.supersetGroupId);
+              await m.addColumn(
+                  templateExercises, templateExercises.supersetGroupId);
             }
           }
           if (from < 5) {
@@ -176,9 +202,12 @@ class AppDatabase extends _$AppDatabase {
           }
           if (from < 6) {
             try {
-              await m.createIndex(Index('idx_sets_exercise_id', 'CREATE INDEX idx_sets_exercise_id ON workout_sets(exercise_id)'));
-              await m.createIndex(Index('idx_workouts_date', 'CREATE INDEX idx_workouts_date ON workouts(date)'));
-              await m.createIndex(Index('idx_exercises_muscle', 'CREATE INDEX idx_exercises_muscle ON exercises(primary_muscle)'));
+              await m.createIndex(Index('idx_sets_exercise_id',
+                  'CREATE INDEX idx_sets_exercise_id ON workout_sets(exercise_id)'));
+              await m.createIndex(Index('idx_workouts_date',
+                  'CREATE INDEX idx_workouts_date ON workouts(date)'));
+              await m.createIndex(Index('idx_exercises_muscle',
+                  'CREATE INDEX idx_exercises_muscle ON exercises(primary_muscle)'));
             } catch (e) {
               debugPrint('Index creation skipped (likely exists): $e');
             }
@@ -193,10 +222,17 @@ class AppDatabase extends _$AppDatabase {
               await m.addColumn(workoutSets, workoutSets.isPr);
             }
           }
-          if (from < 9) {
-            if (!await hasColumn('workout_sets', 'rir')) {
-              await m.addColumn(workoutSets, workoutSets.rir);
-            }
+          if (from < 10) {
+            // Bulk update for Unified Exercise Library
+            await customStatement('ALTER TABLE exercises ADD COLUMN description TEXT');
+            await customStatement("ALTER TABLE exercises ADD COLUMN category TEXT DEFAULT 'Strength'");
+            await customStatement("ALTER TABLE exercises ADD COLUMN difficulty TEXT DEFAULT 'Beginner'");
+            await customStatement('ALTER TABLE exercises ADD COLUMN gif_url TEXT');
+            await customStatement('ALTER TABLE exercises ADD COLUMN image_url TEXT');
+            await customStatement('ALTER TABLE exercises ADD COLUMN video_url TEXT');
+            await customStatement('ALTER TABLE exercises ADD COLUMN mechanic TEXT');
+            await customStatement('ALTER TABLE exercises ADD COLUMN force TEXT');
+            await customStatement("ALTER TABLE exercises ADD COLUMN source TEXT DEFAULT 'local'");
           }
         },
         beforeOpen: (details) async {
@@ -216,9 +252,10 @@ class AppDatabase extends _$AppDatabase {
 
   Future<void> _seedInitialData(Batch batch) async {
     try {
-      final jsonString = await rootBundle.loadString('assets/data/exercises.json');
+      final jsonString =
+          await rootBundle.loadString('assets/data/exercises.json');
       final List<dynamic> jsonList = json.decode(jsonString);
-      
+
       final exercisesToInsert = jsonList.map((item) {
         return ExercisesCompanion.insert(
           name: item['name'] as String,
@@ -248,15 +285,18 @@ class AppDatabase extends _$AppDatabase {
     await _seedImportedPrograms(exerciseMap);
   }
 
-  Future<void> _seedProgram(SampleProgram program, Map<String, int> exerciseMap) async {
-    final templateId = await into(workoutTemplates).insert(WorkoutTemplatesCompanion.insert(
+  Future<void> _seedProgram(
+      SampleProgram program, Map<String, int> exerciseMap) async {
+    final templateId =
+        await into(workoutTemplates).insert(WorkoutTemplatesCompanion.insert(
       name: program.name,
       description: Value(program.description),
     ));
 
     for (int i = 0; i < program.days.length; i++) {
       final day = program.days[i];
-      final dayId = await into(templateDays).insert(TemplateDaysCompanion.insert(
+      final dayId =
+          await into(templateDays).insert(TemplateDaysCompanion.insert(
         templateId: templateId,
         name: day.name,
         order: i,
@@ -266,7 +306,8 @@ class AppDatabase extends _$AppDatabase {
         final ex = day.exercises[j];
         final exId = exerciseMap[ex.name];
         if (exId != null) {
-          await into(templateExercises).insert(TemplateExercisesCompanion.insert(
+          await into(templateExercises)
+              .insert(TemplateExercisesCompanion.insert(
             dayId: dayId,
             exerciseId: exId,
             order: j,
@@ -281,11 +322,14 @@ class AppDatabase extends _$AppDatabase {
   Future<void> seedExercisesIfEmpty() async {
     final allEx = await select(exercises).get();
     final existingNames = allEx.map((e) => e.name).toSet();
-    
-    final missingExercises = initialExercises.where((e) => !existingNames.contains(e.name.value)).toList();
-    
+
+    final missingExercises = initialExercises
+        .where((e) => !existingNames.contains(e.name.value))
+        .toList();
+
     if (missingExercises.isNotEmpty) {
-      debugPrint('Database: Adding ${missingExercises.length} missing exercises...');
+      debugPrint(
+          'Database: Adding ${missingExercises.length} missing exercises...');
       await batch((b) async {
         b.insertAll(exercises, missingExercises);
       });
@@ -313,29 +357,33 @@ class AppDatabase extends _$AppDatabase {
     if (templateNames.any((t) => t.name == '6 Day PPL')) return;
 
     try {
-      final jsonStr = await rootBundle.loadString('assets/data/imported_ppl.json');
+      final jsonStr =
+          await rootBundle.loadString('assets/data/imported_ppl.json');
       final data = jsonDecode(jsonStr);
       final name = data['name'] as String;
       final description = data['description'] as String?;
       final days = data['days'] as List;
 
       await transaction(() async {
-        final templateId = await into(workoutTemplates).insert(WorkoutTemplatesCompanion.insert(
+        final templateId = await into(workoutTemplates)
+            .insert(WorkoutTemplatesCompanion.insert(
           name: name,
           description: Value(description),
         ));
 
         for (final dayData in days) {
-          final dayId = await into(templateDays).insert(TemplateDaysCompanion.insert(
+          final dayId =
+              await into(templateDays).insert(TemplateDaysCompanion.insert(
             templateId: templateId,
             name: dayData['name'],
             order: dayData['order'],
           ));
 
           final exercisesArr = dayData['exercises'] as List;
-          
+
           // Also create a "Completed Workout" for history for each Day in the Excel
-          final workoutId = await into(workouts).insert(WorkoutsCompanion.insert(
+          final workoutId =
+              await into(workouts).insert(WorkoutsCompanion.insert(
             name: 'PPL History: ${dayData['name']}',
             date: DateTime.now().subtract(const Duration(days: 7)),
             status: const Value('completed'),
@@ -346,19 +394,21 @@ class AppDatabase extends _$AppDatabase {
           for (final exData in exercisesArr) {
             final exerciseName = exData['exerciseName'] as String;
             final exId = exerciseMap[exerciseName];
-            
+
             // If exercise not in Drift, we insert it as custom
-            final finalExId = exId ?? await into(exercises).insert(ExercisesCompanion.insert(
-              name: exerciseName,
-              primaryMuscle: 'Full Body',
-              equipment: 'None',
-              setType: 'Straight',
-            ));
-            
+            final finalExId = exId ??
+                await into(exercises).insert(ExercisesCompanion.insert(
+                  name: exerciseName,
+                  primaryMuscle: 'Full Body',
+                  equipment: 'None',
+                  setType: 'Straight',
+                ));
+
             exerciseMap[exerciseName] = finalExId;
 
             // Add to template
-            await into(templateExercises).insert(TemplateExercisesCompanion.insert(
+            await into(templateExercises)
+                .insert(TemplateExercisesCompanion.insert(
               dayId: dayId,
               exerciseId: finalExId,
               order: exData['order'],
@@ -400,13 +450,14 @@ LazyDatabase _openConnection() {
   return LazyDatabase(() async {
     final dbFolder = await getApplicationDocumentsDirectory();
     final file = File(p.join(dbFolder.path, 'gym_log.sqlite'));
-    
+
     try {
       return NativeDatabase(file);
     } catch (e) {
       // If database is corrupted, move it and start fresh
       if (file.existsSync()) {
-        final corruptedPath = p.join(dbFolder.path, 'gym_log_corrupted_${DateTime.now().millisecondsSinceEpoch}.sqlite');
+        final corruptedPath = p.join(dbFolder.path,
+            'gym_log_corrupted_${DateTime.now().millisecondsSinceEpoch}.sqlite');
         await file.rename(corruptedPath);
       }
       return NativeDatabase(file);

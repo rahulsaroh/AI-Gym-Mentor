@@ -9,7 +9,7 @@ class SettingsRepository {
   Future<SettingsState> loadSettings() async {
     final prefs = await SharedPreferences.getInstance();
     final jsonString = prefs.getString(_key);
-    
+
     if (jsonString == null) {
       // Migrate individual legacy keys if they exist
       return _migrateLegacy(prefs);
@@ -31,7 +31,8 @@ class SettingsRepository {
 
   SettingsState _migrateLegacy(SharedPreferences prefs) {
     final name = prefs.getString('userName') ?? 'Alex';
-    final unit = prefs.getString('weightUnit') == 'lbs' ? WeightUnit.lbs : WeightUnit.kg;
+    final unit =
+        prefs.getString('weightUnit') == 'lbs' ? WeightUnit.lbs : WeightUnit.kg;
     final exp = ExperienceLevel.values.firstWhere(
       (e) => e.name == (prefs.getString('experienceLevel') ?? 'beginner'),
       orElse: () => ExperienceLevel.beginner,
@@ -71,11 +72,15 @@ class SettingsRepository {
   SettingsState _fromMap(Map<String, dynamic> map) {
     return SettingsState(
       userName: map['userName'] ?? 'Alex',
-      experienceLevel: ExperienceLevel.values.firstWhere((e) => e.name == map['experienceLevel'], orElse: () => ExperienceLevel.beginner),
+      experienceLevel: ExperienceLevel.values.firstWhere(
+          (e) => e.name == map['experienceLevel'],
+          orElse: () => ExperienceLevel.beginner),
       weightUnit: map['weightUnit'] == 'lbs' ? WeightUnit.lbs : WeightUnit.kg,
-      themeMode: ThemeMode.values.firstWhere((e) => e.name == map['themeMode'], orElse: () => ThemeMode.system),
+      themeMode: ThemeMode.values.firstWhere((e) => e.name == map['themeMode'],
+          orElse: () => ThemeMode.system),
       accentColor: Color(map['accentColor'] ?? Colors.blue.value),
-      fontSize: FontSize.values.firstWhere((e) => e.name == map['fontSize'], orElse: () => FontSize.normal),
+      fontSize: FontSize.values.firstWhere((e) => e.name == map['fontSize'],
+          orElse: () => FontSize.normal),
       restTimeStraight: map['restTimeStraight'] ?? 90,
       restTimeSuperset: map['restTimeSuperset'] ?? 120,
       restTimeDropset: map['restTimeDropset'] ?? 30,
@@ -83,12 +88,15 @@ class SettingsRepository {
       timerVibration: map['timerVibration'] ?? true,
       backgroundNotification: map['backgroundNotification'] ?? true,
       barbellWeight: (map['barbellWeight'] ?? 20.0).toDouble(),
-      availablePlates: (map['availablePlates'] as Map<String, dynamic>?)?.map((k, v) => MapEntry(k, v as int)) ?? const {},
+      availablePlates: (map['availablePlates'] as Map<String, dynamic>?)
+              ?.map((k, v) => MapEntry(k, v as int)) ??
+          const {},
       autoIncrement: (map['autoIncrement'] ?? 0.0).toDouble(),
       showRpe: map['showRpe'] ?? true,
       showPreviousData: map['showPreviousData'] ?? true,
       googleDriveEmail: map['googleDriveEmail'],
-      lastSynced: map['lastSynced'] != null ? DateTime.parse(map['lastSynced']) : null,
+      lastSynced:
+          map['lastSynced'] != null ? DateTime.parse(map['lastSynced']) : null,
     );
   }
 

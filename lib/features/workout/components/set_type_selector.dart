@@ -34,12 +34,18 @@ class SetTypeSelector extends StatelessWidget {
           ),
           Text(
             'Select Set Type',
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+            style: Theme.of(context)
+                .textTheme
+                .headlineSmall
+                ?.copyWith(fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 8),
           Text(
             'Changes apply to all future sets for this exercise',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.grey[500]),
+            style: Theme.of(context)
+                .textTheme
+                .bodyMedium
+                ?.copyWith(color: Colors.grey[500]),
           ),
           const SizedBox(height: 24),
           Flexible(
@@ -67,7 +73,8 @@ class SetTypeSelector extends StatelessWidget {
                   type: SetType.dropSet,
                   icon: LucideIcons.arrowDownWideNarrow,
                   title: 'Drop Set',
-                  desc: 'Perform a set, then immediately drop weight and continue.',
+                  desc:
+                      'Perform a set, then immediately drop weight and continue.',
                   example: '80kg x 8 -> 60kg x 10 -> 40kg x 12',
                 ),
                 _buildTypeCard(
@@ -91,7 +98,8 @@ class SetTypeSelector extends StatelessWidget {
                   type: SetType.restPause,
                   icon: LucideIcons.circlePause,
                   title: 'Rest-Pause',
-                  desc: 'Short breaks (10-15s) between mini-sets to hit high reps.',
+                  desc:
+                      'Short breaks (10-15s) between mini-sets to hit high reps.',
                   example: '15 total reps (8 + 4 + 3)',
                 ),
                 _buildTypeCard(
@@ -119,7 +127,8 @@ class SetTypeSelector extends StatelessWidget {
     required String example,
   }) {
     final isSelected = currentType == type;
-    final color = isSelected ? Theme.of(context).primaryColor : Colors.transparent;
+    final color =
+        isSelected ? Theme.of(context).primaryColor : Colors.transparent;
 
     return GestureDetector(
       onTap: () {
@@ -130,7 +139,8 @@ class SetTypeSelector extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: isSelected ? color.withOpacity(0.1) : Theme.of(context).cardColor,
+          color:
+              isSelected ? color.withOpacity(0.1) : Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: isSelected ? color : Colors.grey[800]!,
@@ -145,7 +155,9 @@ class SetTypeSelector extends StatelessWidget {
                 color: isSelected ? color : Colors.grey[800]!.withOpacity(0.5),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Icon(icon, color: isSelected ? Colors.white : Colors.grey[400], size: 24),
+              child: Icon(icon,
+                  color: isSelected ? Colors.white : Colors.grey[400],
+                  size: 24),
             ),
             const SizedBox(width: 16),
             Expanded(
@@ -168,13 +180,17 @@ class SetTypeSelector extends StatelessWidget {
                   const SizedBox(height: 4),
                   Text(
                     'E.g. $example',
-                    style: TextStyle(fontSize: 12, fontStyle: FontStyle.italic, color: color.withOpacity(0.7)),
+                    style: TextStyle(
+                        fontSize: 12,
+                        fontStyle: FontStyle.italic,
+                        color: color.withOpacity(0.7)),
                   ),
                 ],
               ),
             ),
             if (isSelected)
-              const Icon(LucideIcons.circleCheck, color: Colors.green, size: 20),
+              const Icon(LucideIcons.circleCheck,
+                  color: Colors.green, size: 20),
           ],
         ),
       ),

@@ -10,13 +10,24 @@ class ExercisePickerOverlay extends ConsumerStatefulWidget {
   const ExercisePickerOverlay({super.key, required this.onSelect});
 
   @override
-  ConsumerState<ExercisePickerOverlay> createState() => _ExercisePickerOverlayState();
+  ConsumerState<ExercisePickerOverlay> createState() =>
+      _ExercisePickerOverlayState();
 }
 
 class _ExercisePickerOverlayState extends ConsumerState<ExercisePickerOverlay> {
   final TextEditingController _searchController = TextEditingController();
   final List<String> _muscles = [
-    'All', 'Chest', 'Back', 'Shoulders', 'Quads', 'Hamstrings', 'Glutes', 'Calves', 'Biceps', 'Triceps', 'Abs'
+    'All',
+    'Chest',
+    'Back',
+    'Shoulders',
+    'Quads',
+    'Hamstrings',
+    'Glutes',
+    'Calves',
+    'Biceps',
+    'Triceps',
+    'Abs'
   ];
   String _selectedMuscle = 'All';
   Timer? _debounce;
@@ -84,7 +95,10 @@ class _ExercisePickerOverlayState extends ConsumerState<ExercisePickerOverlay> {
                     hintText: 'Search exercises...',
                     prefixIcon: const Icon(LucideIcons.search),
                     filled: true,
-                    fillColor: Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.5),
+                    fillColor: Theme.of(context)
+                        .colorScheme
+                        .surfaceContainerHighest
+                        .withValues(alpha: 0.5),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide.none,
@@ -105,11 +119,15 @@ class _ExercisePickerOverlayState extends ConsumerState<ExercisePickerOverlay> {
                     return Padding(
                       padding: const EdgeInsets.only(right: 8),
                       child: FilterChip(
-                        label: Text(muscle, style: TextStyle(fontSize: 12, color: isSelected ? Colors.white : null)),
+                        label: Text(muscle,
+                            style: TextStyle(
+                                fontSize: 12,
+                                color: isSelected ? Colors.white : null)),
                         selected: isSelected,
                         onSelected: (val) {
                           setState(() => _selectedMuscle = muscle);
-                          ref.read(exerciseFiltersProvider.notifier).setMuscle(muscle == 'All' ? 'All Muscles' : muscle);
+                          ref.read(exerciseFiltersProvider.notifier).setMuscle(
+                              muscle == 'All' ? 'All Muscles' : muscle);
                         },
                         showCheckmark: false,
                         padding: EdgeInsets.zero,
@@ -132,8 +150,11 @@ class _ExercisePickerOverlayState extends ConsumerState<ExercisePickerOverlay> {
                       itemBuilder: (context, index) {
                         final ex = exercises[index];
                         return ListTile(
-                          title: Text(ex.name, style: const TextStyle(fontWeight: FontWeight.bold)),
-                          subtitle: Text('${ex.primaryMuscle} • ${ex.equipment}'),
+                          title: Text(ex.name,
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.bold)),
+                          subtitle:
+                              Text('${ex.primaryMuscle} • ${ex.equipment}'),
                           onTap: () {
                             widget.onSelect(ex.id);
                             Navigator.pop(context);
@@ -142,7 +163,8 @@ class _ExercisePickerOverlayState extends ConsumerState<ExercisePickerOverlay> {
                       },
                     );
                   },
-                  loading: () => const Center(child: CircularProgressIndicator()),
+                  loading: () =>
+                      const Center(child: CircularProgressIndicator()),
                   error: (e, s) => Center(child: Text('Error: $e')),
                 ),
               ),

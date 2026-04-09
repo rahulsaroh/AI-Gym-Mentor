@@ -10,7 +10,7 @@ class GlobalErrorScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    
+
     return Scaffold(
       backgroundColor: colorScheme.surface,
       body: Center(
@@ -22,7 +22,7 @@ class GlobalErrorScreen extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
-                  color: colorScheme.errorContainer.withOpacity(0.3),
+                  color: colorScheme.errorContainer.withValues(alpha: 0.3),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
@@ -66,16 +66,20 @@ class GlobalErrorScreen extends StatelessWidget {
                         content: SingleChildScrollView(
                           child: Text(
                             details!.exception.toString(),
-                            style: const TextStyle(fontFamily: 'monospace', fontSize: 12),
+                            style: const TextStyle(
+                                fontFamily: 'monospace', fontSize: 12),
                           ),
                         ),
                         actions: [
-                          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Close')),
+                          TextButton(
+                              onPressed: () => Navigator.pop(ctx),
+                              child: const Text('Close')),
                         ],
                       ),
                     );
                   },
-                  child: const Text('View Technical Details', style: TextStyle(color: Colors.grey)),
+                  child: const Text('View Technical Details',
+                      style: TextStyle(color: Colors.grey)),
                 ),
               ],
             ],

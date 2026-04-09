@@ -3,15 +3,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:gym_gemini_pro/core/domain/entities/exercise.dart';
 import 'exercise_library_provider.dart';
 import 'widgets/exercise_media_widget.dart';
-import 'models/exercise.dart';
 
 class ExerciseLibraryScreen extends ConsumerStatefulWidget {
   const ExerciseLibraryScreen({super.key});
 
   @override
-  ConsumerState<ExerciseLibraryScreen> createState() => _ExerciseLibraryScreenState();
+  ConsumerState<ExerciseLibraryScreen> createState() =>
+      _ExerciseLibraryScreenState();
 }
 
 class _ExerciseLibraryScreenState extends ConsumerState<ExerciseLibraryScreen> {
@@ -21,7 +22,9 @@ class _ExerciseLibraryScreenState extends ConsumerState<ExerciseLibraryScreen> {
   void initState() {
     super.initState();
     _searchController.addListener(() {
-      ref.read(exerciseLibrarySearchProvider.notifier).setQuery(_searchController.text);
+      ref
+          .read(exerciseLibrarySearchProvider.notifier)
+          .setQuery(_searchController.text);
     });
   }
 
@@ -45,7 +48,9 @@ class _ExerciseLibraryScreenState extends ConsumerState<ExerciseLibraryScreen> {
             data: (exercises) => _buildExerciseList(exercises),
             loading: () => _buildLoadingList(),
             error: (err, stack) => SliverFillRemaining(
-              child: Center(child: Text('Error: $err', style: const TextStyle(color: Colors.white))),
+              child: Center(
+                  child: Text('Error: $err',
+                      style: const TextStyle(color: Colors.white))),
             ),
           ),
         ],
@@ -59,13 +64,13 @@ class _ExerciseLibraryScreenState extends ConsumerState<ExerciseLibraryScreen> {
       expandedHeight: 200,
       pinned: true,
       flexibleSpace: FlexibleSpaceBar(
-        title: const Text('Exercise Library', 
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+        title: const Text('Exercise Library',
+            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
         background: ShaderMask(
           shaderCallback: (rect) => LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Colors.black.withOpacity(0.5), Colors.black],
+            colors: [Colors.black.withValues(alpha: 0.5), Colors.black],
           ).createShader(rect),
           blendMode: BlendMode.darken,
           child: Container(
@@ -76,7 +81,8 @@ class _ExerciseLibraryScreenState extends ConsumerState<ExerciseLibraryScreen> {
                 end: Alignment.bottomRight,
               ),
             ),
-            child: Icon(LucideIcons.dumbbell, size: 100, color: Colors.white.withOpacity(0.1)),
+            child: Icon(LucideIcons.dumbbell,
+                size: 100, color: Colors.white.withValues(alpha: 0.1)),
           ),
         ),
       ),
@@ -91,8 +97,9 @@ class _ExerciseLibraryScreenState extends ConsumerState<ExerciseLibraryScreen> {
                 style: const TextStyle(color: Colors.white),
                 decoration: InputDecoration(
                   hintText: 'Search 800+ exercises...',
-                  hintStyle: TextStyle(color: Colors.white.withOpacity(0.5)),
-                  prefixIcon: const Icon(LucideIcons.search, color: Colors.white70),
+                  hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.5)),
+                  prefixIcon:
+                      const Icon(LucideIcons.search, color: Colors.white70),
                   filled: true,
                   fillColor: Colors.grey[900],
                   border: OutlineInputBorder(
@@ -118,31 +125,44 @@ class _ExerciseLibraryScreenState extends ConsumerState<ExerciseLibraryScreen> {
           _filterChip(
             label: filters['category'] ?? 'Category',
             isActive: filters['category'] != null,
-            onTap: () => _showFilterPicker('category', ['Strength', 'Stretching', 'Cardio', 'Plyometrics']),
+            onTap: () => _showFilterPicker('category',
+                ['Strength', 'Stretching', 'Cardio', 'Plyometrics']),
           ),
           const SizedBox(width: 8),
           _filterChip(
             label: filters['equipment'] ?? 'Equipment',
             isActive: filters['equipment'] != null,
-            onTap: () => _showFilterPicker('equipment', ['Barbell', 'Dumbbell', 'Machine', 'Cable', 'Bodyweight', 'None']),
+            onTap: () => _showFilterPicker('equipment', [
+              'Barbell',
+              'Dumbbell',
+              'Machine',
+              'Cable',
+              'Bodyweight',
+              'None'
+            ]),
           ),
           const SizedBox(width: 8),
           _filterChip(
             label: filters['difficulty'] ?? 'Difficulty',
             isActive: filters['difficulty'] != null,
-            onTap: () => _showFilterPicker('difficulty', ['Beginner', 'Intermediate', 'Expert']),
+            onTap: () => _showFilterPicker(
+                'difficulty', ['Beginner', 'Intermediate', 'Expert']),
           ),
           if (filters.values.any((v) => v != null))
             IconButton(
               icon: const Icon(LucideIcons.x, color: Colors.red, size: 20),
-              onPressed: () => ref.read(exerciseLibraryFiltersProvider.notifier).reset(),
+              onPressed: () =>
+                  ref.read(exerciseLibraryFiltersProvider.notifier).reset(),
             ),
         ],
       ),
     );
   }
 
-  Widget _filterChip({required String label, required bool isActive, required VoidCallback onTap}) {
+  Widget _filterChip(
+      {required String label,
+      required bool isActive,
+      required VoidCallback onTap}) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -150,11 +170,13 @@ class _ExerciseLibraryScreenState extends ConsumerState<ExerciseLibraryScreen> {
         decoration: BoxDecoration(
           color: isActive ? Colors.blue[700] : Colors.grey[900],
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: isActive ? Colors.blue : Colors.transparent),
+          border:
+              Border.all(color: isActive ? Colors.blue : Colors.transparent),
         ),
         child: Row(
           children: [
-            Text(label, style: const TextStyle(color: Colors.white, fontSize: 12)),
+            Text(label,
+                style: const TextStyle(color: Colors.white, fontSize: 12)),
             const SizedBox(width: 4),
             const Icon(Icons.arrow_drop_down, color: Colors.white70, size: 16),
           ],
@@ -166,7 +188,9 @@ class _ExerciseLibraryScreenState extends ConsumerState<ExerciseLibraryScreen> {
   Widget _buildExerciseList(List<Exercise> exercises) {
     if (exercises.isEmpty) {
       return const SliverFillRemaining(
-        child: Center(child: Text('No exercises found', style: TextStyle(color: Colors.grey))),
+        child: Center(
+            child: Text('No exercises found',
+                style: TextStyle(color: Colors.grey))),
       );
     }
 
@@ -199,7 +223,7 @@ class _ExerciseLibraryScreenState extends ConsumerState<ExerciseLibraryScreen> {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.3),
+              color: Colors.black.withValues(alpha: 0.3),
               blurRadius: 10,
               offset: const Offset(0, 5),
             ),
@@ -225,24 +249,32 @@ class _ExerciseLibraryScreenState extends ConsumerState<ExerciseLibraryScreen> {
                     exercise.name,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
+                    style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     exercise.category,
-                    style: TextStyle(color: Colors.blue[300], fontSize: 10, fontWeight: FontWeight.w600),
+                    style: TextStyle(
+                        color: Colors.blue[300],
+                        fontSize: 10,
+                        fontWeight: FontWeight.w600),
                   ),
                   const SizedBox(height: 4),
                   Row(
                     children: [
-                      Icon(LucideIcons.dumbbell, size: 10, color: Colors.grey[400]),
+                      Icon(LucideIcons.dumbbell,
+                          size: 10, color: Colors.grey[400]),
                       const SizedBox(width: 4),
                       Expanded(
                         child: Text(
                           exercise.equipment,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: TextStyle(color: Colors.grey[400], fontSize: 10),
+                          style:
+                              TextStyle(color: Colors.grey[400], fontSize: 10),
                         ),
                       ),
                     ],
@@ -287,23 +319,40 @@ class _ExerciseLibraryScreenState extends ConsumerState<ExerciseLibraryScreen> {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.grey[900],
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
       builder: (context) => Padding(
         padding: const EdgeInsets.symmetric(vertical: 20),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('Select $filter', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
+            Text('Select $filter',
+                style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18)),
             const SizedBox(height: 10),
             ...options.map((opt) => ListTile(
-              title: Text(opt, style: const TextStyle(color: Colors.white)),
-              onTap: () {
-                if (filter == 'category') ref.read(exerciseLibraryFiltersProvider.notifier).setCategory(opt);
-                if (filter == 'equipment') ref.read(exerciseLibraryFiltersProvider.notifier).setEquipment(opt);
-                if (filter == 'difficulty') ref.read(exerciseLibraryFiltersProvider.notifier).setDifficulty(opt);
-                Navigator.pop(context);
-              },
-            )),
+                  title: Text(opt, style: const TextStyle(color: Colors.white)),
+                  onTap: () {
+                    if (filter == 'category') {
+                      ref
+                          .read(exerciseLibraryFiltersProvider.notifier)
+                          .setCategory(opt);
+                    }
+                    if (filter == 'equipment') {
+                      ref
+                          .read(exerciseLibraryFiltersProvider.notifier)
+                          .setEquipment(opt);
+                    }
+                    if (filter == 'difficulty') {
+                      ref
+                          .read(exerciseLibraryFiltersProvider.notifier)
+                          .setDifficulty(opt);
+                    }
+                    Navigator.pop(context);
+                  },
+                )),
           ],
         ),
       ),

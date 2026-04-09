@@ -26,7 +26,7 @@ class DataService {
       await db.delete(db.bodyMeasurements).go();
       await db.delete(db.exercises).go();
     });
-    
+
     // 2. Clear SharedPreferences
     final prefs = await SharedPreferences.getInstance();
     await prefs.clear();
@@ -49,12 +49,15 @@ class DataService {
 
   Future<String> exportWorkoutsCsv() async {
     final query = db.select(db.workoutSets).join([
-      innerJoin(db.workouts, db.workouts.id.equalsExp(db.workoutSets.workoutId)),
-      innerJoin(db.exercises, db.exercises.id.equalsExp(db.workoutSets.exerciseId)),
-    ])..orderBy([OrderingTerm.desc(db.workouts.date)]);
+      innerJoin(
+          db.workouts, db.workouts.id.equalsExp(db.workoutSets.workoutId)),
+      innerJoin(
+          db.exercises, db.exercises.id.equalsExp(db.workoutSets.exerciseId)),
+    ])
+      ..orderBy([OrderingTerm.desc(db.workouts.date)]);
 
     final rows = await query.get();
-    
+
     StringBuffer csv = StringBuffer();
     csv.writeln('Date,Workout,Exercise,Set,Weight,Reps,RPE,Type');
 
@@ -62,10 +65,11 @@ class DataService {
       final s = row.readTable(db.workoutSets);
       final w = row.readTable(db.workouts);
       final e = row.readTable(db.exercises);
-      
+
       final dateStr = w.date.toIso8601String().split('T')[0];
-      
-      csv.writeln('$dateStr,"${w.name}","${e.name}",${s.setNumber},${s.weight},${s.reps},${s.rpe ?? ""},${s.setType.name}');
+
+      csv.writeln(
+          '$dateStr,"${w.name}","${e.name}",${s.setNumber},${s.weight},${s.reps},${s.rpe ?? ""},${s.setType.name}');
     }
 
     return csv.toString();

@@ -20,9 +20,10 @@ class FitnessWrappedCard extends ConsumerWidget {
         final prs = (stats['monthlyPRs'] as num?)?.toInt() ?? 0;
         final streaks = (stats['activeStreak'] as num?)?.toInt() ?? 0;
         final topMuscle = stats['topMuscle'] as String? ?? 'Legs';
-        final unitSuffix = settings.weightUnit == WeightUnit.kg ? 'Tons' : 'k lbs';
-        final displayVolume = settings.weightUnit == WeightUnit.kg 
-            ? volume 
+        final unitSuffix =
+            settings.weightUnit == WeightUnit.kg ? 'Tons' : 'k lbs';
+        final displayVolume = settings.weightUnit == WeightUnit.kg
+            ? volume
             : volume * 2.20462; // Conversion if stored as kg in DB
 
         return Container(
@@ -37,7 +38,7 @@ class FitnessWrappedCard extends ConsumerWidget {
             borderRadius: BorderRadius.circular(28),
             boxShadow: [
               BoxShadow(
-                color: const Color(0xFF6366F1).withOpacity(0.3),
+                color: const Color(0xFF6366F1).withValues(alpha: 0.3),
                 blurRadius: 20,
                 offset: const Offset(0, 10),
               ),
@@ -55,7 +56,7 @@ class FitnessWrappedCard extends ConsumerWidget {
                       Text(
                         'MONTHLY',
                         style: GoogleFonts.outfit(
-                          color: Colors.white.withOpacity(0.8),
+                          color: Colors.white.withValues(alpha: 0.8),
                           fontSize: 12,
                           fontWeight: FontWeight.w800,
                           letterSpacing: 2,
@@ -101,11 +102,15 @@ class FitnessWrappedCard extends ConsumerWidget {
                     children: [
                       Text(
                         'Active Streak',
-                        style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 13),
+                        style: TextStyle(
+                            color: Colors.white.withValues(alpha: 0.7), fontSize: 13),
                       ),
                       Text(
                         '$streaks Days',
-                        style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+                        style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold),
                       ),
                     ],
                   ),
@@ -116,10 +121,11 @@ class FitnessWrappedCard extends ConsumerWidget {
                     icon: const Icon(LucideIcons.share2, size: 16),
                     label: const Text('SHARE'),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white.withOpacity(0.2),
+                      backgroundColor: Colors.white.withValues(alpha: 0.2),
                       foregroundColor: Colors.white,
                       elevation: 0,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12)),
                     ),
                   ),
                 ],
@@ -128,7 +134,9 @@ class FitnessWrappedCard extends ConsumerWidget {
           ),
         );
       },
-      loading: () => const SizedBox(height: 350, child: Center(child: CircularProgressIndicator(color: Colors.white))),
+      loading: () => const SizedBox(
+          height: 350,
+          child: Center(child: CircularProgressIndicator(color: Colors.white))),
       error: (_, __) => const SizedBox.shrink(),
     );
   }
@@ -139,7 +147,8 @@ class _WrappedStat extends StatelessWidget {
   final String value;
   final IconData icon;
 
-  const _WrappedStat({required this.label, required this.value, required this.icon});
+  const _WrappedStat(
+      {required this.label, required this.value, required this.icon});
 
   @override
   Widget build(BuildContext context) {
@@ -148,7 +157,7 @@ class _WrappedStat extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.1),
+            color: Colors.white.withValues(alpha: 0.1),
             shape: BoxShape.circle,
           ),
           child: Icon(icon, color: Colors.white, size: 20),
@@ -157,8 +166,14 @@ class _WrappedStat extends StatelessWidget {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(label, style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 12)),
-            Text(value, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+            Text(label,
+                style: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.6), fontSize: 12)),
+            Text(value,
+                style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold)),
           ],
         ),
       ],

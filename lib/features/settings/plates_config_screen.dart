@@ -25,15 +25,17 @@ class PlatesConfigScreen extends ConsumerWidget {
         data: (settings) {
           final sortedKeys = settings.availablePlates.keys.toList()
             ..sort((a, b) => double.parse(b).compareTo(double.parse(a)));
-          
+
           if (sortedKeys.isEmpty) {
             return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(LucideIcons.dumbbell, size: 64, color: theme.colorScheme.outline),
+                  Icon(LucideIcons.dumbbell,
+                      size: 64, color: theme.colorScheme.outline),
                   const SizedBox(height: 16),
-                  const Text('No plates configured', style: TextStyle(fontSize: 18)),
+                  const Text('No plates configured',
+                      style: TextStyle(fontSize: 18)),
                   const SizedBox(height: 8),
                   const Text('Add some manually or use presets'),
                 ],
@@ -47,28 +49,36 @@ class PlatesConfigScreen extends ConsumerWidget {
             itemBuilder: (context, index) {
               final weight = sortedKeys[index];
               final count = settings.availablePlates[weight]!;
-              
+
               return Card(
                 margin: const EdgeInsets.only(bottom: 12),
                 child: ListTile(
-                  title: Text('$weight kg', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                  title: Text('$weight kg',
+                      style: const TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 18)),
                   subtitle: Text('$count available'),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       IconButton(
-                        onPressed: () => _updateQuantity(ref, settings, weight, count - 1),
+                        onPressed: () =>
+                            _updateQuantity(ref, settings, weight, count - 1),
                         icon: const Icon(Icons.remove_circle_outline),
                       ),
-                      Text('$count', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                      Text('$count',
+                          style: const TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.bold)),
                       IconButton(
-                        onPressed: () => _updateQuantity(ref, settings, weight, count + 1),
+                        onPressed: () =>
+                            _updateQuantity(ref, settings, weight, count + 1),
                         icon: const Icon(Icons.add_circle_outline),
                       ),
                       const SizedBox(width: 8),
                       IconButton(
-                        onPressed: () => _updateQuantity(ref, settings, weight, 0),
-                        icon: const Icon(LucideIcons.trash2, color: Colors.red, size: 20),
+                        onPressed: () =>
+                            _updateQuantity(ref, settings, weight, 0),
+                        icon: const Icon(LucideIcons.trash2,
+                            color: Colors.red, size: 20),
                       ),
                     ],
                   ),
@@ -87,14 +97,17 @@ class PlatesConfigScreen extends ConsumerWidget {
     );
   }
 
-  void _updateQuantity(WidgetRef ref, dynamic settings, String weight, int newCount) {
+  void _updateQuantity(
+      WidgetRef ref, dynamic settings, String weight, int newCount) {
     final updatedPlates = Map<String, int>.from(settings.availablePlates);
     if (newCount <= 0) {
       updatedPlates.remove(weight);
     } else {
       updatedPlates[weight] = newCount;
     }
-    ref.read(settingsProvider.notifier).updateSettings(settings.copyWith(availablePlates: updatedPlates));
+    ref
+        .read(settingsProvider.notifier)
+        .updateSettings(settings.copyWith(availablePlates: updatedPlates));
   }
 
   void _showAddPlateDialog(BuildContext context, WidgetRef ref) {
@@ -106,10 +119,13 @@ class PlatesConfigScreen extends ConsumerWidget {
         content: TextField(
           controller: controller,
           keyboardType: TextInputType.number,
-          decoration: const InputDecoration(hintText: 'e.g. 1.25', suffixText: 'kg'),
+          decoration:
+              const InputDecoration(hintText: 'e.g. 1.25', suffixText: 'kg'),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+          TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel')),
           FilledButton(
             onPressed: () {
               final weight = controller.text.trim();
@@ -117,7 +133,8 @@ class PlatesConfigScreen extends ConsumerWidget {
                 final settings = ref.read(settingsProvider).value!;
                 final updated = Map<String, int>.from(settings.availablePlates);
                 updated[weight] = updated[weight] ?? 2;
-                ref.read(settingsProvider.notifier).updateSettings(settings.copyWith(availablePlates: updated));
+                ref.read(settingsProvider.notifier).updateSettings(
+                    settings.copyWith(availablePlates: updated));
               }
               Navigator.pop(context);
             },
@@ -133,14 +150,27 @@ class PlatesConfigScreen extends ConsumerWidget {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Load Standard Presets?'),
-        content: const Text('This will add a standard gym set (1.25, 2.5, 5, 10, 15, 20, 25 kg) to your inventory.'),
+        content: const Text(
+            'This will add a standard gym set (1.25, 2.5, 5, 10, 15, 20, 25 kg) to your inventory.'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+          TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel')),
           FilledButton(
             onPressed: () {
-              final presets = {'1.25': 4, '2.5': 4, '5.0': 4, '10.0': 4, '15.0': 2, '20.0': 4, '25.0': 2};
+              final presets = {
+                '1.25': 4,
+                '2.5': 4,
+                '5.0': 4,
+                '10.0': 4,
+                '15.0': 2,
+                '20.0': 4,
+                '25.0': 2
+              };
               final settings = ref.read(settingsProvider).value!;
-              ref.read(settingsProvider.notifier).updateSettings(settings.copyWith(availablePlates: presets));
+              ref
+                  .read(settingsProvider.notifier)
+                  .updateSettings(settings.copyWith(availablePlates: presets));
               Navigator.pop(context);
             },
             child: const Text('Load'),

@@ -1,14 +1,33 @@
 import 'dart:async';
 import 'dart:ui';
 import 'package:flutter_background_service/flutter_background_service.dart';
-import 'package:flutter_background_service_android/flutter_background_service_android.dart';
+
 import 'package:gym_gemini_pro/core/services/notification_service.dart';
+import 'package:gym_gemini_pro/core/utils/timer_utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 @pragma('vm:entry-point')
 Future<bool> onStart(ServiceInstance service) async {
   DartPluginRegistrant.ensureInitialized();
-  
+
+  final prefs = await SharedPreferences.getInstance();
+  DateTime? endTime;
+  String? exName;
+  String? nextEx;
+  int initialDuration = 60;
+
+  void loadMetadata() {
+    final endTimeStr = prefs.getString('rest_timer_end_timestamp');
+    exName = prefs.getString('rest_timer_exercise_name');
+    nextEx = prefs.getString('rest_timer_next_exercise');
+    initialDuration = prefs.getInt('rest_timer_initial_duration') ?? 60;
+    if (endTimeStr != null) {
+      endTime = DateTime.tryParse(endTimeStr);
+    }
+  }
+
+  loadMetadata();
+
   if (service is AndroidServiceInstance) {
     service.on('setAsForeground').listen((event) {
       service.setAsForegroundService();
@@ -22,57 +41,38 @@ Future<bool> onStart(ServiceInstance service) async {
   service.on('stopService').listen((event) {
     service.stopSelf();
   });
-  
+
   service.on('skip').listen((event) {
     service.stopSelf();
   });
 
   service.on('add_30s').listen((event) async {
-    final prefs = await SharedPreferences.getInstance();
-    final endTimeStr = prefs.getString('rest_timer_end_timestamp');
-    if (endTimeStr != null) {
-      final endTime = DateTime.parse(endTimeStr).add(const Duration(seconds: 30));
-      await prefs.setString('rest_timer_end_timestamp', endTime.toIso8601String());
-    }
+    // Reload metadata to get the new endTime set by UI or previous action
+    loadMetadata();
   });
 
-  // Timer logic
+  // Timer logic for updates
   Timer.periodic(const Duration(seconds: 1), (timer) async {
-    if (service is AndroidServiceInstance) {
-      if (await service.isForegroundService()) {
-        final prefs = await SharedPreferences.getInstance();
-        final endTimeStr = prefs.getString('rest_timer_end_timestamp');
-        final exName = prefs.getString('rest_timer_exercise_name');
+    final remaining = TimerUtils.calculateRemainingSeconds(endTime);
 
-        if (endTimeStr != null) {
-          final endTime = DateTime.parse(endTimeStr);
-          final now = DateTime.now();
-          
-          if (endTime.isAfter(now)) {
-            final remaining = endTime.difference(now).inSeconds;
-            // Fetch initial duration to calculate progress
-            final initialDuration = prefs.getInt('rest_timer_initial_duration') ?? 60;
+    if (remaining > 0) {
+      // Update notification text (Cheap)
+      NotificationService().showTimerNotification(
+        remainingSeconds: remaining,
+        maxDuration: initialDuration,
+        exerciseName: exName,
+      );
 
-            // Update notification
-            NotificationService().showTimerNotification(
-              remainingSeconds: remaining,
-              maxDuration: initialDuration,
-              exerciseName: exName,
-            );
-            
-            // Invoke callback for UI
-            service.invoke('update', {
-              "remaining": remaining,
-            });
-          } else {
-            // Timer complete
-            final nextEx = prefs.getString('rest_timer_next_exercise');
-            NotificationService().showTimerCompleteNotification(nextExercise: nextEx);
-            service.stopSelf();
-            timer.cancel();
-          }
-        }
-      }
+      // Invoke callback for UI (Cheap)
+      service.invoke('update', {
+        "remaining": remaining,
+      });
+    } else {
+      // Timer complete
+      NotificationService()
+          .showTimerCompleteNotification(nextExercise: nextEx);
+      service.stopSelf();
+      timer.cancel();
     }
   });
 
@@ -82,7 +82,7 @@ Future<bool> onStart(ServiceInstance service) async {
 class TimerService {
   static Future<void> initialize() async {
     final service = FlutterBackgroundService();
-    
+
     await service.configure(
       androidConfiguration: AndroidConfiguration(
         onStart: onStart,

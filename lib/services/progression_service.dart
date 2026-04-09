@@ -24,13 +24,18 @@ class ProgressionService extends _$ProgressionService {
   @override
   void build() {}
 
-  Future<ProgressionSuggestion?> getSuggestion(int exerciseId, {double targetReps = 10, int targetSets = 3}) async {
+  Future<ProgressionSuggestion?> getSuggestion(int exerciseId,
+      {double targetReps = 10, int targetSets = 3}) async {
     final db = ref.read(appDatabaseProvider);
 
     // 1. Fetch last 3 completed sessions for this exercise
     final sessions = await (db.select(db.workoutSets)
-          ..where((t) => t.exerciseId.equals(exerciseId) & t.completed.equals(true))
-          ..orderBy([(t) => OrderingTerm(expression: t.completedAt, mode: OrderingMode.desc)]))
+          ..where(
+              (t) => t.exerciseId.equals(exerciseId) & t.completed.equals(true))
+          ..orderBy([
+            (t) =>
+                OrderingTerm(expression: t.completedAt, mode: OrderingMode.desc)
+          ]))
         .get();
 
     if (sessions.isEmpty) return null;
@@ -40,22 +45,25 @@ class ProgressionService extends _$ProgressionService {
     if (workoutIds.isEmpty) return null;
 
     final lastWorkoutId = workoutIds.first;
-    final lastSessionSets = sessions.where((s) => s.workoutId == lastWorkoutId).toList();
-    
+    final lastSessionSets =
+        sessions.where((s) => s.workoutId == lastWorkoutId).toList();
+
     // Most recent working weight
     final lastWeight = lastSessionSets.first.weight;
-    
+
     // 3. Get settings and overrides
     final settings = await (db.select(db.exerciseProgressionSettings)
           ..where((t) => t.exerciseId.equals(exerciseId)))
         .getSingleOrNull();
-    
+
     final currentTargetReps = settings?.targetReps.toDouble() ?? targetReps;
     final increment = settings?.incrementOverride ?? 2.5;
 
     // 4. Check success against actual target
-    final allHitTarget = lastSessionSets.every((s) => s.reps >= currentTargetReps);
-    final failCount = lastSessionSets.where((s) => s.reps < currentTargetReps).length;
+    final allHitTarget =
+        lastSessionSets.every((s) => s.reps >= currentTargetReps);
+    final failCount =
+        lastSessionSets.where((s) => s.reps < currentTargetReps).length;
     final isFail = failCount > (lastSessionSets.length / 2);
 
     double suggestedWeight = lastWeight;
@@ -63,13 +71,16 @@ class ProgressionService extends _$ProgressionService {
 
     if (allHitTarget) {
       suggestedWeight = lastWeight + increment;
-      reason = 'Hit target of ${currentTargetReps.toInt()} reps! Increasing by ${increment}kg.';
+      reason =
+          'Hit target of ${currentTargetReps.toInt()} reps! Increasing by ${increment}kg.';
     } else if (isFail) {
       suggestedWeight = max(0.0, lastWeight - increment);
-      reason = 'Missed target reps of ${currentTargetReps.toInt()} on most sets. Reducing by ${increment}kg.';
+      reason =
+          'Missed target reps of ${currentTargetReps.toInt()} on most sets. Reducing by ${increment}kg.';
     } else {
       suggestedWeight = lastWeight;
-      reason = 'Maintain and focus on hitting your ${currentTargetReps.toInt()} rep target.';
+      reason =
+          'Maintain and focus on hitting your ${currentTargetReps.toInt()} rep target.';
     }
 
     // 4. Trend Arrow (last 5 sessions 1RM)
@@ -77,11 +88,12 @@ class ProgressionService extends _$ProgressionService {
     if (workoutIds.length >= 2) {
       final last5Ids = workoutIds.take(5).toList();
       final session1RMs = <double>[];
-      
+
       for (var id in last5Ids) {
         final sets = sessions.where((s) => s.workoutId == id).toList();
         if (sets.isNotEmpty) {
-          final max1RM = sets.map((s) => calculateEpley(s.weight, s.reps)).reduce(max);
+          final max1RM =
+              sets.map((s) => calculateEpley(s.weight, s.reps)).reduce(max);
           session1RMs.add(max1RM);
         }
       }
@@ -105,12 +117,16 @@ class ProgressionService extends _$ProgressionService {
 
   // 1RM Formulas
   double calculateEpley(double weight, double reps) => weight * (1 + reps / 30);
-  double calculateBrzycki(double weight, double reps) => weight * (36 / (37 - reps));
-  double calculateLombardi(double weight, double reps) => weight * pow(reps, 0.1);
-  double calculateOConner(double weight, double reps) => weight * (1 + reps / 40);
+  double calculateBrzycki(double weight, double reps) =>
+      weight * (36 / (37 - reps));
+  double calculateLombardi(double weight, double reps) =>
+      weight * pow(reps, 0.1);
+  double calculateOConner(double weight, double reps) =>
+      weight * (1 + reps / 40);
 
   Map<String, double> getAll1RMs(double weight, double reps) {
-    if (reps <= 0) return {'Epley': 0, 'Brzycki': 0, 'Lombardi': 0, 'OConner': 0};
+    if (reps <= 0)
+      return {'Epley': 0, 'Brzycki': 0, 'Lombardi': 0, 'OConner': 0};
     return {
       'Epley': calculateEpley(weight, reps),
       'Brzycki': calculateBrzycki(weight, reps),
@@ -120,6 +136,9 @@ class ProgressionService extends _$ProgressionService {
   }
 }
 
-final exerciseSuggestionProvider = FutureProvider.autoDispose.family<ProgressionSuggestion?, int>((ref, exerciseId) {
-  return ref.watch(progressionServiceProvider.notifier).getSuggestion(exerciseId);
+final exerciseSuggestionProvider = FutureProvider.autoDispose
+    .family<ProgressionSuggestion?, int>((ref, exerciseId) {
+  return ref
+      .watch(progressionServiceProvider.notifier)
+      .getSuggestion(exerciseId);
 });
