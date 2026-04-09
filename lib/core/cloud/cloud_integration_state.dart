@@ -1,8 +1,8 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:gym_gemini_pro/core/auth/auth_provider.dart';
-import 'package:gym_gemini_pro/core/database/database.dart';
-import 'package:gym_gemini_pro/services/connectivity_service.dart';
+import 'package:ai_gym_mentor/core/auth/auth_provider.dart';
+import 'package:ai_gym_mentor/core/database/database.dart';
+import 'package:ai_gym_mentor/services/connectivity_service.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'dart:async';
 
@@ -73,7 +73,7 @@ class CloudIntegration extends _$CloudIntegration {
     final db = ref.read(appDatabaseProvider);
     _queueSub?.cancel();
     _queueSub = (db.select(db.syncQueue)
-          ..where((t) => t.status.equals('pending') | t.status.equals('failed')))
+          ..where((t) => t.status.isIn(['pending', 'failed'])))
         .watch()
         .listen((items) {
       state = state.copyWith(pendingSyncCount: items.length);

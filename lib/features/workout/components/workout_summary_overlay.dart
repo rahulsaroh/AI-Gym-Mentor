@@ -1,18 +1,19 @@
 import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
-import 'package:gym_gemini_pro/core/database/database.dart';
-import 'package:gym_gemini_pro/core/widgets/number_ticker.dart';
+import 'package:ai_gym_mentor/core/database/database.dart' as db;
+import 'package:ai_gym_mentor/core/widgets/number_ticker.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:lottie/lottie.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:gym_gemini_pro/services/sync_worker.dart';
-import 'package:gym_gemini_pro/services/plateau_service.dart';
+import 'package:ai_gym_mentor/core/domain/entities/exercise.dart' as entity;
+import 'package:ai_gym_mentor/services/sync_worker.dart';
+import 'package:ai_gym_mentor/services/plateau_service.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class WorkoutSummaryOverlay extends ConsumerStatefulWidget {
-  final Workout workout;
-  final List<WorkoutSet> sets;
-  final List<Exercise> exercises;
+  final db.Workout workout;
+  final List<db.WorkoutSet> sets;
+  final List<entity.Exercise> exercises;
   final int elapsedSeconds;
   final int prsAchieved;
   final Function(String) onSave;
@@ -122,7 +123,7 @@ class _WorkoutSummaryOverlayState extends ConsumerState<WorkoutSummaryOverlay>
     final totalVolume =
         completedSets.fold(0.0, (acc, s) => acc + (s.weight * s.reps));
 
-    final Map<int, List<WorkoutSet>> setsByExercise = {};
+    final Map<int, List<db.WorkoutSet>> setsByExercise = {};
     for (final set in completedSets) {
       setsByExercise.putIfAbsent(set.exerciseId, () => []).add(set);
     }

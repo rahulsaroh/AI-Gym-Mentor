@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:gym_gemini_pro/core/utils/timer_utils.dart';
+import 'package:ai_gym_mentor/core/utils/timer_utils.dart';
 
 void main() {
   group('TimerUtils', () {

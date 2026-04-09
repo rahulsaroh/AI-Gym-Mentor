@@ -23,12 +23,12 @@ final historyStatsProvider =
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef HistoryStatsRef = AutoDisposeFutureProviderRef<Map<String, dynamic>>;
-String _$heatmapSetsHash() => r'ef0bd3c30c5cf06663643107545e187d33378366';
+String _$heatmapSetsHash() => r'db6e5aaf174f1403fd4249fe36ca74407da30d36';
 
 /// See also [heatmapSets].
 @ProviderFor(heatmapSets)
 final heatmapSetsProvider =
-    AutoDisposeFutureProvider<List<WorkoutSet>>.internal(
+    AutoDisposeFutureProvider<List<ent.LoggedSet>>.internal(
   heatmapSets,
   name: r'heatmapSetsProvider',
   debugGetCreateSourceHash:
@@ -39,7 +39,7 @@ final heatmapSetsProvider =
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-typedef HeatmapSetsRef = AutoDisposeFutureProviderRef<List<WorkoutSet>>;
+typedef HeatmapSetsRef = AutoDisposeFutureProviderRef<List<ent.LoggedSet>>;
 String _$historyListHash() => r'c9b5586f85779e8e8b5f214a9e748b56c740f59d';
 
 /// See also [HistoryList].

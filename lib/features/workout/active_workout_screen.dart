@@ -5,30 +5,31 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
-import 'package:gym_gemini_pro/core/database/database.dart' as db;
+import 'package:ai_gym_mentor/core/database/database.dart' as db;
 import 'package:uuid/uuid.dart';
 import 'package:drift/drift.dart' hide Column;
-import 'package:gym_gemini_pro/features/exercises/exercises_provider.dart';
-import 'package:gym_gemini_pro/features/exercises/exercise_repository.dart';
-import 'package:gym_gemini_pro/core/domain/entities/exercise.dart' as entity;
+import 'package:ai_gym_mentor/features/exercises/exercises_provider.dart';
+import 'package:ai_gym_mentor/features/exercises/exercise_repository.dart';
+import 'package:ai_gym_mentor/core/domain/entities/exercise.dart';
+import 'package:ai_gym_mentor/core/domain/entities/exercise.dart' as entity;
 import 'package:confetti/confetti.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:gym_gemini_pro/services/sync_worker.dart';
-import 'package:gym_gemini_pro/core/widgets/speed_dial_fab.dart';
-import 'package:gym_gemini_pro/features/workout/components/pr_banner.dart';
-import 'package:gym_gemini_pro/features/workout/components/set_type_selector.dart';
-import 'package:gym_gemini_pro/services/progression_service.dart';
-import 'package:gym_gemini_pro/features/workout/providers/workout_home_notifier.dart';
-import 'package:gym_gemini_pro/features/workout/components/workout_summary_overlay.dart';
-import 'package:gym_gemini_pro/features/workout/components/superset_bracket_painter.dart';
-import 'package:gym_gemini_pro/features/workout/components/rest_timer_overlay.dart';
-import 'package:gym_gemini_pro/features/workout/providers/timer_notifier.dart';
-import 'package:gym_gemini_pro/features/settings/settings_provider.dart';
-import 'package:gym_gemini_pro/core/utils/weight_converter.dart';
-import 'package:gym_gemini_pro/features/settings/models/settings_state.dart';
-import 'package:gym_gemini_pro/features/workout/providers/workout_duration_provider.dart';
-import 'package:gym_gemini_pro/features/workout/components/plate_calculator_dialog.dart';
-import 'package:gym_gemini_pro/features/exercises/components/exercise_picker_overlay.dart';
+import 'package:ai_gym_mentor/services/sync_worker.dart';
+import 'package:ai_gym_mentor/core/widgets/speed_dial_fab.dart';
+import 'package:ai_gym_mentor/features/workout/components/pr_banner.dart';
+import 'package:ai_gym_mentor/features/workout/components/set_type_selector.dart';
+import 'package:ai_gym_mentor/services/progression_service.dart';
+import 'package:ai_gym_mentor/features/workout/providers/workout_home_notifier.dart';
+import 'package:ai_gym_mentor/features/workout/components/workout_summary_overlay.dart';
+import 'package:ai_gym_mentor/features/workout/components/superset_bracket_painter.dart';
+import 'package:ai_gym_mentor/features/workout/components/rest_timer_overlay.dart';
+import 'package:ai_gym_mentor/features/workout/providers/timer_notifier.dart';
+import 'package:ai_gym_mentor/features/settings/settings_provider.dart';
+import 'package:ai_gym_mentor/core/utils/weight_converter.dart';
+import 'package:ai_gym_mentor/features/settings/models/settings_state.dart';
+import 'package:ai_gym_mentor/features/workout/providers/workout_duration_provider.dart';
+import 'package:ai_gym_mentor/features/workout/components/plate_calculator_dialog.dart';
+import 'package:ai_gym_mentor/features/exercises/components/exercise_picker_overlay.dart';
 
 class ActiveWorkoutScreen extends ConsumerStatefulWidget {
   final int workoutId;
@@ -173,18 +174,18 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
       if (mounted) setState(() => _isInitializing = false);
       return;
     }
-    final db = ref.read(appDatabaseProvider);
-    final existingSets = await (db.select(db.workoutSets)
+    final database = ref.read(db.appDatabaseProvider);
+    final existingSets = await (database.select(database.workoutSets)
           ..where((t) => t.workoutId.equals(widget.workoutId)))
         .get();
     if (existingSets.isEmpty) {
-      final templateExercises = await (db.select(db.templateExercises)
+      final templateExercises = await (database.select(database.templateExercises)
             ..where((t) => t.dayId.equals(widget.dayId!))
             ..orderBy([(t) => OrderingTerm(expression: t.order)]))
           .get();
       for (var i = 0; i < templateExercises.length; i++) {
         final te = templateExercises[i];
-        await db.into(db.workoutSets).insert(WorkoutSetsCompanion.insert(
+        await database.into(database.workoutSets).insert(db.WorkoutSetsCompanion.insert(
               workoutId: widget.workoutId,
               exerciseId: te.exerciseId,
               exerciseOrder: i,
@@ -459,7 +460,7 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
         if (exercises.isEmpty) {
           return const Center(child: Text('No exercises found in library'));
         }
-        final entity.Exercise exercise = exercises.firstWhere(
+        final Exercise exercise = exercises.firstWhere(
           (e) => e.id == block.exerciseId,
           orElse: () => exercises.first,
         );
@@ -562,7 +563,7 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
-                            exercise.instructions!,
+                            exercise.instructions!.join('\n'),
                             style: TextStyle(
                               fontSize: 11,
                               fontStyle: FontStyle.italic,
@@ -672,7 +673,7 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
     final unit = settings.weightUnit;
     final Color rowColor = isCompleted
         ? Colors.green.withValues(alpha: 0.1)
-        : (set.setType == SetType.warmup
+        : (set.setType == db.SetType.warmup
             ? Colors.orange.withValues(alpha: 0.05)
             : Colors.transparent);
 
@@ -1520,7 +1521,7 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
                 setNumber: 1,
                 reps: 0,
                 weight: 0,
-                setType: const Value(SetType.straight),
+                setType: Value(db.SetType.straight),
               ));
         },
       ),
@@ -1624,7 +1625,7 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
     final duration = ref.read(workoutDurationProvider);
     await database.transaction(() async {
       await database.update(database.workouts).replace(workout.copyWith(
-            status: const Value('completed'),
+            status: 'completed',
             endTime: Value(DateTime.now()),
             duration: Value(duration),
             notes: Value(notes),
@@ -1748,7 +1749,6 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
       if (mounted) context.go('/app');
     }
   }
-}
 
   Future<void> _undoDelete() async {
     if (_lastDeletedSet != null) {

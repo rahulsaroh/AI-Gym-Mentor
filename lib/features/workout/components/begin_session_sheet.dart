@@ -3,9 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
-import 'package:gym_gemini_pro/features/workout/providers/workout_home_notifier.dart';
-import 'package:gym_gemini_pro/features/workout/workout_providers.dart';
-import 'package:gym_gemini_pro/core/database/database.dart';
+import 'package:ai_gym_mentor/features/workout/providers/workout_home_notifier.dart';
+import 'package:ai_gym_mentor/features/workout/workout_providers.dart';
+import 'package:ai_gym_mentor/core/domain/entities/workout_program.dart';
+import 'package:ai_gym_mentor/core/domain/entities/workout_session.dart';
 
 class BeginSessionSheet extends ConsumerWidget {
   const BeginSessionSheet({super.key});
@@ -141,7 +142,7 @@ class BeginSessionSheet extends ConsumerWidget {
   }
 
   Future<void> _startTemplateWorkout(
-      BuildContext context, WidgetRef ref, WorkoutTemplate template) async {
+      BuildContext context, WidgetRef ref, WorkoutProgram template) async {
     // In a real app, we'd find the next day in the cycle.
     // For now, we use the startWorkout logic in the notifier which does this.
     final id =
@@ -168,7 +169,7 @@ class BeginSessionSheet extends ConsumerWidget {
 }
 
 class _ResumeCard extends StatelessWidget {
-  final Workout workout;
+  final WorkoutSession workout;
   const _ResumeCard({required this.workout});
 
   @override
@@ -231,7 +232,7 @@ class _ResumeCard extends StatelessWidget {
 }
 
 class _ProgramCard extends StatelessWidget {
-  final WorkoutTemplate template;
+  final WorkoutProgram template;
   final VoidCallback onSelect;
 
   const _ProgramCard({required this.template, required this.onSelect});

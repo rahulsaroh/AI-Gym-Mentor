@@ -6,7 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
-import 'package:gym_gemini_pro/core/database/initial_data.dart';
+import 'package:ai_gym_mentor/core/database/initial_data.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'database.g.dart';
@@ -22,6 +22,7 @@ enum SetType {
   cluster
 }
 
+@DataClassName('ExerciseTable')
 class Exercises extends Table {
   IntColumn get id => integer().autoIncrement()();
   TextColumn get name => text().withLength(min: 1, max: 255)();
@@ -105,20 +106,28 @@ class WorkoutSets extends Table {
   TextColumn get subSetsJson => text().nullable()(); // For DropSets/Rest-Pause
 }
 
+@DataClassName('BodyMeasurementTable')
 class BodyMeasurements extends Table {
   IntColumn get id => integer().autoIncrement()();
   DateTimeColumn get date => dateTime()();
   RealColumn get weight => real().nullable()();
+  RealColumn get bodyFat => real().nullable()();
+  RealColumn get neck => real().nullable()();
   RealColumn get chest => real().nullable()();
+  RealColumn get shoulders => real().nullable()();
+  RealColumn get armLeft => real().nullable()();
+  RealColumn get armRight => real().nullable()();
+  RealColumn get forearmLeft => real().nullable()();
+  RealColumn get forearmRight => real().nullable()();
   RealColumn get waist => real().nullable()();
   RealColumn get hips => real().nullable()();
-  RealColumn get leftArm => real().nullable()();
-  RealColumn get rightArm => real().nullable()();
-  RealColumn get leftThigh => real().nullable()();
-  RealColumn get rightThigh => real().nullable()();
-  RealColumn get calves => real().nullable()();
-  RealColumn get bodyFat => real().nullable()();
+  RealColumn get thighLeft => real().nullable()();
+  RealColumn get thighRight => real().nullable()();
+  RealColumn get calfLeft => real().nullable()();
+  RealColumn get calfRight => real().nullable()();
+  TextColumn get notes => text().nullable()();
 }
+
 
 class SyncQueue extends Table {
   IntColumn get id => integer().autoIncrement()();
@@ -158,7 +167,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? e]) : super(e ?? _openConnection());
 
   @override
-  int get schemaVersion => 10;
+  int get schemaVersion => 11;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(

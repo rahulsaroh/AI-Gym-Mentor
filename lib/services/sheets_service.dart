@@ -1,6 +1,6 @@
 import 'package:http/http.dart' as http;
-import 'package:gym_gemini_pro/core/database/database.dart';
-import 'package:gym_gemini_pro/services/sheets_api_client.dart';
+import 'package:ai_gym_mentor/core/database/database.dart';
+import 'package:ai_gym_mentor/services/sheets_api_client.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/foundation.dart';
@@ -205,7 +205,7 @@ class SheetsService {
   }
 
   Future<void> appendMeasurementsBatch(
-      List<BodyMeasurement> measurements) async {
+      List<BodyMeasurementTable> measurements) async {
     final spreadsheetId = await getSpreadsheetId();
     if (spreadsheetId == null) return;
 
@@ -217,11 +217,11 @@ class SheetsService {
         m.chest,
         m.waist,
         m.hips,
-        m.leftArm,
-        m.rightArm,
-        m.leftThigh,
-        m.rightThigh,
-        m.calves,
+        m.armLeft,
+        m.armRight,
+        m.thighLeft,
+        m.thighRight,
+        m.calfLeft,
         m.bodyFat
       ];
     }).toList();
@@ -256,7 +256,7 @@ class SheetsService {
     ]);
   }
 
-  Future<void> appendMeasurement(BodyMeasurement m) async {
+  Future<void> appendMeasurement(BodyMeasurementTable m) async {
     await appendMeasurementsBatch([m]);
   }
 }

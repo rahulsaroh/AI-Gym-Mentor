@@ -1,11 +1,11 @@
 import 'package:flutter/foundation.dart';
-import 'package:gym_gemini_pro/core/cloud/cloud_integration_state.dart';
-import 'package:gym_gemini_pro/services/connectivity_service.dart';
+import 'package:ai_gym_mentor/core/cloud/cloud_integration_state.dart';
+import 'package:ai_gym_mentor/services/connectivity_service.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:gym_gemini_pro/core/auth/auth_provider.dart';
-import 'package:gym_gemini_pro/core/database/database.dart';
-import 'package:gym_gemini_pro/services/sheets_service.dart';
-import 'package:gym_gemini_pro/features/settings/settings_provider.dart';
+import 'package:ai_gym_mentor/core/auth/auth_provider.dart';
+import 'package:ai_gym_mentor/core/database/database.dart';
+import 'package:ai_gym_mentor/services/sheets_service.dart';
+import 'package:ai_gym_mentor/features/settings/settings_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:drift/drift.dart';
 import 'package:flutter/material.dart' show ConnectionState;
@@ -71,7 +71,7 @@ class SyncWorker extends _$SyncWorker {
 
     debugPrint('SyncWorker: Checking for pending items...');
     final pendingItems = await (db.select(db.syncQueue)
-          ..where((t) => t.status.equals('pending') | t.status.equals('failed'))
+          ..where((t) => t.status.isIn(['pending', 'failed']))
           ..where((t) => t.attempts.isSmallerThanValue(3))
           ..orderBy([(t) => OrderingTerm.asc(t.createdAt)]))
         .get();
@@ -141,7 +141,7 @@ class SyncWorker extends _$SyncWorker {
         .where((i) => i.type == 'measurement' && i.measurementId != null)
         .toList();
     if (measurementItems.isNotEmpty) {
-      final measurements = <BodyMeasurement>[];
+      final measurements = <BodyMeasurementTable>[];
       final successIds = <int>[];
 
       for (final item in measurementItems) {

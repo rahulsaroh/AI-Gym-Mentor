@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:gym_gemini_pro/core/database/database.dart';
+import 'package:ai_gym_mentor/core/database/database.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:drift/drift.dart' show Value;
 

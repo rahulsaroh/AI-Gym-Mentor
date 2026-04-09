@@ -1,6 +1,6 @@
 import 'package:drift/drift.dart';
-import 'package:gym_gemini_pro/core/database/database.dart';
-import 'package:gym_gemini_pro/features/workout/workout_repository.dart';
+import 'package:ai_gym_mentor/core/database/database.dart';
+import 'package:ai_gym_mentor/features/workout/workout_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'stats_repository.g.dart';

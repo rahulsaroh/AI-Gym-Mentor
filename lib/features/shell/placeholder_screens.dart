@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:gym_gemini_pro/core/cloud/cloud_integration_state.dart';
+import 'package:ai_gym_mentor/core/cloud/cloud_integration_state.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 
 class SplashScreen extends ConsumerWidget {

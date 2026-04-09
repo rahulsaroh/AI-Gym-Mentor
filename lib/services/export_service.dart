@@ -2,8 +2,8 @@ import 'dart:io';
 import 'package:csv/csv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:drift/drift.dart';
-import 'package:gym_gemini_pro/core/database/database.dart';
-import 'package:gym_gemini_pro/features/exercises/exercise_repository.dart';
+import 'package:ai_gym_mentor/core/database/database.dart';
+import 'package:ai_gym_mentor/features/exercises/exercise_repository.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
@@ -211,13 +211,15 @@ class ExportService {
         final setsData = data['sets'] as List<dynamic>;
 
         for (var wJson in workoutsData) {
-          await db.into(db.workouts).insert(WorkoutsCompanion.fromJson(wJson));
+          final workout = Workout.fromJson(wJson);
+          await db.into(db.workouts).insert(workout.toCompanion(false));
         }
 
         for (var sJson in setsData) {
+          final workoutSet = WorkoutSet.fromJson(sJson);
           await db
               .into(db.workoutSets)
-              .insert(WorkoutSetsCompanion.fromJson(sJson));
+              .insert(workoutSet.toCompanion(false));
         }
       });
 

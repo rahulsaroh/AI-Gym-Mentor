@@ -2,13 +2,13 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:gym_gemini_pro/core/database/database.dart';
+import 'package:ai_gym_mentor/core/database/database.dart';
 import 'package:intl/intl.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:go_router/go_router.dart';
 import 'package:drift/drift.dart' hide Column, Table;
-import 'package:gym_gemini_pro/features/history/history_providers.dart';
-import 'package:gym_gemini_pro/features/workout/workout_repository.dart';
+import 'package:ai_gym_mentor/features/history/history_providers.dart';
+import 'package:ai_gym_mentor/features/workout/workout_repository.dart';
 
 class WorkoutDetailScreen extends ConsumerStatefulWidget {
   final int workoutId;

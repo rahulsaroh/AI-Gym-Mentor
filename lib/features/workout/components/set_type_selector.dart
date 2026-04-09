@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
-import 'package:gym_gemini_pro/core/database/database.dart';
+import 'package:ai_gym_mentor/core/database/database.dart';
 
 class SetTypeSelector extends StatelessWidget {
   final SetType currentType;

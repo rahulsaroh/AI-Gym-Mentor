@@ -1,4 +1,4 @@
-import 'package:gym_gemini_pro/features/settings/models/settings_state.dart';
+import 'package:ai_gym_mentor/features/settings/models/settings_state.dart';
 
 class WeightConverter {
   /// Converts weight from storage (KG) to display (KG/LBS)

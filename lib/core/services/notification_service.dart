@@ -4,7 +4,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:flutter_background_service/flutter_background_service.dart';
-import 'package:gym_gemini_pro/core/utils/timer_utils.dart';
+import 'package:ai_gym_mentor/core/utils/timer_utils.dart';
 
 @pragma('vm:entry-point')
 void onDidReceiveBackgroundNotificationResponse(NotificationResponse details) {
@@ -12,7 +12,7 @@ void onDidReceiveBackgroundNotificationResponse(NotificationResponse details) {
   if (details.actionId == 'skip_rest') {
     service.invoke('skip');
   } else if (details.actionId == 'add_30s') {
-    service.invoke('add_30s');
+    service.invoke('refresh_timer');
   }
 }
 
@@ -49,7 +49,7 @@ class NotificationService {
         if (details.actionId == 'skip_rest') {
           FlutterBackgroundService().invoke('skip');
         } else if (details.actionId == 'add_30s') {
-          FlutterBackgroundService().invoke('add_30s');
+          FlutterBackgroundService().invoke('refresh_timer');
         }
       },
       onDidReceiveBackgroundNotificationResponse:

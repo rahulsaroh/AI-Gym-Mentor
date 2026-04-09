@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:shimmer/shimmer.dart';
-import 'package:gym_gemini_pro/core/domain/entities/exercise.dart';
+import 'package:ai_gym_mentor/core/domain/entities/exercise.dart';
 import 'exercise_library_provider.dart';
 import 'widgets/exercise_media_widget.dart';
 

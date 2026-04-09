@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:gym_gemini_pro/core/database/database.dart';
-import 'package:gym_gemini_pro/features/settings/models/settings_state.dart';
-import 'package:gym_gemini_pro/features/settings/settings_repository.dart';
-import 'package:gym_gemini_pro/features/settings/services/data_service.dart';
+import 'package:ai_gym_mentor/core/database/database.dart';
+import 'package:ai_gym_mentor/features/settings/models/settings_state.dart';
+import 'package:ai_gym_mentor/features/settings/settings_repository.dart';
+import 'package:ai_gym_mentor/features/settings/services/data_service.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'settings_provider.g.dart';

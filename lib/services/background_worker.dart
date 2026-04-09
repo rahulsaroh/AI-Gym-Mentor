@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:gym_gemini_pro/core/auth/auth_provider.dart';
-import 'package:gym_gemini_pro/services/backup_service.dart';
+import 'package:ai_gym_mentor/core/auth/auth_provider.dart';
+import 'package:ai_gym_mentor/services/backup_service.dart';
 import 'package:workmanager/workmanager.dart';
 
 @pragma('vm:entry-point')

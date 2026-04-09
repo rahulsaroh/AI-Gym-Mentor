@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:gym_gemini_pro/features/settings/models/settings_state.dart';
+import 'package:ai_gym_mentor/features/settings/models/settings_state.dart';
 
 class SettingsRepository {
   static const _key = 'user_settings';

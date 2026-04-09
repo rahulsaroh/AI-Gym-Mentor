@@ -3,13 +3,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
-import 'package:gym_gemini_pro/features/settings/models/settings_state.dart';
-import 'package:gym_gemini_pro/features/settings/settings_provider.dart';
-import 'package:gym_gemini_pro/core/auth/auth_provider.dart';
-import 'package:gym_gemini_pro/services/backup_service.dart';
-import 'package:gym_gemini_pro/features/settings/csv_export_screen.dart';
-import 'package:gym_gemini_pro/features/settings/import_wizard_screen.dart';
-import 'package:gym_gemini_pro/services/sync_worker.dart';
+import 'package:ai_gym_mentor/features/settings/models/settings_state.dart';
+import 'package:ai_gym_mentor/features/settings/settings_provider.dart';
+import 'package:ai_gym_mentor/core/auth/auth_provider.dart';
+import 'package:ai_gym_mentor/services/backup_service.dart';
+import 'package:ai_gym_mentor/features/settings/csv_export_screen.dart';
+import 'package:ai_gym_mentor/features/settings/import_wizard_screen.dart';
+import 'package:ai_gym_mentor/services/sync_worker.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});

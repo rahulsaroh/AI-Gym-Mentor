@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:gym_gemini_pro/features/analytics/analytics_providers.dart';
-import 'package:gym_gemini_pro/features/settings/models/settings_state.dart';
-import 'package:gym_gemini_pro/features/settings/settings_provider.dart';
+import 'package:ai_gym_mentor/features/analytics/analytics_providers.dart';
+import 'package:ai_gym_mentor/features/settings/models/settings_state.dart';
+import 'package:ai_gym_mentor/features/settings/settings_provider.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:google_fonts/google_fonts.dart';
 

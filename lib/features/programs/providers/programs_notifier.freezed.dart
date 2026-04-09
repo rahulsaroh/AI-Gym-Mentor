@@ -16,7 +16,7 @@ final _privateConstructorUsedError = UnsupportedError(
 
 /// @nodoc
 mixin _$ProgramsState {
-  List<WorkoutTemplate> get templates => throw _privateConstructorUsedError;
+  List<WorkoutProgram> get templates => throw _privateConstructorUsedError;
   bool get isLoading => throw _privateConstructorUsedError;
   String? get errorMessage => throw _privateConstructorUsedError;
 
@@ -34,7 +34,7 @@ abstract class $ProgramsStateCopyWith<$Res> {
       _$ProgramsStateCopyWithImpl<$Res, ProgramsState>;
   @useResult
   $Res call(
-      {List<WorkoutTemplate> templates, bool isLoading, String? errorMessage});
+      {List<WorkoutProgram> templates, bool isLoading, String? errorMessage});
 }
 
 /// @nodoc
@@ -60,7 +60,7 @@ class _$ProgramsStateCopyWithImpl<$Res, $Val extends ProgramsState>
       templates: null == templates
           ? _value.templates
           : templates // ignore: cast_nullable_to_non_nullable
-              as List<WorkoutTemplate>,
+              as List<WorkoutProgram>,
       isLoading: null == isLoading
           ? _value.isLoading
           : isLoading // ignore: cast_nullable_to_non_nullable
@@ -82,7 +82,7 @@ abstract class _$$ProgramsStateImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {List<WorkoutTemplate> templates, bool isLoading, String? errorMessage});
+      {List<WorkoutProgram> templates, bool isLoading, String? errorMessage});
 }
 
 /// @nodoc
@@ -106,7 +106,7 @@ class __$$ProgramsStateImplCopyWithImpl<$Res>
       templates: null == templates
           ? _value._templates
           : templates // ignore: cast_nullable_to_non_nullable
-              as List<WorkoutTemplate>,
+              as List<WorkoutProgram>,
       isLoading: null == isLoading
           ? _value.isLoading
           : isLoading // ignore: cast_nullable_to_non_nullable
@@ -123,15 +123,15 @@ class __$$ProgramsStateImplCopyWithImpl<$Res>
 
 class _$ProgramsStateImpl implements _ProgramsState {
   const _$ProgramsStateImpl(
-      {final List<WorkoutTemplate> templates = const [],
+      {final List<WorkoutProgram> templates = const [],
       this.isLoading = false,
       this.errorMessage})
       : _templates = templates;
 
-  final List<WorkoutTemplate> _templates;
+  final List<WorkoutProgram> _templates;
   @override
   @JsonKey()
-  List<WorkoutTemplate> get templates {
+  List<WorkoutProgram> get templates {
     if (_templates is EqualUnmodifiableListView) return _templates;
     // ignore: implicit_dynamic_type
     return EqualUnmodifiableListView(_templates);
@@ -176,12 +176,12 @@ class _$ProgramsStateImpl implements _ProgramsState {
 
 abstract class _ProgramsState implements ProgramsState {
   const factory _ProgramsState(
-      {final List<WorkoutTemplate> templates,
+      {final List<WorkoutProgram> templates,
       final bool isLoading,
       final String? errorMessage}) = _$ProgramsStateImpl;
 
   @override
-  List<WorkoutTemplate> get templates;
+  List<WorkoutProgram> get templates;
   @override
   bool get isLoading;
   @override

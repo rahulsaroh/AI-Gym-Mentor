@@ -1,4 +1,4 @@
-import 'package:gym_gemini_pro/core/domain/entities/exercise.dart';
+import 'package:ai_gym_mentor/core/domain/entities/exercise.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'repositories/exercise_library_repository.dart';
 

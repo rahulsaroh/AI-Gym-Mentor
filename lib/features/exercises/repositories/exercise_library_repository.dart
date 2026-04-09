@@ -1,6 +1,6 @@
 import 'package:drift/drift.dart';
-import 'package:gym_gemini_pro/core/database/database.dart';
-import 'package:gym_gemini_pro/core/domain/entities/exercise.dart' as entity;
+import 'package:ai_gym_mentor/core/database/database.dart';
+import 'package:ai_gym_mentor/core/domain/entities/exercise.dart' as entity;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'exercise_library_repository.g.dart';
@@ -11,7 +11,7 @@ class ExerciseLibraryRepository {
   ExerciseLibraryRepository(this._db);
 
   // Conversion helper
-  entity.Exercise _toEntity(Exercise row) {
+  entity.Exercise _toEntity(ExerciseTable row) {
     return entity.Exercise(
       id: row.id,
       name: row.name,

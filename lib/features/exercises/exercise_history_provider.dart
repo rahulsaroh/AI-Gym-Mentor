@@ -1,4 +1,4 @@
-import 'package:gym_gemini_pro/features/exercises/exercise_history_repository.dart';
+import 'package:ai_gym_mentor/features/exercises/exercise_history_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'exercise_history_provider.g.dart';

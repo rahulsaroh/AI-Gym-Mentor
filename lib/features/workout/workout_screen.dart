@@ -4,15 +4,16 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
-import 'package:gym_gemini_pro/core/database/database.dart';
+import 'package:ai_gym_mentor/core/database/database.dart';
+import 'package:ai_gym_mentor/core/domain/entities/workout_session.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:drift/drift.dart' show OrderingTerm, OrderingMode;
-import 'package:gym_gemini_pro/features/workout/providers/workout_home_notifier.dart';
-import 'package:gym_gemini_pro/features/workout/components/begin_session_sheet.dart';
-import 'package:gym_gemini_pro/services/plateau_service.dart';
-import 'package:gym_gemini_pro/services/sync_worker.dart';
+import 'package:ai_gym_mentor/features/workout/providers/workout_home_notifier.dart';
+import 'package:ai_gym_mentor/features/workout/components/begin_session_sheet.dart';
+import 'package:ai_gym_mentor/services/plateau_service.dart';
+import 'package:ai_gym_mentor/services/sync_worker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:gym_gemini_pro/core/widgets/skeleton_card.dart';
+import 'package:ai_gym_mentor/core/widgets/skeleton_card.dart';
 
 class WorkoutHomeScreen extends ConsumerWidget {
   const WorkoutHomeScreen({super.key});
@@ -1041,7 +1042,7 @@ class _MotivationSection extends StatelessWidget {
 }
 
 class _FloatingWorkoutBanner extends StatefulWidget {
-  final Workout workout;
+  final WorkoutSession workout;
   const _FloatingWorkoutBanner({required this.workout});
 
   @override

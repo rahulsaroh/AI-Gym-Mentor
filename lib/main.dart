@@ -3,18 +3,18 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:gym_gemini_pro/core/router/router.dart';
-import 'package:gym_gemini_pro/core/widgets/global_error_handler.dart';
+import 'package:ai_gym_mentor/core/router/router.dart';
+import 'package:ai_gym_mentor/core/widgets/global_error_handler.dart';
 import 'dart:ui';
-import 'package:gym_gemini_pro/core/services/notification_service.dart';
-import 'package:gym_gemini_pro/core/services/timer_service.dart';
-import 'package:gym_gemini_pro/features/settings/models/settings_state.dart';
-import 'package:gym_gemini_pro/features/settings/settings_provider.dart';
-import 'package:gym_gemini_pro/services/connectivity_service.dart';
-import 'package:gym_gemini_pro/services/sync_worker.dart';
-import 'package:gym_gemini_pro/services/background_worker.dart';
-import 'package:gym_gemini_pro/firebase_options.dart';
-import 'package:gym_gemini_pro/core/cloud/cloud_integration_state.dart';
+import 'package:ai_gym_mentor/core/services/notification_service.dart';
+import 'package:ai_gym_mentor/core/services/timer_service.dart';
+import 'package:ai_gym_mentor/features/settings/models/settings_state.dart';
+import 'package:ai_gym_mentor/features/settings/settings_provider.dart';
+import 'package:ai_gym_mentor/services/connectivity_service.dart';
+import 'package:ai_gym_mentor/services/sync_worker.dart';
+import 'package:ai_gym_mentor/services/background_worker.dart';
+import 'package:ai_gym_mentor/firebase_options.dart';
+import 'package:ai_gym_mentor/core/cloud/cloud_integration_state.dart';
 
 void main() async {
   // Ensure Flutter is initialized before any async code

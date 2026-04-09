@@ -1,7 +1,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:gym_gemini_pro/core/domain/entities/workout_program.dart' as ent;
-import 'package:gym_gemini_pro/features/workout/workout_repository.dart';
-import 'package:gym_gemini_pro/features/workout/providers/workout_home_notifier.dart';
+import 'package:ai_gym_mentor/core/domain/entities/workout_program.dart';
+import 'package:ai_gym_mentor/features/workout/workout_repository.dart';
+import 'package:ai_gym_mentor/features/workout/providers/workout_home_notifier.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:file_picker/file_picker.dart';
@@ -13,7 +13,7 @@ part 'programs_notifier.g.dart';
 @freezed
 class ProgramsState with _$ProgramsState {
   const factory ProgramsState({
-    @Default([]) List<ent.WorkoutProgram> templates,
+    @Default([]) List<WorkoutProgram> templates,
     @Default(false) bool isLoading,
     String? errorMessage,
   }) = _ProgramsState;

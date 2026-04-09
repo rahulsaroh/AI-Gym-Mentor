@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:gym_gemini_pro/features/workout/workout_screen.dart';
-import 'package:gym_gemini_pro/features/shell/placeholder_screens.dart'
+import 'package:ai_gym_mentor/features/workout/workout_screen.dart';
+import 'package:ai_gym_mentor/features/shell/placeholder_screens.dart'
     hide
         SplashScreen,
         OnboardingScreen,
@@ -9,28 +9,28 @@ import 'package:gym_gemini_pro/features/shell/placeholder_screens.dart'
         WorkoutScreen,
         HistoryScreen,
         SettingsScreen;
-import 'package:gym_gemini_pro/features/splash/splash_screen.dart';
-import 'package:gym_gemini_pro/features/onboarding/onboarding_screen.dart';
-import 'package:gym_gemini_pro/features/setup/setup_screen.dart';
-import 'package:gym_gemini_pro/features/exercises/exercises_screen.dart';
-import 'package:gym_gemini_pro/features/workout/active_workout_screen.dart';
-import 'package:gym_gemini_pro/features/history/history_screen.dart';
-import 'package:gym_gemini_pro/features/history/workout_detail_screen.dart';
-import 'package:gym_gemini_pro/features/exercises/exercise_history_screen.dart';
-import 'package:gym_gemini_pro/features/exercises/exercise_detail_screen.dart';
-import 'package:gym_gemini_pro/features/analytics/analytics_dashboard_screen.dart';
-import 'package:gym_gemini_pro/features/analytics/pr_hall_of_fame_screen.dart';
-import 'package:gym_gemini_pro/features/analytics/body_measurements_screen.dart';
-import 'package:gym_gemini_pro/features/settings/settings_screen.dart';
-import 'package:gym_gemini_pro/features/settings/plates_config_screen.dart';
-import 'package:gym_gemini_pro/features/settings/about_screen.dart';
-import 'package:gym_gemini_pro/features/settings/sheets_setup_screen.dart';
-import 'package:gym_gemini_pro/features/programs/programs_screen.dart';
-import 'package:gym_gemini_pro/features/programs/create_edit_program_screen.dart';
-import 'package:gym_gemini_pro/features/workout/start_workout_screen.dart';
-import 'package:gym_gemini_pro/features/settings/sync_log_screen.dart';
-import 'package:gym_gemini_pro/features/exercises/exercise_library_screen.dart';
-import 'package:gym_gemini_pro/features/exercises/exercise_library_detail_screen.dart';
+import 'package:ai_gym_mentor/features/splash/splash_screen.dart';
+import 'package:ai_gym_mentor/features/onboarding/onboarding_screen.dart';
+import 'package:ai_gym_mentor/features/setup/setup_screen.dart';
+import 'package:ai_gym_mentor/features/exercises/exercises_screen.dart';
+import 'package:ai_gym_mentor/features/workout/active_workout_screen.dart';
+import 'package:ai_gym_mentor/features/history/history_screen.dart';
+import 'package:ai_gym_mentor/features/history/workout_detail_screen.dart';
+import 'package:ai_gym_mentor/features/exercises/exercise_history_screen.dart';
+import 'package:ai_gym_mentor/features/exercises/exercise_detail_screen.dart';
+import 'package:ai_gym_mentor/features/analytics/analytics_dashboard_screen.dart';
+import 'package:ai_gym_mentor/features/analytics/pr_hall_of_fame_screen.dart';
+import 'package:ai_gym_mentor/features/analytics/body_measurements_screen.dart';
+import 'package:ai_gym_mentor/features/settings/settings_screen.dart';
+import 'package:ai_gym_mentor/features/settings/plates_config_screen.dart';
+import 'package:ai_gym_mentor/features/settings/about_screen.dart';
+import 'package:ai_gym_mentor/features/settings/sheets_setup_screen.dart';
+import 'package:ai_gym_mentor/features/programs/programs_screen.dart';
+import 'package:ai_gym_mentor/features/programs/create_edit_program_screen.dart';
+import 'package:ai_gym_mentor/features/workout/start_workout_screen.dart';
+import 'package:ai_gym_mentor/features/settings/sync_log_screen.dart';
+import 'package:ai_gym_mentor/features/exercises/exercise_library_screen.dart';
+import 'package:ai_gym_mentor/features/exercises/exercise_library_detail_screen.dart';
 
 final router = GoRouter(
   initialLocation: '/',

@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:gym_gemini_pro/core/database/database.dart';
-import 'package:gym_gemini_pro/features/exercises/exercises_provider.dart';
-import 'package:gym_gemini_pro/services/progression_service.dart';
-import 'package:gym_gemini_pro/features/exercises/exercise_repository.dart';
+import 'package:ai_gym_mentor/core/database/database.dart' as db;
+import 'package:ai_gym_mentor/features/exercises/exercises_provider.dart';
+import 'package:ai_gym_mentor/services/progression_service.dart';
+import 'package:ai_gym_mentor/features/exercises/exercise_repository.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:drift/drift.dart' show Value;
+import 'package:ai_gym_mentor/core/domain/entities/exercise.dart' as entity;
 
 class ExerciseDetailScreen extends ConsumerStatefulWidget {
   final int exerciseId;
@@ -36,7 +37,7 @@ class _ExerciseDetailScreenState extends ConsumerState<ExerciseDetailScreen> {
 
     return exercisesAsync.when(
       data: (exercises) {
-        final exercise = widget.exerciseId > 0
+        final entity.Exercise? exercise = widget.exerciseId > 0
             ? exercises.firstWhere((e) => e.id == widget.exerciseId,
                 orElse: () => exercises.first)
             : null;
@@ -89,7 +90,7 @@ class _ExerciseDetailScreenState extends ConsumerState<ExerciseDetailScreen> {
     );
   }
 
-  Widget _buildAppBar(Exercise exercise) {
+  Widget _buildAppBar(entity.Exercise exercise) {
     return SliverAppBar(
       expandedHeight: 200,
       pinned: true,
@@ -121,7 +122,7 @@ class _ExerciseDetailScreenState extends ConsumerState<ExerciseDetailScreen> {
     );
   }
 
-  Widget _buildProgressionSettings(Exercise exercise) {
+  Widget _buildProgressionSettings(entity.Exercise exercise) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -143,11 +144,11 @@ class _ExerciseDetailScreenState extends ConsumerState<ExerciseDetailScreen> {
     );
   }
 
-  Widget _buildSettingsCard(Exercise exercise) {
+  Widget _buildSettingsCard(entity.Exercise exercise) {
     // We would fetch settings from DB here. For brevity in this turn I'll use a FutureBuilder or similar.
-    final db = ref.read(appDatabaseProvider);
-    return StreamBuilder<ExerciseProgressionSetting?>(
-      stream: (db.select(db.exerciseProgressionSettings)
+    final database = ref.read(db.appDatabaseProvider);
+    return StreamBuilder<db.ExerciseProgressionSetting?>(
+      stream: (database.select(database.exerciseProgressionSettings)
             ..where((t) => t.exerciseId.equals(widget.exerciseId)))
           .watchSingleOrNull(),
       builder: (context, snapshot) {
@@ -326,15 +327,15 @@ class _ExerciseDetailScreenState extends ConsumerState<ExerciseDetailScreen> {
       int? targetReps,
       int? targetSets,
       bool? autoSuggest}) async {
-    final db = ref.read(appDatabaseProvider);
-    final existing = await (db.select(db.exerciseProgressionSettings)
+    final database = ref.read(db.appDatabaseProvider);
+    final existing = await (database.select(database.exerciseProgressionSettings)
           ..where((t) => t.exerciseId.equals(widget.exerciseId)))
         .getSingleOrNull();
 
     if (existing == null) {
-      await db
-          .into(db.exerciseProgressionSettings)
-          .insert(ExerciseProgressionSettingsCompanion.insert(
+      await database
+          .into(database.exerciseProgressionSettings)
+          .insert(db.ExerciseProgressionSettingsCompanion.insert(
             exerciseId: widget.exerciseId,
             incrementOverride: Value(incrementOverride),
             targetReps: Value(targetReps ?? 10),
@@ -342,10 +343,10 @@ class _ExerciseDetailScreenState extends ConsumerState<ExerciseDetailScreen> {
             autoSuggest: Value(autoSuggest ?? true),
           ));
     } else {
-      await (db.update(db.exerciseProgressionSettings)
+      await (database.update(database.exerciseProgressionSettings)
             ..where((t) => t.exerciseId.equals(widget.exerciseId)))
           .write(
-        ExerciseProgressionSettingsCompanion(
+        db.ExerciseProgressionSettingsCompanion(
           incrementOverride:
               Value(incrementOverride ?? existing.incrementOverride),
           targetReps: Value(targetReps ?? existing.targetReps),
@@ -356,7 +357,7 @@ class _ExerciseDetailScreenState extends ConsumerState<ExerciseDetailScreen> {
     }
   }
 
-  void _showIncrementPicker(ExerciseProgressionSetting? settings) {
+  void _showIncrementPicker(db.ExerciseProgressionSetting? settings) {
     showModalBottomSheet(
       context: context,
       builder: (context) => SizedBox(
@@ -421,7 +422,7 @@ class _ExerciseDetailScreenState extends ConsumerState<ExerciseDetailScreen> {
     );
   }
 
-  Widget _buildFormScreen(Exercise? exercise) {
+  Widget _buildFormScreen(entity.Exercise? exercise) {
     final muscleGroups = [
       'Chest',
       'Back',
@@ -502,14 +503,14 @@ class _ExerciseDetailScreenState extends ConsumerState<ExerciseDetailScreen> {
               }
               final repository = ref.read(exerciseRepositoryProvider);
               final companion = isNew
-                  ? ExercisesCompanion.insert(
+                  ? db.ExercisesCompanion.insert(
                       name: _nameController.text.trim(),
                       primaryMuscle: _selectedMuscle,
                       equipment: _selectedEquipment,
                       setType: 'Straight',
                       isCustom: const Value(true),
                     )
-                  : ExercisesCompanion(
+                  : db.ExercisesCompanion(
                       id: Value(widget.exerciseId),
                       name: Value(_nameController.text.trim()),
                       primaryMuscle: Value(_selectedMuscle),

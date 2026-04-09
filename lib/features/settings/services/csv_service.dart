@@ -1,7 +1,7 @@
 import 'package:csv/csv.dart';
-import 'package:gym_gemini_pro/core/database/database.dart';
-import 'package:gym_gemini_pro/core/utils/weight_converter.dart';
-import 'package:gym_gemini_pro/features/settings/models/settings_state.dart';
+import 'package:ai_gym_mentor/core/database/database.dart';
+import 'package:ai_gym_mentor/core/utils/weight_converter.dart';
+import 'package:ai_gym_mentor/features/settings/models/settings_state.dart';
 import 'package:intl/intl.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 

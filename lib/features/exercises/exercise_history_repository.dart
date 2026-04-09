@@ -1,5 +1,5 @@
 import 'package:drift/drift.dart';
-import 'package:gym_gemini_pro/core/database/database.dart';
+import 'package:ai_gym_mentor/core/database/database.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'exercise_history_repository.g.dart';

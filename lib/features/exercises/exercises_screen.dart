@@ -3,10 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
-import 'package:gym_gemini_pro/core/database/database.dart';
-import 'package:gym_gemini_pro/core/widgets/skeleton_card.dart';
-import 'package:gym_gemini_pro/core/widgets/speed_dial_fab.dart';
-import 'package:gym_gemini_pro/features/exercises/exercises_provider.dart';
+import 'package:ai_gym_mentor/core/database/database.dart' as db;
+import 'package:ai_gym_mentor/core/widgets/skeleton_card.dart';
+import 'package:ai_gym_mentor/core/widgets/speed_dial_fab.dart';
+import 'package:ai_gym_mentor/features/exercises/exercises_provider.dart';
+import 'package:ai_gym_mentor/core/domain/entities/exercise.dart' as entity;
 
 class ExercisesScreen extends ConsumerStatefulWidget {
   const ExercisesScreen({super.key});
@@ -225,7 +226,7 @@ class _ExercisesScreenState extends ConsumerState<ExercisesScreen> {
               }
 
               // Group by first letter
-              final groups = <String, List<Exercise>>{};
+              final groups = <String, List<entity.Exercise>>{};
               for (var ex in exercises) {
                 final letter = ex.name[0].toUpperCase();
                 groups.putIfAbsent(letter, () => []).add(ex);
@@ -436,7 +437,7 @@ class _ExercisesScreenState extends ConsumerState<ExercisesScreen> {
     );
   }
 
-  void _deleteExercise(Exercise exercise) {
+  void _deleteExercise(entity.Exercise exercise) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -450,8 +451,8 @@ class _ExercisesScreenState extends ConsumerState<ExercisesScreen> {
           ),
           TextButton(
             onPressed: () async {
-              final db = ref.read(appDatabaseProvider);
-              await (db.delete(db.exercises)
+              final database = ref.read(db.appDatabaseProvider);
+              await (database.delete(database.exercises)
                     ..where((t) => t.id.equals(exercise.id)))
                   .go();
               ref.invalidate(allExercisesProvider);

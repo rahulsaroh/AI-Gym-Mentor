@@ -1,15 +1,15 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:gym_gemini_pro/core/database/database.dart';
-import 'package:gym_gemini_pro/features/settings/settings_provider.dart';
+import 'package:ai_gym_mentor/core/database/database.dart';
+import 'package:ai_gym_mentor/features/settings/settings_provider.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
-import 'package:gym_gemini_pro/features/settings/settings_repository.dart';
+import 'package:ai_gym_mentor/features/settings/settings_repository.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:http/http.dart' as http;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:gym_gemini_pro/services/sheets_api_client.dart';
+import 'package:ai_gym_mentor/services/sheets_api_client.dart';
 
 part 'backup_service.g.dart';
 

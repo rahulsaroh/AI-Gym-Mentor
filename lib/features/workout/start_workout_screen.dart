@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
-import 'package:gym_gemini_pro/features/workout/providers/workout_home_notifier.dart';
+import 'package:ai_gym_mentor/features/workout/providers/workout_home_notifier.dart';
 
 class StartWorkoutScreen extends ConsumerWidget {
   const StartWorkoutScreen({super.key});

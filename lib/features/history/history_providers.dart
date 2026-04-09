@@ -1,7 +1,7 @@
-import 'package:gym_gemini_pro/core/database/database.dart';
-import 'package:gym_gemini_pro/core/domain/entities/logged_set.dart' as ent;
-import 'package:gym_gemini_pro/core/domain/entities/workout_session.dart' as ent;
-import 'package:gym_gemini_pro/features/workout/workout_repository.dart';
+import 'package:ai_gym_mentor/core/database/database.dart';
+import 'package:ai_gym_mentor/core/domain/entities/logged_set.dart' as ent;
+import 'package:ai_gym_mentor/core/domain/entities/workout_session.dart' as ent;
+import 'package:ai_gym_mentor/features/workout/workout_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'history_providers.g.dart';

@@ -4,7 +4,7 @@ part of 'database.dart';
 
 // ignore_for_file: type=lint
 class $ExercisesTable extends Exercises
-    with TableInfo<$ExercisesTable, Exercise> {
+    with TableInfo<$ExercisesTable, ExerciseTable> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
@@ -26,6 +26,28 @@ class $ExercisesTable extends Exercises
           GeneratedColumn.checkTextLength(minTextLength: 1, maxTextLength: 255),
       type: DriftSqlType.string,
       requiredDuringInsert: true);
+  static const VerificationMeta _descriptionMeta =
+      const VerificationMeta('description');
+  @override
+  late final GeneratedColumn<String> description = GeneratedColumn<String>(
+      'description', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _categoryMeta =
+      const VerificationMeta('category');
+  @override
+  late final GeneratedColumn<String> category = GeneratedColumn<String>(
+      'category', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      defaultValue: const Constant('Strength'));
+  static const VerificationMeta _difficultyMeta =
+      const VerificationMeta('difficulty');
+  @override
+  late final GeneratedColumn<String> difficulty = GeneratedColumn<String>(
+      'difficulty', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      defaultValue: const Constant('Beginner'));
   static const VerificationMeta _primaryMuscleMeta =
       const VerificationMeta('primaryMuscle');
   @override
@@ -64,6 +86,41 @@ class $ExercisesTable extends Exercises
   late final GeneratedColumn<String> instructions = GeneratedColumn<String>(
       'instructions', aliasedName, true,
       type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _gifUrlMeta = const VerificationMeta('gifUrl');
+  @override
+  late final GeneratedColumn<String> gifUrl = GeneratedColumn<String>(
+      'gif_url', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _imageUrlMeta =
+      const VerificationMeta('imageUrl');
+  @override
+  late final GeneratedColumn<String> imageUrl = GeneratedColumn<String>(
+      'image_url', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _videoUrlMeta =
+      const VerificationMeta('videoUrl');
+  @override
+  late final GeneratedColumn<String> videoUrl = GeneratedColumn<String>(
+      'video_url', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _mechanicMeta =
+      const VerificationMeta('mechanic');
+  @override
+  late final GeneratedColumn<String> mechanic = GeneratedColumn<String>(
+      'mechanic', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _forceMeta = const VerificationMeta('force');
+  @override
+  late final GeneratedColumn<String> force = GeneratedColumn<String>(
+      'force', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _sourceMeta = const VerificationMeta('source');
+  @override
+  late final GeneratedColumn<String> source = GeneratedColumn<String>(
+      'source', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      defaultValue: const Constant('local'));
   static const VerificationMeta _isCustomMeta =
       const VerificationMeta('isCustom');
   @override
@@ -84,12 +141,21 @@ class $ExercisesTable extends Exercises
   List<GeneratedColumn> get $columns => [
         id,
         name,
+        description,
+        category,
+        difficulty,
         primaryMuscle,
         secondaryMuscle,
         equipment,
         setType,
         restTime,
         instructions,
+        gifUrl,
+        imageUrl,
+        videoUrl,
+        mechanic,
+        force,
+        source,
         isCustom,
         lastUsed
       ];
@@ -99,7 +165,7 @@ class $ExercisesTable extends Exercises
   String get actualTableName => $name;
   static const String $name = 'exercises';
   @override
-  VerificationContext validateIntegrity(Insertable<Exercise> instance,
+  VerificationContext validateIntegrity(Insertable<ExerciseTable> instance,
       {bool isInserting = false}) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
@@ -111,6 +177,22 @@ class $ExercisesTable extends Exercises
           _nameMeta, name.isAcceptableOrUnknown(data['name']!, _nameMeta));
     } else if (isInserting) {
       context.missing(_nameMeta);
+    }
+    if (data.containsKey('description')) {
+      context.handle(
+          _descriptionMeta,
+          description.isAcceptableOrUnknown(
+              data['description']!, _descriptionMeta));
+    }
+    if (data.containsKey('category')) {
+      context.handle(_categoryMeta,
+          category.isAcceptableOrUnknown(data['category']!, _categoryMeta));
+    }
+    if (data.containsKey('difficulty')) {
+      context.handle(
+          _difficultyMeta,
+          difficulty.isAcceptableOrUnknown(
+              data['difficulty']!, _difficultyMeta));
     }
     if (data.containsKey('primary_muscle')) {
       context.handle(
@@ -148,6 +230,30 @@ class $ExercisesTable extends Exercises
           instructions.isAcceptableOrUnknown(
               data['instructions']!, _instructionsMeta));
     }
+    if (data.containsKey('gif_url')) {
+      context.handle(_gifUrlMeta,
+          gifUrl.isAcceptableOrUnknown(data['gif_url']!, _gifUrlMeta));
+    }
+    if (data.containsKey('image_url')) {
+      context.handle(_imageUrlMeta,
+          imageUrl.isAcceptableOrUnknown(data['image_url']!, _imageUrlMeta));
+    }
+    if (data.containsKey('video_url')) {
+      context.handle(_videoUrlMeta,
+          videoUrl.isAcceptableOrUnknown(data['video_url']!, _videoUrlMeta));
+    }
+    if (data.containsKey('mechanic')) {
+      context.handle(_mechanicMeta,
+          mechanic.isAcceptableOrUnknown(data['mechanic']!, _mechanicMeta));
+    }
+    if (data.containsKey('force')) {
+      context.handle(
+          _forceMeta, force.isAcceptableOrUnknown(data['force']!, _forceMeta));
+    }
+    if (data.containsKey('source')) {
+      context.handle(_sourceMeta,
+          source.isAcceptableOrUnknown(data['source']!, _sourceMeta));
+    }
     if (data.containsKey('is_custom')) {
       context.handle(_isCustomMeta,
           isCustom.isAcceptableOrUnknown(data['is_custom']!, _isCustomMeta));
@@ -162,13 +268,19 @@ class $ExercisesTable extends Exercises
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
-  Exercise map(Map<String, dynamic> data, {String? tablePrefix}) {
+  ExerciseTable map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return Exercise(
+    return ExerciseTable(
       id: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
       name: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
+      description: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}description']),
+      category: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}category'])!,
+      difficulty: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}difficulty'])!,
       primaryMuscle: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}primary_muscle'])!,
       secondaryMuscle: attachedDatabase.typeMapping.read(
@@ -181,6 +293,18 @@ class $ExercisesTable extends Exercises
           .read(DriftSqlType.int, data['${effectivePrefix}rest_time'])!,
       instructions: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}instructions']),
+      gifUrl: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}gif_url']),
+      imageUrl: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}image_url']),
+      videoUrl: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}video_url']),
+      mechanic: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}mechanic']),
+      force: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}force']),
+      source: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}source'])!,
       isCustom: attachedDatabase.typeMapping
           .read(DriftSqlType.bool, data['${effectivePrefix}is_custom'])!,
       lastUsed: attachedDatabase.typeMapping
@@ -194,26 +318,44 @@ class $ExercisesTable extends Exercises
   }
 }
 
-class Exercise extends DataClass implements Insertable<Exercise> {
+class ExerciseTable extends DataClass implements Insertable<ExerciseTable> {
   final int id;
   final String name;
+  final String? description;
+  final String category;
+  final String difficulty;
   final String primaryMuscle;
   final String? secondaryMuscle;
   final String equipment;
   final String setType;
   final int restTime;
   final String? instructions;
+  final String? gifUrl;
+  final String? imageUrl;
+  final String? videoUrl;
+  final String? mechanic;
+  final String? force;
+  final String source;
   final bool isCustom;
   final DateTime? lastUsed;
-  const Exercise(
+  const ExerciseTable(
       {required this.id,
       required this.name,
+      this.description,
+      required this.category,
+      required this.difficulty,
       required this.primaryMuscle,
       this.secondaryMuscle,
       required this.equipment,
       required this.setType,
       required this.restTime,
       this.instructions,
+      this.gifUrl,
+      this.imageUrl,
+      this.videoUrl,
+      this.mechanic,
+      this.force,
+      required this.source,
       required this.isCustom,
       this.lastUsed});
   @override
@@ -221,6 +363,11 @@ class Exercise extends DataClass implements Insertable<Exercise> {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
     map['name'] = Variable<String>(name);
+    if (!nullToAbsent || description != null) {
+      map['description'] = Variable<String>(description);
+    }
+    map['category'] = Variable<String>(category);
+    map['difficulty'] = Variable<String>(difficulty);
     map['primary_muscle'] = Variable<String>(primaryMuscle);
     if (!nullToAbsent || secondaryMuscle != null) {
       map['secondary_muscle'] = Variable<String>(secondaryMuscle);
@@ -231,6 +378,22 @@ class Exercise extends DataClass implements Insertable<Exercise> {
     if (!nullToAbsent || instructions != null) {
       map['instructions'] = Variable<String>(instructions);
     }
+    if (!nullToAbsent || gifUrl != null) {
+      map['gif_url'] = Variable<String>(gifUrl);
+    }
+    if (!nullToAbsent || imageUrl != null) {
+      map['image_url'] = Variable<String>(imageUrl);
+    }
+    if (!nullToAbsent || videoUrl != null) {
+      map['video_url'] = Variable<String>(videoUrl);
+    }
+    if (!nullToAbsent || mechanic != null) {
+      map['mechanic'] = Variable<String>(mechanic);
+    }
+    if (!nullToAbsent || force != null) {
+      map['force'] = Variable<String>(force);
+    }
+    map['source'] = Variable<String>(source);
     map['is_custom'] = Variable<bool>(isCustom);
     if (!nullToAbsent || lastUsed != null) {
       map['last_used'] = Variable<DateTime>(lastUsed);
@@ -242,6 +405,11 @@ class Exercise extends DataClass implements Insertable<Exercise> {
     return ExercisesCompanion(
       id: Value(id),
       name: Value(name),
+      description: description == null && nullToAbsent
+          ? const Value.absent()
+          : Value(description),
+      category: Value(category),
+      difficulty: Value(difficulty),
       primaryMuscle: Value(primaryMuscle),
       secondaryMuscle: secondaryMuscle == null && nullToAbsent
           ? const Value.absent()
@@ -252,6 +420,20 @@ class Exercise extends DataClass implements Insertable<Exercise> {
       instructions: instructions == null && nullToAbsent
           ? const Value.absent()
           : Value(instructions),
+      gifUrl:
+          gifUrl == null && nullToAbsent ? const Value.absent() : Value(gifUrl),
+      imageUrl: imageUrl == null && nullToAbsent
+          ? const Value.absent()
+          : Value(imageUrl),
+      videoUrl: videoUrl == null && nullToAbsent
+          ? const Value.absent()
+          : Value(videoUrl),
+      mechanic: mechanic == null && nullToAbsent
+          ? const Value.absent()
+          : Value(mechanic),
+      force:
+          force == null && nullToAbsent ? const Value.absent() : Value(force),
+      source: Value(source),
       isCustom: Value(isCustom),
       lastUsed: lastUsed == null && nullToAbsent
           ? const Value.absent()
@@ -259,18 +441,27 @@ class Exercise extends DataClass implements Insertable<Exercise> {
     );
   }
 
-  factory Exercise.fromJson(Map<String, dynamic> json,
+  factory ExerciseTable.fromJson(Map<String, dynamic> json,
       {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return Exercise(
+    return ExerciseTable(
       id: serializer.fromJson<int>(json['id']),
       name: serializer.fromJson<String>(json['name']),
+      description: serializer.fromJson<String?>(json['description']),
+      category: serializer.fromJson<String>(json['category']),
+      difficulty: serializer.fromJson<String>(json['difficulty']),
       primaryMuscle: serializer.fromJson<String>(json['primaryMuscle']),
       secondaryMuscle: serializer.fromJson<String?>(json['secondaryMuscle']),
       equipment: serializer.fromJson<String>(json['equipment']),
       setType: serializer.fromJson<String>(json['setType']),
       restTime: serializer.fromJson<int>(json['restTime']),
       instructions: serializer.fromJson<String?>(json['instructions']),
+      gifUrl: serializer.fromJson<String?>(json['gifUrl']),
+      imageUrl: serializer.fromJson<String?>(json['imageUrl']),
+      videoUrl: serializer.fromJson<String?>(json['videoUrl']),
+      mechanic: serializer.fromJson<String?>(json['mechanic']),
+      force: serializer.fromJson<String?>(json['force']),
+      source: serializer.fromJson<String>(json['source']),
       isCustom: serializer.fromJson<bool>(json['isCustom']),
       lastUsed: serializer.fromJson<DateTime?>(json['lastUsed']),
     );
@@ -281,31 +472,52 @@ class Exercise extends DataClass implements Insertable<Exercise> {
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
       'name': serializer.toJson<String>(name),
+      'description': serializer.toJson<String?>(description),
+      'category': serializer.toJson<String>(category),
+      'difficulty': serializer.toJson<String>(difficulty),
       'primaryMuscle': serializer.toJson<String>(primaryMuscle),
       'secondaryMuscle': serializer.toJson<String?>(secondaryMuscle),
       'equipment': serializer.toJson<String>(equipment),
       'setType': serializer.toJson<String>(setType),
       'restTime': serializer.toJson<int>(restTime),
       'instructions': serializer.toJson<String?>(instructions),
+      'gifUrl': serializer.toJson<String?>(gifUrl),
+      'imageUrl': serializer.toJson<String?>(imageUrl),
+      'videoUrl': serializer.toJson<String?>(videoUrl),
+      'mechanic': serializer.toJson<String?>(mechanic),
+      'force': serializer.toJson<String?>(force),
+      'source': serializer.toJson<String>(source),
       'isCustom': serializer.toJson<bool>(isCustom),
       'lastUsed': serializer.toJson<DateTime?>(lastUsed),
     };
   }
 
-  Exercise copyWith(
+  ExerciseTable copyWith(
           {int? id,
           String? name,
+          Value<String?> description = const Value.absent(),
+          String? category,
+          String? difficulty,
           String? primaryMuscle,
           Value<String?> secondaryMuscle = const Value.absent(),
           String? equipment,
           String? setType,
           int? restTime,
           Value<String?> instructions = const Value.absent(),
+          Value<String?> gifUrl = const Value.absent(),
+          Value<String?> imageUrl = const Value.absent(),
+          Value<String?> videoUrl = const Value.absent(),
+          Value<String?> mechanic = const Value.absent(),
+          Value<String?> force = const Value.absent(),
+          String? source,
           bool? isCustom,
           Value<DateTime?> lastUsed = const Value.absent()}) =>
-      Exercise(
+      ExerciseTable(
         id: id ?? this.id,
         name: name ?? this.name,
+        description: description.present ? description.value : this.description,
+        category: category ?? this.category,
+        difficulty: difficulty ?? this.difficulty,
         primaryMuscle: primaryMuscle ?? this.primaryMuscle,
         secondaryMuscle: secondaryMuscle.present
             ? secondaryMuscle.value
@@ -315,13 +527,24 @@ class Exercise extends DataClass implements Insertable<Exercise> {
         restTime: restTime ?? this.restTime,
         instructions:
             instructions.present ? instructions.value : this.instructions,
+        gifUrl: gifUrl.present ? gifUrl.value : this.gifUrl,
+        imageUrl: imageUrl.present ? imageUrl.value : this.imageUrl,
+        videoUrl: videoUrl.present ? videoUrl.value : this.videoUrl,
+        mechanic: mechanic.present ? mechanic.value : this.mechanic,
+        force: force.present ? force.value : this.force,
+        source: source ?? this.source,
         isCustom: isCustom ?? this.isCustom,
         lastUsed: lastUsed.present ? lastUsed.value : this.lastUsed,
       );
-  Exercise copyWithCompanion(ExercisesCompanion data) {
-    return Exercise(
+  ExerciseTable copyWithCompanion(ExercisesCompanion data) {
+    return ExerciseTable(
       id: data.id.present ? data.id.value : this.id,
       name: data.name.present ? data.name.value : this.name,
+      description:
+          data.description.present ? data.description.value : this.description,
+      category: data.category.present ? data.category.value : this.category,
+      difficulty:
+          data.difficulty.present ? data.difficulty.value : this.difficulty,
       primaryMuscle: data.primaryMuscle.present
           ? data.primaryMuscle.value
           : this.primaryMuscle,
@@ -334,6 +557,12 @@ class Exercise extends DataClass implements Insertable<Exercise> {
       instructions: data.instructions.present
           ? data.instructions.value
           : this.instructions,
+      gifUrl: data.gifUrl.present ? data.gifUrl.value : this.gifUrl,
+      imageUrl: data.imageUrl.present ? data.imageUrl.value : this.imageUrl,
+      videoUrl: data.videoUrl.present ? data.videoUrl.value : this.videoUrl,
+      mechanic: data.mechanic.present ? data.mechanic.value : this.mechanic,
+      force: data.force.present ? data.force.value : this.force,
+      source: data.source.present ? data.source.value : this.source,
       isCustom: data.isCustom.present ? data.isCustom.value : this.isCustom,
       lastUsed: data.lastUsed.present ? data.lastUsed.value : this.lastUsed,
     );
@@ -341,15 +570,24 @@ class Exercise extends DataClass implements Insertable<Exercise> {
 
   @override
   String toString() {
-    return (StringBuffer('Exercise(')
+    return (StringBuffer('ExerciseTable(')
           ..write('id: $id, ')
           ..write('name: $name, ')
+          ..write('description: $description, ')
+          ..write('category: $category, ')
+          ..write('difficulty: $difficulty, ')
           ..write('primaryMuscle: $primaryMuscle, ')
           ..write('secondaryMuscle: $secondaryMuscle, ')
           ..write('equipment: $equipment, ')
           ..write('setType: $setType, ')
           ..write('restTime: $restTime, ')
           ..write('instructions: $instructions, ')
+          ..write('gifUrl: $gifUrl, ')
+          ..write('imageUrl: $imageUrl, ')
+          ..write('videoUrl: $videoUrl, ')
+          ..write('mechanic: $mechanic, ')
+          ..write('force: $force, ')
+          ..write('source: $source, ')
           ..write('isCustom: $isCustom, ')
           ..write('lastUsed: $lastUsed')
           ..write(')'))
@@ -357,83 +595,155 @@ class Exercise extends DataClass implements Insertable<Exercise> {
   }
 
   @override
-  int get hashCode => Object.hash(id, name, primaryMuscle, secondaryMuscle,
-      equipment, setType, restTime, instructions, isCustom, lastUsed);
+  int get hashCode => Object.hash(
+      id,
+      name,
+      description,
+      category,
+      difficulty,
+      primaryMuscle,
+      secondaryMuscle,
+      equipment,
+      setType,
+      restTime,
+      instructions,
+      gifUrl,
+      imageUrl,
+      videoUrl,
+      mechanic,
+      force,
+      source,
+      isCustom,
+      lastUsed);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is Exercise &&
+      (other is ExerciseTable &&
           other.id == this.id &&
           other.name == this.name &&
+          other.description == this.description &&
+          other.category == this.category &&
+          other.difficulty == this.difficulty &&
           other.primaryMuscle == this.primaryMuscle &&
           other.secondaryMuscle == this.secondaryMuscle &&
           other.equipment == this.equipment &&
           other.setType == this.setType &&
           other.restTime == this.restTime &&
           other.instructions == this.instructions &&
+          other.gifUrl == this.gifUrl &&
+          other.imageUrl == this.imageUrl &&
+          other.videoUrl == this.videoUrl &&
+          other.mechanic == this.mechanic &&
+          other.force == this.force &&
+          other.source == this.source &&
           other.isCustom == this.isCustom &&
           other.lastUsed == this.lastUsed);
 }
 
-class ExercisesCompanion extends UpdateCompanion<Exercise> {
+class ExercisesCompanion extends UpdateCompanion<ExerciseTable> {
   final Value<int> id;
   final Value<String> name;
+  final Value<String?> description;
+  final Value<String> category;
+  final Value<String> difficulty;
   final Value<String> primaryMuscle;
   final Value<String?> secondaryMuscle;
   final Value<String> equipment;
   final Value<String> setType;
   final Value<int> restTime;
   final Value<String?> instructions;
+  final Value<String?> gifUrl;
+  final Value<String?> imageUrl;
+  final Value<String?> videoUrl;
+  final Value<String?> mechanic;
+  final Value<String?> force;
+  final Value<String> source;
   final Value<bool> isCustom;
   final Value<DateTime?> lastUsed;
   const ExercisesCompanion({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
+    this.description = const Value.absent(),
+    this.category = const Value.absent(),
+    this.difficulty = const Value.absent(),
     this.primaryMuscle = const Value.absent(),
     this.secondaryMuscle = const Value.absent(),
     this.equipment = const Value.absent(),
     this.setType = const Value.absent(),
     this.restTime = const Value.absent(),
     this.instructions = const Value.absent(),
+    this.gifUrl = const Value.absent(),
+    this.imageUrl = const Value.absent(),
+    this.videoUrl = const Value.absent(),
+    this.mechanic = const Value.absent(),
+    this.force = const Value.absent(),
+    this.source = const Value.absent(),
     this.isCustom = const Value.absent(),
     this.lastUsed = const Value.absent(),
   });
   ExercisesCompanion.insert({
     this.id = const Value.absent(),
     required String name,
+    this.description = const Value.absent(),
+    this.category = const Value.absent(),
+    this.difficulty = const Value.absent(),
     required String primaryMuscle,
     this.secondaryMuscle = const Value.absent(),
     required String equipment,
     required String setType,
     this.restTime = const Value.absent(),
     this.instructions = const Value.absent(),
+    this.gifUrl = const Value.absent(),
+    this.imageUrl = const Value.absent(),
+    this.videoUrl = const Value.absent(),
+    this.mechanic = const Value.absent(),
+    this.force = const Value.absent(),
+    this.source = const Value.absent(),
     this.isCustom = const Value.absent(),
     this.lastUsed = const Value.absent(),
   })  : name = Value(name),
         primaryMuscle = Value(primaryMuscle),
         equipment = Value(equipment),
         setType = Value(setType);
-  static Insertable<Exercise> custom({
+  static Insertable<ExerciseTable> custom({
     Expression<int>? id,
     Expression<String>? name,
+    Expression<String>? description,
+    Expression<String>? category,
+    Expression<String>? difficulty,
     Expression<String>? primaryMuscle,
     Expression<String>? secondaryMuscle,
     Expression<String>? equipment,
     Expression<String>? setType,
     Expression<int>? restTime,
     Expression<String>? instructions,
+    Expression<String>? gifUrl,
+    Expression<String>? imageUrl,
+    Expression<String>? videoUrl,
+    Expression<String>? mechanic,
+    Expression<String>? force,
+    Expression<String>? source,
     Expression<bool>? isCustom,
     Expression<DateTime>? lastUsed,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (name != null) 'name': name,
+      if (description != null) 'description': description,
+      if (category != null) 'category': category,
+      if (difficulty != null) 'difficulty': difficulty,
       if (primaryMuscle != null) 'primary_muscle': primaryMuscle,
       if (secondaryMuscle != null) 'secondary_muscle': secondaryMuscle,
       if (equipment != null) 'equipment': equipment,
       if (setType != null) 'set_type': setType,
       if (restTime != null) 'rest_time': restTime,
       if (instructions != null) 'instructions': instructions,
+      if (gifUrl != null) 'gif_url': gifUrl,
+      if (imageUrl != null) 'image_url': imageUrl,
+      if (videoUrl != null) 'video_url': videoUrl,
+      if (mechanic != null) 'mechanic': mechanic,
+      if (force != null) 'force': force,
+      if (source != null) 'source': source,
       if (isCustom != null) 'is_custom': isCustom,
       if (lastUsed != null) 'last_used': lastUsed,
     });
@@ -442,23 +752,41 @@ class ExercisesCompanion extends UpdateCompanion<Exercise> {
   ExercisesCompanion copyWith(
       {Value<int>? id,
       Value<String>? name,
+      Value<String?>? description,
+      Value<String>? category,
+      Value<String>? difficulty,
       Value<String>? primaryMuscle,
       Value<String?>? secondaryMuscle,
       Value<String>? equipment,
       Value<String>? setType,
       Value<int>? restTime,
       Value<String?>? instructions,
+      Value<String?>? gifUrl,
+      Value<String?>? imageUrl,
+      Value<String?>? videoUrl,
+      Value<String?>? mechanic,
+      Value<String?>? force,
+      Value<String>? source,
       Value<bool>? isCustom,
       Value<DateTime?>? lastUsed}) {
     return ExercisesCompanion(
       id: id ?? this.id,
       name: name ?? this.name,
+      description: description ?? this.description,
+      category: category ?? this.category,
+      difficulty: difficulty ?? this.difficulty,
       primaryMuscle: primaryMuscle ?? this.primaryMuscle,
       secondaryMuscle: secondaryMuscle ?? this.secondaryMuscle,
       equipment: equipment ?? this.equipment,
       setType: setType ?? this.setType,
       restTime: restTime ?? this.restTime,
       instructions: instructions ?? this.instructions,
+      gifUrl: gifUrl ?? this.gifUrl,
+      imageUrl: imageUrl ?? this.imageUrl,
+      videoUrl: videoUrl ?? this.videoUrl,
+      mechanic: mechanic ?? this.mechanic,
+      force: force ?? this.force,
+      source: source ?? this.source,
       isCustom: isCustom ?? this.isCustom,
       lastUsed: lastUsed ?? this.lastUsed,
     );
@@ -472,6 +800,15 @@ class ExercisesCompanion extends UpdateCompanion<Exercise> {
     }
     if (name.present) {
       map['name'] = Variable<String>(name.value);
+    }
+    if (description.present) {
+      map['description'] = Variable<String>(description.value);
+    }
+    if (category.present) {
+      map['category'] = Variable<String>(category.value);
+    }
+    if (difficulty.present) {
+      map['difficulty'] = Variable<String>(difficulty.value);
     }
     if (primaryMuscle.present) {
       map['primary_muscle'] = Variable<String>(primaryMuscle.value);
@@ -491,6 +828,24 @@ class ExercisesCompanion extends UpdateCompanion<Exercise> {
     if (instructions.present) {
       map['instructions'] = Variable<String>(instructions.value);
     }
+    if (gifUrl.present) {
+      map['gif_url'] = Variable<String>(gifUrl.value);
+    }
+    if (imageUrl.present) {
+      map['image_url'] = Variable<String>(imageUrl.value);
+    }
+    if (videoUrl.present) {
+      map['video_url'] = Variable<String>(videoUrl.value);
+    }
+    if (mechanic.present) {
+      map['mechanic'] = Variable<String>(mechanic.value);
+    }
+    if (force.present) {
+      map['force'] = Variable<String>(force.value);
+    }
+    if (source.present) {
+      map['source'] = Variable<String>(source.value);
+    }
     if (isCustom.present) {
       map['is_custom'] = Variable<bool>(isCustom.value);
     }
@@ -505,12 +860,21 @@ class ExercisesCompanion extends UpdateCompanion<Exercise> {
     return (StringBuffer('ExercisesCompanion(')
           ..write('id: $id, ')
           ..write('name: $name, ')
+          ..write('description: $description, ')
+          ..write('category: $category, ')
+          ..write('difficulty: $difficulty, ')
           ..write('primaryMuscle: $primaryMuscle, ')
           ..write('secondaryMuscle: $secondaryMuscle, ')
           ..write('equipment: $equipment, ')
           ..write('setType: $setType, ')
           ..write('restTime: $restTime, ')
           ..write('instructions: $instructions, ')
+          ..write('gifUrl: $gifUrl, ')
+          ..write('imageUrl: $imageUrl, ')
+          ..write('videoUrl: $videoUrl, ')
+          ..write('mechanic: $mechanic, ')
+          ..write('force: $force, ')
+          ..write('source: $source, ')
           ..write('isCustom: $isCustom, ')
           ..write('lastUsed: $lastUsed')
           ..write(')'))
@@ -2784,7 +3148,7 @@ class WorkoutSetsCompanion extends UpdateCompanion<WorkoutSet> {
 }
 
 class $BodyMeasurementsTable extends BodyMeasurements
-    with TableInfo<$BodyMeasurementsTable, BodyMeasurement> {
+    with TableInfo<$BodyMeasurementsTable, BodyMeasurementTable> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
@@ -2808,10 +3172,51 @@ class $BodyMeasurementsTable extends BodyMeasurements
   late final GeneratedColumn<double> weight = GeneratedColumn<double>(
       'weight', aliasedName, true,
       type: DriftSqlType.double, requiredDuringInsert: false);
+  static const VerificationMeta _bodyFatMeta =
+      const VerificationMeta('bodyFat');
+  @override
+  late final GeneratedColumn<double> bodyFat = GeneratedColumn<double>(
+      'body_fat', aliasedName, true,
+      type: DriftSqlType.double, requiredDuringInsert: false);
+  static const VerificationMeta _neckMeta = const VerificationMeta('neck');
+  @override
+  late final GeneratedColumn<double> neck = GeneratedColumn<double>(
+      'neck', aliasedName, true,
+      type: DriftSqlType.double, requiredDuringInsert: false);
   static const VerificationMeta _chestMeta = const VerificationMeta('chest');
   @override
   late final GeneratedColumn<double> chest = GeneratedColumn<double>(
       'chest', aliasedName, true,
+      type: DriftSqlType.double, requiredDuringInsert: false);
+  static const VerificationMeta _shouldersMeta =
+      const VerificationMeta('shoulders');
+  @override
+  late final GeneratedColumn<double> shoulders = GeneratedColumn<double>(
+      'shoulders', aliasedName, true,
+      type: DriftSqlType.double, requiredDuringInsert: false);
+  static const VerificationMeta _armLeftMeta =
+      const VerificationMeta('armLeft');
+  @override
+  late final GeneratedColumn<double> armLeft = GeneratedColumn<double>(
+      'arm_left', aliasedName, true,
+      type: DriftSqlType.double, requiredDuringInsert: false);
+  static const VerificationMeta _armRightMeta =
+      const VerificationMeta('armRight');
+  @override
+  late final GeneratedColumn<double> armRight = GeneratedColumn<double>(
+      'arm_right', aliasedName, true,
+      type: DriftSqlType.double, requiredDuringInsert: false);
+  static const VerificationMeta _forearmLeftMeta =
+      const VerificationMeta('forearmLeft');
+  @override
+  late final GeneratedColumn<double> forearmLeft = GeneratedColumn<double>(
+      'forearm_left', aliasedName, true,
+      type: DriftSqlType.double, requiredDuringInsert: false);
+  static const VerificationMeta _forearmRightMeta =
+      const VerificationMeta('forearmRight');
+  @override
+  late final GeneratedColumn<double> forearmRight = GeneratedColumn<double>(
+      'forearm_right', aliasedName, true,
       type: DriftSqlType.double, requiredDuringInsert: false);
   static const VerificationMeta _waistMeta = const VerificationMeta('waist');
   @override
@@ -2823,55 +3228,55 @@ class $BodyMeasurementsTable extends BodyMeasurements
   late final GeneratedColumn<double> hips = GeneratedColumn<double>(
       'hips', aliasedName, true,
       type: DriftSqlType.double, requiredDuringInsert: false);
-  static const VerificationMeta _leftArmMeta =
-      const VerificationMeta('leftArm');
+  static const VerificationMeta _thighLeftMeta =
+      const VerificationMeta('thighLeft');
   @override
-  late final GeneratedColumn<double> leftArm = GeneratedColumn<double>(
-      'left_arm', aliasedName, true,
+  late final GeneratedColumn<double> thighLeft = GeneratedColumn<double>(
+      'thigh_left', aliasedName, true,
       type: DriftSqlType.double, requiredDuringInsert: false);
-  static const VerificationMeta _rightArmMeta =
-      const VerificationMeta('rightArm');
+  static const VerificationMeta _thighRightMeta =
+      const VerificationMeta('thighRight');
   @override
-  late final GeneratedColumn<double> rightArm = GeneratedColumn<double>(
-      'right_arm', aliasedName, true,
+  late final GeneratedColumn<double> thighRight = GeneratedColumn<double>(
+      'thigh_right', aliasedName, true,
       type: DriftSqlType.double, requiredDuringInsert: false);
-  static const VerificationMeta _leftThighMeta =
-      const VerificationMeta('leftThigh');
+  static const VerificationMeta _calfLeftMeta =
+      const VerificationMeta('calfLeft');
   @override
-  late final GeneratedColumn<double> leftThigh = GeneratedColumn<double>(
-      'left_thigh', aliasedName, true,
+  late final GeneratedColumn<double> calfLeft = GeneratedColumn<double>(
+      'calf_left', aliasedName, true,
       type: DriftSqlType.double, requiredDuringInsert: false);
-  static const VerificationMeta _rightThighMeta =
-      const VerificationMeta('rightThigh');
+  static const VerificationMeta _calfRightMeta =
+      const VerificationMeta('calfRight');
   @override
-  late final GeneratedColumn<double> rightThigh = GeneratedColumn<double>(
-      'right_thigh', aliasedName, true,
+  late final GeneratedColumn<double> calfRight = GeneratedColumn<double>(
+      'calf_right', aliasedName, true,
       type: DriftSqlType.double, requiredDuringInsert: false);
-  static const VerificationMeta _calvesMeta = const VerificationMeta('calves');
+  static const VerificationMeta _notesMeta = const VerificationMeta('notes');
   @override
-  late final GeneratedColumn<double> calves = GeneratedColumn<double>(
-      'calves', aliasedName, true,
-      type: DriftSqlType.double, requiredDuringInsert: false);
-  static const VerificationMeta _bodyFatMeta =
-      const VerificationMeta('bodyFat');
-  @override
-  late final GeneratedColumn<double> bodyFat = GeneratedColumn<double>(
-      'body_fat', aliasedName, true,
-      type: DriftSqlType.double, requiredDuringInsert: false);
+  late final GeneratedColumn<String> notes = GeneratedColumn<String>(
+      'notes', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
   @override
   List<GeneratedColumn> get $columns => [
         id,
         date,
         weight,
+        bodyFat,
+        neck,
         chest,
+        shoulders,
+        armLeft,
+        armRight,
+        forearmLeft,
+        forearmRight,
         waist,
         hips,
-        leftArm,
-        rightArm,
-        leftThigh,
-        rightThigh,
-        calves,
-        bodyFat
+        thighLeft,
+        thighRight,
+        calfLeft,
+        calfRight,
+        notes
       ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -2879,7 +3284,8 @@ class $BodyMeasurementsTable extends BodyMeasurements
   String get actualTableName => $name;
   static const String $name = 'body_measurements';
   @override
-  VerificationContext validateIntegrity(Insertable<BodyMeasurement> instance,
+  VerificationContext validateIntegrity(
+      Insertable<BodyMeasurementTable> instance,
       {bool isInserting = false}) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
@@ -2896,9 +3302,41 @@ class $BodyMeasurementsTable extends BodyMeasurements
       context.handle(_weightMeta,
           weight.isAcceptableOrUnknown(data['weight']!, _weightMeta));
     }
+    if (data.containsKey('body_fat')) {
+      context.handle(_bodyFatMeta,
+          bodyFat.isAcceptableOrUnknown(data['body_fat']!, _bodyFatMeta));
+    }
+    if (data.containsKey('neck')) {
+      context.handle(
+          _neckMeta, neck.isAcceptableOrUnknown(data['neck']!, _neckMeta));
+    }
     if (data.containsKey('chest')) {
       context.handle(
           _chestMeta, chest.isAcceptableOrUnknown(data['chest']!, _chestMeta));
+    }
+    if (data.containsKey('shoulders')) {
+      context.handle(_shouldersMeta,
+          shoulders.isAcceptableOrUnknown(data['shoulders']!, _shouldersMeta));
+    }
+    if (data.containsKey('arm_left')) {
+      context.handle(_armLeftMeta,
+          armLeft.isAcceptableOrUnknown(data['arm_left']!, _armLeftMeta));
+    }
+    if (data.containsKey('arm_right')) {
+      context.handle(_armRightMeta,
+          armRight.isAcceptableOrUnknown(data['arm_right']!, _armRightMeta));
+    }
+    if (data.containsKey('forearm_left')) {
+      context.handle(
+          _forearmLeftMeta,
+          forearmLeft.isAcceptableOrUnknown(
+              data['forearm_left']!, _forearmLeftMeta));
+    }
+    if (data.containsKey('forearm_right')) {
+      context.handle(
+          _forearmRightMeta,
+          forearmRight.isAcceptableOrUnknown(
+              data['forearm_right']!, _forearmRightMeta));
     }
     if (data.containsKey('waist')) {
       context.handle(
@@ -2908,31 +3346,27 @@ class $BodyMeasurementsTable extends BodyMeasurements
       context.handle(
           _hipsMeta, hips.isAcceptableOrUnknown(data['hips']!, _hipsMeta));
     }
-    if (data.containsKey('left_arm')) {
-      context.handle(_leftArmMeta,
-          leftArm.isAcceptableOrUnknown(data['left_arm']!, _leftArmMeta));
+    if (data.containsKey('thigh_left')) {
+      context.handle(_thighLeftMeta,
+          thighLeft.isAcceptableOrUnknown(data['thigh_left']!, _thighLeftMeta));
     }
-    if (data.containsKey('right_arm')) {
-      context.handle(_rightArmMeta,
-          rightArm.isAcceptableOrUnknown(data['right_arm']!, _rightArmMeta));
-    }
-    if (data.containsKey('left_thigh')) {
-      context.handle(_leftThighMeta,
-          leftThigh.isAcceptableOrUnknown(data['left_thigh']!, _leftThighMeta));
-    }
-    if (data.containsKey('right_thigh')) {
+    if (data.containsKey('thigh_right')) {
       context.handle(
-          _rightThighMeta,
-          rightThigh.isAcceptableOrUnknown(
-              data['right_thigh']!, _rightThighMeta));
+          _thighRightMeta,
+          thighRight.isAcceptableOrUnknown(
+              data['thigh_right']!, _thighRightMeta));
     }
-    if (data.containsKey('calves')) {
-      context.handle(_calvesMeta,
-          calves.isAcceptableOrUnknown(data['calves']!, _calvesMeta));
+    if (data.containsKey('calf_left')) {
+      context.handle(_calfLeftMeta,
+          calfLeft.isAcceptableOrUnknown(data['calf_left']!, _calfLeftMeta));
     }
-    if (data.containsKey('body_fat')) {
-      context.handle(_bodyFatMeta,
-          bodyFat.isAcceptableOrUnknown(data['body_fat']!, _bodyFatMeta));
+    if (data.containsKey('calf_right')) {
+      context.handle(_calfRightMeta,
+          calfRight.isAcceptableOrUnknown(data['calf_right']!, _calfRightMeta));
+    }
+    if (data.containsKey('notes')) {
+      context.handle(
+          _notesMeta, notes.isAcceptableOrUnknown(data['notes']!, _notesMeta));
     }
     return context;
   }
@@ -2940,33 +3374,45 @@ class $BodyMeasurementsTable extends BodyMeasurements
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
-  BodyMeasurement map(Map<String, dynamic> data, {String? tablePrefix}) {
+  BodyMeasurementTable map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return BodyMeasurement(
+    return BodyMeasurementTable(
       id: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
       date: attachedDatabase.typeMapping
           .read(DriftSqlType.dateTime, data['${effectivePrefix}date'])!,
       weight: attachedDatabase.typeMapping
           .read(DriftSqlType.double, data['${effectivePrefix}weight']),
+      bodyFat: attachedDatabase.typeMapping
+          .read(DriftSqlType.double, data['${effectivePrefix}body_fat']),
+      neck: attachedDatabase.typeMapping
+          .read(DriftSqlType.double, data['${effectivePrefix}neck']),
       chest: attachedDatabase.typeMapping
           .read(DriftSqlType.double, data['${effectivePrefix}chest']),
+      shoulders: attachedDatabase.typeMapping
+          .read(DriftSqlType.double, data['${effectivePrefix}shoulders']),
+      armLeft: attachedDatabase.typeMapping
+          .read(DriftSqlType.double, data['${effectivePrefix}arm_left']),
+      armRight: attachedDatabase.typeMapping
+          .read(DriftSqlType.double, data['${effectivePrefix}arm_right']),
+      forearmLeft: attachedDatabase.typeMapping
+          .read(DriftSqlType.double, data['${effectivePrefix}forearm_left']),
+      forearmRight: attachedDatabase.typeMapping
+          .read(DriftSqlType.double, data['${effectivePrefix}forearm_right']),
       waist: attachedDatabase.typeMapping
           .read(DriftSqlType.double, data['${effectivePrefix}waist']),
       hips: attachedDatabase.typeMapping
           .read(DriftSqlType.double, data['${effectivePrefix}hips']),
-      leftArm: attachedDatabase.typeMapping
-          .read(DriftSqlType.double, data['${effectivePrefix}left_arm']),
-      rightArm: attachedDatabase.typeMapping
-          .read(DriftSqlType.double, data['${effectivePrefix}right_arm']),
-      leftThigh: attachedDatabase.typeMapping
-          .read(DriftSqlType.double, data['${effectivePrefix}left_thigh']),
-      rightThigh: attachedDatabase.typeMapping
-          .read(DriftSqlType.double, data['${effectivePrefix}right_thigh']),
-      calves: attachedDatabase.typeMapping
-          .read(DriftSqlType.double, data['${effectivePrefix}calves']),
-      bodyFat: attachedDatabase.typeMapping
-          .read(DriftSqlType.double, data['${effectivePrefix}body_fat']),
+      thighLeft: attachedDatabase.typeMapping
+          .read(DriftSqlType.double, data['${effectivePrefix}thigh_left']),
+      thighRight: attachedDatabase.typeMapping
+          .read(DriftSqlType.double, data['${effectivePrefix}thigh_right']),
+      calfLeft: attachedDatabase.typeMapping
+          .read(DriftSqlType.double, data['${effectivePrefix}calf_left']),
+      calfRight: attachedDatabase.typeMapping
+          .read(DriftSqlType.double, data['${effectivePrefix}calf_right']),
+      notes: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}notes']),
     );
   }
 
@@ -2976,32 +3422,45 @@ class $BodyMeasurementsTable extends BodyMeasurements
   }
 }
 
-class BodyMeasurement extends DataClass implements Insertable<BodyMeasurement> {
+class BodyMeasurementTable extends DataClass
+    implements Insertable<BodyMeasurementTable> {
   final int id;
   final DateTime date;
   final double? weight;
+  final double? bodyFat;
+  final double? neck;
   final double? chest;
+  final double? shoulders;
+  final double? armLeft;
+  final double? armRight;
+  final double? forearmLeft;
+  final double? forearmRight;
   final double? waist;
   final double? hips;
-  final double? leftArm;
-  final double? rightArm;
-  final double? leftThigh;
-  final double? rightThigh;
-  final double? calves;
-  final double? bodyFat;
-  const BodyMeasurement(
+  final double? thighLeft;
+  final double? thighRight;
+  final double? calfLeft;
+  final double? calfRight;
+  final String? notes;
+  const BodyMeasurementTable(
       {required this.id,
       required this.date,
       this.weight,
+      this.bodyFat,
+      this.neck,
       this.chest,
+      this.shoulders,
+      this.armLeft,
+      this.armRight,
+      this.forearmLeft,
+      this.forearmRight,
       this.waist,
       this.hips,
-      this.leftArm,
-      this.rightArm,
-      this.leftThigh,
-      this.rightThigh,
-      this.calves,
-      this.bodyFat});
+      this.thighLeft,
+      this.thighRight,
+      this.calfLeft,
+      this.calfRight,
+      this.notes});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -3010,8 +3469,29 @@ class BodyMeasurement extends DataClass implements Insertable<BodyMeasurement> {
     if (!nullToAbsent || weight != null) {
       map['weight'] = Variable<double>(weight);
     }
+    if (!nullToAbsent || bodyFat != null) {
+      map['body_fat'] = Variable<double>(bodyFat);
+    }
+    if (!nullToAbsent || neck != null) {
+      map['neck'] = Variable<double>(neck);
+    }
     if (!nullToAbsent || chest != null) {
       map['chest'] = Variable<double>(chest);
+    }
+    if (!nullToAbsent || shoulders != null) {
+      map['shoulders'] = Variable<double>(shoulders);
+    }
+    if (!nullToAbsent || armLeft != null) {
+      map['arm_left'] = Variable<double>(armLeft);
+    }
+    if (!nullToAbsent || armRight != null) {
+      map['arm_right'] = Variable<double>(armRight);
+    }
+    if (!nullToAbsent || forearmLeft != null) {
+      map['forearm_left'] = Variable<double>(forearmLeft);
+    }
+    if (!nullToAbsent || forearmRight != null) {
+      map['forearm_right'] = Variable<double>(forearmRight);
     }
     if (!nullToAbsent || waist != null) {
       map['waist'] = Variable<double>(waist);
@@ -3019,23 +3499,20 @@ class BodyMeasurement extends DataClass implements Insertable<BodyMeasurement> {
     if (!nullToAbsent || hips != null) {
       map['hips'] = Variable<double>(hips);
     }
-    if (!nullToAbsent || leftArm != null) {
-      map['left_arm'] = Variable<double>(leftArm);
+    if (!nullToAbsent || thighLeft != null) {
+      map['thigh_left'] = Variable<double>(thighLeft);
     }
-    if (!nullToAbsent || rightArm != null) {
-      map['right_arm'] = Variable<double>(rightArm);
+    if (!nullToAbsent || thighRight != null) {
+      map['thigh_right'] = Variable<double>(thighRight);
     }
-    if (!nullToAbsent || leftThigh != null) {
-      map['left_thigh'] = Variable<double>(leftThigh);
+    if (!nullToAbsent || calfLeft != null) {
+      map['calf_left'] = Variable<double>(calfLeft);
     }
-    if (!nullToAbsent || rightThigh != null) {
-      map['right_thigh'] = Variable<double>(rightThigh);
+    if (!nullToAbsent || calfRight != null) {
+      map['calf_right'] = Variable<double>(calfRight);
     }
-    if (!nullToAbsent || calves != null) {
-      map['calves'] = Variable<double>(calves);
-    }
-    if (!nullToAbsent || bodyFat != null) {
-      map['body_fat'] = Variable<double>(bodyFat);
+    if (!nullToAbsent || notes != null) {
+      map['notes'] = Variable<String>(notes);
     }
     return map;
   }
@@ -3046,47 +3523,69 @@ class BodyMeasurement extends DataClass implements Insertable<BodyMeasurement> {
       date: Value(date),
       weight:
           weight == null && nullToAbsent ? const Value.absent() : Value(weight),
-      chest:
-          chest == null && nullToAbsent ? const Value.absent() : Value(chest),
-      waist:
-          waist == null && nullToAbsent ? const Value.absent() : Value(waist),
-      hips: hips == null && nullToAbsent ? const Value.absent() : Value(hips),
-      leftArm: leftArm == null && nullToAbsent
-          ? const Value.absent()
-          : Value(leftArm),
-      rightArm: rightArm == null && nullToAbsent
-          ? const Value.absent()
-          : Value(rightArm),
-      leftThigh: leftThigh == null && nullToAbsent
-          ? const Value.absent()
-          : Value(leftThigh),
-      rightThigh: rightThigh == null && nullToAbsent
-          ? const Value.absent()
-          : Value(rightThigh),
-      calves:
-          calves == null && nullToAbsent ? const Value.absent() : Value(calves),
       bodyFat: bodyFat == null && nullToAbsent
           ? const Value.absent()
           : Value(bodyFat),
+      neck: neck == null && nullToAbsent ? const Value.absent() : Value(neck),
+      chest:
+          chest == null && nullToAbsent ? const Value.absent() : Value(chest),
+      shoulders: shoulders == null && nullToAbsent
+          ? const Value.absent()
+          : Value(shoulders),
+      armLeft: armLeft == null && nullToAbsent
+          ? const Value.absent()
+          : Value(armLeft),
+      armRight: armRight == null && nullToAbsent
+          ? const Value.absent()
+          : Value(armRight),
+      forearmLeft: forearmLeft == null && nullToAbsent
+          ? const Value.absent()
+          : Value(forearmLeft),
+      forearmRight: forearmRight == null && nullToAbsent
+          ? const Value.absent()
+          : Value(forearmRight),
+      waist:
+          waist == null && nullToAbsent ? const Value.absent() : Value(waist),
+      hips: hips == null && nullToAbsent ? const Value.absent() : Value(hips),
+      thighLeft: thighLeft == null && nullToAbsent
+          ? const Value.absent()
+          : Value(thighLeft),
+      thighRight: thighRight == null && nullToAbsent
+          ? const Value.absent()
+          : Value(thighRight),
+      calfLeft: calfLeft == null && nullToAbsent
+          ? const Value.absent()
+          : Value(calfLeft),
+      calfRight: calfRight == null && nullToAbsent
+          ? const Value.absent()
+          : Value(calfRight),
+      notes:
+          notes == null && nullToAbsent ? const Value.absent() : Value(notes),
     );
   }
 
-  factory BodyMeasurement.fromJson(Map<String, dynamic> json,
+  factory BodyMeasurementTable.fromJson(Map<String, dynamic> json,
       {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return BodyMeasurement(
+    return BodyMeasurementTable(
       id: serializer.fromJson<int>(json['id']),
       date: serializer.fromJson<DateTime>(json['date']),
       weight: serializer.fromJson<double?>(json['weight']),
+      bodyFat: serializer.fromJson<double?>(json['bodyFat']),
+      neck: serializer.fromJson<double?>(json['neck']),
       chest: serializer.fromJson<double?>(json['chest']),
+      shoulders: serializer.fromJson<double?>(json['shoulders']),
+      armLeft: serializer.fromJson<double?>(json['armLeft']),
+      armRight: serializer.fromJson<double?>(json['armRight']),
+      forearmLeft: serializer.fromJson<double?>(json['forearmLeft']),
+      forearmRight: serializer.fromJson<double?>(json['forearmRight']),
       waist: serializer.fromJson<double?>(json['waist']),
       hips: serializer.fromJson<double?>(json['hips']),
-      leftArm: serializer.fromJson<double?>(json['leftArm']),
-      rightArm: serializer.fromJson<double?>(json['rightArm']),
-      leftThigh: serializer.fromJson<double?>(json['leftThigh']),
-      rightThigh: serializer.fromJson<double?>(json['rightThigh']),
-      calves: serializer.fromJson<double?>(json['calves']),
-      bodyFat: serializer.fromJson<double?>(json['bodyFat']),
+      thighLeft: serializer.fromJson<double?>(json['thighLeft']),
+      thighRight: serializer.fromJson<double?>(json['thighRight']),
+      calfLeft: serializer.fromJson<double?>(json['calfLeft']),
+      calfRight: serializer.fromJson<double?>(json['calfRight']),
+      notes: serializer.fromJson<String?>(json['notes']),
     );
   }
   @override
@@ -3096,171 +3595,258 @@ class BodyMeasurement extends DataClass implements Insertable<BodyMeasurement> {
       'id': serializer.toJson<int>(id),
       'date': serializer.toJson<DateTime>(date),
       'weight': serializer.toJson<double?>(weight),
+      'bodyFat': serializer.toJson<double?>(bodyFat),
+      'neck': serializer.toJson<double?>(neck),
       'chest': serializer.toJson<double?>(chest),
+      'shoulders': serializer.toJson<double?>(shoulders),
+      'armLeft': serializer.toJson<double?>(armLeft),
+      'armRight': serializer.toJson<double?>(armRight),
+      'forearmLeft': serializer.toJson<double?>(forearmLeft),
+      'forearmRight': serializer.toJson<double?>(forearmRight),
       'waist': serializer.toJson<double?>(waist),
       'hips': serializer.toJson<double?>(hips),
-      'leftArm': serializer.toJson<double?>(leftArm),
-      'rightArm': serializer.toJson<double?>(rightArm),
-      'leftThigh': serializer.toJson<double?>(leftThigh),
-      'rightThigh': serializer.toJson<double?>(rightThigh),
-      'calves': serializer.toJson<double?>(calves),
-      'bodyFat': serializer.toJson<double?>(bodyFat),
+      'thighLeft': serializer.toJson<double?>(thighLeft),
+      'thighRight': serializer.toJson<double?>(thighRight),
+      'calfLeft': serializer.toJson<double?>(calfLeft),
+      'calfRight': serializer.toJson<double?>(calfRight),
+      'notes': serializer.toJson<String?>(notes),
     };
   }
 
-  BodyMeasurement copyWith(
+  BodyMeasurementTable copyWith(
           {int? id,
           DateTime? date,
           Value<double?> weight = const Value.absent(),
+          Value<double?> bodyFat = const Value.absent(),
+          Value<double?> neck = const Value.absent(),
           Value<double?> chest = const Value.absent(),
+          Value<double?> shoulders = const Value.absent(),
+          Value<double?> armLeft = const Value.absent(),
+          Value<double?> armRight = const Value.absent(),
+          Value<double?> forearmLeft = const Value.absent(),
+          Value<double?> forearmRight = const Value.absent(),
           Value<double?> waist = const Value.absent(),
           Value<double?> hips = const Value.absent(),
-          Value<double?> leftArm = const Value.absent(),
-          Value<double?> rightArm = const Value.absent(),
-          Value<double?> leftThigh = const Value.absent(),
-          Value<double?> rightThigh = const Value.absent(),
-          Value<double?> calves = const Value.absent(),
-          Value<double?> bodyFat = const Value.absent()}) =>
-      BodyMeasurement(
+          Value<double?> thighLeft = const Value.absent(),
+          Value<double?> thighRight = const Value.absent(),
+          Value<double?> calfLeft = const Value.absent(),
+          Value<double?> calfRight = const Value.absent(),
+          Value<String?> notes = const Value.absent()}) =>
+      BodyMeasurementTable(
         id: id ?? this.id,
         date: date ?? this.date,
         weight: weight.present ? weight.value : this.weight,
+        bodyFat: bodyFat.present ? bodyFat.value : this.bodyFat,
+        neck: neck.present ? neck.value : this.neck,
         chest: chest.present ? chest.value : this.chest,
+        shoulders: shoulders.present ? shoulders.value : this.shoulders,
+        armLeft: armLeft.present ? armLeft.value : this.armLeft,
+        armRight: armRight.present ? armRight.value : this.armRight,
+        forearmLeft: forearmLeft.present ? forearmLeft.value : this.forearmLeft,
+        forearmRight:
+            forearmRight.present ? forearmRight.value : this.forearmRight,
         waist: waist.present ? waist.value : this.waist,
         hips: hips.present ? hips.value : this.hips,
-        leftArm: leftArm.present ? leftArm.value : this.leftArm,
-        rightArm: rightArm.present ? rightArm.value : this.rightArm,
-        leftThigh: leftThigh.present ? leftThigh.value : this.leftThigh,
-        rightThigh: rightThigh.present ? rightThigh.value : this.rightThigh,
-        calves: calves.present ? calves.value : this.calves,
-        bodyFat: bodyFat.present ? bodyFat.value : this.bodyFat,
+        thighLeft: thighLeft.present ? thighLeft.value : this.thighLeft,
+        thighRight: thighRight.present ? thighRight.value : this.thighRight,
+        calfLeft: calfLeft.present ? calfLeft.value : this.calfLeft,
+        calfRight: calfRight.present ? calfRight.value : this.calfRight,
+        notes: notes.present ? notes.value : this.notes,
       );
-  BodyMeasurement copyWithCompanion(BodyMeasurementsCompanion data) {
-    return BodyMeasurement(
+  BodyMeasurementTable copyWithCompanion(BodyMeasurementsCompanion data) {
+    return BodyMeasurementTable(
       id: data.id.present ? data.id.value : this.id,
       date: data.date.present ? data.date.value : this.date,
       weight: data.weight.present ? data.weight.value : this.weight,
+      bodyFat: data.bodyFat.present ? data.bodyFat.value : this.bodyFat,
+      neck: data.neck.present ? data.neck.value : this.neck,
       chest: data.chest.present ? data.chest.value : this.chest,
+      shoulders: data.shoulders.present ? data.shoulders.value : this.shoulders,
+      armLeft: data.armLeft.present ? data.armLeft.value : this.armLeft,
+      armRight: data.armRight.present ? data.armRight.value : this.armRight,
+      forearmLeft:
+          data.forearmLeft.present ? data.forearmLeft.value : this.forearmLeft,
+      forearmRight: data.forearmRight.present
+          ? data.forearmRight.value
+          : this.forearmRight,
       waist: data.waist.present ? data.waist.value : this.waist,
       hips: data.hips.present ? data.hips.value : this.hips,
-      leftArm: data.leftArm.present ? data.leftArm.value : this.leftArm,
-      rightArm: data.rightArm.present ? data.rightArm.value : this.rightArm,
-      leftThigh: data.leftThigh.present ? data.leftThigh.value : this.leftThigh,
-      rightThigh:
-          data.rightThigh.present ? data.rightThigh.value : this.rightThigh,
-      calves: data.calves.present ? data.calves.value : this.calves,
-      bodyFat: data.bodyFat.present ? data.bodyFat.value : this.bodyFat,
+      thighLeft: data.thighLeft.present ? data.thighLeft.value : this.thighLeft,
+      thighRight:
+          data.thighRight.present ? data.thighRight.value : this.thighRight,
+      calfLeft: data.calfLeft.present ? data.calfLeft.value : this.calfLeft,
+      calfRight: data.calfRight.present ? data.calfRight.value : this.calfRight,
+      notes: data.notes.present ? data.notes.value : this.notes,
     );
   }
 
   @override
   String toString() {
-    return (StringBuffer('BodyMeasurement(')
+    return (StringBuffer('BodyMeasurementTable(')
           ..write('id: $id, ')
           ..write('date: $date, ')
           ..write('weight: $weight, ')
+          ..write('bodyFat: $bodyFat, ')
+          ..write('neck: $neck, ')
           ..write('chest: $chest, ')
+          ..write('shoulders: $shoulders, ')
+          ..write('armLeft: $armLeft, ')
+          ..write('armRight: $armRight, ')
+          ..write('forearmLeft: $forearmLeft, ')
+          ..write('forearmRight: $forearmRight, ')
           ..write('waist: $waist, ')
           ..write('hips: $hips, ')
-          ..write('leftArm: $leftArm, ')
-          ..write('rightArm: $rightArm, ')
-          ..write('leftThigh: $leftThigh, ')
-          ..write('rightThigh: $rightThigh, ')
-          ..write('calves: $calves, ')
-          ..write('bodyFat: $bodyFat')
+          ..write('thighLeft: $thighLeft, ')
+          ..write('thighRight: $thighRight, ')
+          ..write('calfLeft: $calfLeft, ')
+          ..write('calfRight: $calfRight, ')
+          ..write('notes: $notes')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, date, weight, chest, waist, hips, leftArm,
-      rightArm, leftThigh, rightThigh, calves, bodyFat);
+  int get hashCode => Object.hash(
+      id,
+      date,
+      weight,
+      bodyFat,
+      neck,
+      chest,
+      shoulders,
+      armLeft,
+      armRight,
+      forearmLeft,
+      forearmRight,
+      waist,
+      hips,
+      thighLeft,
+      thighRight,
+      calfLeft,
+      calfRight,
+      notes);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is BodyMeasurement &&
+      (other is BodyMeasurementTable &&
           other.id == this.id &&
           other.date == this.date &&
           other.weight == this.weight &&
+          other.bodyFat == this.bodyFat &&
+          other.neck == this.neck &&
           other.chest == this.chest &&
+          other.shoulders == this.shoulders &&
+          other.armLeft == this.armLeft &&
+          other.armRight == this.armRight &&
+          other.forearmLeft == this.forearmLeft &&
+          other.forearmRight == this.forearmRight &&
           other.waist == this.waist &&
           other.hips == this.hips &&
-          other.leftArm == this.leftArm &&
-          other.rightArm == this.rightArm &&
-          other.leftThigh == this.leftThigh &&
-          other.rightThigh == this.rightThigh &&
-          other.calves == this.calves &&
-          other.bodyFat == this.bodyFat);
+          other.thighLeft == this.thighLeft &&
+          other.thighRight == this.thighRight &&
+          other.calfLeft == this.calfLeft &&
+          other.calfRight == this.calfRight &&
+          other.notes == this.notes);
 }
 
-class BodyMeasurementsCompanion extends UpdateCompanion<BodyMeasurement> {
+class BodyMeasurementsCompanion extends UpdateCompanion<BodyMeasurementTable> {
   final Value<int> id;
   final Value<DateTime> date;
   final Value<double?> weight;
+  final Value<double?> bodyFat;
+  final Value<double?> neck;
   final Value<double?> chest;
+  final Value<double?> shoulders;
+  final Value<double?> armLeft;
+  final Value<double?> armRight;
+  final Value<double?> forearmLeft;
+  final Value<double?> forearmRight;
   final Value<double?> waist;
   final Value<double?> hips;
-  final Value<double?> leftArm;
-  final Value<double?> rightArm;
-  final Value<double?> leftThigh;
-  final Value<double?> rightThigh;
-  final Value<double?> calves;
-  final Value<double?> bodyFat;
+  final Value<double?> thighLeft;
+  final Value<double?> thighRight;
+  final Value<double?> calfLeft;
+  final Value<double?> calfRight;
+  final Value<String?> notes;
   const BodyMeasurementsCompanion({
     this.id = const Value.absent(),
     this.date = const Value.absent(),
     this.weight = const Value.absent(),
+    this.bodyFat = const Value.absent(),
+    this.neck = const Value.absent(),
     this.chest = const Value.absent(),
+    this.shoulders = const Value.absent(),
+    this.armLeft = const Value.absent(),
+    this.armRight = const Value.absent(),
+    this.forearmLeft = const Value.absent(),
+    this.forearmRight = const Value.absent(),
     this.waist = const Value.absent(),
     this.hips = const Value.absent(),
-    this.leftArm = const Value.absent(),
-    this.rightArm = const Value.absent(),
-    this.leftThigh = const Value.absent(),
-    this.rightThigh = const Value.absent(),
-    this.calves = const Value.absent(),
-    this.bodyFat = const Value.absent(),
+    this.thighLeft = const Value.absent(),
+    this.thighRight = const Value.absent(),
+    this.calfLeft = const Value.absent(),
+    this.calfRight = const Value.absent(),
+    this.notes = const Value.absent(),
   });
   BodyMeasurementsCompanion.insert({
     this.id = const Value.absent(),
     required DateTime date,
     this.weight = const Value.absent(),
+    this.bodyFat = const Value.absent(),
+    this.neck = const Value.absent(),
     this.chest = const Value.absent(),
+    this.shoulders = const Value.absent(),
+    this.armLeft = const Value.absent(),
+    this.armRight = const Value.absent(),
+    this.forearmLeft = const Value.absent(),
+    this.forearmRight = const Value.absent(),
     this.waist = const Value.absent(),
     this.hips = const Value.absent(),
-    this.leftArm = const Value.absent(),
-    this.rightArm = const Value.absent(),
-    this.leftThigh = const Value.absent(),
-    this.rightThigh = const Value.absent(),
-    this.calves = const Value.absent(),
-    this.bodyFat = const Value.absent(),
+    this.thighLeft = const Value.absent(),
+    this.thighRight = const Value.absent(),
+    this.calfLeft = const Value.absent(),
+    this.calfRight = const Value.absent(),
+    this.notes = const Value.absent(),
   }) : date = Value(date);
-  static Insertable<BodyMeasurement> custom({
+  static Insertable<BodyMeasurementTable> custom({
     Expression<int>? id,
     Expression<DateTime>? date,
     Expression<double>? weight,
+    Expression<double>? bodyFat,
+    Expression<double>? neck,
     Expression<double>? chest,
+    Expression<double>? shoulders,
+    Expression<double>? armLeft,
+    Expression<double>? armRight,
+    Expression<double>? forearmLeft,
+    Expression<double>? forearmRight,
     Expression<double>? waist,
     Expression<double>? hips,
-    Expression<double>? leftArm,
-    Expression<double>? rightArm,
-    Expression<double>? leftThigh,
-    Expression<double>? rightThigh,
-    Expression<double>? calves,
-    Expression<double>? bodyFat,
+    Expression<double>? thighLeft,
+    Expression<double>? thighRight,
+    Expression<double>? calfLeft,
+    Expression<double>? calfRight,
+    Expression<String>? notes,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (date != null) 'date': date,
       if (weight != null) 'weight': weight,
+      if (bodyFat != null) 'body_fat': bodyFat,
+      if (neck != null) 'neck': neck,
       if (chest != null) 'chest': chest,
+      if (shoulders != null) 'shoulders': shoulders,
+      if (armLeft != null) 'arm_left': armLeft,
+      if (armRight != null) 'arm_right': armRight,
+      if (forearmLeft != null) 'forearm_left': forearmLeft,
+      if (forearmRight != null) 'forearm_right': forearmRight,
       if (waist != null) 'waist': waist,
       if (hips != null) 'hips': hips,
-      if (leftArm != null) 'left_arm': leftArm,
-      if (rightArm != null) 'right_arm': rightArm,
-      if (leftThigh != null) 'left_thigh': leftThigh,
-      if (rightThigh != null) 'right_thigh': rightThigh,
-      if (calves != null) 'calves': calves,
-      if (bodyFat != null) 'body_fat': bodyFat,
+      if (thighLeft != null) 'thigh_left': thighLeft,
+      if (thighRight != null) 'thigh_right': thighRight,
+      if (calfLeft != null) 'calf_left': calfLeft,
+      if (calfRight != null) 'calf_right': calfRight,
+      if (notes != null) 'notes': notes,
     });
   }
 
@@ -3268,28 +3854,40 @@ class BodyMeasurementsCompanion extends UpdateCompanion<BodyMeasurement> {
       {Value<int>? id,
       Value<DateTime>? date,
       Value<double?>? weight,
+      Value<double?>? bodyFat,
+      Value<double?>? neck,
       Value<double?>? chest,
+      Value<double?>? shoulders,
+      Value<double?>? armLeft,
+      Value<double?>? armRight,
+      Value<double?>? forearmLeft,
+      Value<double?>? forearmRight,
       Value<double?>? waist,
       Value<double?>? hips,
-      Value<double?>? leftArm,
-      Value<double?>? rightArm,
-      Value<double?>? leftThigh,
-      Value<double?>? rightThigh,
-      Value<double?>? calves,
-      Value<double?>? bodyFat}) {
+      Value<double?>? thighLeft,
+      Value<double?>? thighRight,
+      Value<double?>? calfLeft,
+      Value<double?>? calfRight,
+      Value<String?>? notes}) {
     return BodyMeasurementsCompanion(
       id: id ?? this.id,
       date: date ?? this.date,
       weight: weight ?? this.weight,
+      bodyFat: bodyFat ?? this.bodyFat,
+      neck: neck ?? this.neck,
       chest: chest ?? this.chest,
+      shoulders: shoulders ?? this.shoulders,
+      armLeft: armLeft ?? this.armLeft,
+      armRight: armRight ?? this.armRight,
+      forearmLeft: forearmLeft ?? this.forearmLeft,
+      forearmRight: forearmRight ?? this.forearmRight,
       waist: waist ?? this.waist,
       hips: hips ?? this.hips,
-      leftArm: leftArm ?? this.leftArm,
-      rightArm: rightArm ?? this.rightArm,
-      leftThigh: leftThigh ?? this.leftThigh,
-      rightThigh: rightThigh ?? this.rightThigh,
-      calves: calves ?? this.calves,
-      bodyFat: bodyFat ?? this.bodyFat,
+      thighLeft: thighLeft ?? this.thighLeft,
+      thighRight: thighRight ?? this.thighRight,
+      calfLeft: calfLeft ?? this.calfLeft,
+      calfRight: calfRight ?? this.calfRight,
+      notes: notes ?? this.notes,
     );
   }
 
@@ -3305,8 +3903,29 @@ class BodyMeasurementsCompanion extends UpdateCompanion<BodyMeasurement> {
     if (weight.present) {
       map['weight'] = Variable<double>(weight.value);
     }
+    if (bodyFat.present) {
+      map['body_fat'] = Variable<double>(bodyFat.value);
+    }
+    if (neck.present) {
+      map['neck'] = Variable<double>(neck.value);
+    }
     if (chest.present) {
       map['chest'] = Variable<double>(chest.value);
+    }
+    if (shoulders.present) {
+      map['shoulders'] = Variable<double>(shoulders.value);
+    }
+    if (armLeft.present) {
+      map['arm_left'] = Variable<double>(armLeft.value);
+    }
+    if (armRight.present) {
+      map['arm_right'] = Variable<double>(armRight.value);
+    }
+    if (forearmLeft.present) {
+      map['forearm_left'] = Variable<double>(forearmLeft.value);
+    }
+    if (forearmRight.present) {
+      map['forearm_right'] = Variable<double>(forearmRight.value);
     }
     if (waist.present) {
       map['waist'] = Variable<double>(waist.value);
@@ -3314,23 +3933,20 @@ class BodyMeasurementsCompanion extends UpdateCompanion<BodyMeasurement> {
     if (hips.present) {
       map['hips'] = Variable<double>(hips.value);
     }
-    if (leftArm.present) {
-      map['left_arm'] = Variable<double>(leftArm.value);
+    if (thighLeft.present) {
+      map['thigh_left'] = Variable<double>(thighLeft.value);
     }
-    if (rightArm.present) {
-      map['right_arm'] = Variable<double>(rightArm.value);
+    if (thighRight.present) {
+      map['thigh_right'] = Variable<double>(thighRight.value);
     }
-    if (leftThigh.present) {
-      map['left_thigh'] = Variable<double>(leftThigh.value);
+    if (calfLeft.present) {
+      map['calf_left'] = Variable<double>(calfLeft.value);
     }
-    if (rightThigh.present) {
-      map['right_thigh'] = Variable<double>(rightThigh.value);
+    if (calfRight.present) {
+      map['calf_right'] = Variable<double>(calfRight.value);
     }
-    if (calves.present) {
-      map['calves'] = Variable<double>(calves.value);
-    }
-    if (bodyFat.present) {
-      map['body_fat'] = Variable<double>(bodyFat.value);
+    if (notes.present) {
+      map['notes'] = Variable<String>(notes.value);
     }
     return map;
   }
@@ -3341,15 +3957,21 @@ class BodyMeasurementsCompanion extends UpdateCompanion<BodyMeasurement> {
           ..write('id: $id, ')
           ..write('date: $date, ')
           ..write('weight: $weight, ')
+          ..write('bodyFat: $bodyFat, ')
+          ..write('neck: $neck, ')
           ..write('chest: $chest, ')
+          ..write('shoulders: $shoulders, ')
+          ..write('armLeft: $armLeft, ')
+          ..write('armRight: $armRight, ')
+          ..write('forearmLeft: $forearmLeft, ')
+          ..write('forearmRight: $forearmRight, ')
           ..write('waist: $waist, ')
           ..write('hips: $hips, ')
-          ..write('leftArm: $leftArm, ')
-          ..write('rightArm: $rightArm, ')
-          ..write('leftThigh: $leftThigh, ')
-          ..write('rightThigh: $rightThigh, ')
-          ..write('calves: $calves, ')
-          ..write('bodyFat: $bodyFat')
+          ..write('thighLeft: $thighLeft, ')
+          ..write('thighRight: $thighRight, ')
+          ..write('calfLeft: $calfLeft, ')
+          ..write('calfRight: $calfRight, ')
+          ..write('notes: $notes')
           ..write(')'))
         .toString();
   }
@@ -4176,30 +4798,48 @@ abstract class _$AppDatabase extends GeneratedDatabase {
 typedef $$ExercisesTableCreateCompanionBuilder = ExercisesCompanion Function({
   Value<int> id,
   required String name,
+  Value<String?> description,
+  Value<String> category,
+  Value<String> difficulty,
   required String primaryMuscle,
   Value<String?> secondaryMuscle,
   required String equipment,
   required String setType,
   Value<int> restTime,
   Value<String?> instructions,
+  Value<String?> gifUrl,
+  Value<String?> imageUrl,
+  Value<String?> videoUrl,
+  Value<String?> mechanic,
+  Value<String?> force,
+  Value<String> source,
   Value<bool> isCustom,
   Value<DateTime?> lastUsed,
 });
 typedef $$ExercisesTableUpdateCompanionBuilder = ExercisesCompanion Function({
   Value<int> id,
   Value<String> name,
+  Value<String?> description,
+  Value<String> category,
+  Value<String> difficulty,
   Value<String> primaryMuscle,
   Value<String?> secondaryMuscle,
   Value<String> equipment,
   Value<String> setType,
   Value<int> restTime,
   Value<String?> instructions,
+  Value<String?> gifUrl,
+  Value<String?> imageUrl,
+  Value<String?> videoUrl,
+  Value<String?> mechanic,
+  Value<String?> force,
+  Value<String> source,
   Value<bool> isCustom,
   Value<DateTime?> lastUsed,
 });
 
 final class $$ExercisesTableReferences
-    extends BaseReferences<_$AppDatabase, $ExercisesTable, Exercise> {
+    extends BaseReferences<_$AppDatabase, $ExercisesTable, ExerciseTable> {
   $$ExercisesTableReferences(super.$_db, super.$_table, super.$_typedResult);
 
   static MultiTypedResultKey<$TemplateExercisesTable, List<TemplateExercise>>
@@ -4269,6 +4909,15 @@ class $$ExercisesTableFilterComposer
   ColumnFilters<String> get name => $composableBuilder(
       column: $table.name, builder: (column) => ColumnFilters(column));
 
+  ColumnFilters<String> get description => $composableBuilder(
+      column: $table.description, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get category => $composableBuilder(
+      column: $table.category, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get difficulty => $composableBuilder(
+      column: $table.difficulty, builder: (column) => ColumnFilters(column));
+
   ColumnFilters<String> get primaryMuscle => $composableBuilder(
       column: $table.primaryMuscle, builder: (column) => ColumnFilters(column));
 
@@ -4287,6 +4936,24 @@ class $$ExercisesTableFilterComposer
 
   ColumnFilters<String> get instructions => $composableBuilder(
       column: $table.instructions, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get gifUrl => $composableBuilder(
+      column: $table.gifUrl, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get imageUrl => $composableBuilder(
+      column: $table.imageUrl, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get videoUrl => $composableBuilder(
+      column: $table.videoUrl, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get mechanic => $composableBuilder(
+      column: $table.mechanic, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get force => $composableBuilder(
+      column: $table.force, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get source => $composableBuilder(
+      column: $table.source, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<bool> get isCustom => $composableBuilder(
       column: $table.isCustom, builder: (column) => ColumnFilters(column));
@@ -4376,6 +5043,15 @@ class $$ExercisesTableOrderingComposer
   ColumnOrderings<String> get name => $composableBuilder(
       column: $table.name, builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<String> get description => $composableBuilder(
+      column: $table.description, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get category => $composableBuilder(
+      column: $table.category, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get difficulty => $composableBuilder(
+      column: $table.difficulty, builder: (column) => ColumnOrderings(column));
+
   ColumnOrderings<String> get primaryMuscle => $composableBuilder(
       column: $table.primaryMuscle,
       builder: (column) => ColumnOrderings(column));
@@ -4396,6 +5072,24 @@ class $$ExercisesTableOrderingComposer
   ColumnOrderings<String> get instructions => $composableBuilder(
       column: $table.instructions,
       builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get gifUrl => $composableBuilder(
+      column: $table.gifUrl, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get imageUrl => $composableBuilder(
+      column: $table.imageUrl, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get videoUrl => $composableBuilder(
+      column: $table.videoUrl, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get mechanic => $composableBuilder(
+      column: $table.mechanic, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get force => $composableBuilder(
+      column: $table.force, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get source => $composableBuilder(
+      column: $table.source, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<bool> get isCustom => $composableBuilder(
       column: $table.isCustom, builder: (column) => ColumnOrderings(column));
@@ -4419,6 +5113,15 @@ class $$ExercisesTableAnnotationComposer
   GeneratedColumn<String> get name =>
       $composableBuilder(column: $table.name, builder: (column) => column);
 
+  GeneratedColumn<String> get description => $composableBuilder(
+      column: $table.description, builder: (column) => column);
+
+  GeneratedColumn<String> get category =>
+      $composableBuilder(column: $table.category, builder: (column) => column);
+
+  GeneratedColumn<String> get difficulty => $composableBuilder(
+      column: $table.difficulty, builder: (column) => column);
+
   GeneratedColumn<String> get primaryMuscle => $composableBuilder(
       column: $table.primaryMuscle, builder: (column) => column);
 
@@ -4436,6 +5139,24 @@ class $$ExercisesTableAnnotationComposer
 
   GeneratedColumn<String> get instructions => $composableBuilder(
       column: $table.instructions, builder: (column) => column);
+
+  GeneratedColumn<String> get gifUrl =>
+      $composableBuilder(column: $table.gifUrl, builder: (column) => column);
+
+  GeneratedColumn<String> get imageUrl =>
+      $composableBuilder(column: $table.imageUrl, builder: (column) => column);
+
+  GeneratedColumn<String> get videoUrl =>
+      $composableBuilder(column: $table.videoUrl, builder: (column) => column);
+
+  GeneratedColumn<String> get mechanic =>
+      $composableBuilder(column: $table.mechanic, builder: (column) => column);
+
+  GeneratedColumn<String> get force =>
+      $composableBuilder(column: $table.force, builder: (column) => column);
+
+  GeneratedColumn<String> get source =>
+      $composableBuilder(column: $table.source, builder: (column) => column);
 
   GeneratedColumn<bool> get isCustom =>
       $composableBuilder(column: $table.isCustom, builder: (column) => column);
@@ -4514,14 +5235,14 @@ class $$ExercisesTableAnnotationComposer
 class $$ExercisesTableTableManager extends RootTableManager<
     _$AppDatabase,
     $ExercisesTable,
-    Exercise,
+    ExerciseTable,
     $$ExercisesTableFilterComposer,
     $$ExercisesTableOrderingComposer,
     $$ExercisesTableAnnotationComposer,
     $$ExercisesTableCreateCompanionBuilder,
     $$ExercisesTableUpdateCompanionBuilder,
-    (Exercise, $$ExercisesTableReferences),
-    Exercise,
+    (ExerciseTable, $$ExercisesTableReferences),
+    ExerciseTable,
     PrefetchHooks Function(
         {bool templateExercisesRefs,
         bool workoutSetsRefs,
@@ -4539,48 +5260,84 @@ class $$ExercisesTableTableManager extends RootTableManager<
           updateCompanionCallback: ({
             Value<int> id = const Value.absent(),
             Value<String> name = const Value.absent(),
+            Value<String?> description = const Value.absent(),
+            Value<String> category = const Value.absent(),
+            Value<String> difficulty = const Value.absent(),
             Value<String> primaryMuscle = const Value.absent(),
             Value<String?> secondaryMuscle = const Value.absent(),
             Value<String> equipment = const Value.absent(),
             Value<String> setType = const Value.absent(),
             Value<int> restTime = const Value.absent(),
             Value<String?> instructions = const Value.absent(),
+            Value<String?> gifUrl = const Value.absent(),
+            Value<String?> imageUrl = const Value.absent(),
+            Value<String?> videoUrl = const Value.absent(),
+            Value<String?> mechanic = const Value.absent(),
+            Value<String?> force = const Value.absent(),
+            Value<String> source = const Value.absent(),
             Value<bool> isCustom = const Value.absent(),
             Value<DateTime?> lastUsed = const Value.absent(),
           }) =>
               ExercisesCompanion(
             id: id,
             name: name,
+            description: description,
+            category: category,
+            difficulty: difficulty,
             primaryMuscle: primaryMuscle,
             secondaryMuscle: secondaryMuscle,
             equipment: equipment,
             setType: setType,
             restTime: restTime,
             instructions: instructions,
+            gifUrl: gifUrl,
+            imageUrl: imageUrl,
+            videoUrl: videoUrl,
+            mechanic: mechanic,
+            force: force,
+            source: source,
             isCustom: isCustom,
             lastUsed: lastUsed,
           ),
           createCompanionCallback: ({
             Value<int> id = const Value.absent(),
             required String name,
+            Value<String?> description = const Value.absent(),
+            Value<String> category = const Value.absent(),
+            Value<String> difficulty = const Value.absent(),
             required String primaryMuscle,
             Value<String?> secondaryMuscle = const Value.absent(),
             required String equipment,
             required String setType,
             Value<int> restTime = const Value.absent(),
             Value<String?> instructions = const Value.absent(),
+            Value<String?> gifUrl = const Value.absent(),
+            Value<String?> imageUrl = const Value.absent(),
+            Value<String?> videoUrl = const Value.absent(),
+            Value<String?> mechanic = const Value.absent(),
+            Value<String?> force = const Value.absent(),
+            Value<String> source = const Value.absent(),
             Value<bool> isCustom = const Value.absent(),
             Value<DateTime?> lastUsed = const Value.absent(),
           }) =>
               ExercisesCompanion.insert(
             id: id,
             name: name,
+            description: description,
+            category: category,
+            difficulty: difficulty,
             primaryMuscle: primaryMuscle,
             secondaryMuscle: secondaryMuscle,
             equipment: equipment,
             setType: setType,
             restTime: restTime,
             instructions: instructions,
+            gifUrl: gifUrl,
+            imageUrl: imageUrl,
+            videoUrl: videoUrl,
+            mechanic: mechanic,
+            force: force,
+            source: source,
             isCustom: isCustom,
             lastUsed: lastUsed,
           ),
@@ -4606,7 +5363,7 @@ class $$ExercisesTableTableManager extends RootTableManager<
               getPrefetchedDataCallback: (items) async {
                 return [
                   if (templateExercisesRefs)
-                    await $_getPrefetchedData<Exercise, $ExercisesTable,
+                    await $_getPrefetchedData<ExerciseTable, $ExercisesTable,
                             TemplateExercise>(
                         currentTable: table,
                         referencedTable: $$ExercisesTableReferences
@@ -4619,7 +5376,7 @@ class $$ExercisesTableTableManager extends RootTableManager<
                                 .where((e) => e.exerciseId == item.id),
                         typedResults: items),
                   if (workoutSetsRefs)
-                    await $_getPrefetchedData<Exercise, $ExercisesTable,
+                    await $_getPrefetchedData<ExerciseTable, $ExercisesTable,
                             WorkoutSet>(
                         currentTable: table,
                         referencedTable: $$ExercisesTableReferences
@@ -4632,7 +5389,7 @@ class $$ExercisesTableTableManager extends RootTableManager<
                                 .where((e) => e.exerciseId == item.id),
                         typedResults: items),
                   if (exerciseProgressionSettingsRefs)
-                    await $_getPrefetchedData<Exercise, $ExercisesTable,
+                    await $_getPrefetchedData<ExerciseTable, $ExercisesTable,
                             ExerciseProgressionSetting>(
                         currentTable: table,
                         referencedTable: $$ExercisesTableReferences
@@ -4654,14 +5411,14 @@ class $$ExercisesTableTableManager extends RootTableManager<
 typedef $$ExercisesTableProcessedTableManager = ProcessedTableManager<
     _$AppDatabase,
     $ExercisesTable,
-    Exercise,
+    ExerciseTable,
     $$ExercisesTableFilterComposer,
     $$ExercisesTableOrderingComposer,
     $$ExercisesTableAnnotationComposer,
     $$ExercisesTableCreateCompanionBuilder,
     $$ExercisesTableUpdateCompanionBuilder,
-    (Exercise, $$ExercisesTableReferences),
-    Exercise,
+    (ExerciseTable, $$ExercisesTableReferences),
+    ExerciseTable,
     PrefetchHooks Function(
         {bool templateExercisesRefs,
         bool workoutSetsRefs,
@@ -6886,34 +7643,46 @@ typedef $$BodyMeasurementsTableCreateCompanionBuilder
   Value<int> id,
   required DateTime date,
   Value<double?> weight,
+  Value<double?> bodyFat,
+  Value<double?> neck,
   Value<double?> chest,
+  Value<double?> shoulders,
+  Value<double?> armLeft,
+  Value<double?> armRight,
+  Value<double?> forearmLeft,
+  Value<double?> forearmRight,
   Value<double?> waist,
   Value<double?> hips,
-  Value<double?> leftArm,
-  Value<double?> rightArm,
-  Value<double?> leftThigh,
-  Value<double?> rightThigh,
-  Value<double?> calves,
-  Value<double?> bodyFat,
+  Value<double?> thighLeft,
+  Value<double?> thighRight,
+  Value<double?> calfLeft,
+  Value<double?> calfRight,
+  Value<String?> notes,
 });
 typedef $$BodyMeasurementsTableUpdateCompanionBuilder
     = BodyMeasurementsCompanion Function({
   Value<int> id,
   Value<DateTime> date,
   Value<double?> weight,
+  Value<double?> bodyFat,
+  Value<double?> neck,
   Value<double?> chest,
+  Value<double?> shoulders,
+  Value<double?> armLeft,
+  Value<double?> armRight,
+  Value<double?> forearmLeft,
+  Value<double?> forearmRight,
   Value<double?> waist,
   Value<double?> hips,
-  Value<double?> leftArm,
-  Value<double?> rightArm,
-  Value<double?> leftThigh,
-  Value<double?> rightThigh,
-  Value<double?> calves,
-  Value<double?> bodyFat,
+  Value<double?> thighLeft,
+  Value<double?> thighRight,
+  Value<double?> calfLeft,
+  Value<double?> calfRight,
+  Value<String?> notes,
 });
 
 final class $$BodyMeasurementsTableReferences extends BaseReferences<
-    _$AppDatabase, $BodyMeasurementsTable, BodyMeasurement> {
+    _$AppDatabase, $BodyMeasurementsTable, BodyMeasurementTable> {
   $$BodyMeasurementsTableReferences(
       super.$_db, super.$_table, super.$_typedResult);
 
@@ -6951,8 +7720,29 @@ class $$BodyMeasurementsTableFilterComposer
   ColumnFilters<double> get weight => $composableBuilder(
       column: $table.weight, builder: (column) => ColumnFilters(column));
 
+  ColumnFilters<double> get bodyFat => $composableBuilder(
+      column: $table.bodyFat, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<double> get neck => $composableBuilder(
+      column: $table.neck, builder: (column) => ColumnFilters(column));
+
   ColumnFilters<double> get chest => $composableBuilder(
       column: $table.chest, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<double> get shoulders => $composableBuilder(
+      column: $table.shoulders, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<double> get armLeft => $composableBuilder(
+      column: $table.armLeft, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<double> get armRight => $composableBuilder(
+      column: $table.armRight, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<double> get forearmLeft => $composableBuilder(
+      column: $table.forearmLeft, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<double> get forearmRight => $composableBuilder(
+      column: $table.forearmRight, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<double> get waist => $composableBuilder(
       column: $table.waist, builder: (column) => ColumnFilters(column));
@@ -6960,23 +7750,20 @@ class $$BodyMeasurementsTableFilterComposer
   ColumnFilters<double> get hips => $composableBuilder(
       column: $table.hips, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<double> get leftArm => $composableBuilder(
-      column: $table.leftArm, builder: (column) => ColumnFilters(column));
+  ColumnFilters<double> get thighLeft => $composableBuilder(
+      column: $table.thighLeft, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<double> get rightArm => $composableBuilder(
-      column: $table.rightArm, builder: (column) => ColumnFilters(column));
+  ColumnFilters<double> get thighRight => $composableBuilder(
+      column: $table.thighRight, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<double> get leftThigh => $composableBuilder(
-      column: $table.leftThigh, builder: (column) => ColumnFilters(column));
+  ColumnFilters<double> get calfLeft => $composableBuilder(
+      column: $table.calfLeft, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<double> get rightThigh => $composableBuilder(
-      column: $table.rightThigh, builder: (column) => ColumnFilters(column));
+  ColumnFilters<double> get calfRight => $composableBuilder(
+      column: $table.calfRight, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<double> get calves => $composableBuilder(
-      column: $table.calves, builder: (column) => ColumnFilters(column));
-
-  ColumnFilters<double> get bodyFat => $composableBuilder(
-      column: $table.bodyFat, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get notes => $composableBuilder(
+      column: $table.notes, builder: (column) => ColumnFilters(column));
 
   Expression<bool> syncQueueRefs(
       Expression<bool> Function($$SyncQueueTableFilterComposer f) f) {
@@ -7018,8 +7805,30 @@ class $$BodyMeasurementsTableOrderingComposer
   ColumnOrderings<double> get weight => $composableBuilder(
       column: $table.weight, builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<double> get bodyFat => $composableBuilder(
+      column: $table.bodyFat, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<double> get neck => $composableBuilder(
+      column: $table.neck, builder: (column) => ColumnOrderings(column));
+
   ColumnOrderings<double> get chest => $composableBuilder(
       column: $table.chest, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<double> get shoulders => $composableBuilder(
+      column: $table.shoulders, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<double> get armLeft => $composableBuilder(
+      column: $table.armLeft, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<double> get armRight => $composableBuilder(
+      column: $table.armRight, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<double> get forearmLeft => $composableBuilder(
+      column: $table.forearmLeft, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<double> get forearmRight => $composableBuilder(
+      column: $table.forearmRight,
+      builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<double> get waist => $composableBuilder(
       column: $table.waist, builder: (column) => ColumnOrderings(column));
@@ -7027,23 +7836,20 @@ class $$BodyMeasurementsTableOrderingComposer
   ColumnOrderings<double> get hips => $composableBuilder(
       column: $table.hips, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<double> get leftArm => $composableBuilder(
-      column: $table.leftArm, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<double> get thighLeft => $composableBuilder(
+      column: $table.thighLeft, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<double> get rightArm => $composableBuilder(
-      column: $table.rightArm, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<double> get thighRight => $composableBuilder(
+      column: $table.thighRight, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<double> get leftThigh => $composableBuilder(
-      column: $table.leftThigh, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<double> get calfLeft => $composableBuilder(
+      column: $table.calfLeft, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<double> get rightThigh => $composableBuilder(
-      column: $table.rightThigh, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<double> get calfRight => $composableBuilder(
+      column: $table.calfRight, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<double> get calves => $composableBuilder(
-      column: $table.calves, builder: (column) => ColumnOrderings(column));
-
-  ColumnOrderings<double> get bodyFat => $composableBuilder(
-      column: $table.bodyFat, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get notes => $composableBuilder(
+      column: $table.notes, builder: (column) => ColumnOrderings(column));
 }
 
 class $$BodyMeasurementsTableAnnotationComposer
@@ -7064,8 +7870,29 @@ class $$BodyMeasurementsTableAnnotationComposer
   GeneratedColumn<double> get weight =>
       $composableBuilder(column: $table.weight, builder: (column) => column);
 
+  GeneratedColumn<double> get bodyFat =>
+      $composableBuilder(column: $table.bodyFat, builder: (column) => column);
+
+  GeneratedColumn<double> get neck =>
+      $composableBuilder(column: $table.neck, builder: (column) => column);
+
   GeneratedColumn<double> get chest =>
       $composableBuilder(column: $table.chest, builder: (column) => column);
+
+  GeneratedColumn<double> get shoulders =>
+      $composableBuilder(column: $table.shoulders, builder: (column) => column);
+
+  GeneratedColumn<double> get armLeft =>
+      $composableBuilder(column: $table.armLeft, builder: (column) => column);
+
+  GeneratedColumn<double> get armRight =>
+      $composableBuilder(column: $table.armRight, builder: (column) => column);
+
+  GeneratedColumn<double> get forearmLeft => $composableBuilder(
+      column: $table.forearmLeft, builder: (column) => column);
+
+  GeneratedColumn<double> get forearmRight => $composableBuilder(
+      column: $table.forearmRight, builder: (column) => column);
 
   GeneratedColumn<double> get waist =>
       $composableBuilder(column: $table.waist, builder: (column) => column);
@@ -7073,23 +7900,20 @@ class $$BodyMeasurementsTableAnnotationComposer
   GeneratedColumn<double> get hips =>
       $composableBuilder(column: $table.hips, builder: (column) => column);
 
-  GeneratedColumn<double> get leftArm =>
-      $composableBuilder(column: $table.leftArm, builder: (column) => column);
+  GeneratedColumn<double> get thighLeft =>
+      $composableBuilder(column: $table.thighLeft, builder: (column) => column);
 
-  GeneratedColumn<double> get rightArm =>
-      $composableBuilder(column: $table.rightArm, builder: (column) => column);
+  GeneratedColumn<double> get thighRight => $composableBuilder(
+      column: $table.thighRight, builder: (column) => column);
 
-  GeneratedColumn<double> get leftThigh =>
-      $composableBuilder(column: $table.leftThigh, builder: (column) => column);
+  GeneratedColumn<double> get calfLeft =>
+      $composableBuilder(column: $table.calfLeft, builder: (column) => column);
 
-  GeneratedColumn<double> get rightThigh => $composableBuilder(
-      column: $table.rightThigh, builder: (column) => column);
+  GeneratedColumn<double> get calfRight =>
+      $composableBuilder(column: $table.calfRight, builder: (column) => column);
 
-  GeneratedColumn<double> get calves =>
-      $composableBuilder(column: $table.calves, builder: (column) => column);
-
-  GeneratedColumn<double> get bodyFat =>
-      $composableBuilder(column: $table.bodyFat, builder: (column) => column);
+  GeneratedColumn<String> get notes =>
+      $composableBuilder(column: $table.notes, builder: (column) => column);
 
   Expression<T> syncQueueRefs<T extends Object>(
       Expression<T> Function($$SyncQueueTableAnnotationComposer a) f) {
@@ -7116,14 +7940,14 @@ class $$BodyMeasurementsTableAnnotationComposer
 class $$BodyMeasurementsTableTableManager extends RootTableManager<
     _$AppDatabase,
     $BodyMeasurementsTable,
-    BodyMeasurement,
+    BodyMeasurementTable,
     $$BodyMeasurementsTableFilterComposer,
     $$BodyMeasurementsTableOrderingComposer,
     $$BodyMeasurementsTableAnnotationComposer,
     $$BodyMeasurementsTableCreateCompanionBuilder,
     $$BodyMeasurementsTableUpdateCompanionBuilder,
-    (BodyMeasurement, $$BodyMeasurementsTableReferences),
-    BodyMeasurement,
+    (BodyMeasurementTable, $$BodyMeasurementsTableReferences),
+    BodyMeasurementTable,
     PrefetchHooks Function({bool syncQueueRefs})> {
   $$BodyMeasurementsTableTableManager(
       _$AppDatabase db, $BodyMeasurementsTable table)
@@ -7140,57 +7964,81 @@ class $$BodyMeasurementsTableTableManager extends RootTableManager<
             Value<int> id = const Value.absent(),
             Value<DateTime> date = const Value.absent(),
             Value<double?> weight = const Value.absent(),
+            Value<double?> bodyFat = const Value.absent(),
+            Value<double?> neck = const Value.absent(),
             Value<double?> chest = const Value.absent(),
+            Value<double?> shoulders = const Value.absent(),
+            Value<double?> armLeft = const Value.absent(),
+            Value<double?> armRight = const Value.absent(),
+            Value<double?> forearmLeft = const Value.absent(),
+            Value<double?> forearmRight = const Value.absent(),
             Value<double?> waist = const Value.absent(),
             Value<double?> hips = const Value.absent(),
-            Value<double?> leftArm = const Value.absent(),
-            Value<double?> rightArm = const Value.absent(),
-            Value<double?> leftThigh = const Value.absent(),
-            Value<double?> rightThigh = const Value.absent(),
-            Value<double?> calves = const Value.absent(),
-            Value<double?> bodyFat = const Value.absent(),
+            Value<double?> thighLeft = const Value.absent(),
+            Value<double?> thighRight = const Value.absent(),
+            Value<double?> calfLeft = const Value.absent(),
+            Value<double?> calfRight = const Value.absent(),
+            Value<String?> notes = const Value.absent(),
           }) =>
               BodyMeasurementsCompanion(
             id: id,
             date: date,
             weight: weight,
+            bodyFat: bodyFat,
+            neck: neck,
             chest: chest,
+            shoulders: shoulders,
+            armLeft: armLeft,
+            armRight: armRight,
+            forearmLeft: forearmLeft,
+            forearmRight: forearmRight,
             waist: waist,
             hips: hips,
-            leftArm: leftArm,
-            rightArm: rightArm,
-            leftThigh: leftThigh,
-            rightThigh: rightThigh,
-            calves: calves,
-            bodyFat: bodyFat,
+            thighLeft: thighLeft,
+            thighRight: thighRight,
+            calfLeft: calfLeft,
+            calfRight: calfRight,
+            notes: notes,
           ),
           createCompanionCallback: ({
             Value<int> id = const Value.absent(),
             required DateTime date,
             Value<double?> weight = const Value.absent(),
+            Value<double?> bodyFat = const Value.absent(),
+            Value<double?> neck = const Value.absent(),
             Value<double?> chest = const Value.absent(),
+            Value<double?> shoulders = const Value.absent(),
+            Value<double?> armLeft = const Value.absent(),
+            Value<double?> armRight = const Value.absent(),
+            Value<double?> forearmLeft = const Value.absent(),
+            Value<double?> forearmRight = const Value.absent(),
             Value<double?> waist = const Value.absent(),
             Value<double?> hips = const Value.absent(),
-            Value<double?> leftArm = const Value.absent(),
-            Value<double?> rightArm = const Value.absent(),
-            Value<double?> leftThigh = const Value.absent(),
-            Value<double?> rightThigh = const Value.absent(),
-            Value<double?> calves = const Value.absent(),
-            Value<double?> bodyFat = const Value.absent(),
+            Value<double?> thighLeft = const Value.absent(),
+            Value<double?> thighRight = const Value.absent(),
+            Value<double?> calfLeft = const Value.absent(),
+            Value<double?> calfRight = const Value.absent(),
+            Value<String?> notes = const Value.absent(),
           }) =>
               BodyMeasurementsCompanion.insert(
             id: id,
             date: date,
             weight: weight,
+            bodyFat: bodyFat,
+            neck: neck,
             chest: chest,
+            shoulders: shoulders,
+            armLeft: armLeft,
+            armRight: armRight,
+            forearmLeft: forearmLeft,
+            forearmRight: forearmRight,
             waist: waist,
             hips: hips,
-            leftArm: leftArm,
-            rightArm: rightArm,
-            leftThigh: leftThigh,
-            rightThigh: rightThigh,
-            calves: calves,
-            bodyFat: bodyFat,
+            thighLeft: thighLeft,
+            thighRight: thighRight,
+            calfLeft: calfLeft,
+            calfRight: calfRight,
+            notes: notes,
           ),
           withReferenceMapper: (p0) => p0
               .map((e) => (
@@ -7206,7 +8054,7 @@ class $$BodyMeasurementsTableTableManager extends RootTableManager<
               getPrefetchedDataCallback: (items) async {
                 return [
                   if (syncQueueRefs)
-                    await $_getPrefetchedData<BodyMeasurement,
+                    await $_getPrefetchedData<BodyMeasurementTable,
                             $BodyMeasurementsTable, SyncQueueData>(
                         currentTable: table,
                         referencedTable: $$BodyMeasurementsTableReferences
@@ -7228,14 +8076,14 @@ class $$BodyMeasurementsTableTableManager extends RootTableManager<
 typedef $$BodyMeasurementsTableProcessedTableManager = ProcessedTableManager<
     _$AppDatabase,
     $BodyMeasurementsTable,
-    BodyMeasurement,
+    BodyMeasurementTable,
     $$BodyMeasurementsTableFilterComposer,
     $$BodyMeasurementsTableOrderingComposer,
     $$BodyMeasurementsTableAnnotationComposer,
     $$BodyMeasurementsTableCreateCompanionBuilder,
     $$BodyMeasurementsTableUpdateCompanionBuilder,
-    (BodyMeasurement, $$BodyMeasurementsTableReferences),
-    BodyMeasurement,
+    (BodyMeasurementTable, $$BodyMeasurementsTableReferences),
+    BodyMeasurementTable,
     PrefetchHooks Function({bool syncQueueRefs})>;
 typedef $$SyncQueueTableCreateCompanionBuilder = SyncQueueCompanion Function({
   Value<int> id,

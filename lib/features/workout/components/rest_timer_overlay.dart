@@ -2,7 +2,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
-import 'package:gym_gemini_pro/features/workout/providers/timer_notifier.dart';
+import 'package:ai_gym_mentor/features/workout/providers/timer_notifier.dart';
 
 class RestTimerOverlay extends ConsumerWidget {
   final String? nextExerciseName;

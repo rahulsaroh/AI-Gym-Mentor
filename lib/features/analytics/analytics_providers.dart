@@ -1,6 +1,6 @@
-import 'package:gym_gemini_pro/core/database/database.dart';
-import 'package:gym_gemini_pro/features/analytics/stats_repository.dart';
-import 'package:gym_gemini_pro/features/analytics/measurements_repository.dart';
+import 'package:ai_gym_mentor/features/analytics/stats_repository.dart';
+import 'package:ai_gym_mentor/features/analytics/measurements_repository.dart';
+import 'package:ai_gym_mentor/core/domain/entities/body_measurement.dart' as ent;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'analytics_providers.g.dart';
@@ -44,14 +44,14 @@ Future<List<Map<String, dynamic>>> recentPRs(RecentPRsRef ref) async {
 @riverpod
 class BodyMeasurementsList extends _$BodyMeasurementsList {
   @override
-  Future<List<BodyMeasurement>> build() async {
+  Future<List<ent.BodyMeasurement>> build() async {
     final repo = ref.watch(measurementsRepositoryProvider);
     return await repo.getAllMeasurements();
   }
 
-  Future<void> addMeasurement(BodyMeasurementsCompanion companion) async {
+  Future<void> addMeasurement(ent.BodyMeasurement measurement) async {
     final repo = ref.read(measurementsRepositoryProvider);
-    await repo.addMeasurement(companion);
+    await repo.addMeasurement(measurement);
     ref.invalidateSelf();
   }
 

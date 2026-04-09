@@ -4,10 +4,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
-import 'package:gym_gemini_pro/core/database/database.dart';
-import 'package:gym_gemini_pro/features/exercises/exercises_provider.dart';
-import 'package:gym_gemini_pro/features/exercises/components/exercise_picker_overlay.dart';
-import 'package:gym_gemini_pro/features/programs/providers/programs_notifier.dart';
+import 'package:ai_gym_mentor/core/database/database.dart';
+import 'package:ai_gym_mentor/core/domain/entities/exercise.dart';
+import 'package:ai_gym_mentor/features/exercises/exercises_provider.dart';
+import 'package:ai_gym_mentor/features/exercises/components/exercise_picker_overlay.dart';
+import 'package:ai_gym_mentor/features/programs/providers/programs_notifier.dart';
 import 'package:drift/drift.dart' hide Column;
 
 class CreateEditProgramScreen extends ConsumerStatefulWidget {

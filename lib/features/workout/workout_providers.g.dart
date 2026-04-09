@@ -6,11 +6,12 @@ part of 'workout_providers.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$activeWorkoutHash() => r'17fa1e36cb1fa4746040d38ab36cfef7807bd491';
+String _$activeWorkoutHash() => r'8c9afd07828c334e2dfe41e38c200b35e2d12b01';
 
 /// See also [activeWorkout].
 @ProviderFor(activeWorkout)
-final activeWorkoutProvider = AutoDisposeFutureProvider<Workout?>.internal(
+final activeWorkoutProvider =
+    AutoDisposeFutureProvider<WorkoutSession?>.internal(
   activeWorkout,
   name: r'activeWorkoutProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
@@ -22,13 +23,13 @@ final activeWorkoutProvider = AutoDisposeFutureProvider<Workout?>.internal(
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-typedef ActiveWorkoutRef = AutoDisposeFutureProviderRef<Workout?>;
-String _$workoutTemplatesHash() => r'd62598744ca7c737193ed697ba983dcb6bf359cb';
+typedef ActiveWorkoutRef = AutoDisposeFutureProviderRef<WorkoutSession?>;
+String _$workoutTemplatesHash() => r'f4868254b79f56c8b8e88cf9ee89ae7308637a58';
 
 /// See also [workoutTemplates].
 @ProviderFor(workoutTemplates)
 final workoutTemplatesProvider =
-    AutoDisposeFutureProvider<List<WorkoutTemplate>>.internal(
+    AutoDisposeFutureProvider<List<WorkoutProgram>>.internal(
   workoutTemplates,
   name: r'workoutTemplatesProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
@@ -41,8 +42,8 @@ final workoutTemplatesProvider =
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef WorkoutTemplatesRef
-    = AutoDisposeFutureProviderRef<List<WorkoutTemplate>>;
-String _$templateDaysHash() => r'63e24068ca9260cfd5ec6d8d60ba6cf4253bb396';
+    = AutoDisposeFutureProviderRef<List<WorkoutProgram>>;
+String _$templateDaysHash() => r'9a833cf6d9bbd98c12854d1e531a19ea2819ca8a';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -70,7 +71,7 @@ class _SystemHash {
 const templateDaysProvider = TemplateDaysFamily();
 
 /// See also [templateDays].
-class TemplateDaysFamily extends Family<AsyncValue<List<TemplateDay>>> {
+class TemplateDaysFamily extends Family<AsyncValue<List<ProgramDay>>> {
   /// See also [templateDays].
   const TemplateDaysFamily();
 
@@ -108,8 +109,7 @@ class TemplateDaysFamily extends Family<AsyncValue<List<TemplateDay>>> {
 }
 
 /// See also [templateDays].
-class TemplateDaysProvider
-    extends AutoDisposeFutureProvider<List<TemplateDay>> {
+class TemplateDaysProvider extends AutoDisposeFutureProvider<List<ProgramDay>> {
   /// See also [templateDays].
   TemplateDaysProvider(
     int templateId,
@@ -144,7 +144,7 @@ class TemplateDaysProvider
 
   @override
   Override overrideWith(
-    FutureOr<List<TemplateDay>> Function(TemplateDaysRef provider) create,
+    FutureOr<List<ProgramDay>> Function(TemplateDaysRef provider) create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -161,7 +161,7 @@ class TemplateDaysProvider
   }
 
   @override
-  AutoDisposeFutureProviderElement<List<TemplateDay>> createElement() {
+  AutoDisposeFutureProviderElement<List<ProgramDay>> createElement() {
     return _TemplateDaysProviderElement(this);
   }
 
@@ -181,13 +181,13 @@ class TemplateDaysProvider
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-mixin TemplateDaysRef on AutoDisposeFutureProviderRef<List<TemplateDay>> {
+mixin TemplateDaysRef on AutoDisposeFutureProviderRef<List<ProgramDay>> {
   /// The parameter `templateId` of this provider.
   int get templateId;
 }
 
 class _TemplateDaysProviderElement
-    extends AutoDisposeFutureProviderElement<List<TemplateDay>>
+    extends AutoDisposeFutureProviderElement<List<ProgramDay>>
     with TemplateDaysRef {
   _TemplateDaysProviderElement(super.provider);
 

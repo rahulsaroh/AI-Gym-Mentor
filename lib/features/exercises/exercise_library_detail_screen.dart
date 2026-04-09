@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
-import 'package:gym_gemini_pro/core/database/database.dart';
-import 'package:gym_gemini_pro/core/domain/entities/exercise.dart' as ent;
-import 'package:gym_gemini_pro/features/exercises/exercise_repository.dart';
+import 'package:ai_gym_mentor/core/database/database.dart';
+import 'package:ai_gym_mentor/core/domain/entities/exercise.dart' as ent;
+import 'package:ai_gym_mentor/features/exercises/exercise_repository.dart';
 import 'package:drift/drift.dart' as drift;
 import 'repositories/exercise_library_repository.dart';
 import 'widgets/exercise_media_widget.dart';

@@ -1,11 +1,10 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:gym_gemini_pro/core/database/database.dart';
-import 'package:gym_gemini_pro/features/analytics/analytics_providers.dart';
+import 'package:ai_gym_mentor/features/analytics/analytics_providers.dart';
 import 'package:intl/intl.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
-import 'package:drift/drift.dart' hide Column;
+import 'package:ai_gym_mentor/core/domain/entities/body_measurement.dart' as ent;
 
 class BodyMeasurementsScreen extends ConsumerStatefulWidget {
   const BodyMeasurementsScreen({super.key});
@@ -103,8 +102,8 @@ class _BodyMeasurementsScreenState
       context: context,
       isScrollControlled: true,
       builder: (context) => _AddMeasurementSheet(
-        onAdd: (c) =>
-            ref.read(bodyMeasurementsListProvider.notifier).addMeasurement(c),
+        onAdd: (m) =>
+            ref.read(bodyMeasurementsListProvider.notifier).addMeasurement(m),
       ),
     );
   }
@@ -140,7 +139,7 @@ class _MetricSelector extends StatelessWidget {
 }
 
 class _MetricChart extends StatelessWidget {
-  final List<BodyMeasurement> data;
+  final List<ent.BodyMeasurement> data;
   final String metric;
   final String label;
 
@@ -206,7 +205,7 @@ class _MetricChart extends StatelessWidget {
     );
   }
 
-  double? _getValue(BodyMeasurement m, String key) {
+  double? _getValue(ent.BodyMeasurement m, String key) {
     switch (key) {
       case 'weight':
         return m.weight;
@@ -235,7 +234,7 @@ class _MetricChart extends StatelessWidget {
 }
 
 class _MeasurementTile extends ConsumerWidget {
-  final BodyMeasurement measurement;
+  final ent.BodyMeasurement measurement;
   const _MeasurementTile({required this.measurement});
 
   @override
@@ -284,7 +283,7 @@ class _MeasurementTile extends ConsumerWidget {
 }
 
 class _MeasurementGrid extends StatelessWidget {
-  final BodyMeasurement m;
+  final ent.BodyMeasurement m;
   const _MeasurementGrid({required this.m});
 
   @override
@@ -308,7 +307,7 @@ class _MeasurementGrid extends StatelessWidget {
 }
 
 class _AddMeasurementSheet extends StatefulWidget {
-  final Function(BodyMeasurementsCompanion) onAdd;
+  final Function(ent.BodyMeasurement) onAdd;
   const _AddMeasurementSheet({required this.onAdd});
 
   @override
@@ -383,17 +382,18 @@ class _AddMeasurementSheetState extends State<_AddMeasurementSheet> {
           const SizedBox(height: 24),
           ElevatedButton(
             onPressed: () {
-              final c = BodyMeasurementsCompanion(
-                date: Value(_date),
-                weight: Value(double.tryParse(_weightC.text)),
-                waist: Value(double.tryParse(_waistC.text)),
-                chest: Value(double.tryParse(_chestC.text)),
-                hips: Value(double.tryParse(_hipsC.text)),
-                leftArm: Value(double.tryParse(_lArmC.text)),
-                rightArm: Value(double.tryParse(_rArmC.text)),
-                bodyFat: Value(double.tryParse(_bodyFatC.text)),
+              final m = ent.BodyMeasurement(
+                id: 0,
+                date: _date,
+                weight: double.tryParse(_weightC.text),
+                waist: double.tryParse(_waistC.text),
+                chest: double.tryParse(_chestC.text),
+                hips: double.tryParse(_hipsC.text),
+                armLeft: double.tryParse(_lArmC.text),
+                armRight: double.tryParse(_rArmC.text),
+                bodyFat: double.tryParse(_bodyFatC.text),
               );
-              widget.onAdd(c);
+              widget.onAdd(m);
               Navigator.pop(context);
             },
             child: const Text('Save Entry'),

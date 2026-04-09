@@ -2,8 +2,8 @@ import 'dart:async';
 import 'dart:ui';
 import 'package:flutter_background_service/flutter_background_service.dart';
 
-import 'package:gym_gemini_pro/core/services/notification_service.dart';
-import 'package:gym_gemini_pro/core/utils/timer_utils.dart';
+import 'package:ai_gym_mentor/core/services/notification_service.dart';
+import 'package:ai_gym_mentor/core/utils/timer_utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 @pragma('vm:entry-point')
@@ -46,7 +46,7 @@ Future<bool> onStart(ServiceInstance service) async {
     service.stopSelf();
   });
 
-  service.on('add_30s').listen((event) async {
+  service.on('refresh_timer').listen((event) async {
     // Reload metadata to get the new endTime set by UI or previous action
     loadMetadata();
   });

@@ -2,10 +2,10 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:gym_gemini_pro/core/utils/timer_utils.dart';
+import 'package:ai_gym_mentor/core/utils/timer_utils.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:gym_gemini_pro/core/services/notification_service.dart';
+import 'package:ai_gym_mentor/core/services/notification_service.dart';
 
 part 'timer_notifier.g.dart';
 
@@ -193,7 +193,7 @@ class TimerNotifier extends _$TimerNotifier {
 
     // 3. Notify service if running
     FlutterBackgroundService()
-        .invoke('add_30s'); // Service also updates its internal endTime
+        .invoke('refresh_timer'); // Service also updates its internal endTime
   }
 
   Future<bool> checkPermissions() async {

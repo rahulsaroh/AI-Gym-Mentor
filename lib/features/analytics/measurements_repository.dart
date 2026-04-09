@@ -1,6 +1,6 @@
 import 'package:drift/drift.dart';
-import 'package:gym_gemini_pro/core/database/database.dart';
-import 'package:gym_gemini_pro/core/domain/entities/body_measurement.dart' as ent;
+import 'package:ai_gym_mentor/core/database/database.dart';
+import 'package:ai_gym_mentor/core/domain/entities/body_measurement.dart' as ent;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'measurements_repository.g.dart';
@@ -9,7 +9,7 @@ class MeasurementsRepository {
   final AppDatabase db;
   MeasurementsRepository(this.db);
 
-  ent.BodyMeasurement _toEntity(BodyMeasurement row) {
+  ent.BodyMeasurement _toEntity(BodyMeasurementTable row) {
     return ent.BodyMeasurement(
       id: row.id,
       date: row.date,
@@ -85,7 +85,7 @@ class MeasurementsRepository {
   }
 
   Future<void> updateMeasurement(ent.BodyMeasurement measurement) async {
-    await db.update(db.bodyMeasurements).replace(BodyMeasurement(
+    await db.update(db.bodyMeasurements).replace(BodyMeasurementTable(
       id: measurement.id,
       date: measurement.date,
       weight: measurement.weight,

@@ -1,5 +1,5 @@
 import 'package:drift/drift.dart';
-import 'package:gym_gemini_pro/core/database/database.dart';
+import 'package:ai_gym_mentor/core/database/database.dart';
 
 final initialExercises = [
   const ExercisesCompanion(

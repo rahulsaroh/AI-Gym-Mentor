@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:gym_gemini_pro/core/domain/entities/logged_set.dart' as ent;
-import 'package:gym_gemini_pro/core/domain/entities/workout_session.dart' as ent;
-import 'package:gym_gemini_pro/features/workout/workout_repository.dart';
-import 'package:gym_gemini_pro/core/widgets/skeleton_card.dart';
-import 'package:gym_gemini_pro/core/widgets/number_ticker.dart';
-import 'package:gym_gemini_pro/features/history/history_providers.dart';
-import 'package:gym_gemini_pro/features/settings/settings_provider.dart';
-import 'package:gym_gemini_pro/core/utils/weight_converter.dart';
+import 'package:ai_gym_mentor/core/domain/entities/logged_set.dart' as ent;
+import 'package:ai_gym_mentor/core/domain/entities/workout_session.dart' as ent;
+import 'package:ai_gym_mentor/features/workout/workout_repository.dart';
+import 'package:ai_gym_mentor/core/widgets/skeleton_card.dart';
+import 'package:ai_gym_mentor/core/widgets/number_ticker.dart';
+import 'package:ai_gym_mentor/features/history/history_providers.dart';
+import 'package:ai_gym_mentor/features/settings/settings_provider.dart';
+import 'package:ai_gym_mentor/core/utils/weight_converter.dart';
 import 'package:intl/intl.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
-import 'package:gym_gemini_pro/features/settings/models/settings_state.dart';
+import 'package:ai_gym_mentor/features/settings/models/settings_state.dart';
 import 'package:go_router/go_router.dart';
-import 'package:gym_gemini_pro/services/export_service.dart';
+import 'package:ai_gym_mentor/services/export_service.dart';
 
 class HistoryScreen extends ConsumerStatefulWidget {
   const HistoryScreen({super.key});

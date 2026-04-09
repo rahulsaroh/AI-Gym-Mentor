@@ -1,13 +1,13 @@
 import 'package:drift/drift.dart' hide JsonKey;
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:gym_gemini_pro/core/database/database.dart';
-import 'package:gym_gemini_pro/core/domain/entities/body_measurement.dart' as ent;
-import 'package:gym_gemini_pro/core/domain/entities/workout_program.dart' as ent;
-import 'package:gym_gemini_pro/core/domain/entities/workout_session.dart' as ent;
+import 'package:ai_gym_mentor/core/database/database.dart';
+import 'package:ai_gym_mentor/core/domain/entities/body_measurement.dart' as ent;
+import 'package:ai_gym_mentor/core/domain/entities/workout_program.dart' as ent;
+import 'package:ai_gym_mentor/core/domain/entities/workout_session.dart' as ent;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:gym_gemini_pro/features/workout/workout_repository.dart';
-import 'package:gym_gemini_pro/features/analytics/measurements_repository.dart';
-import 'package:gym_gemini_pro/features/settings/settings_provider.dart';
+import 'package:ai_gym_mentor/features/workout/workout_repository.dart';
+import 'package:ai_gym_mentor/features/analytics/measurements_repository.dart';
+import 'package:ai_gym_mentor/features/settings/settings_provider.dart';
 
 part 'workout_home_notifier.freezed.dart';
 part 'workout_home_notifier.g.dart';

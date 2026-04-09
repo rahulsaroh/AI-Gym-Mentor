@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
-import 'package:gym_gemini_pro/features/settings/settings_provider.dart';
+import 'package:ai_gym_mentor/features/settings/settings_provider.dart';
 
 class PlatesConfigScreen extends ConsumerWidget {
   const PlatesConfigScreen({super.key});

@@ -116,12 +116,12 @@ final recentPRsProvider =
 // ignore: unused_element
 typedef RecentPRsRef = AutoDisposeFutureProviderRef<List<Map<String, dynamic>>>;
 String _$bodyMeasurementsListHash() =>
-    r'cc3be684cf40e60673ea5bb2dbe0e57fd04e8886';
+    r'c28d4395516e2b2ed3b78ea519f6a4111338bb55';
 
 /// See also [BodyMeasurementsList].
 @ProviderFor(BodyMeasurementsList)
 final bodyMeasurementsListProvider = AutoDisposeAsyncNotifierProvider<
-    BodyMeasurementsList, List<BodyMeasurement>>.internal(
+    BodyMeasurementsList, List<ent.BodyMeasurement>>.internal(
   BodyMeasurementsList.new,
   name: r'bodyMeasurementsListProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
@@ -132,6 +132,6 @@ final bodyMeasurementsListProvider = AutoDisposeAsyncNotifierProvider<
 );
 
 typedef _$BodyMeasurementsList
-    = AutoDisposeAsyncNotifier<List<BodyMeasurement>>;
+    = AutoDisposeAsyncNotifier<List<ent.BodyMeasurement>>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

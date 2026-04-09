@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:gym_gemini_pro/core/domain/entities/workout_program.dart' as ent;
-import 'package:gym_gemini_pro/features/programs/providers/programs_notifier.dart';
+import 'package:ai_gym_mentor/core/domain/entities/workout_program.dart' as ent;
+import 'package:ai_gym_mentor/features/programs/providers/programs_notifier.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:gym_gemini_pro/features/workout/workout_repository.dart';
-import 'package:gym_gemini_pro/features/workout/providers/workout_home_notifier.dart';
+import 'package:ai_gym_mentor/features/workout/workout_repository.dart';
+import 'package:ai_gym_mentor/features/workout/providers/workout_home_notifier.dart';
 
 class ProgramsScreen extends ConsumerWidget {
   const ProgramsScreen({super.key});

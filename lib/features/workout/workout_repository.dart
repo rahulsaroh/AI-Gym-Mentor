@@ -1,10 +1,10 @@
 import 'dart:convert';
 import 'package:drift/drift.dart';
-import 'package:gym_gemini_pro/core/database/database.dart';
-import 'package:gym_gemini_pro/core/domain/entities/exercise.dart' as ent;
-import 'package:gym_gemini_pro/core/domain/entities/logged_set.dart' as ent;
-import 'package:gym_gemini_pro/core/domain/entities/workout_session.dart' as ent;
-import 'package:gym_gemini_pro/core/domain/entities/workout_program.dart' as ent;
+import 'package:ai_gym_mentor/core/database/database.dart';
+import 'package:ai_gym_mentor/core/domain/entities/exercise.dart' as ent;
+import 'package:ai_gym_mentor/core/domain/entities/logged_set.dart' as ent;
+import 'package:ai_gym_mentor/core/domain/entities/workout_session.dart' as ent;
+import 'package:ai_gym_mentor/core/domain/entities/workout_program.dart' as ent;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

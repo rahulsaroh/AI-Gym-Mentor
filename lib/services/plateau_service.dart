@@ -1,7 +1,7 @@
 import 'dart:math';
 import 'package:drift/drift.dart';
-import 'package:gym_gemini_pro/core/database/database.dart';
-import 'package:gym_gemini_pro/services/progression_service.dart';
+import 'package:ai_gym_mentor/core/database/database.dart';
+import 'package:ai_gym_mentor/services/progression_service.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'plateau_service.g.dart';
