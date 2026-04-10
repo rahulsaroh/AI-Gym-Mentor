@@ -41,6 +41,6 @@ class DefaultFirebaseOptions {
     messagingSenderId: 'placeholder-sender-id',
     projectId: 'placeholder-project-id',
     storageBucket: 'placeholder-storage-bucket',
-    iosBundleId: 'com.gymgemini.pro.gym_gemini_pro',
+    iosBundleId: 'com.aigymmentor.app',
   );
 }

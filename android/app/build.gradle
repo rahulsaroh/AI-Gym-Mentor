@@ -41,6 +41,15 @@ android {
         main.java.srcDirs += 'src/main/kotlin'
     }
 
+    tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+        kotlinOptions {
+            freeCompilerArgs += [
+                "-Xuse-classpath=false",
+                "-Xskip-metadata-version-check"
+            ]
+        }
+    }
+
     defaultConfig {
         applicationId "com.aigymmentor.app"
         minSdkVersion flutter.minSdkVersion

@@ -42,6 +42,8 @@ class SettingsRepository {
       userName: name,
       weightUnit: unit,
       experienceLevel: exp,
+      age: prefs.getInt('age') ?? 25,
+      goals: prefs.getString('goals') ?? 'Build muscle and gain strength',
     );
   }
 
@@ -50,6 +52,8 @@ class SettingsRepository {
       'userName': s.userName,
       'experienceLevel': s.experienceLevel.name,
       'weightUnit': s.weightUnit.name,
+      'age': s.age,
+      'goals': s.goals,
       'themeMode': s.themeMode.name,
       'accentColor': s.accentColor.value,
       'fontSize': s.fontSize.name,
@@ -76,6 +80,8 @@ class SettingsRepository {
           (e) => e.name == map['experienceLevel'],
           orElse: () => ExperienceLevel.beginner),
       weightUnit: map['weightUnit'] == 'lbs' ? WeightUnit.lbs : WeightUnit.kg,
+      age: map['age'] ?? 25,
+      goals: map['goals'] ?? 'Build muscle and gain strength',
       themeMode: ThemeMode.values.firstWhere((e) => e.name == map['themeMode'],
           orElse: () => ThemeMode.system),
       accentColor: Color(map['accentColor'] ?? Colors.blue.value),

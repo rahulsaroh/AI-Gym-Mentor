@@ -10,6 +10,8 @@ class SettingsState {
   final String userName;
   final ExperienceLevel experienceLevel;
   final WeightUnit weightUnit;
+  final int age;
+  final String goals;
 
   final ThemeMode themeMode;
   final Color accentColor;
@@ -39,6 +41,8 @@ class SettingsState {
     this.userName = 'Alex',
     this.experienceLevel = ExperienceLevel.beginner,
     this.weightUnit = WeightUnit.kg,
+    this.age = 25,
+    this.goals = 'Build muscle and gain strength',
     this.themeMode = ThemeMode.system,
     this.accentColor = Colors.blue,
     this.fontSize = FontSize.normal,
@@ -71,6 +75,8 @@ class SettingsState {
     String? userName,
     ExperienceLevel? experienceLevel,
     WeightUnit? weightUnit,
+    int? age,
+    String? goals,
     ThemeMode? themeMode,
     Color? accentColor,
     FontSize? fontSize,
@@ -94,6 +100,8 @@ class SettingsState {
       userName: userName ?? this.userName,
       experienceLevel: experienceLevel ?? this.experienceLevel,
       weightUnit: weightUnit ?? this.weightUnit,
+      age: age ?? this.age,
+      goals: goals ?? this.goals,
       themeMode: themeMode ?? this.themeMode,
       accentColor: accentColor ?? this.accentColor,
       fontSize: fontSize ?? this.fontSize,

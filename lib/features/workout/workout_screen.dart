@@ -58,6 +58,12 @@ class WorkoutHomeScreen extends ConsumerWidget {
           error: (err, stack) => Center(child: Text('Error: $err')),
         ),
       ),
+      floatingActionButton: FloatingActionButton(
+        heroTag: 'ai_mentor_fab',
+        onPressed: () => context.push('/ai-mentor'),
+        backgroundColor: Colors.amber,
+        child: const Icon(Icons.auto_awesome, color: Colors.black),
+      ),
     );
   }
 }

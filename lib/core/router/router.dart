@@ -31,6 +31,7 @@ import 'package:ai_gym_mentor/features/workout/start_workout_screen.dart';
 import 'package:ai_gym_mentor/features/settings/sync_log_screen.dart';
 import 'package:ai_gym_mentor/features/exercises/exercise_library_screen.dart';
 import 'package:ai_gym_mentor/features/exercises/exercise_library_detail_screen.dart';
+import 'package:ai_gym_mentor/features/ai_mentor/ai_mentor_screen.dart';
 
 final router = GoRouter(
   initialLocation: '/',
@@ -89,6 +90,10 @@ final router = GoRouter(
                   },
                 ),
               ],
+            ),
+            GoRoute(
+              path: '/ai-mentor',
+              builder: (context, state) => const AiMentorScreen(),
             ),
           ],
         ),
