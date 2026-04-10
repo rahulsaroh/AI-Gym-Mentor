@@ -218,15 +218,15 @@ class _MetricChart extends StatelessWidget {
       case 'hips':
         return m.hips;
       case 'leftArm':
-        return m.leftArm;
+        return m.armLeft;
       case 'rightArm':
-        return m.rightArm;
+        return m.armRight;
       case 'leftThigh':
-        return m.leftThigh;
+        return m.thighLeft;
       case 'rightThigh':
-        return m.rightThigh;
+        return m.thighRight;
       case 'calves':
-        return m.calves;
+        return m.calfLeft;
       default:
         return null;
     }
@@ -292,7 +292,7 @@ class _MeasurementGrid extends StatelessWidget {
       if (m.waist != null) 'Waist: ${m.waist}cm',
       if (m.chest != null) 'Chest: ${m.chest}cm',
       if (m.bodyFat != null) 'BF%: ${m.bodyFat}%',
-      if (m.leftArm != null) 'L-Arm: ${m.leftArm}cm',
+      if (m.armLeft != null) 'L-Arm: ${m.armLeft}cm',
     ];
 
     return Wrap(

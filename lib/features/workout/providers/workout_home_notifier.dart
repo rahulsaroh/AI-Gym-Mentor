@@ -1,9 +1,9 @@
 import 'package:drift/drift.dart' hide JsonKey;
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:ai_gym_mentor/core/database/database.dart';
-import 'package:ai_gym_mentor/core/domain/entities/body_measurement.dart' as ent;
-import 'package:ai_gym_mentor/core/domain/entities/workout_program.dart' as ent;
-import 'package:ai_gym_mentor/core/domain/entities/workout_session.dart' as ent;
+import 'package:ai_gym_mentor/core/domain/entities/body_measurement.dart';
+import 'package:ai_gym_mentor/core/domain/entities/workout_program.dart';
+import 'package:ai_gym_mentor/core/domain/entities/workout_session.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:ai_gym_mentor/features/workout/workout_repository.dart';
 import 'package:ai_gym_mentor/features/analytics/measurements_repository.dart';
@@ -28,11 +28,11 @@ class WorkoutHomeState with _$WorkoutHomeState {
     required String dateString,
     required int currentStreak,
     required MotivationTip dailyTip,
-    ent.WorkoutSession? lastWorkout,
-    ent.WorkoutSession? activeDraft,
+    @Default(null) WorkoutSession? lastWorkout,
+    @Default(null) WorkoutSession? activeDraft,
     @Default({})
-    Map<int, double> weeklyVolume, // millisecondsSinceEpoch -> volume
-    ent.BodyMeasurement? lastWeight,
+    Map<int, double> weeklyVolume,
+    @Default(null) BodyMeasurement? lastWeight,
     String? lastWorkoutSummary,
     @Default(false) bool isRestDay,
     String? todayDayName,
@@ -41,6 +41,11 @@ class WorkoutHomeState with _$WorkoutHomeState {
     int? nextDayId,
     int? templateId,
   }) = _WorkoutHomeState;
+
+  const WorkoutHomeState._();
+
+  bool get hasActiveWorkout => activeDraft != null;
+  bool get hasLastWorkout => lastWorkout != null;
 }
 
 @riverpod
@@ -68,8 +73,11 @@ class WorkoutHomeNotifier extends _$WorkoutHomeNotifier {
 
     // Get real summary for last workout
     String? lastWorkoutSummary;
-    if (lastWorkout != null) {
-      final summaryData = await workoutRepo.getWorkoutSummary(lastWorkout.id);
+    final lastWorkoutEntity = await workoutRepo.getLastWorkout();
+    final activeDraftEntity = await workoutRepo.getActiveWorkoutDraft();
+    final lastWorkoutDate = lastWorkoutEntity?.date;
+    if (lastWorkoutEntity != null) {
+      final summaryData = await workoutRepo.getWorkoutSummary(lastWorkoutEntity.id);
       if (summaryData.isNotEmpty) {
         lastWorkoutSummary = summaryData.entries
             .take(2)
@@ -80,7 +88,6 @@ class WorkoutHomeNotifier extends _$WorkoutHomeNotifier {
 
     final measurementsRepo = ref.read(measurementsRepositoryProvider);
     final measurements = await measurementsRepo.getAllMeasurements();
-    final lastWeight = measurements.isNotEmpty ? measurements.first : null;
 
     final settings = ref.read(settingsProvider);
     final userName = settings.asData?.value.userName ?? 'Gym Kilo User';
@@ -176,11 +183,10 @@ class WorkoutHomeNotifier extends _$WorkoutHomeNotifier {
     }
 
     // Fallback: If no workout completed today but no template, it's not a rest day yet
-    if (activeTemplate == null && lastWorkout != null) {
-      final workoutDate = lastWorkout.date;
-      if (workoutDate.year == now.year &&
-          workoutDate.month == now.month &&
-          workoutDate.day == now.day) {
+    if (activeTemplate == null && lastWorkoutDate != null) {
+      if (lastWorkoutDate.year == now.year &&
+          lastWorkoutDate.month == now.month &&
+          lastWorkoutDate.day == now.day) {
         isRestDay = true;
       }
     }
@@ -191,10 +197,10 @@ class WorkoutHomeNotifier extends _$WorkoutHomeNotifier {
       dateString: dateString,
       currentStreak: stats['currentStreak'] as int,
       dailyTip: tips[tipIndex],
-      lastWorkout: lastWorkout,
-      activeDraft: activeDraft,
+      lastWorkout: lastWorkoutEntity,
+      activeDraft: activeDraftEntity,
       weeklyVolume: weeklyVolume,
-      lastWeight: lastWeight,
+      lastWeight: measurements.isNotEmpty ? measurements.first : null,
       lastWorkoutSummary: lastWorkoutSummary,
       isRestDay: isRestDay,
       todayDayName: todayDayName,

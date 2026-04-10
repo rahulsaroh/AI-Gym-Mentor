@@ -279,9 +279,28 @@ class _ImportWizardScreenState extends ConsumerState<ImportWizardScreen> {
       // 1. Custom Exercises
       final customExs = _importData!['custom_exercises'] as List;
       for (var ex in customExs) {
-        await db
-            .into(db.exercises)
-            .insertOnConflictUpdate(Exercise.fromJson(ex));
+        final exercise = ExerciseTable(
+          id: ex['id'] as int,
+          name: ex['name'] as String,
+          description: ex['description'] as String?,
+          category: ex['category'] as String? ?? 'Strength',
+          difficulty: ex['difficulty'] as String? ?? 'Beginner',
+          primaryMuscle: ex['primaryMuscle'] as String? ?? '',
+          secondaryMuscle: ex['secondaryMuscle'] as String?,
+          equipment: ex['equipment'] as String? ?? 'Barbell',
+          setType: ex['setType'] as String? ?? 'Straight',
+          restTime: ex['restTime'] as int? ?? 90,
+          instructions: ex['instructions'] as String?,
+          gifUrl: ex['gifUrl'] as String?,
+          imageUrl: ex['imageUrl'] as String?,
+          videoUrl: ex['videoUrl'] as String?,
+          mechanic: ex['mechanic'] as String?,
+          force: ex['force'] as String?,
+          source: ex['source'] as String? ?? 'local',
+          isCustom: ex['isCustom'] as bool? ?? false,
+          lastUsed: ex['lastUsed'] != null ? DateTime.parse(ex['lastUsed'] as String) : null,
+        );
+        await db.into(db.exercises).insertOnConflictUpdate(exercise);
       }
 
       // 2. Workouts & Sets
@@ -330,9 +349,27 @@ class _ImportWizardScreenState extends ConsumerState<ImportWizardScreen> {
       // 3. Measurements
       final measurements = _importData!['body_measurements'] as List;
       for (var m in measurements) {
-        await db
-            .into(db.bodyMeasurements)
-            .insertOnConflictUpdate(BodyMeasurement.fromJson(m));
+        final measurement = BodyMeasurementTable(
+          id: m['id'] as int,
+          date: DateTime.parse(m['date'] as String),
+          weight: m['weight'] as double?,
+          bodyFat: m['bodyFat'] as double?,
+          neck: m['neck'] as double?,
+          chest: m['chest'] as double?,
+          shoulders: m['shoulders'] as double?,
+          armLeft: m['armLeft'] as double?,
+          armRight: m['armRight'] as double?,
+          forearmLeft: m['forearmLeft'] as double?,
+          forearmRight: m['forearmRight'] as double?,
+          waist: m['waist'] as double?,
+          hips: m['hips'] as double?,
+          thighLeft: m['thighLeft'] as double?,
+          thighRight: m['thighRight'] as double?,
+          calfLeft: m['calfLeft'] as double?,
+          calfRight: m['calfRight'] as double?,
+          notes: m['notes'] as String?,
+        );
+        await db.into(db.bodyMeasurements).insertOnConflictUpdate(measurement);
       }
     });
 

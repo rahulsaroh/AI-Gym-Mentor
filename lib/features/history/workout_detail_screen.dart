@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ai_gym_mentor/core/database/database.dart';
+import 'package:ai_gym_mentor/core/domain/entities/exercise.dart';
 import 'package:intl/intl.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:go_router/go_router.dart';
@@ -304,7 +305,7 @@ class _SummaryStat extends StatelessWidget {
 }
 
 class _ExerciseDetailBlock extends ConsumerWidget {
-  final Exercise exercise;
+  final ExerciseTable exercise;
   final List<TypedResult> rows;
   final bool isEditing;
   final Function(int, double, double) onUpdate;

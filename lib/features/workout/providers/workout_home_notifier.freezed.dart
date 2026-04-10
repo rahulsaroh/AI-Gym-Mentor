@@ -168,11 +168,10 @@ mixin _$WorkoutHomeState {
   String get dateString => throw _privateConstructorUsedError;
   int get currentStreak => throw _privateConstructorUsedError;
   MotivationTip get dailyTip => throw _privateConstructorUsedError;
-  ent.WorkoutSession? get lastWorkout => throw _privateConstructorUsedError;
-  ent.WorkoutSession? get activeDraft => throw _privateConstructorUsedError;
-  Map<int, double> get weeklyVolume =>
-      throw _privateConstructorUsedError; // millisecondsSinceEpoch -> volume
-  ent.BodyMeasurement? get lastWeight => throw _privateConstructorUsedError;
+  WorkoutSession? get lastWorkout => throw _privateConstructorUsedError;
+  WorkoutSession? get activeDraft => throw _privateConstructorUsedError;
+  Map<int, double> get weeklyVolume => throw _privateConstructorUsedError;
+  BodyMeasurement? get lastWeight => throw _privateConstructorUsedError;
   String? get lastWorkoutSummary => throw _privateConstructorUsedError;
   bool get isRestDay => throw _privateConstructorUsedError;
   String? get todayDayName => throw _privateConstructorUsedError;
@@ -200,10 +199,10 @@ abstract class $WorkoutHomeStateCopyWith<$Res> {
       String dateString,
       int currentStreak,
       MotivationTip dailyTip,
-      ent.WorkoutSession? lastWorkout,
-      ent.WorkoutSession? activeDraft,
+      WorkoutSession? lastWorkout,
+      WorkoutSession? activeDraft,
       Map<int, double> weeklyVolume,
-      ent.BodyMeasurement? lastWeight,
+      BodyMeasurement? lastWeight,
       String? lastWorkoutSummary,
       bool isRestDay,
       String? todayDayName,
@@ -274,11 +273,11 @@ class _$WorkoutHomeStateCopyWithImpl<$Res, $Val extends WorkoutHomeState>
       lastWorkout: freezed == lastWorkout
           ? _value.lastWorkout
           : lastWorkout // ignore: cast_nullable_to_non_nullable
-              as ent.WorkoutSession?,
+              as WorkoutSession?,
       activeDraft: freezed == activeDraft
           ? _value.activeDraft
           : activeDraft // ignore: cast_nullable_to_non_nullable
-              as ent.WorkoutSession?,
+              as WorkoutSession?,
       weeklyVolume: null == weeklyVolume
           ? _value.weeklyVolume
           : weeklyVolume // ignore: cast_nullable_to_non_nullable
@@ -286,7 +285,7 @@ class _$WorkoutHomeStateCopyWithImpl<$Res, $Val extends WorkoutHomeState>
       lastWeight: freezed == lastWeight
           ? _value.lastWeight
           : lastWeight // ignore: cast_nullable_to_non_nullable
-              as ent.BodyMeasurement?,
+              as BodyMeasurement?,
       lastWorkoutSummary: freezed == lastWorkoutSummary
           ? _value.lastWorkoutSummary
           : lastWorkoutSummary // ignore: cast_nullable_to_non_nullable
@@ -385,10 +384,10 @@ abstract class _$$WorkoutHomeStateImplCopyWith<$Res>
       String dateString,
       int currentStreak,
       MotivationTip dailyTip,
-      ent.WorkoutSession? lastWorkout,
-      ent.WorkoutSession? activeDraft,
+      WorkoutSession? lastWorkout,
+      WorkoutSession? activeDraft,
       Map<int, double> weeklyVolume,
-      ent.BodyMeasurement? lastWeight,
+      BodyMeasurement? lastWeight,
       String? lastWorkoutSummary,
       bool isRestDay,
       String? todayDayName,
@@ -461,11 +460,11 @@ class __$$WorkoutHomeStateImplCopyWithImpl<$Res>
       lastWorkout: freezed == lastWorkout
           ? _value.lastWorkout
           : lastWorkout // ignore: cast_nullable_to_non_nullable
-              as ent.WorkoutSession?,
+              as WorkoutSession?,
       activeDraft: freezed == activeDraft
           ? _value.activeDraft
           : activeDraft // ignore: cast_nullable_to_non_nullable
-              as ent.WorkoutSession?,
+              as WorkoutSession?,
       weeklyVolume: null == weeklyVolume
           ? _value._weeklyVolume
           : weeklyVolume // ignore: cast_nullable_to_non_nullable
@@ -473,7 +472,7 @@ class __$$WorkoutHomeStateImplCopyWithImpl<$Res>
       lastWeight: freezed == lastWeight
           ? _value.lastWeight
           : lastWeight // ignore: cast_nullable_to_non_nullable
-              as ent.BodyMeasurement?,
+              as BodyMeasurement?,
       lastWorkoutSummary: freezed == lastWorkoutSummary
           ? _value.lastWorkoutSummary
           : lastWorkoutSummary // ignore: cast_nullable_to_non_nullable
@@ -508,17 +507,17 @@ class __$$WorkoutHomeStateImplCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$WorkoutHomeStateImpl implements _WorkoutHomeState {
+class _$WorkoutHomeStateImpl extends _WorkoutHomeState {
   const _$WorkoutHomeStateImpl(
       {required this.greeting,
       required this.userName,
       required this.dateString,
       required this.currentStreak,
       required this.dailyTip,
-      this.lastWorkout,
-      this.activeDraft,
+      this.lastWorkout = null,
+      this.activeDraft = null,
       final Map<int, double> weeklyVolume = const {},
-      this.lastWeight,
+      this.lastWeight = null,
       this.lastWorkoutSummary,
       this.isRestDay = false,
       this.todayDayName,
@@ -527,7 +526,8 @@ class _$WorkoutHomeStateImpl implements _WorkoutHomeState {
       this.nextDayId,
       this.templateId})
       : _weeklyVolume = weeklyVolume,
-        _todayExercises = todayExercises;
+        _todayExercises = todayExercises,
+        super._();
 
   @override
   final String greeting;
@@ -540,9 +540,11 @@ class _$WorkoutHomeStateImpl implements _WorkoutHomeState {
   @override
   final MotivationTip dailyTip;
   @override
-  final ent.WorkoutSession? lastWorkout;
+  @JsonKey()
+  final WorkoutSession? lastWorkout;
   @override
-  final ent.WorkoutSession? activeDraft;
+  @JsonKey()
+  final WorkoutSession? activeDraft;
   final Map<int, double> _weeklyVolume;
   @override
   @JsonKey()
@@ -552,9 +554,9 @@ class _$WorkoutHomeStateImpl implements _WorkoutHomeState {
     return EqualUnmodifiableMapView(_weeklyVolume);
   }
 
-// millisecondsSinceEpoch -> volume
   @override
-  final ent.BodyMeasurement? lastWeight;
+  @JsonKey()
+  final BodyMeasurement? lastWeight;
   @override
   final String? lastWorkoutSummary;
   @override
@@ -653,17 +655,17 @@ class _$WorkoutHomeStateImpl implements _WorkoutHomeState {
           this, _$identity);
 }
 
-abstract class _WorkoutHomeState implements WorkoutHomeState {
+abstract class _WorkoutHomeState extends WorkoutHomeState {
   const factory _WorkoutHomeState(
       {required final String greeting,
       required final String userName,
       required final String dateString,
       required final int currentStreak,
       required final MotivationTip dailyTip,
-      final ent.WorkoutSession? lastWorkout,
-      final ent.WorkoutSession? activeDraft,
+      final WorkoutSession? lastWorkout,
+      final WorkoutSession? activeDraft,
       final Map<int, double> weeklyVolume,
-      final ent.BodyMeasurement? lastWeight,
+      final BodyMeasurement? lastWeight,
       final String? lastWorkoutSummary,
       final bool isRestDay,
       final String? todayDayName,
@@ -671,6 +673,7 @@ abstract class _WorkoutHomeState implements WorkoutHomeState {
       final int estimatedDuration,
       final int? nextDayId,
       final int? templateId}) = _$WorkoutHomeStateImpl;
+  const _WorkoutHomeState._() : super._();
 
   @override
   String get greeting;
@@ -683,13 +686,13 @@ abstract class _WorkoutHomeState implements WorkoutHomeState {
   @override
   MotivationTip get dailyTip;
   @override
-  ent.WorkoutSession? get lastWorkout;
+  WorkoutSession? get lastWorkout;
   @override
-  ent.WorkoutSession? get activeDraft;
+  WorkoutSession? get activeDraft;
   @override
-  Map<int, double> get weeklyVolume; // millisecondsSinceEpoch -> volume
+  Map<int, double> get weeklyVolume;
   @override
-  ent.BodyMeasurement? get lastWeight;
+  BodyMeasurement? get lastWeight;
   @override
   String? get lastWorkoutSummary;
   @override
