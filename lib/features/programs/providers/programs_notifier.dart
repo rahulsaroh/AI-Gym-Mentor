@@ -11,7 +11,9 @@ part 'programs_notifier.freezed.dart';
 part 'programs_notifier.g.dart';
 
 @freezed
-class ProgramsState with _$ProgramsState {
+abstract class ProgramsState with _$ProgramsState {
+  const ProgramsState._();
+
   const factory ProgramsState({
     @Default([]) List<WorkoutProgram> templates,
     @Default(false) bool isLoading,
@@ -65,26 +67,42 @@ class ProgramsNotifier extends _$ProgramsNotifier {
   }
 
   Future<void> importTemplate() async {
-    final result = await FilePicker.platform.pickFiles(
+    print('DEBUG: importTemplate called');
+    final result = await FilePicker.pickFiles(
       type: FileType.custom,
       allowedExtensions: ['json'],
     );
 
     if (result != null && result.files.single.path != null) {
+      print('DEBUG: File picked: ${result.files.single.path}');
       final file = File(result.files.single.path!);
       final jsonStr = await file.readAsString();
 
       final repo = ref.read(workoutRepositoryProvider);
       await repo.importTemplateFromJson(jsonStr);
       await refresh();
+    } else {
+      print('DEBUG: No file picked or result was null');
     }
+  }
+
+  Future<void> importTemplateFromString(String jsonStr) async {
+    final repo = ref.read(workoutRepositoryProvider);
+    await repo.importTemplateFromJson(jsonStr);
+    await refresh();
   }
 
   Future<void> makeDefault(int id) async {
     final repo = ref.read(workoutRepositoryProvider);
     await repo.setActiveTemplate(id);
     // Invalidate workout home to show the new template
-    ref.invalidate(workoutHomeNotifierProvider);
+    ref.invalidate(workoutHomeProvider);
+    await refresh();
+  }
+
+  Future<void> resetPrograms() async {
+    final repo = ref.read(workoutRepositoryProvider);
+    await repo.clearAllTemplatesAndInsertSample();
     await refresh();
   }
 }

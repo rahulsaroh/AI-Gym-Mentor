@@ -24,14 +24,12 @@ import 'package:ai_gym_mentor/features/analytics/body_measurements_screen.dart';
 import 'package:ai_gym_mentor/features/settings/settings_screen.dart';
 import 'package:ai_gym_mentor/features/settings/plates_config_screen.dart';
 import 'package:ai_gym_mentor/features/settings/about_screen.dart';
-import 'package:ai_gym_mentor/features/settings/sheets_setup_screen.dart';
 import 'package:ai_gym_mentor/features/programs/programs_screen.dart';
 import 'package:ai_gym_mentor/features/programs/create_edit_program_screen.dart';
+import 'package:ai_gym_mentor/features/programs/program_details_screen.dart';
 import 'package:ai_gym_mentor/features/workout/start_workout_screen.dart';
-import 'package:ai_gym_mentor/features/settings/sync_log_screen.dart';
 import 'package:ai_gym_mentor/features/exercises/exercise_library_screen.dart';
 import 'package:ai_gym_mentor/features/exercises/exercise_library_detail_screen.dart';
-import 'package:ai_gym_mentor/features/ai_mentor/ai_mentor_screen.dart';
 
 final router = GoRouter(
   initialLocation: '/',
@@ -63,6 +61,14 @@ final router = GoRouter(
         return CreateEditProgramScreen(templateId: id);
       },
     ),
+    GoRoute(
+      path: '/programs/details/:id',
+      builder: (context, state) {
+        final idStr = state.pathParameters['id'];
+        final id = int.tryParse(idStr ?? '0') ?? 0;
+        return ProgramDetailScreen(templateId: id);
+      },
+    ),
     StatefulShellRoute.indexedStack(
       builder: (context, state, navigationShell) {
         return MainShell(child: navigationShell);
@@ -90,10 +96,6 @@ final router = GoRouter(
                   },
                 ),
               ],
-            ),
-            GoRoute(
-              path: '/ai-mentor',
-              builder: (context, state) => const AiMentorScreen(),
             ),
           ],
         ),
@@ -211,21 +213,6 @@ final router = GoRouter(
                   path: 'about',
                   builder: (context, state) => const AboutScreen(),
                 ),
-                GoRoute(
-                  path: 'setup-sheets',
-                  builder: (context, state) => const SheetsSetupScreen(),
-                ),
-                GoRoute(
-                  path: 'sheets-success',
-                  builder: (context, state) {
-                    final id = state.extra as String;
-                    return SheetsSuccessScreen(spreadsheetId: id);
-                  },
-                ),
-                GoRoute(
-                  path: 'sync-log',
-                  builder: (context, state) => const SyncLogScreen(),
-                ),
               ],
             ),
           ],
@@ -234,3 +221,4 @@ final router = GoRouter(
     ),
   ],
 );
+

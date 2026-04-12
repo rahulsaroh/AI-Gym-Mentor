@@ -40,47 +40,55 @@ class _CreateEditProgramScreenState
 
   Future<void> _loadTemplate() async {
     setState(() => _isLoading = true);
-    final db = ref.read(appDatabaseProvider);
-    final template = await (db.select(db.workoutTemplates)
-          ..where((t) => t.id.equals(widget.templateId!)))
-        .getSingleOrNull();
-    if (template != null) {
-      _nameController.text = template.name;
-      _descriptionController.text = template.description ?? '';
+    try {
+      final db = ref.read(appDatabaseProvider);
+      final template = await (db.select(db.workoutTemplates)
+            ..where((t) => t.id.equals(widget.templateId!)))
+          .getSingleOrNull();
 
-      final days = await (db.select(db.templateDays)
-            ..where((t) => t.templateId.equals(widget.templateId!))
-            ..orderBy([(t) => OrderingTerm(expression: t.order)]))
-          .get();
+      if (template != null) {
+        _nameController.text = template.name;
+        _descriptionController.text = template.description ?? '';
 
-      final loadedDays = <_DayData>[];
-      for (var day in days) {
-        final exercises = await (db.select(db.templateExercises)
-              ..where((t) => t.dayId.equals(day.id))
+        final days = await (db.select(db.templateDays)
+              ..where((t) => t.templateId.equals(widget.templateId!))
               ..orderBy([(t) => OrderingTerm(expression: t.order)]))
             .get();
 
-        final exercisesData = <_ExerciseData>[];
-        for (var ex in exercises) {
-          exercisesData.add(_ExerciseData(
-            exerciseId: ex.exerciseId,
-            sets: ex.setsJson.isNotEmpty
-                ? _parseSetsJson(ex.setsJson)
-                : [const _SetData(3, 10, 90)],
+        final loadedDays = <_DayData>[];
+        for (var day in days) {
+          final exercises = await (db.select(db.templateExercises)
+                ..where((t) => t.dayId.equals(day.id))
+                ..orderBy([(t) => OrderingTerm(expression: t.order)]))
+              .get();
+
+          final exercisesData = <_ExerciseData>[];
+          for (var ex in exercises) {
+            exercisesData.add(_ExerciseData(
+              exerciseId: ex.exerciseId,
+              sets: ex.setsJson.isNotEmpty
+                  ? _parseSetsJson(ex.setsJson)
+                  : [const _SetData(3, 10, 90)],
+            ));
+          }
+
+          loadedDays.add(_DayData(
+            id: day.id,
+            name: day.name,
+            exercises: exercisesData,
           ));
         }
 
-        loadedDays.add(_DayData(
-          id: day.id,
-          name: day.name,
-          exercises: exercisesData,
-        ));
+        setState(() {
+          _days = loadedDays;
+        });
       }
-
-      setState(() {
-        _days = loadedDays;
-        _isLoading = false;
-      });
+    } catch (e) {
+      debugPrint('Error loading template: $e');
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 
@@ -132,118 +140,129 @@ class _CreateEditProgramScreenState
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
-          : ListView(
-              padding: const EdgeInsets.all(20),
-              children: [
-                TextField(
-                  controller: _nameController,
-                  autofocus: !_isEditing,
-                  onChanged: (_) => setState(() {}),
-                  decoration: InputDecoration(
-                    labelText: 'Program Name',
-                    hintText: 'e.g., PPL Week 1',
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12)),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: _descriptionController,
-                  maxLines: 3,
-                  decoration: InputDecoration(
-                    labelText: 'Description (optional)',
-                    hintText: 'Describe your program...',
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12)),
-                  ),
-                ),
-                const SizedBox(height: 24),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text('Training Days',
-                        style: GoogleFonts.outfit(
-                            fontSize: 18, fontWeight: FontWeight.bold)),
-                    TextButton.icon(
-                      onPressed: _addDay,
-                      icon: const Icon(LucideIcons.plus, size: 18),
-                      label: const Text('Add Day'),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                if (_days.isEmpty)
-                  Center(
+          : CustomScrollView(
+              slivers: [
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.all(20),
                     child: Column(
                       children: [
-                        Icon(LucideIcons.calendar,
-                            size: 48, color: Colors.grey[400]),
+                        TextField(
+                          controller: _nameController,
+                          autofocus: !_isEditing,
+                          onChanged: (_) => setState(() {}),
+                          decoration: InputDecoration(
+                            labelText: 'Program Name',
+                            hintText: 'e.g., PPL Week 1',
+                            border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12)),
+                          ),
+                        ),
                         const SizedBox(height: 16),
-                        Text('No training days yet',
-                            style: GoogleFonts.outfit(color: Colors.grey)),
-                        const SizedBox(height: 8),
-                        ElevatedButton.icon(
-                          onPressed: _addDay,
-                          icon: const Icon(LucideIcons.plus),
-                          label: const Text('Add Training Day'),
+                        TextField(
+                          controller: _descriptionController,
+                          maxLines: 3,
+                          decoration: InputDecoration(
+                            labelText: 'Description (optional)',
+                            hintText: 'Describe your program...',
+                            border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12)),
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text('Training Days',
+                                style: GoogleFonts.outfit(
+                                    fontSize: 18, fontWeight: FontWeight.bold)),
+                            TextButton.icon(
+                              onPressed: _addDay,
+                              icon: const Icon(LucideIcons.plus, size: 18),
+                              label: const Text('Add Day'),
+                            ),
+                          ],
                         ),
                       ],
                     ),
+                  ),
+                ),
+                if (_days.isEmpty)
+                  SliverToBoxAdapter(
+                    child: Center(
+                      child: Column(
+                        children: [
+                          const SizedBox(height: 40),
+                          Icon(LucideIcons.calendar,
+                              size: 48, color: Colors.grey[400]),
+                          const SizedBox(height: 16),
+                          Text('No training days yet',
+                              style: GoogleFonts.outfit(color: Colors.grey)),
+                          const SizedBox(height: 8),
+                          ElevatedButton.icon(
+                            onPressed: _addDay,
+                            icon: const Icon(LucideIcons.plus),
+                            label: const Text('Add Training Day'),
+                          ),
+                        ],
+                      ),
+                    ),
                   )
                 else
-                  ReorderableListView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: _days.length,
-                    buildDefaultDragHandles: false, // We'll use custom handles
-                    onReorder: (oldIndex, newIndex) {
-                      setState(() {
-                        if (newIndex > oldIndex) newIndex--;
-                        final item = _days.removeAt(oldIndex);
-                        _days.insert(newIndex, item);
-
-                        // Also update expanded indices (simple approach: clear or map them)
-                        _expandedIndices.clear();
-                        _expandedIndices.add(newIndex);
-                      });
-                    },
-                    itemBuilder: (context, index) => _DayCard(
-                      key: ValueKey(
-                          'day_${_days[index].id ?? index}_${_days[index].name}'),
-                      day: _days[index],
-                      index: index,
-                      isExpanded: _expandedIndices.contains(index),
-                      onToggleExpansion: () {
+                  SliverPadding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    sliver: SliverReorderableList(
+                      itemCount: _days.length,
+                      onReorder: (oldIndex, newIndex) {
                         setState(() {
-                          if (_expandedIndices.contains(index)) {
-                            _expandedIndices.remove(index);
-                          } else {
-                            _expandedIndices.add(index);
-                          }
+                          if (newIndex > oldIndex) newIndex--;
+                          final item = _days.removeAt(oldIndex);
+                          _days.insert(newIndex, item);
+
+                          _expandedIndices.clear();
+                          _expandedIndices.add(newIndex);
                         });
                       },
-                      onNameChanged: (name) => setState(() =>
-                          _days[index] = _days[index].copyWith(name: name)),
-                      onAddExercise: () => _addExerciseToDay(index),
-                      onRemoveExercise: (exIndex) {
-                        final updatedExercises =
-                            List<_ExerciseData>.from(_days[index].exercises)
-                              ..removeAt(exIndex);
-                        setState(() => _days[index] =
-                            _days[index].copyWith(exercises: updatedExercises));
+                      itemBuilder: (context, index) {
+                        return _DayCard(
+                          key: ValueKey(
+                              'day_${_days[index].id ?? index}_${_days[index].name}'),
+                          day: _days[index],
+                          index: index,
+                          isExpanded: _expandedIndices.contains(index),
+                          onToggleExpansion: () {
+                            setState(() {
+                              if (_expandedIndices.contains(index)) {
+                                _expandedIndices.remove(index);
+                              } else {
+                                _expandedIndices.add(index);
+                              }
+                            });
+                          },
+                          onNameChanged: (name) => setState(() =>
+                              _days[index] = _days[index].copyWith(name: name)),
+                          onAddExercise: () => _addExerciseToDay(index),
+                          onRemoveExercise: (exIndex) {
+                            final updatedExercises =
+                                List<_ExerciseData>.from(_days[index].exercises)
+                                  ..removeAt(exIndex);
+                            setState(() => _days[index] = _days[index]
+                                .copyWith(exercises: updatedExercises));
+                          },
+                          onUpdateExerciseSets: (exIndex, sets) {
+                            final updatedExercises =
+                                List<_ExerciseData>.from(_days[index].exercises);
+                            updatedExercises[exIndex] =
+                                updatedExercises[exIndex].copyWith(sets: sets);
+                            setState(() => _days[index] = _days[index]
+                                .copyWith(exercises: updatedExercises));
+                          },
+                          onDelete: () => setState(() => _days.removeAt(index)),
+                        );
                       },
-                      onUpdateExerciseSets: (exIndex, sets) {
-                        final updatedExercises =
-                            List<_ExerciseData>.from(_days[index].exercises);
-                        updatedExercises[exIndex] =
-                            updatedExercises[exIndex].copyWith(sets: sets);
-                        setState(() => _days[index] =
-                            _days[index].copyWith(exercises: updatedExercises));
-                      },
-                      onDelete: () => setState(() => _days.removeAt(index)),
                     ),
                   ),
-                const SizedBox(height: 100),
+                const SliverToBoxAdapter(child: SizedBox(height: 120)),
               ],
             ),
     );
@@ -381,7 +400,7 @@ class _CreateEditProgramScreenState
         }
       });
 
-      ref.invalidate(programsNotifierProvider);
+      ref.invalidate(programsProvider);
       if (mounted) context.pop();
     } catch (e) {
       if (mounted) {

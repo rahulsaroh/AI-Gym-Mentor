@@ -6,25 +6,49 @@ part of 'measurements_repository.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$measurementsRepositoryHash() =>
-    r'eeee023308f3c34bcf28758f3ac9241bd107b150';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
 
-/// See also [measurementsRepository].
 @ProviderFor(measurementsRepository)
-final measurementsRepositoryProvider =
-    AutoDisposeProvider<MeasurementsRepository>.internal(
-  measurementsRepository,
-  name: r'measurementsRepositoryProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$measurementsRepositoryHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+final measurementsRepositoryProvider = MeasurementsRepositoryProvider._();
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef MeasurementsRepositoryRef
-    = AutoDisposeProviderRef<MeasurementsRepository>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+final class MeasurementsRepositoryProvider extends $FunctionalProvider<
+    MeasurementsRepository,
+    MeasurementsRepository,
+    MeasurementsRepository> with $Provider<MeasurementsRepository> {
+  MeasurementsRepositoryProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'measurementsRepositoryProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$measurementsRepositoryHash();
+
+  @$internal
+  @override
+  $ProviderElement<MeasurementsRepository> $createElement(
+          $ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  MeasurementsRepository create(Ref ref) {
+    return measurementsRepository(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(MeasurementsRepository value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<MeasurementsRepository>(value),
+    );
+  }
+}
+
+String _$measurementsRepositoryHash() =>
+    r'80328f32b37bf2a4bb4ef908ef08a1a5035a8ea8';

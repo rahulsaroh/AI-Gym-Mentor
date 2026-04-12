@@ -92,7 +92,7 @@ class ExerciseLibraryRepository {
 }
 
 @riverpod
-ExerciseLibraryRepository exerciseLibraryRepository(ExerciseLibraryRepositoryRef ref) {
+ExerciseLibraryRepository exerciseLibraryRepository(Ref ref) {
   final db = ref.watch(appDatabaseProvider);
   return ExerciseLibraryRepository(db);
 }

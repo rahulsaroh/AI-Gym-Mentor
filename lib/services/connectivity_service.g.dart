@@ -6,22 +6,49 @@ part of 'connectivity_service.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$connectivityServiceHash() =>
-    r'129ba788769888e7786249d1802163f07b8bba5d';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
 
-/// See also [ConnectivityService].
 @ProviderFor(ConnectivityService)
-final connectivityServiceProvider = AutoDisposeStreamNotifierProvider<
-    ConnectivityService, ConnectivityResult>.internal(
-  ConnectivityService.new,
-  name: r'connectivityServiceProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$connectivityServiceHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+final connectivityServiceProvider = ConnectivityServiceProvider._();
 
-typedef _$ConnectivityService = AutoDisposeStreamNotifier<ConnectivityResult>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+final class ConnectivityServiceProvider
+    extends $StreamNotifierProvider<ConnectivityService, ConnectivityResult> {
+  ConnectivityServiceProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'connectivityServiceProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$connectivityServiceHash();
+
+  @$internal
+  @override
+  ConnectivityService create() => ConnectivityService();
+}
+
+String _$connectivityServiceHash() =>
+    r'1a848296b876b4b46591abd268c3a467ccb30bcc';
+
+abstract class _$ConnectivityService
+    extends $StreamNotifier<ConnectivityResult> {
+  Stream<ConnectivityResult> build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref =
+        this.ref as $Ref<AsyncValue<ConnectivityResult>, ConnectivityResult>;
+    final element = ref.element as $ClassProviderElement<
+        AnyNotifier<AsyncValue<ConnectivityResult>, ConnectivityResult>,
+        AsyncValue<ConnectivityResult>,
+        Object?,
+        Object?>;
+    element.handleCreate(ref, build);
+  }
+}

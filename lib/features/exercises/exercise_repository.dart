@@ -78,7 +78,7 @@ class ExerciseRepository {
 }
 
 @riverpod
-ExerciseRepository exerciseRepository(ExerciseRepositoryRef ref) {
+ExerciseRepository exerciseRepository(Ref ref) {
   final db = ref.watch(appDatabaseProvider);
   return ExerciseRepository(db);
 }

@@ -6,20 +6,51 @@ part of 'sync_worker.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$syncWorkerHash() => r'39c21ffeb4d47096b5fc0dc8ecbc2c8933d1cc2a';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
 
-/// See also [SyncWorker].
 @ProviderFor(SyncWorker)
-final syncWorkerProvider =
-    AutoDisposeNotifierProvider<SyncWorker, SyncStatus>.internal(
-  SyncWorker.new,
-  name: r'syncWorkerProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$syncWorkerHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+final syncWorkerProvider = SyncWorkerProvider._();
 
-typedef _$SyncWorker = AutoDisposeNotifier<SyncStatus>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+final class SyncWorkerProvider
+    extends $NotifierProvider<SyncWorker, SyncStatus> {
+  SyncWorkerProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'syncWorkerProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$syncWorkerHash();
+
+  @$internal
+  @override
+  SyncWorker create() => SyncWorker();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(SyncStatus value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<SyncStatus>(value),
+    );
+  }
+}
+
+String _$syncWorkerHash() => r'1179636f86e7f5a200f3593f746936a4bdc134fc';
+
+abstract class _$SyncWorker extends $Notifier<SyncStatus> {
+  SyncStatus build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<SyncStatus, SyncStatus>;
+    final element = ref.element as $ClassProviderElement<
+        AnyNotifier<SyncStatus, SyncStatus>, SyncStatus, Object?, Object?>;
+    element.handleCreate(ref, build);
+  }
+}

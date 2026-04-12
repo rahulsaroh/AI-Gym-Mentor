@@ -6,55 +6,122 @@ part of 'exercises_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$allExercisesHash() => r'6d4e4af96a1a109974c9a316e7c38a42c5c9ed96';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
 
-/// See also [allExercises].
 @ProviderFor(allExercises)
-final allExercisesProvider = AutoDisposeStreamProvider<List<Exercise>>.internal(
-  allExercises,
-  name: r'allExercisesProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$allExercisesHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+final allExercisesProvider = AllExercisesProvider._();
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef AllExercisesRef = AutoDisposeStreamProviderRef<List<Exercise>>;
-String _$filteredExercisesHash() => r'fad828c9cc7a996d85b8c8bcd38b2d0124c34814';
+final class AllExercisesProvider extends $FunctionalProvider<
+        AsyncValue<List<Exercise>>, List<Exercise>, Stream<List<Exercise>>>
+    with $FutureModifier<List<Exercise>>, $StreamProvider<List<Exercise>> {
+  AllExercisesProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'allExercisesProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
 
-/// See also [filteredExercises].
-@ProviderFor(filteredExercises)
-final filteredExercisesProvider =
-    AutoDisposeStreamProvider<List<Exercise>>.internal(
-  filteredExercises,
-  name: r'filteredExercisesProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$filteredExercisesHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+  @override
+  String debugGetCreateSourceHash() => _$allExercisesHash();
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef FilteredExercisesRef = AutoDisposeStreamProviderRef<List<Exercise>>;
+  @$internal
+  @override
+  $StreamProviderElement<List<Exercise>> $createElement(
+          $ProviderPointer pointer) =>
+      $StreamProviderElement(pointer);
+
+  @override
+  Stream<List<Exercise>> create(Ref ref) {
+    return allExercises(ref);
+  }
+}
+
+String _$allExercisesHash() => r'811ff50e9332e9c058a0d7222e7ffaf374ca7287';
+
+@ProviderFor(ExerciseFilters)
+final exerciseFiltersProvider = ExerciseFiltersProvider._();
+
+final class ExerciseFiltersProvider
+    extends $NotifierProvider<ExerciseFilters, Map<String, String>> {
+  ExerciseFiltersProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'exerciseFiltersProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$exerciseFiltersHash();
+
+  @$internal
+  @override
+  ExerciseFilters create() => ExerciseFilters();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(Map<String, String> value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<Map<String, String>>(value),
+    );
+  }
+}
+
 String _$exerciseFiltersHash() => r'2e0386f9581f23adb9de9ab1356b5551b88187a2';
 
-/// See also [ExerciseFilters].
-@ProviderFor(ExerciseFilters)
-final exerciseFiltersProvider =
-    AutoDisposeNotifierProvider<ExerciseFilters, Map<String, String>>.internal(
-  ExerciseFilters.new,
-  name: r'exerciseFiltersProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$exerciseFiltersHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+abstract class _$ExerciseFilters extends $Notifier<Map<String, String>> {
+  Map<String, String> build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<Map<String, String>, Map<String, String>>;
+    final element = ref.element as $ClassProviderElement<
+        AnyNotifier<Map<String, String>, Map<String, String>>,
+        Map<String, String>,
+        Object?,
+        Object?>;
+    element.handleCreate(ref, build);
+  }
+}
 
-typedef _$ExerciseFilters = AutoDisposeNotifier<Map<String, String>>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+@ProviderFor(filteredExercises)
+final filteredExercisesProvider = FilteredExercisesProvider._();
+
+final class FilteredExercisesProvider extends $FunctionalProvider<
+        AsyncValue<List<Exercise>>, List<Exercise>, Stream<List<Exercise>>>
+    with $FutureModifier<List<Exercise>>, $StreamProvider<List<Exercise>> {
+  FilteredExercisesProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'filteredExercisesProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$filteredExercisesHash();
+
+  @$internal
+  @override
+  $StreamProviderElement<List<Exercise>> $createElement(
+          $ProviderPointer pointer) =>
+      $StreamProviderElement(pointer);
+
+  @override
+  Stream<List<Exercise>> create(Ref ref) {
+    return filteredExercises(ref);
+  }
+}
+
+String _$filteredExercisesHash() => r'7df30f0f4669b4470e5e5154f2000551927e90bb';

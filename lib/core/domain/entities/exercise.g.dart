@@ -6,8 +6,7 @@ part of 'exercise.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$ExerciseImpl _$$ExerciseImplFromJson(Map<String, dynamic> json) =>
-    _$ExerciseImpl(
+_Exercise _$ExerciseFromJson(Map<String, dynamic> json) => _Exercise(
       id: (json['id'] as num).toInt(),
       name: json['name'] as String,
       description: json['description'] as String?,
@@ -33,8 +32,7 @@ _$ExerciseImpl _$$ExerciseImplFromJson(Map<String, dynamic> json) =>
           : DateTime.parse(json['lastUsed'] as String),
     );
 
-Map<String, dynamic> _$$ExerciseImplToJson(_$ExerciseImpl instance) =>
-    <String, dynamic>{
+Map<String, dynamic> _$ExerciseToJson(_Exercise instance) => <String, dynamic>{
       'id': instance.id,
       'name': instance.name,
       'description': instance.description,

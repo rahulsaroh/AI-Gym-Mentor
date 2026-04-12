@@ -49,6 +49,8 @@ class WorkoutTemplates extends Table {
   IntColumn get id => integer().autoIncrement()();
   TextColumn get name => text().withLength(min: 1, max: 100)();
   TextColumn get description => text().nullable()();
+  TextColumn get goal => text().nullable()(); // e.g. Aesthetics, Strength
+  TextColumn get duration => text().nullable()(); // e.g. 12 weeks
   DateTimeColumn get lastUsed => dateTime().nullable()();
 }
 
@@ -167,7 +169,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? e]) : super(e ?? _openConnection());
 
   @override
-  int get schemaVersion => 11;
+  int get schemaVersion => 12;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -243,6 +245,14 @@ class AppDatabase extends _$AppDatabase {
             await customStatement('ALTER TABLE exercises ADD COLUMN force TEXT');
             await customStatement("ALTER TABLE exercises ADD COLUMN source TEXT DEFAULT 'local'");
           }
+          if (from < 12) {
+            if (!await hasColumn('workout_templates', 'goal')) {
+              await m.addColumn(workoutTemplates, workoutTemplates.goal);
+            }
+            if (!await hasColumn('workout_templates', 'duration')) {
+              await m.addColumn(workoutTemplates, workoutTemplates.duration);
+            }
+          }
         },
         beforeOpen: (details) async {
           await customStatement('PRAGMA foreign_keys = ON');
@@ -289,8 +299,9 @@ class AppDatabase extends _$AppDatabase {
     final allExercises = await select(exercises).get();
     final exerciseMap = {for (var e in allExercises) e.name: e.id};
 
-    await _seedProgram(samplePPLProgram, exerciseMap);
-    await _seedProgram(elitePPLProgram, exerciseMap);
+    for (final program in allSamplePrograms) {
+      await _seedProgram(program, exerciseMap);
+    }
     await _seedImportedPrograms(exerciseMap);
   }
 
@@ -300,6 +311,8 @@ class AppDatabase extends _$AppDatabase {
         await into(workoutTemplates).insert(WorkoutTemplatesCompanion.insert(
       name: program.name,
       description: Value(program.description),
+      goal: Value(program.goal),
+      duration: Value(program.duration),
     ));
 
     for (int i = 0; i < program.days.length; i++) {
@@ -352,11 +365,10 @@ class AppDatabase extends _$AppDatabase {
     final allExercises = await select(exercises).get();
     final exerciseMap = {for (var e in allExercises) e.name: e.id};
 
-    if (!templateNames.contains(samplePPLProgram.name)) {
-      await _seedProgram(samplePPLProgram, exerciseMap);
-    }
-    if (!templateNames.contains(elitePPLProgram.name)) {
-      await _seedProgram(elitePPLProgram, exerciseMap);
+    for (final program in allSamplePrograms) {
+      if (!templateNames.contains(program.name)) {
+        await _seedProgram(program, exerciseMap);
+      }
     }
     await _seedImportedPrograms(exerciseMap);
   }
@@ -449,7 +461,7 @@ class AppDatabase extends _$AppDatabase {
 }
 
 @Riverpod(keepAlive: true)
-AppDatabase appDatabase(AppDatabaseRef ref) {
+AppDatabase appDatabase(Ref ref) {
   final db = AppDatabase();
   ref.onDispose(db.close);
   return db;

@@ -328,6 +328,6 @@ class StatsRepository {
 }
 
 @riverpod
-StatsRepository statsRepository(StatsRepositoryRef ref) {
+StatsRepository statsRepository(Ref ref) {
   return StatsRepository(ref.watch(appDatabaseProvider));
 }

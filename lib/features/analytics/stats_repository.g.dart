@@ -6,22 +6,45 @@ part of 'stats_repository.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$statsRepositoryHash() => r'10816b99d0abb022145c8d6bbfad2de652457b02';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
 
-/// See also [statsRepository].
 @ProviderFor(statsRepository)
-final statsRepositoryProvider = AutoDisposeProvider<StatsRepository>.internal(
-  statsRepository,
-  name: r'statsRepositoryProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$statsRepositoryHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+final statsRepositoryProvider = StatsRepositoryProvider._();
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef StatsRepositoryRef = AutoDisposeProviderRef<StatsRepository>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+final class StatsRepositoryProvider extends $FunctionalProvider<StatsRepository,
+    StatsRepository, StatsRepository> with $Provider<StatsRepository> {
+  StatsRepositoryProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'statsRepositoryProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$statsRepositoryHash();
+
+  @$internal
+  @override
+  $ProviderElement<StatsRepository> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  StatsRepository create(Ref ref) {
+    return statsRepository(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(StatsRepository value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<StatsRepository>(value),
+    );
+  }
+}
+
+String _$statsRepositoryHash() => r'd7f53f9ba3b0ce78f4893ed16f37af5c04e57e68';

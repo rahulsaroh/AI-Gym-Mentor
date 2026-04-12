@@ -6,8 +6,8 @@ part of 'workout_session.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$WorkoutSessionImpl _$$WorkoutSessionImplFromJson(Map<String, dynamic> json) =>
-    _$WorkoutSessionImpl(
+_WorkoutSession _$WorkoutSessionFromJson(Map<String, dynamic> json) =>
+    _WorkoutSession(
       id: (json['id'] as num).toInt(),
       name: json['name'] as String,
       date: DateTime.parse(json['date'] as String),
@@ -28,8 +28,7 @@ _$WorkoutSessionImpl _$$WorkoutSessionImplFromJson(Map<String, dynamic> json) =>
           const [],
     );
 
-Map<String, dynamic> _$$WorkoutSessionImplToJson(
-        _$WorkoutSessionImpl instance) =>
+Map<String, dynamic> _$WorkoutSessionToJson(_WorkoutSession instance) =>
     <String, dynamic>{
       'id': instance.id,
       'name': instance.name,
@@ -44,8 +43,8 @@ Map<String, dynamic> _$$WorkoutSessionImplToJson(
       'exercises': instance.exercises,
     };
 
-_$LoggedExerciseImpl _$$LoggedExerciseImplFromJson(Map<String, dynamic> json) =>
-    _$LoggedExerciseImpl(
+_LoggedExercise _$LoggedExerciseFromJson(Map<String, dynamic> json) =>
+    _LoggedExercise(
       exerciseId: (json['exerciseId'] as num).toInt(),
       exerciseName: json['exerciseName'] as String,
       order: (json['order'] as num).toInt(),
@@ -55,8 +54,7 @@ _$LoggedExerciseImpl _$$LoggedExerciseImplFromJson(Map<String, dynamic> json) =>
           const [],
     );
 
-Map<String, dynamic> _$$LoggedExerciseImplToJson(
-        _$LoggedExerciseImpl instance) =>
+Map<String, dynamic> _$LoggedExerciseToJson(_LoggedExercise instance) =>
     <String, dynamic>{
       'exerciseId': instance.exerciseId,
       'exerciseName': instance.exerciseName,

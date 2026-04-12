@@ -53,7 +53,7 @@ class SkeletonDashboard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView(
-      physics: const NeverScrollableScrollPhysics(),
+      physics: const AlwaysScrollableScrollPhysics(),
       children: [
         const SizedBox(height: 60),
         const SkeletonCard(

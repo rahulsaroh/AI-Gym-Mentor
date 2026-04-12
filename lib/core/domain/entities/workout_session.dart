@@ -6,7 +6,9 @@ part 'workout_session.freezed.dart';
 part 'workout_session.g.dart';
 
 @freezed
-class WorkoutSession with _$WorkoutSession {
+abstract class WorkoutSession with _$WorkoutSession {
+  const WorkoutSession._();
+
   const factory WorkoutSession({
     required int id,
     required String name,
@@ -25,7 +27,9 @@ class WorkoutSession with _$WorkoutSession {
 }
 
 @freezed
-class LoggedExercise with _$LoggedExercise {
+abstract class LoggedExercise with _$LoggedExercise {
+  const LoggedExercise._();
+
   const factory LoggedExercise({
     required int exerciseId,
     required String exerciseName,

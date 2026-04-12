@@ -6,22 +6,52 @@ part of 'progression_service.dart';
 // RiverpodGenerator
 // **************************************************************************
 
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
+
+@ProviderFor(ProgressionService)
+final progressionServiceProvider = ProgressionServiceProvider._();
+
+final class ProgressionServiceProvider
+    extends $NotifierProvider<ProgressionService, void> {
+  ProgressionServiceProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'progressionServiceProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$progressionServiceHash();
+
+  @$internal
+  @override
+  ProgressionService create() => ProgressionService();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(void value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<void>(value),
+    );
+  }
+}
+
 String _$progressionServiceHash() =>
     r'96ddb7e1bd7d113277d8c6ba6cb7f2b56a66b8a6';
 
-/// See also [ProgressionService].
-@ProviderFor(ProgressionService)
-final progressionServiceProvider =
-    AutoDisposeNotifierProvider<ProgressionService, void>.internal(
-  ProgressionService.new,
-  name: r'progressionServiceProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$progressionServiceHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-typedef _$ProgressionService = AutoDisposeNotifier<void>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+abstract class _$ProgressionService extends $Notifier<void> {
+  void build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<void, void>;
+    final element = ref.element as $ClassProviderElement<
+        AnyNotifier<void, void>, void, Object?, Object?>;
+    element.handleCreate(ref, build);
+  }
+}

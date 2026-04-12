@@ -116,7 +116,7 @@ class ExerciseHistoryRepository {
 
 @riverpod
 ExerciseHistoryRepository exerciseHistoryRepository(
-    ExerciseHistoryRepositoryRef ref) {
+    Ref ref) {
   final db = ref.watch(appDatabaseProvider);
   return ExerciseHistoryRepository(db);
 }

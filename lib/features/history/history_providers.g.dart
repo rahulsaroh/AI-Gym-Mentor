@@ -6,54 +6,123 @@ part of 'history_providers.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$historyStatsHash() => r'4456fb11f906bdf13b165715f2483ee4a5b1dafc';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
 
-/// See also [historyStats].
 @ProviderFor(historyStats)
-final historyStatsProvider =
-    AutoDisposeFutureProvider<Map<String, dynamic>>.internal(
-  historyStats,
-  name: r'historyStatsProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$historyStatsHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+final historyStatsProvider = HistoryStatsProvider._();
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef HistoryStatsRef = AutoDisposeFutureProviderRef<Map<String, dynamic>>;
-String _$heatmapSetsHash() => r'db6e5aaf174f1403fd4249fe36ca74407da30d36';
+final class HistoryStatsProvider extends $FunctionalProvider<
+        AsyncValue<Map<String, dynamic>>,
+        Map<String, dynamic>,
+        FutureOr<Map<String, dynamic>>>
+    with
+        $FutureModifier<Map<String, dynamic>>,
+        $FutureProvider<Map<String, dynamic>> {
+  HistoryStatsProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'historyStatsProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
 
-/// See also [heatmapSets].
-@ProviderFor(heatmapSets)
-final heatmapSetsProvider =
-    AutoDisposeFutureProvider<List<ent.LoggedSet>>.internal(
-  heatmapSets,
-  name: r'heatmapSetsProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$heatmapSetsHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+  @override
+  String debugGetCreateSourceHash() => _$historyStatsHash();
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef HeatmapSetsRef = AutoDisposeFutureProviderRef<List<ent.LoggedSet>>;
+  @$internal
+  @override
+  $FutureProviderElement<Map<String, dynamic>> $createElement(
+          $ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<Map<String, dynamic>> create(Ref ref) {
+    return historyStats(ref);
+  }
+}
+
+String _$historyStatsHash() => r'4860a477cbc069456b7902bcfcae25b44cedb8ec';
+
+@ProviderFor(HistoryList)
+final historyListProvider = HistoryListProvider._();
+
+final class HistoryListProvider
+    extends $AsyncNotifierProvider<HistoryList, List<HistoryItem>> {
+  HistoryListProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'historyListProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$historyListHash();
+
+  @$internal
+  @override
+  HistoryList create() => HistoryList();
+}
+
 String _$historyListHash() => r'c9b5586f85779e8e8b5f214a9e748b56c740f59d';
 
-/// See also [HistoryList].
-@ProviderFor(HistoryList)
-final historyListProvider =
-    AutoDisposeAsyncNotifierProvider<HistoryList, List<HistoryItem>>.internal(
-  HistoryList.new,
-  name: r'historyListProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$historyListHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+abstract class _$HistoryList extends $AsyncNotifier<List<HistoryItem>> {
+  FutureOr<List<HistoryItem>> build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref =
+        this.ref as $Ref<AsyncValue<List<HistoryItem>>, List<HistoryItem>>;
+    final element = ref.element as $ClassProviderElement<
+        AnyNotifier<AsyncValue<List<HistoryItem>>, List<HistoryItem>>,
+        AsyncValue<List<HistoryItem>>,
+        Object?,
+        Object?>;
+    element.handleCreate(ref, build);
+  }
+}
 
-typedef _$HistoryList = AutoDisposeAsyncNotifier<List<HistoryItem>>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+@ProviderFor(heatmapSets)
+final heatmapSetsProvider = HeatmapSetsProvider._();
+
+final class HeatmapSetsProvider extends $FunctionalProvider<
+        AsyncValue<List<ent.LoggedSet>>,
+        List<ent.LoggedSet>,
+        FutureOr<List<ent.LoggedSet>>>
+    with
+        $FutureModifier<List<ent.LoggedSet>>,
+        $FutureProvider<List<ent.LoggedSet>> {
+  HeatmapSetsProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'heatmapSetsProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$heatmapSetsHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<List<ent.LoggedSet>> $createElement(
+          $ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<List<ent.LoggedSet>> create(Ref ref) {
+    return heatmapSets(ref);
+  }
+}
+
+String _$heatmapSetsHash() => r'50b237ca9c4bb4f8705aa77e93d01942a8e3ae17';

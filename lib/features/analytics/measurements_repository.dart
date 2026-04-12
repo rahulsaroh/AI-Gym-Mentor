@@ -122,6 +122,6 @@ class MeasurementsRepository {
 }
 
 @riverpod
-MeasurementsRepository measurementsRepository(MeasurementsRepositoryRef ref) {
+MeasurementsRepository measurementsRepository(Ref ref) {
   return MeasurementsRepository(ref.watch(appDatabaseProvider));
 }

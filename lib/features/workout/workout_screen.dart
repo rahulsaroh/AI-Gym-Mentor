@@ -11,7 +11,6 @@ import 'package:drift/drift.dart' show OrderingTerm, OrderingMode;
 import 'package:ai_gym_mentor/features/workout/providers/workout_home_notifier.dart';
 import 'package:ai_gym_mentor/features/workout/components/begin_session_sheet.dart';
 import 'package:ai_gym_mentor/services/plateau_service.dart';
-import 'package:ai_gym_mentor/services/sync_worker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ai_gym_mentor/core/widgets/skeleton_card.dart';
 
@@ -20,16 +19,16 @@ class WorkoutHomeScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final homeState = ref.watch(workoutHomeNotifierProvider);
+    final homeState = ref.watch(workoutHomeProvider);
 
     return Scaffold(
-      body: RefreshIndicator(
-        onRefresh: () =>
-            ref.read(workoutHomeNotifierProvider.notifier).refresh(),
-        child: homeState.when(
-          data: (state) => Stack(
-            children: [
-              CustomScrollView(
+      body: homeState.when(
+        data: (state) => Stack(
+          children: [
+            RefreshIndicator(
+              onRefresh: () => ref.read(workoutHomeProvider.notifier).refresh(),
+              child: CustomScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
                 slivers: [
                   _HeaderSection(state: state),
                   _PlateauAlertSection(),
@@ -42,27 +41,33 @@ class WorkoutHomeScreen extends ConsumerWidget {
                   const SliverPadding(padding: EdgeInsets.only(bottom: 100)),
                 ],
               ),
-              Consumer(
-                builder: (context, ref, _) {
-                  final activeDraft = ref.watch(workoutHomeNotifierProvider
-                      .select((s) => s.asData?.value.activeDraft));
-                  if (activeDraft != null) {
-                    return _FloatingWorkoutBanner(workout: activeDraft);
-                  }
-                  return const SizedBox.shrink();
-                },
-              ),
-            ],
-          ),
-          loading: () => const SkeletonDashboard(),
-          error: (err, stack) => Center(child: Text('Error: $err')),
+            ),
+            Consumer(
+              builder: (context, ref, _) {
+                final activeDraft = ref.watch(workoutHomeProvider
+                    .select((s) => s.asData?.value.activeDraft));
+                if (activeDraft != null) {
+                  return _FloatingWorkoutBanner(workout: activeDraft);
+                }
+                return const SizedBox.shrink();
+              },
+            ),
+          ],
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        heroTag: 'ai_mentor_fab',
-        onPressed: () => context.push('/ai-mentor'),
-        backgroundColor: Colors.amber,
-        child: const Icon(Icons.auto_awesome, color: Colors.black),
+        loading: () => RefreshIndicator(
+          onRefresh: () => ref.read(workoutHomeProvider.notifier).refresh(),
+          child: const SkeletonDashboard(),
+        ),
+        error: (err, stack) => RefreshIndicator(
+          onRefresh: () => ref.read(workoutHomeProvider.notifier).refresh(),
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            child: SizedBox(
+              height: MediaQuery.of(context).size.height,
+              child: Center(child: Text('Error: $err')),
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -108,13 +113,7 @@ class _HeaderSection extends StatelessWidget {
                       ],
                     ),
                   ),
-                  Row(
-                    children: [
-                      const _SyncIndicator(),
-                      const SizedBox(width: 8),
-                      _StreakBadge(streak: state.currentStreak),
-                    ],
-                  ),
+                  _StreakBadge(streak: state.currentStreak),
                 ],
               ),
               const SizedBox(height: 8),
@@ -130,88 +129,6 @@ class _HeaderSection extends StatelessWidget {
             ],
           ),
         ),
-      ),
-    );
-  }
-}
-
-class _SyncIndicator extends ConsumerWidget {
-  const _SyncIndicator();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final syncStatus = ref.watch(syncWorkerProvider);
-
-    switch (syncStatus) {
-      case SyncStatus.syncing:
-        return _buildChip(
-          context,
-          icon: const SizedBox(
-            width: 12,
-            height: 12,
-            child:
-                CircularProgressIndicator(strokeWidth: 2, color: Colors.blue),
-          ),
-          label: 'Syncing...',
-          color: Colors.blue,
-        );
-      case SyncStatus.failed:
-        return GestureDetector(
-          onTap: () => ref.read(syncWorkerProvider.notifier).processQueue(),
-          child: _buildChip(
-            context,
-            icon: const Icon(LucideIcons.cloudAlert,
-                size: 14, color: Colors.orange),
-            label: 'Retry Sync',
-            color: Colors.orange,
-          ),
-        );
-      case SyncStatus.authenticationRequired:
-        return GestureDetector(
-          onTap: () => context.push('/settings/sheets-setup'),
-          child: _buildChip(
-            context,
-            icon: const Icon(LucideIcons.cloudAlert,
-                size: 14, color: Colors.orange),
-            label: 'Fix Connection',
-            color: Colors.orange,
-          ),
-        );
-      case SyncStatus.success:
-        return _buildChip(
-          context,
-          icon: const Icon(LucideIcons.check, size: 14, color: Colors.green),
-          label: 'Synced',
-          color: Colors.green,
-        );
-      case SyncStatus.idle:
-        return const SizedBox.shrink();
-    }
-  }
-
-  Widget _buildChip(BuildContext context,
-      {required Widget icon, required String label, required Color color}) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: color.withValues(alpha: 0.5), width: 1),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          icon,
-          const SizedBox(width: 6),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.bold,
-              color: color,
-            ),
-          ),
-        ],
       ),
     );
   }
@@ -824,7 +741,7 @@ class _BodyweightSection extends StatelessWidget {
                     final weight = double.tryParse(controller.text);
                     if (weight != null) {
                       ref
-                          .read(workoutHomeNotifierProvider.notifier)
+                          .read(workoutHomeProvider.notifier)
                           .logWeight(weight);
                       Navigator.pop(context);
                     }
@@ -1077,7 +994,7 @@ class _FloatingWorkoutBannerState extends State<_FloatingWorkoutBanner>
   @override
   Widget build(BuildContext context) {
     return Positioned(
-      bottom: 20,
+      bottom: 100,
       left: 20,
       right: 20,
       child: AnimatedBuilder(
@@ -1165,7 +1082,7 @@ class _FloatingWorkoutBannerState extends State<_FloatingWorkoutBanner>
                       );
                       if (confirm == true) {
                         ref
-                            .read(workoutHomeNotifierProvider.notifier)
+                            .read(workoutHomeProvider.notifier)
                             .deleteWorkout(widget.workout.id);
                       }
                     },

@@ -5,7 +5,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'exercises_provider.g.dart';
 
 @riverpod
-Stream<List<Exercise>> allExercises(AllExercisesRef ref) {
+Stream<List<Exercise>> allExercises(Ref ref) {
   final repository = ref.watch(exerciseRepositoryProvider);
   return repository.watchAllExercises();
 }
@@ -43,7 +43,7 @@ class ExerciseFilters extends _$ExerciseFilters {
 }
 
 @riverpod
-Stream<List<Exercise>> filteredExercises(FilteredExercisesRef ref) {
+Stream<List<Exercise>> filteredExercises(Ref ref) {
   final allExercisesAsync = ref.watch(allExercisesProvider);
   final filters = ref.watch(exerciseFiltersProvider);
 

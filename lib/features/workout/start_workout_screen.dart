@@ -10,7 +10,7 @@ class StartWorkoutScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final homeState = ref.watch(workoutHomeNotifierProvider);
+    final homeState = ref.watch(workoutHomeProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -31,7 +31,7 @@ class StartWorkoutScreen extends ConsumerWidget {
               color: Colors.green,
               onTap: () async {
                 final id = await ref
-                    .read(workoutHomeNotifierProvider.notifier)
+                    .read(workoutHomeProvider.notifier)
                     .startWorkout(
                       name: 'Quick Workout',
                     );
@@ -41,7 +41,7 @@ class StartWorkoutScreen extends ConsumerWidget {
               },
             ),
             const SizedBox(height: 16),
-            if (state.templateId != null && !state.isRestDay) ...[
+            if (state.templateId != null && !state.isRestDay && state.nextDayId != null) ...[
               _buildOptionCard(
                 context: context,
                 icon: LucideIcons.calendar,
@@ -51,7 +51,7 @@ class StartWorkoutScreen extends ConsumerWidget {
                 color: Colors.blue,
                 onTap: () async {
                   final id = await ref
-                      .read(workoutHomeNotifierProvider.notifier)
+                      .read(workoutHomeProvider.notifier)
                       .startWorkout(
                         templateId: state.templateId,
                         dayId: state.nextDayId,

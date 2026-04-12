@@ -1,5 +1,5 @@
-// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// coverage:ignore-file
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
@@ -9,123 +9,27 @@ part of 'workout_home_notifier.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// dart format off
 T _$identity<T>(T value) => value;
-
-final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
 /// @nodoc
 mixin _$MotivationTip {
-  String get text => throw _privateConstructorUsedError;
-  String get category => throw _privateConstructorUsedError;
+  String get text;
+  String get category;
 
   /// Create a copy of MotivationTip
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
   $MotivationTipCopyWith<MotivationTip> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $MotivationTipCopyWith<$Res> {
-  factory $MotivationTipCopyWith(
-          MotivationTip value, $Res Function(MotivationTip) then) =
-      _$MotivationTipCopyWithImpl<$Res, MotivationTip>;
-  @useResult
-  $Res call({String text, String category});
-}
-
-/// @nodoc
-class _$MotivationTipCopyWithImpl<$Res, $Val extends MotivationTip>
-    implements $MotivationTipCopyWith<$Res> {
-  _$MotivationTipCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of MotivationTip
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? text = null,
-    Object? category = null,
-  }) {
-    return _then(_value.copyWith(
-      text: null == text
-          ? _value.text
-          : text // ignore: cast_nullable_to_non_nullable
-              as String,
-      category: null == category
-          ? _value.category
-          : category // ignore: cast_nullable_to_non_nullable
-              as String,
-    ) as $Val);
-  }
-}
-
-/// @nodoc
-abstract class _$$MotivationTipImplCopyWith<$Res>
-    implements $MotivationTipCopyWith<$Res> {
-  factory _$$MotivationTipImplCopyWith(
-          _$MotivationTipImpl value, $Res Function(_$MotivationTipImpl) then) =
-      __$$MotivationTipImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call({String text, String category});
-}
-
-/// @nodoc
-class __$$MotivationTipImplCopyWithImpl<$Res>
-    extends _$MotivationTipCopyWithImpl<$Res, _$MotivationTipImpl>
-    implements _$$MotivationTipImplCopyWith<$Res> {
-  __$$MotivationTipImplCopyWithImpl(
-      _$MotivationTipImpl _value, $Res Function(_$MotivationTipImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of MotivationTip
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? text = null,
-    Object? category = null,
-  }) {
-    return _then(_$MotivationTipImpl(
-      text: null == text
-          ? _value.text
-          : text // ignore: cast_nullable_to_non_nullable
-              as String,
-      category: null == category
-          ? _value.category
-          : category // ignore: cast_nullable_to_non_nullable
-              as String,
-    ));
-  }
-}
-
-/// @nodoc
-
-class _$MotivationTipImpl implements _MotivationTip {
-  const _$MotivationTipImpl({required this.text, required this.category});
-
-  @override
-  final String text;
-  @override
-  final String category;
-
-  @override
-  String toString() {
-    return 'MotivationTip(text: $text, category: $category)';
-  }
+      _$MotivationTipCopyWithImpl<MotivationTip>(
+          this as MotivationTip, _$identity);
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$MotivationTipImpl &&
+            other is MotivationTip &&
             (identical(other.text, text) || other.text == text) &&
             (identical(other.category, category) ||
                 other.category == category));
@@ -134,64 +38,382 @@ class _$MotivationTipImpl implements _MotivationTip {
   @override
   int get hashCode => Object.hash(runtimeType, text, category);
 
-  /// Create a copy of MotivationTip
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  @pragma('vm:prefer-inline')
-  _$$MotivationTipImplCopyWith<_$MotivationTipImpl> get copyWith =>
-      __$$MotivationTipImplCopyWithImpl<_$MotivationTipImpl>(this, _$identity);
+  String toString() {
+    return 'MotivationTip(text: $text, category: $category)';
+  }
 }
 
-abstract class _MotivationTip implements MotivationTip {
-  const factory _MotivationTip(
-      {required final String text,
-      required final String category}) = _$MotivationTipImpl;
+/// @nodoc
+abstract mixin class $MotivationTipCopyWith<$Res> {
+  factory $MotivationTipCopyWith(
+          MotivationTip value, $Res Function(MotivationTip) _then) =
+      _$MotivationTipCopyWithImpl;
+  @useResult
+  $Res call({String text, String category});
+}
+
+/// @nodoc
+class _$MotivationTipCopyWithImpl<$Res>
+    implements $MotivationTipCopyWith<$Res> {
+  _$MotivationTipCopyWithImpl(this._self, this._then);
+
+  final MotivationTip _self;
+  final $Res Function(MotivationTip) _then;
+
+  /// Create a copy of MotivationTip
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? text = null,
+    Object? category = null,
+  }) {
+    return _then(_self.copyWith(
+      text: null == text
+          ? _self.text
+          : text // ignore: cast_nullable_to_non_nullable
+              as String,
+      category: null == category
+          ? _self.category
+          : category // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
+  }
+}
+
+/// Adds pattern-matching-related methods to [MotivationTip].
+extension MotivationTipPatterns on MotivationTip {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_MotivationTip value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _MotivationTip() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_MotivationTip value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _MotivationTip():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_MotivationTip value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _MotivationTip() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(String text, String category)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _MotivationTip() when $default != null:
+        return $default(_that.text, _that.category);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(String text, String category) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _MotivationTip():
+        return $default(_that.text, _that.category);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(String text, String category)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _MotivationTip() when $default != null:
+        return $default(_that.text, _that.category);
+      case _:
+        return null;
+    }
+  }
+}
+
+/// @nodoc
+
+class _MotivationTip extends MotivationTip {
+  const _MotivationTip({required this.text, required this.category})
+      : super._();
 
   @override
-  String get text;
+  final String text;
   @override
-  String get category;
+  final String category;
 
   /// Create a copy of MotivationTip
   /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$MotivationTipImplCopyWith<_$MotivationTipImpl> get copyWith =>
-      throw _privateConstructorUsedError;
+  @pragma('vm:prefer-inline')
+  _$MotivationTipCopyWith<_MotivationTip> get copyWith =>
+      __$MotivationTipCopyWithImpl<_MotivationTip>(this, _$identity);
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _MotivationTip &&
+            (identical(other.text, text) || other.text == text) &&
+            (identical(other.category, category) ||
+                other.category == category));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, text, category);
+
+  @override
+  String toString() {
+    return 'MotivationTip(text: $text, category: $category)';
+  }
+}
+
+/// @nodoc
+abstract mixin class _$MotivationTipCopyWith<$Res>
+    implements $MotivationTipCopyWith<$Res> {
+  factory _$MotivationTipCopyWith(
+          _MotivationTip value, $Res Function(_MotivationTip) _then) =
+      __$MotivationTipCopyWithImpl;
+  @override
+  @useResult
+  $Res call({String text, String category});
+}
+
+/// @nodoc
+class __$MotivationTipCopyWithImpl<$Res>
+    implements _$MotivationTipCopyWith<$Res> {
+  __$MotivationTipCopyWithImpl(this._self, this._then);
+
+  final _MotivationTip _self;
+  final $Res Function(_MotivationTip) _then;
+
+  /// Create a copy of MotivationTip
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? text = null,
+    Object? category = null,
+  }) {
+    return _then(_MotivationTip(
+      text: null == text
+          ? _self.text
+          : text // ignore: cast_nullable_to_non_nullable
+              as String,
+      category: null == category
+          ? _self.category
+          : category // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
+  }
 }
 
 /// @nodoc
 mixin _$WorkoutHomeState {
-  String get greeting => throw _privateConstructorUsedError;
-  String get userName => throw _privateConstructorUsedError;
-  String get dateString => throw _privateConstructorUsedError;
-  int get currentStreak => throw _privateConstructorUsedError;
-  MotivationTip get dailyTip => throw _privateConstructorUsedError;
-  WorkoutSession? get lastWorkout => throw _privateConstructorUsedError;
-  WorkoutSession? get activeDraft => throw _privateConstructorUsedError;
-  Map<int, double> get weeklyVolume => throw _privateConstructorUsedError;
-  BodyMeasurement? get lastWeight => throw _privateConstructorUsedError;
-  String? get lastWorkoutSummary => throw _privateConstructorUsedError;
-  bool get isRestDay => throw _privateConstructorUsedError;
-  String? get todayDayName => throw _privateConstructorUsedError;
-  List<String> get todayExercises => throw _privateConstructorUsedError;
-  int get estimatedDuration => throw _privateConstructorUsedError;
-  int? get nextDayId => throw _privateConstructorUsedError;
-  int? get templateId => throw _privateConstructorUsedError;
+  String get greeting;
+  String get userName;
+  String get dateString;
+  int get currentStreak;
+  MotivationTip get dailyTip;
+  WorkoutSession? get lastWorkout;
+  WorkoutSession? get activeDraft;
+  Map<int, double> get weeklyVolume;
+  BodyMeasurement? get lastWeight;
+  String? get lastWorkoutSummary;
+  bool get isRestDay;
+  String? get todayDayName;
+  List<String> get todayExercises;
+  int get estimatedDuration;
+  int? get nextDayId;
+  int? get templateId;
 
   /// Create a copy of WorkoutHomeState
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
   $WorkoutHomeStateCopyWith<WorkoutHomeState> get copyWith =>
-      throw _privateConstructorUsedError;
+      _$WorkoutHomeStateCopyWithImpl<WorkoutHomeState>(
+          this as WorkoutHomeState, _$identity);
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is WorkoutHomeState &&
+            (identical(other.greeting, greeting) ||
+                other.greeting == greeting) &&
+            (identical(other.userName, userName) ||
+                other.userName == userName) &&
+            (identical(other.dateString, dateString) ||
+                other.dateString == dateString) &&
+            (identical(other.currentStreak, currentStreak) ||
+                other.currentStreak == currentStreak) &&
+            (identical(other.dailyTip, dailyTip) ||
+                other.dailyTip == dailyTip) &&
+            (identical(other.lastWorkout, lastWorkout) ||
+                other.lastWorkout == lastWorkout) &&
+            (identical(other.activeDraft, activeDraft) ||
+                other.activeDraft == activeDraft) &&
+            const DeepCollectionEquality()
+                .equals(other.weeklyVolume, weeklyVolume) &&
+            (identical(other.lastWeight, lastWeight) ||
+                other.lastWeight == lastWeight) &&
+            (identical(other.lastWorkoutSummary, lastWorkoutSummary) ||
+                other.lastWorkoutSummary == lastWorkoutSummary) &&
+            (identical(other.isRestDay, isRestDay) ||
+                other.isRestDay == isRestDay) &&
+            (identical(other.todayDayName, todayDayName) ||
+                other.todayDayName == todayDayName) &&
+            const DeepCollectionEquality()
+                .equals(other.todayExercises, todayExercises) &&
+            (identical(other.estimatedDuration, estimatedDuration) ||
+                other.estimatedDuration == estimatedDuration) &&
+            (identical(other.nextDayId, nextDayId) ||
+                other.nextDayId == nextDayId) &&
+            (identical(other.templateId, templateId) ||
+                other.templateId == templateId));
+  }
+
+  @override
+  int get hashCode => Object.hash(
+      runtimeType,
+      greeting,
+      userName,
+      dateString,
+      currentStreak,
+      dailyTip,
+      lastWorkout,
+      activeDraft,
+      const DeepCollectionEquality().hash(weeklyVolume),
+      lastWeight,
+      lastWorkoutSummary,
+      isRestDay,
+      todayDayName,
+      const DeepCollectionEquality().hash(todayExercises),
+      estimatedDuration,
+      nextDayId,
+      templateId);
+
+  @override
+  String toString() {
+    return 'WorkoutHomeState(greeting: $greeting, userName: $userName, dateString: $dateString, currentStreak: $currentStreak, dailyTip: $dailyTip, lastWorkout: $lastWorkout, activeDraft: $activeDraft, weeklyVolume: $weeklyVolume, lastWeight: $lastWeight, lastWorkoutSummary: $lastWorkoutSummary, isRestDay: $isRestDay, todayDayName: $todayDayName, todayExercises: $todayExercises, estimatedDuration: $estimatedDuration, nextDayId: $nextDayId, templateId: $templateId)';
+  }
 }
 
 /// @nodoc
-abstract class $WorkoutHomeStateCopyWith<$Res> {
+abstract mixin class $WorkoutHomeStateCopyWith<$Res> {
   factory $WorkoutHomeStateCopyWith(
-          WorkoutHomeState value, $Res Function(WorkoutHomeState) then) =
-      _$WorkoutHomeStateCopyWithImpl<$Res, WorkoutHomeState>;
+          WorkoutHomeState value, $Res Function(WorkoutHomeState) _then) =
+      _$WorkoutHomeStateCopyWithImpl;
   @useResult
   $Res call(
       {String greeting,
@@ -218,14 +440,12 @@ abstract class $WorkoutHomeStateCopyWith<$Res> {
 }
 
 /// @nodoc
-class _$WorkoutHomeStateCopyWithImpl<$Res, $Val extends WorkoutHomeState>
+class _$WorkoutHomeStateCopyWithImpl<$Res>
     implements $WorkoutHomeStateCopyWith<$Res> {
-  _$WorkoutHomeStateCopyWithImpl(this._value, this._then);
+  _$WorkoutHomeStateCopyWithImpl(this._self, this._then);
 
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
+  final WorkoutHomeState _self;
+  final $Res Function(WorkoutHomeState) _then;
 
   /// Create a copy of WorkoutHomeState
   /// with the given fields replaced by the non-null parameter values.
@@ -249,72 +469,72 @@ class _$WorkoutHomeStateCopyWithImpl<$Res, $Val extends WorkoutHomeState>
     Object? nextDayId = freezed,
     Object? templateId = freezed,
   }) {
-    return _then(_value.copyWith(
+    return _then(_self.copyWith(
       greeting: null == greeting
-          ? _value.greeting
+          ? _self.greeting
           : greeting // ignore: cast_nullable_to_non_nullable
               as String,
       userName: null == userName
-          ? _value.userName
+          ? _self.userName
           : userName // ignore: cast_nullable_to_non_nullable
               as String,
       dateString: null == dateString
-          ? _value.dateString
+          ? _self.dateString
           : dateString // ignore: cast_nullable_to_non_nullable
               as String,
       currentStreak: null == currentStreak
-          ? _value.currentStreak
+          ? _self.currentStreak
           : currentStreak // ignore: cast_nullable_to_non_nullable
               as int,
       dailyTip: null == dailyTip
-          ? _value.dailyTip
+          ? _self.dailyTip
           : dailyTip // ignore: cast_nullable_to_non_nullable
               as MotivationTip,
       lastWorkout: freezed == lastWorkout
-          ? _value.lastWorkout
+          ? _self.lastWorkout
           : lastWorkout // ignore: cast_nullable_to_non_nullable
               as WorkoutSession?,
       activeDraft: freezed == activeDraft
-          ? _value.activeDraft
+          ? _self.activeDraft
           : activeDraft // ignore: cast_nullable_to_non_nullable
               as WorkoutSession?,
       weeklyVolume: null == weeklyVolume
-          ? _value.weeklyVolume
+          ? _self.weeklyVolume
           : weeklyVolume // ignore: cast_nullable_to_non_nullable
               as Map<int, double>,
       lastWeight: freezed == lastWeight
-          ? _value.lastWeight
+          ? _self.lastWeight
           : lastWeight // ignore: cast_nullable_to_non_nullable
               as BodyMeasurement?,
       lastWorkoutSummary: freezed == lastWorkoutSummary
-          ? _value.lastWorkoutSummary
+          ? _self.lastWorkoutSummary
           : lastWorkoutSummary // ignore: cast_nullable_to_non_nullable
               as String?,
       isRestDay: null == isRestDay
-          ? _value.isRestDay
+          ? _self.isRestDay
           : isRestDay // ignore: cast_nullable_to_non_nullable
               as bool,
       todayDayName: freezed == todayDayName
-          ? _value.todayDayName
+          ? _self.todayDayName
           : todayDayName // ignore: cast_nullable_to_non_nullable
               as String?,
       todayExercises: null == todayExercises
-          ? _value.todayExercises
+          ? _self.todayExercises
           : todayExercises // ignore: cast_nullable_to_non_nullable
               as List<String>,
       estimatedDuration: null == estimatedDuration
-          ? _value.estimatedDuration
+          ? _self.estimatedDuration
           : estimatedDuration // ignore: cast_nullable_to_non_nullable
               as int,
       nextDayId: freezed == nextDayId
-          ? _value.nextDayId
+          ? _self.nextDayId
           : nextDayId // ignore: cast_nullable_to_non_nullable
               as int?,
       templateId: freezed == templateId
-          ? _value.templateId
+          ? _self.templateId
           : templateId // ignore: cast_nullable_to_non_nullable
               as int?,
-    ) as $Val);
+    ));
   }
 
   /// Create a copy of WorkoutHomeState
@@ -322,8 +542,8 @@ class _$WorkoutHomeStateCopyWithImpl<$Res, $Val extends WorkoutHomeState>
   @override
   @pragma('vm:prefer-inline')
   $MotivationTipCopyWith<$Res> get dailyTip {
-    return $MotivationTipCopyWith<$Res>(_value.dailyTip, (value) {
-      return _then(_value.copyWith(dailyTip: value) as $Val);
+    return $MotivationTipCopyWith<$Res>(_self.dailyTip, (value) {
+      return _then(_self.copyWith(dailyTip: value));
     });
   }
 
@@ -332,12 +552,12 @@ class _$WorkoutHomeStateCopyWithImpl<$Res, $Val extends WorkoutHomeState>
   @override
   @pragma('vm:prefer-inline')
   $WorkoutSessionCopyWith<$Res>? get lastWorkout {
-    if (_value.lastWorkout == null) {
+    if (_self.lastWorkout == null) {
       return null;
     }
 
-    return $WorkoutSessionCopyWith<$Res>(_value.lastWorkout!, (value) {
-      return _then(_value.copyWith(lastWorkout: value) as $Val);
+    return $WorkoutSessionCopyWith<$Res>(_self.lastWorkout!, (value) {
+      return _then(_self.copyWith(lastWorkout: value));
     });
   }
 
@@ -346,12 +566,12 @@ class _$WorkoutHomeStateCopyWithImpl<$Res, $Val extends WorkoutHomeState>
   @override
   @pragma('vm:prefer-inline')
   $WorkoutSessionCopyWith<$Res>? get activeDraft {
-    if (_value.activeDraft == null) {
+    if (_self.activeDraft == null) {
       return null;
     }
 
-    return $WorkoutSessionCopyWith<$Res>(_value.activeDraft!, (value) {
-      return _then(_value.copyWith(activeDraft: value) as $Val);
+    return $WorkoutSessionCopyWith<$Res>(_self.activeDraft!, (value) {
+      return _then(_self.copyWith(activeDraft: value));
     });
   }
 
@@ -360,155 +580,276 @@ class _$WorkoutHomeStateCopyWithImpl<$Res, $Val extends WorkoutHomeState>
   @override
   @pragma('vm:prefer-inline')
   $BodyMeasurementCopyWith<$Res>? get lastWeight {
-    if (_value.lastWeight == null) {
+    if (_self.lastWeight == null) {
       return null;
     }
 
-    return $BodyMeasurementCopyWith<$Res>(_value.lastWeight!, (value) {
-      return _then(_value.copyWith(lastWeight: value) as $Val);
+    return $BodyMeasurementCopyWith<$Res>(_self.lastWeight!, (value) {
+      return _then(_self.copyWith(lastWeight: value));
     });
   }
 }
 
-/// @nodoc
-abstract class _$$WorkoutHomeStateImplCopyWith<$Res>
-    implements $WorkoutHomeStateCopyWith<$Res> {
-  factory _$$WorkoutHomeStateImplCopyWith(_$WorkoutHomeStateImpl value,
-          $Res Function(_$WorkoutHomeStateImpl) then) =
-      __$$WorkoutHomeStateImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call(
-      {String greeting,
-      String userName,
-      String dateString,
-      int currentStreak,
-      MotivationTip dailyTip,
-      WorkoutSession? lastWorkout,
-      WorkoutSession? activeDraft,
-      Map<int, double> weeklyVolume,
-      BodyMeasurement? lastWeight,
-      String? lastWorkoutSummary,
-      bool isRestDay,
-      String? todayDayName,
-      List<String> todayExercises,
-      int estimatedDuration,
-      int? nextDayId,
-      int? templateId});
+/// Adds pattern-matching-related methods to [WorkoutHomeState].
+extension WorkoutHomeStatePatterns on WorkoutHomeState {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
 
-  @override
-  $MotivationTipCopyWith<$Res> get dailyTip;
-  @override
-  $WorkoutSessionCopyWith<$Res>? get lastWorkout;
-  @override
-  $WorkoutSessionCopyWith<$Res>? get activeDraft;
-  @override
-  $BodyMeasurementCopyWith<$Res>? get lastWeight;
-}
-
-/// @nodoc
-class __$$WorkoutHomeStateImplCopyWithImpl<$Res>
-    extends _$WorkoutHomeStateCopyWithImpl<$Res, _$WorkoutHomeStateImpl>
-    implements _$$WorkoutHomeStateImplCopyWith<$Res> {
-  __$$WorkoutHomeStateImplCopyWithImpl(_$WorkoutHomeStateImpl _value,
-      $Res Function(_$WorkoutHomeStateImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of WorkoutHomeState
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? greeting = null,
-    Object? userName = null,
-    Object? dateString = null,
-    Object? currentStreak = null,
-    Object? dailyTip = null,
-    Object? lastWorkout = freezed,
-    Object? activeDraft = freezed,
-    Object? weeklyVolume = null,
-    Object? lastWeight = freezed,
-    Object? lastWorkoutSummary = freezed,
-    Object? isRestDay = null,
-    Object? todayDayName = freezed,
-    Object? todayExercises = null,
-    Object? estimatedDuration = null,
-    Object? nextDayId = freezed,
-    Object? templateId = freezed,
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_WorkoutHomeState value)? $default, {
+    required TResult orElse(),
   }) {
-    return _then(_$WorkoutHomeStateImpl(
-      greeting: null == greeting
-          ? _value.greeting
-          : greeting // ignore: cast_nullable_to_non_nullable
-              as String,
-      userName: null == userName
-          ? _value.userName
-          : userName // ignore: cast_nullable_to_non_nullable
-              as String,
-      dateString: null == dateString
-          ? _value.dateString
-          : dateString // ignore: cast_nullable_to_non_nullable
-              as String,
-      currentStreak: null == currentStreak
-          ? _value.currentStreak
-          : currentStreak // ignore: cast_nullable_to_non_nullable
-              as int,
-      dailyTip: null == dailyTip
-          ? _value.dailyTip
-          : dailyTip // ignore: cast_nullable_to_non_nullable
-              as MotivationTip,
-      lastWorkout: freezed == lastWorkout
-          ? _value.lastWorkout
-          : lastWorkout // ignore: cast_nullable_to_non_nullable
-              as WorkoutSession?,
-      activeDraft: freezed == activeDraft
-          ? _value.activeDraft
-          : activeDraft // ignore: cast_nullable_to_non_nullable
-              as WorkoutSession?,
-      weeklyVolume: null == weeklyVolume
-          ? _value._weeklyVolume
-          : weeklyVolume // ignore: cast_nullable_to_non_nullable
-              as Map<int, double>,
-      lastWeight: freezed == lastWeight
-          ? _value.lastWeight
-          : lastWeight // ignore: cast_nullable_to_non_nullable
-              as BodyMeasurement?,
-      lastWorkoutSummary: freezed == lastWorkoutSummary
-          ? _value.lastWorkoutSummary
-          : lastWorkoutSummary // ignore: cast_nullable_to_non_nullable
-              as String?,
-      isRestDay: null == isRestDay
-          ? _value.isRestDay
-          : isRestDay // ignore: cast_nullable_to_non_nullable
-              as bool,
-      todayDayName: freezed == todayDayName
-          ? _value.todayDayName
-          : todayDayName // ignore: cast_nullable_to_non_nullable
-              as String?,
-      todayExercises: null == todayExercises
-          ? _value._todayExercises
-          : todayExercises // ignore: cast_nullable_to_non_nullable
-              as List<String>,
-      estimatedDuration: null == estimatedDuration
-          ? _value.estimatedDuration
-          : estimatedDuration // ignore: cast_nullable_to_non_nullable
-              as int,
-      nextDayId: freezed == nextDayId
-          ? _value.nextDayId
-          : nextDayId // ignore: cast_nullable_to_non_nullable
-              as int?,
-      templateId: freezed == templateId
-          ? _value.templateId
-          : templateId // ignore: cast_nullable_to_non_nullable
-              as int?,
-    ));
+    final _that = this;
+    switch (_that) {
+      case _WorkoutHomeState() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_WorkoutHomeState value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _WorkoutHomeState():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_WorkoutHomeState value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _WorkoutHomeState() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(
+            String greeting,
+            String userName,
+            String dateString,
+            int currentStreak,
+            MotivationTip dailyTip,
+            WorkoutSession? lastWorkout,
+            WorkoutSession? activeDraft,
+            Map<int, double> weeklyVolume,
+            BodyMeasurement? lastWeight,
+            String? lastWorkoutSummary,
+            bool isRestDay,
+            String? todayDayName,
+            List<String> todayExercises,
+            int estimatedDuration,
+            int? nextDayId,
+            int? templateId)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _WorkoutHomeState() when $default != null:
+        return $default(
+            _that.greeting,
+            _that.userName,
+            _that.dateString,
+            _that.currentStreak,
+            _that.dailyTip,
+            _that.lastWorkout,
+            _that.activeDraft,
+            _that.weeklyVolume,
+            _that.lastWeight,
+            _that.lastWorkoutSummary,
+            _that.isRestDay,
+            _that.todayDayName,
+            _that.todayExercises,
+            _that.estimatedDuration,
+            _that.nextDayId,
+            _that.templateId);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(
+            String greeting,
+            String userName,
+            String dateString,
+            int currentStreak,
+            MotivationTip dailyTip,
+            WorkoutSession? lastWorkout,
+            WorkoutSession? activeDraft,
+            Map<int, double> weeklyVolume,
+            BodyMeasurement? lastWeight,
+            String? lastWorkoutSummary,
+            bool isRestDay,
+            String? todayDayName,
+            List<String> todayExercises,
+            int estimatedDuration,
+            int? nextDayId,
+            int? templateId)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _WorkoutHomeState():
+        return $default(
+            _that.greeting,
+            _that.userName,
+            _that.dateString,
+            _that.currentStreak,
+            _that.dailyTip,
+            _that.lastWorkout,
+            _that.activeDraft,
+            _that.weeklyVolume,
+            _that.lastWeight,
+            _that.lastWorkoutSummary,
+            _that.isRestDay,
+            _that.todayDayName,
+            _that.todayExercises,
+            _that.estimatedDuration,
+            _that.nextDayId,
+            _that.templateId);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(
+            String greeting,
+            String userName,
+            String dateString,
+            int currentStreak,
+            MotivationTip dailyTip,
+            WorkoutSession? lastWorkout,
+            WorkoutSession? activeDraft,
+            Map<int, double> weeklyVolume,
+            BodyMeasurement? lastWeight,
+            String? lastWorkoutSummary,
+            bool isRestDay,
+            String? todayDayName,
+            List<String> todayExercises,
+            int estimatedDuration,
+            int? nextDayId,
+            int? templateId)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _WorkoutHomeState() when $default != null:
+        return $default(
+            _that.greeting,
+            _that.userName,
+            _that.dateString,
+            _that.currentStreak,
+            _that.dailyTip,
+            _that.lastWorkout,
+            _that.activeDraft,
+            _that.weeklyVolume,
+            _that.lastWeight,
+            _that.lastWorkoutSummary,
+            _that.isRestDay,
+            _that.todayDayName,
+            _that.todayExercises,
+            _that.estimatedDuration,
+            _that.nextDayId,
+            _that.templateId);
+      case _:
+        return null;
+    }
   }
 }
 
 /// @nodoc
 
-class _$WorkoutHomeStateImpl extends _WorkoutHomeState {
-  const _$WorkoutHomeStateImpl(
+class _WorkoutHomeState extends WorkoutHomeState {
+  const _WorkoutHomeState(
       {required this.greeting,
       required this.userName,
       required this.dateString,
@@ -581,16 +922,19 @@ class _$WorkoutHomeStateImpl extends _WorkoutHomeState {
   @override
   final int? templateId;
 
+  /// Create a copy of WorkoutHomeState
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  String toString() {
-    return 'WorkoutHomeState(greeting: $greeting, userName: $userName, dateString: $dateString, currentStreak: $currentStreak, dailyTip: $dailyTip, lastWorkout: $lastWorkout, activeDraft: $activeDraft, weeklyVolume: $weeklyVolume, lastWeight: $lastWeight, lastWorkoutSummary: $lastWorkoutSummary, isRestDay: $isRestDay, todayDayName: $todayDayName, todayExercises: $todayExercises, estimatedDuration: $estimatedDuration, nextDayId: $nextDayId, templateId: $templateId)';
-  }
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$WorkoutHomeStateCopyWith<_WorkoutHomeState> get copyWith =>
+      __$WorkoutHomeStateCopyWithImpl<_WorkoutHomeState>(this, _$identity);
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$WorkoutHomeStateImpl &&
+            other is _WorkoutHomeState &&
             (identical(other.greeting, greeting) ||
                 other.greeting == greeting) &&
             (identical(other.userName, userName) ||
@@ -645,73 +989,197 @@ class _$WorkoutHomeStateImpl extends _WorkoutHomeState {
       nextDayId,
       templateId);
 
+  @override
+  String toString() {
+    return 'WorkoutHomeState(greeting: $greeting, userName: $userName, dateString: $dateString, currentStreak: $currentStreak, dailyTip: $dailyTip, lastWorkout: $lastWorkout, activeDraft: $activeDraft, weeklyVolume: $weeklyVolume, lastWeight: $lastWeight, lastWorkoutSummary: $lastWorkoutSummary, isRestDay: $isRestDay, todayDayName: $todayDayName, todayExercises: $todayExercises, estimatedDuration: $estimatedDuration, nextDayId: $nextDayId, templateId: $templateId)';
+  }
+}
+
+/// @nodoc
+abstract mixin class _$WorkoutHomeStateCopyWith<$Res>
+    implements $WorkoutHomeStateCopyWith<$Res> {
+  factory _$WorkoutHomeStateCopyWith(
+          _WorkoutHomeState value, $Res Function(_WorkoutHomeState) _then) =
+      __$WorkoutHomeStateCopyWithImpl;
+  @override
+  @useResult
+  $Res call(
+      {String greeting,
+      String userName,
+      String dateString,
+      int currentStreak,
+      MotivationTip dailyTip,
+      WorkoutSession? lastWorkout,
+      WorkoutSession? activeDraft,
+      Map<int, double> weeklyVolume,
+      BodyMeasurement? lastWeight,
+      String? lastWorkoutSummary,
+      bool isRestDay,
+      String? todayDayName,
+      List<String> todayExercises,
+      int estimatedDuration,
+      int? nextDayId,
+      int? templateId});
+
+  @override
+  $MotivationTipCopyWith<$Res> get dailyTip;
+  @override
+  $WorkoutSessionCopyWith<$Res>? get lastWorkout;
+  @override
+  $WorkoutSessionCopyWith<$Res>? get activeDraft;
+  @override
+  $BodyMeasurementCopyWith<$Res>? get lastWeight;
+}
+
+/// @nodoc
+class __$WorkoutHomeStateCopyWithImpl<$Res>
+    implements _$WorkoutHomeStateCopyWith<$Res> {
+  __$WorkoutHomeStateCopyWithImpl(this._self, this._then);
+
+  final _WorkoutHomeState _self;
+  final $Res Function(_WorkoutHomeState) _then;
+
   /// Create a copy of WorkoutHomeState
   /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
-  _$$WorkoutHomeStateImplCopyWith<_$WorkoutHomeStateImpl> get copyWith =>
-      __$$WorkoutHomeStateImplCopyWithImpl<_$WorkoutHomeStateImpl>(
-          this, _$identity);
-}
-
-abstract class _WorkoutHomeState extends WorkoutHomeState {
-  const factory _WorkoutHomeState(
-      {required final String greeting,
-      required final String userName,
-      required final String dateString,
-      required final int currentStreak,
-      required final MotivationTip dailyTip,
-      final WorkoutSession? lastWorkout,
-      final WorkoutSession? activeDraft,
-      final Map<int, double> weeklyVolume,
-      final BodyMeasurement? lastWeight,
-      final String? lastWorkoutSummary,
-      final bool isRestDay,
-      final String? todayDayName,
-      final List<String> todayExercises,
-      final int estimatedDuration,
-      final int? nextDayId,
-      final int? templateId}) = _$WorkoutHomeStateImpl;
-  const _WorkoutHomeState._() : super._();
-
-  @override
-  String get greeting;
-  @override
-  String get userName;
-  @override
-  String get dateString;
-  @override
-  int get currentStreak;
-  @override
-  MotivationTip get dailyTip;
-  @override
-  WorkoutSession? get lastWorkout;
-  @override
-  WorkoutSession? get activeDraft;
-  @override
-  Map<int, double> get weeklyVolume;
-  @override
-  BodyMeasurement? get lastWeight;
-  @override
-  String? get lastWorkoutSummary;
-  @override
-  bool get isRestDay;
-  @override
-  String? get todayDayName;
-  @override
-  List<String> get todayExercises;
-  @override
-  int get estimatedDuration;
-  @override
-  int? get nextDayId;
-  @override
-  int? get templateId;
+  $Res call({
+    Object? greeting = null,
+    Object? userName = null,
+    Object? dateString = null,
+    Object? currentStreak = null,
+    Object? dailyTip = null,
+    Object? lastWorkout = freezed,
+    Object? activeDraft = freezed,
+    Object? weeklyVolume = null,
+    Object? lastWeight = freezed,
+    Object? lastWorkoutSummary = freezed,
+    Object? isRestDay = null,
+    Object? todayDayName = freezed,
+    Object? todayExercises = null,
+    Object? estimatedDuration = null,
+    Object? nextDayId = freezed,
+    Object? templateId = freezed,
+  }) {
+    return _then(_WorkoutHomeState(
+      greeting: null == greeting
+          ? _self.greeting
+          : greeting // ignore: cast_nullable_to_non_nullable
+              as String,
+      userName: null == userName
+          ? _self.userName
+          : userName // ignore: cast_nullable_to_non_nullable
+              as String,
+      dateString: null == dateString
+          ? _self.dateString
+          : dateString // ignore: cast_nullable_to_non_nullable
+              as String,
+      currentStreak: null == currentStreak
+          ? _self.currentStreak
+          : currentStreak // ignore: cast_nullable_to_non_nullable
+              as int,
+      dailyTip: null == dailyTip
+          ? _self.dailyTip
+          : dailyTip // ignore: cast_nullable_to_non_nullable
+              as MotivationTip,
+      lastWorkout: freezed == lastWorkout
+          ? _self.lastWorkout
+          : lastWorkout // ignore: cast_nullable_to_non_nullable
+              as WorkoutSession?,
+      activeDraft: freezed == activeDraft
+          ? _self.activeDraft
+          : activeDraft // ignore: cast_nullable_to_non_nullable
+              as WorkoutSession?,
+      weeklyVolume: null == weeklyVolume
+          ? _self._weeklyVolume
+          : weeklyVolume // ignore: cast_nullable_to_non_nullable
+              as Map<int, double>,
+      lastWeight: freezed == lastWeight
+          ? _self.lastWeight
+          : lastWeight // ignore: cast_nullable_to_non_nullable
+              as BodyMeasurement?,
+      lastWorkoutSummary: freezed == lastWorkoutSummary
+          ? _self.lastWorkoutSummary
+          : lastWorkoutSummary // ignore: cast_nullable_to_non_nullable
+              as String?,
+      isRestDay: null == isRestDay
+          ? _self.isRestDay
+          : isRestDay // ignore: cast_nullable_to_non_nullable
+              as bool,
+      todayDayName: freezed == todayDayName
+          ? _self.todayDayName
+          : todayDayName // ignore: cast_nullable_to_non_nullable
+              as String?,
+      todayExercises: null == todayExercises
+          ? _self._todayExercises
+          : todayExercises // ignore: cast_nullable_to_non_nullable
+              as List<String>,
+      estimatedDuration: null == estimatedDuration
+          ? _self.estimatedDuration
+          : estimatedDuration // ignore: cast_nullable_to_non_nullable
+              as int,
+      nextDayId: freezed == nextDayId
+          ? _self.nextDayId
+          : nextDayId // ignore: cast_nullable_to_non_nullable
+              as int?,
+      templateId: freezed == templateId
+          ? _self.templateId
+          : templateId // ignore: cast_nullable_to_non_nullable
+              as int?,
+    ));
+  }
 
   /// Create a copy of WorkoutHomeState
   /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$WorkoutHomeStateImplCopyWith<_$WorkoutHomeStateImpl> get copyWith =>
-      throw _privateConstructorUsedError;
+  @pragma('vm:prefer-inline')
+  $MotivationTipCopyWith<$Res> get dailyTip {
+    return $MotivationTipCopyWith<$Res>(_self.dailyTip, (value) {
+      return _then(_self.copyWith(dailyTip: value));
+    });
+  }
+
+  /// Create a copy of WorkoutHomeState
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $WorkoutSessionCopyWith<$Res>? get lastWorkout {
+    if (_self.lastWorkout == null) {
+      return null;
+    }
+
+    return $WorkoutSessionCopyWith<$Res>(_self.lastWorkout!, (value) {
+      return _then(_self.copyWith(lastWorkout: value));
+    });
+  }
+
+  /// Create a copy of WorkoutHomeState
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $WorkoutSessionCopyWith<$Res>? get activeDraft {
+    if (_self.activeDraft == null) {
+      return null;
+    }
+
+    return $WorkoutSessionCopyWith<$Res>(_self.activeDraft!, (value) {
+      return _then(_self.copyWith(activeDraft: value));
+    });
+  }
+
+  /// Create a copy of WorkoutHomeState
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $BodyMeasurementCopyWith<$Res>? get lastWeight {
+    if (_self.lastWeight == null) {
+      return null;
+    }
+
+    return $BodyMeasurementCopyWith<$Res>(_self.lastWeight!, (value) {
+      return _then(_self.copyWith(lastWeight: value));
+    });
+  }
 }
+
+// dart format on

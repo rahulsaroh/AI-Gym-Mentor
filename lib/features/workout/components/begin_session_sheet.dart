@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:ai_gym_mentor/features/workout/providers/workout_home_notifier.dart';
 import 'package:ai_gym_mentor/features/workout/workout_providers.dart';
+import 'package:ai_gym_mentor/features/workout/workout_repository.dart';
 import 'package:ai_gym_mentor/core/domain/entities/workout_program.dart';
 import 'package:ai_gym_mentor/core/domain/entities/workout_session.dart';
 
@@ -13,7 +14,7 @@ class BeginSessionSheet extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final homeState = ref.watch(workoutHomeNotifierProvider);
+    final homeState = ref.watch(workoutHomeProvider);
     final templatesAsync = ref.watch(workoutTemplatesProvider);
     final colorScheme = Theme.of(context).colorScheme;
 
@@ -143,22 +144,30 @@ class BeginSessionSheet extends ConsumerWidget {
 
   Future<void> _startTemplateWorkout(
       BuildContext context, WidgetRef ref, WorkoutProgram template) async {
-    // In a real app, we'd find the next day in the cycle.
-    // For now, we use the startWorkout logic in the notifier which does this.
-    final id =
-        await ref.read(workoutHomeNotifierProvider.notifier).startWorkout(
-              templateId: template.id,
-              name: '${template.name} - Session',
-            );
+    final repo = ref.read(workoutRepositoryProvider);
+    final days = await repo.getTemplateDays(template.id);
+    int? dayId;
+    if (days.isNotEmpty) {
+      dayId = days.first.id;
+    }
+    final id = await ref.read(workoutHomeProvider.notifier).startWorkout(
+          templateId: template.id,
+          dayId: dayId,
+          name: '${template.name} - Session',
+        );
     if (context.mounted) {
       Navigator.pop(context);
-      context.push('/app/workout/active?id=$id');
+      if (dayId != null) {
+        context.push('/app/workout/active?id=$id&dayId=$dayId');
+      } else {
+        context.push('/app/workout/active?id=$id');
+      }
     }
   }
 
   Future<void> _startEmptyWorkout(BuildContext context, WidgetRef ref) async {
     final id =
-        await ref.read(workoutHomeNotifierProvider.notifier).startWorkout(
+        await ref.read(workoutHomeProvider.notifier).startWorkout(
               name: 'Quick Workout',
             );
     if (context.mounted) {

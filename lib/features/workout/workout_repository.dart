@@ -7,6 +7,7 @@ import 'package:ai_gym_mentor/core/domain/entities/workout_session.dart' as ent;
 import 'package:ai_gym_mentor/core/domain/entities/workout_program.dart' as ent;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:ai_gym_mentor/core/database/initial_data.dart';
 
 part 'workout_repository.g.dart';
 
@@ -500,6 +501,10 @@ class WorkoutRepository {
     return result;
   }
 
+  Future<List<ExerciseTable>> getAllExercises() async {
+    return await _db.select(_db.exercises).get();
+  }
+
   Future<void> deleteTemplate(int id) async {
     await _db.transaction(() async {
       final days = await (_db.select(_db.templateDays)
@@ -550,93 +555,161 @@ class WorkoutRepository {
   }
 
   Future<void> importTemplateFromJson(String jsonStr) async {
-    final data = jsonDecode(jsonStr);
-    final name = data['name'] as String;
-    final description = data['description'] as String?;
-    final days = data['days'] as List;
+    try {
+      final data = jsonDecode(jsonStr);
+      final name = data['name'] as String;
+      final description = data['description'] as String?;
+      final goal = data['goal'] as String?;
+      final duration = data['duration'] as String?;
+      final days = data['days'] as List;
 
-    await _db.transaction(() async {
-      final templateId = await _db
-          .into(_db.workoutTemplates)
-          .insert(WorkoutTemplatesCompanion.insert(
-            name: name,
-            description: Value(description),
-          ));
-
-      for (final dayData in days) {
-        final dayId = await _db
-            .into(_db.templateDays)
-            .insert(TemplateDaysCompanion.insert(
-              templateId: templateId,
-              name: dayData['name'],
-              order: dayData['order'],
+      await _db.transaction(() async {
+        final templateId = await _db
+            .into(_db.workoutTemplates)
+            .insert(WorkoutTemplatesCompanion.insert(
+              name: name,
+              description: Value(description),
+              goal: Value(goal),
+              duration: Value(duration),
             ));
 
-        final exercises = dayData['exercises'] as List;
-        for (final exData in exercises) {
-          final exerciseName = exData['exerciseName'] as String;
-          final ex = await (_db.select(_db.exercises)
-                ..where((t) => t.name.equals(exerciseName)))
-              .getSingleOrNull();
-          if (ex != null) {
+        for (final dayData in days) {
+          final dayId = await _db
+              .into(_db.templateDays)
+              .insert(TemplateDaysCompanion.insert(
+                templateId: templateId,
+                name: dayData['name'],
+                order: dayData['order'],
+              ));
+
+          final exercisesList = dayData['exercises'] as List;
+          for (final exData in exercisesList) {
+            final exerciseName = exData['exerciseName'] as String;
+
+            // Find or create exercise
+            final existingExs = await (_db.select(_db.exercises)
+                  ..where((t) => t.name.equals(exerciseName)))
+              .get();
+            var ex = existingExs.isNotEmpty ? existingExs.first : null;
+
+            if (ex == null) {
+              final newId = await _db
+                  .into(_db.exercises)
+                  .insert(ExercisesCompanion.insert(
+                    name: exerciseName,
+                    primaryMuscle: 'Full Body',
+                    equipment: 'None',
+                    setType: 'Straight',
+                    source: const Value('imported'),
+                  ));
+              ex = await (_db.select(_db.exercises)
+                    ..where((t) => t.id.equals(newId)))
+                .getSingle();
+            }
+
+            // Handle SetType mapping (e.g., 'normal' -> 'straight')
+            SetType resolvedType;
+            try {
+              String typeStr = exData['setType'] as String? ?? 'straight';
+              if (typeStr == 'normal') typeStr = 'straight';
+              resolvedType = SetType.values.byName(typeStr);
+            } catch (_) {
+              resolvedType = SetType.straight;
+            }
+
             await _db
                 .into(_db.templateExercises)
                 .insert(TemplateExercisesCompanion.insert(
                   dayId: dayId,
                   exerciseId: ex.id,
-                  order: exData['order'],
-                  setType: Value(SetType.values.byName(exData['setType'])),
-                  setsJson: exData['setsJson'],
-                  restTime: Value(exData['restTime'] ?? 90),
-                  notes: Value(exData['notes']),
+                  order: exData['order'] as int? ?? 0,
+                  setType: Value(resolvedType),
+                  setsJson: exData['setsJson'] is String
+                      ? exData['setsJson']
+                      : jsonEncode(exData['setsJson']),
+                  restTime: Value(exData['restTime'] as int? ?? 90),
+                  notes: Value(exData['notes'] as String?),
                 ));
           }
         }
+      });
+      print('Import successful: $name');
+    } catch (e, stack) {
+      print('Import failed: $e');
+      print(stack);
+    }
+  }
+
+  Future<void> clearAllTemplatesAndInsertSample() async {
+    await _db.transaction(() async {
+      // 1. Delete all existing templates
+      final allTemplates = await (_db.select(_db.workoutTemplates)).get();
+      for (final t in allTemplates) {
+        await deleteTemplate(t.id);
+      }
+
+      // 2. Insert all professional samples from initial_data.dart
+      for (final program in allSamplePrograms) {
+        await importTemplateFromJson(jsonEncode(program.toJson()));
       }
     });
   }
 
   String getSampleJson() {
     return jsonEncode({
-      'name': 'Sample 3-Day Split',
-      'description': 'A simple example of a workout program structure.',
+      'name': 'V-Shape Transformation',
+      'description': 'Focused upper-body width and core tightening plan to improve shoulder-to-waist ratio with professional hypertrophy techniques.',
+      'goal': 'Aesthetics', // New field for UI tags
+      'duration': '12 weeks', // New field for UI tags
+      'tags': ['Aesthetics', 'Muscle Gain', 'Fat Loss'],
       'days': [
         {
-          'name': 'Upper Body',
+          'name': 'Push (Chest/Shoulders/Triceps)',
           'order': 0,
           'exercises': [
             {
-              'exerciseName': 'Bench Press',
+              'exerciseName': 'Bench Press (Dumbbell)',
               'order': 0,
-              'setType': 'normal',
-              'setsJson':
-                  '[{"reps":10, "weight": 60.0}, {"reps":10, "weight": 60.0}, {"reps":10, "weight": 60.0}]',
+              'setType': 'straight',
+              'setsJson': '[{"reps":10, "weight": 20.0}, {"reps":10, "weight": 20.0}, {"reps":10, "weight": 20.0}]',
               'restTime': 90,
-              'notes': 'Keep core tight'
+              'notes': 'Focus on the stretch at the bottom'
             },
             {
-              'exerciseName': 'Pull Ups',
+              'exerciseName': 'Lateral Raise (Dumbbell)',
               'order': 1,
-              'setType': 'normal',
-              'setsJson':
-                  '[{"reps":12, "weight": 0.0}, {"reps":12, "weight": 0.0}, {"reps":12, "weight": 0.0}]',
+              'setType': 'straight',
+              'setsJson': '[{"reps":15, "weight": 8.0}, {"reps":15, "weight": 8.0}, {"reps":15, "weight": 8.0}]',
               'restTime': 60,
-              'notes': 'Full extension'
+              'notes': 'Lead with elbows'
             }
           ]
         },
         {
-          'name': 'Lower Body',
+          'name': 'Pull (Back/Biceps)',
           'order': 1,
           'exercises': [
             {
-              'exerciseName': 'Squat (Barbell)',
+              'exerciseName': 'Lat Pulldown',
               'order': 0,
-              'setType': 'normal',
-              'setsJson':
-                  '[{"reps":8, "weight": 80.0}, {"reps":8, "weight": 80.0}, {"reps":8, "weight": 80.0}]',
+              'setType': 'straight',
+              'setsJson': '[{"reps":12, "weight": 45.0}, {"reps":12, "weight": 45.0}, {"reps":12, "weight": 45.0}]',
+              'restTime': 90,
+              'notes': 'Squeeze lats at the bottom'
+            }
+          ]
+        },
+        {
+          'name': 'Legs/Core',
+          'order': 2,
+          'exercises': [
+            {
+              'exerciseName': 'Squat (Crossover)',
+              'order': 0,
+              'setType': 'straight',
+              'setsJson': '[{"reps":12, "weight": 40.0}, {"reps":12, "weight": 40.0}, {"reps":12, "weight": 40.0}]',
               'restTime': 120,
-              'notes': 'Go deep'
+              'notes': 'Controlled descent'
             }
           ]
         }
@@ -646,7 +719,7 @@ class WorkoutRepository {
 }
 
 @riverpod
-WorkoutRepository workoutRepository(WorkoutRepositoryRef ref) {
+WorkoutRepository workoutRepository(Ref ref) {
   final db = ref.watch(appDatabaseProvider);
   return WorkoutRepository(db);
 }

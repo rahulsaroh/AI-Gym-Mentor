@@ -15,7 +15,7 @@ class HistoryItem {
 }
 
 @riverpod
-Future<Map<String, dynamic>> historyStats(HistoryStatsRef ref) async {
+Future<Map<String, dynamic>> historyStats(Ref ref) async {
   final repo = ref.watch(workoutRepositoryProvider);
   return await repo.getStats();
 }
@@ -77,7 +77,7 @@ class HistoryList extends _$HistoryList {
 }
 
 @riverpod
-Future<List<ent.LoggedSet>> heatmapSets(HeatmapSetsRef ref) async {
+Future<List<ent.LoggedSet>> heatmapSets(Ref ref) async {
   final repo = ref.watch(workoutRepositoryProvider);
   return await repo.getSetsForHeatmap();
 }

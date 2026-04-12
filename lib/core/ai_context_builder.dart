@@ -8,7 +8,7 @@ final aiContextBuilderProvider = Provider<AiContextBuilder>((ref) {
   final db = ref.watch(appDatabaseProvider);
   final settingsState = ref.watch(settingsProvider);
   // Default to a safe fallback if settings aren't loaded yet
-  final settings = settingsState.valueOrNull ?? const SettingsState();
+  final settings = settingsState.asData?.value ?? const SettingsState();
   return AiContextBuilder(db, settings);
 });
 

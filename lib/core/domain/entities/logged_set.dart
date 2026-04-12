@@ -15,7 +15,9 @@ enum SetType {
 }
 
 @freezed
-class LoggedSet with _$LoggedSet {
+abstract class LoggedSet with _$LoggedSet {
+  const LoggedSet._();
+
   const factory LoggedSet({
     required int id,
     required int workoutId,

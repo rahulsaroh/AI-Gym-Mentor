@@ -14,7 +14,6 @@ import 'package:ai_gym_mentor/core/domain/entities/exercise.dart';
 import 'package:ai_gym_mentor/core/domain/entities/exercise.dart' as entity;
 import 'package:confetti/confetti.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:ai_gym_mentor/services/sync_worker.dart';
 import 'package:ai_gym_mentor/core/widgets/speed_dial_fab.dart';
 import 'package:ai_gym_mentor/features/workout/components/pr_banner.dart';
 import 'package:ai_gym_mentor/features/workout/components/set_type_selector.dart';
@@ -1349,7 +1348,7 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
 
   Future<void> _showRestTimer(
       int seconds, String currentExName, String? nextExName) async {
-    final notifier = ref.read(timerNotifierProvider.notifier);
+    final notifier = ref.read(timerProvider.notifier);
     final hasPermission = await notifier.checkPermissions();
 
     if (!hasPermission && mounted) {
@@ -1630,17 +1629,10 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
             duration: Value(duration),
             notes: Value(notes),
           ));
-      await database.into(database.syncQueue).insert(db.SyncQueueCompanion.insert(
-          workoutId: Value(workout.id),
-          type: 'workout',
-          createdAt: DateTime.now()));
     });
 
-    // Trigger Sync
-    ref.read(syncWorkerProvider.notifier).processQueue();
-
     if (mounted) {
-      ref.invalidate(workoutHomeNotifierProvider);
+      ref.invalidate(workoutHomeProvider);
       context.go('/app');
     }
   }

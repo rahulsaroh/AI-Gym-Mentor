@@ -6,132 +6,278 @@ part of 'analytics_providers.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$dashboardStatsHash() => r'19fe6fde5f4e3db607a843fd8e202a07fad96f60';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
 
-/// See also [dashboardStats].
 @ProviderFor(dashboardStats)
-final dashboardStatsProvider =
-    AutoDisposeFutureProvider<Map<String, dynamic>>.internal(
-  dashboardStats,
-  name: r'dashboardStatsProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$dashboardStatsHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+final dashboardStatsProvider = DashboardStatsProvider._();
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef DashboardStatsRef = AutoDisposeFutureProviderRef<Map<String, dynamic>>;
-String _$volumeTrendHash() => r'935c7018f9f9a3bf41d853b18762429a91c23abe';
+final class DashboardStatsProvider extends $FunctionalProvider<
+        AsyncValue<Map<String, dynamic>>,
+        Map<String, dynamic>,
+        FutureOr<Map<String, dynamic>>>
+    with
+        $FutureModifier<Map<String, dynamic>>,
+        $FutureProvider<Map<String, dynamic>> {
+  DashboardStatsProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'dashboardStatsProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
 
-/// See also [volumeTrend].
+  @override
+  String debugGetCreateSourceHash() => _$dashboardStatsHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<Map<String, dynamic>> $createElement(
+          $ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<Map<String, dynamic>> create(Ref ref) {
+    return dashboardStats(ref);
+  }
+}
+
+String _$dashboardStatsHash() => r'855c50e866eaaa1317733f2cbe30e16ea5a518a4';
+
 @ProviderFor(volumeTrend)
-final volumeTrendProvider =
-    AutoDisposeFutureProvider<List<Map<String, dynamic>>>.internal(
-  volumeTrend,
-  name: r'volumeTrendProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$volumeTrendHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+final volumeTrendProvider = VolumeTrendProvider._();
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef VolumeTrendRef
-    = AutoDisposeFutureProviderRef<List<Map<String, dynamic>>>;
-String _$frequencyTrendHash() => r'cc2587a6626bbc1a32ff29aaf4d5fe68dbc4f869';
+final class VolumeTrendProvider extends $FunctionalProvider<
+        AsyncValue<List<Map<String, dynamic>>>,
+        List<Map<String, dynamic>>,
+        FutureOr<List<Map<String, dynamic>>>>
+    with
+        $FutureModifier<List<Map<String, dynamic>>>,
+        $FutureProvider<List<Map<String, dynamic>>> {
+  VolumeTrendProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'volumeTrendProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
 
-/// See also [frequencyTrend].
+  @override
+  String debugGetCreateSourceHash() => _$volumeTrendHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<List<Map<String, dynamic>>> $createElement(
+          $ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<List<Map<String, dynamic>>> create(Ref ref) {
+    return volumeTrend(ref);
+  }
+}
+
+String _$volumeTrendHash() => r'a64c01d9c700354b43e62c6464ee636bc52c28b2';
+
 @ProviderFor(frequencyTrend)
-final frequencyTrendProvider =
-    AutoDisposeFutureProvider<List<Map<String, dynamic>>>.internal(
-  frequencyTrend,
-  name: r'frequencyTrendProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$frequencyTrendHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+final frequencyTrendProvider = FrequencyTrendProvider._();
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef FrequencyTrendRef
-    = AutoDisposeFutureProviderRef<List<Map<String, dynamic>>>;
-String _$muscleBalanceHash() => r'860179fe720350a7682d614814868b6d9d426aa1';
+final class FrequencyTrendProvider extends $FunctionalProvider<
+        AsyncValue<List<Map<String, dynamic>>>,
+        List<Map<String, dynamic>>,
+        FutureOr<List<Map<String, dynamic>>>>
+    with
+        $FutureModifier<List<Map<String, dynamic>>>,
+        $FutureProvider<List<Map<String, dynamic>>> {
+  FrequencyTrendProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'frequencyTrendProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
 
-/// See also [muscleBalance].
+  @override
+  String debugGetCreateSourceHash() => _$frequencyTrendHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<List<Map<String, dynamic>>> $createElement(
+          $ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<List<Map<String, dynamic>>> create(Ref ref) {
+    return frequencyTrend(ref);
+  }
+}
+
+String _$frequencyTrendHash() => r'5377d5c0eacc71e4b75e313016bc72f21fa933ed';
+
 @ProviderFor(muscleBalance)
-final muscleBalanceProvider =
-    AutoDisposeFutureProvider<Map<String, dynamic>>.internal(
-  muscleBalance,
-  name: r'muscleBalanceProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$muscleBalanceHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+final muscleBalanceProvider = MuscleBalanceProvider._();
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef MuscleBalanceRef = AutoDisposeFutureProviderRef<Map<String, dynamic>>;
-String _$plateauAlertsHash() => r'22d5173c246fcf1cbaef93a060f998e8d77722d4';
+final class MuscleBalanceProvider extends $FunctionalProvider<
+        AsyncValue<Map<String, dynamic>>,
+        Map<String, dynamic>,
+        FutureOr<Map<String, dynamic>>>
+    with
+        $FutureModifier<Map<String, dynamic>>,
+        $FutureProvider<Map<String, dynamic>> {
+  MuscleBalanceProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'muscleBalanceProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
 
-/// See also [plateauAlerts].
+  @override
+  String debugGetCreateSourceHash() => _$muscleBalanceHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<Map<String, dynamic>> $createElement(
+          $ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<Map<String, dynamic>> create(Ref ref) {
+    return muscleBalance(ref);
+  }
+}
+
+String _$muscleBalanceHash() => r'f209ac7ec9c7a0054a7752d3a1a8a827d5dfcbf5';
+
 @ProviderFor(plateauAlerts)
-final plateauAlertsProvider =
-    AutoDisposeFutureProvider<List<Map<String, dynamic>>>.internal(
-  plateauAlerts,
-  name: r'plateauAlertsProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$plateauAlertsHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+final plateauAlertsProvider = PlateauAlertsProvider._();
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef PlateauAlertsRef
-    = AutoDisposeFutureProviderRef<List<Map<String, dynamic>>>;
-String _$recentPRsHash() => r'e5ddfa3864cb894d3b2fc51e9132a036660b4fe7';
+final class PlateauAlertsProvider extends $FunctionalProvider<
+        AsyncValue<List<Map<String, dynamic>>>,
+        List<Map<String, dynamic>>,
+        FutureOr<List<Map<String, dynamic>>>>
+    with
+        $FutureModifier<List<Map<String, dynamic>>>,
+        $FutureProvider<List<Map<String, dynamic>>> {
+  PlateauAlertsProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'plateauAlertsProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
 
-/// See also [recentPRs].
+  @override
+  String debugGetCreateSourceHash() => _$plateauAlertsHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<List<Map<String, dynamic>>> $createElement(
+          $ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<List<Map<String, dynamic>>> create(Ref ref) {
+    return plateauAlerts(ref);
+  }
+}
+
+String _$plateauAlertsHash() => r'd73aa8790884bff04ee1f39639dd3c3f331bac6f';
+
 @ProviderFor(recentPRs)
-final recentPRsProvider =
-    AutoDisposeFutureProvider<List<Map<String, dynamic>>>.internal(
-  recentPRs,
-  name: r'recentPRsProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$recentPRsHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+final recentPRsProvider = RecentPRsProvider._();
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef RecentPRsRef = AutoDisposeFutureProviderRef<List<Map<String, dynamic>>>;
+final class RecentPRsProvider extends $FunctionalProvider<
+        AsyncValue<List<Map<String, dynamic>>>,
+        List<Map<String, dynamic>>,
+        FutureOr<List<Map<String, dynamic>>>>
+    with
+        $FutureModifier<List<Map<String, dynamic>>>,
+        $FutureProvider<List<Map<String, dynamic>>> {
+  RecentPRsProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'recentPRsProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$recentPRsHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<List<Map<String, dynamic>>> $createElement(
+          $ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<List<Map<String, dynamic>>> create(Ref ref) {
+    return recentPRs(ref);
+  }
+}
+
+String _$recentPRsHash() => r'd130b371b2a845a632292098586dd4184211b1c5';
+
+@ProviderFor(BodyMeasurementsList)
+final bodyMeasurementsListProvider = BodyMeasurementsListProvider._();
+
+final class BodyMeasurementsListProvider extends $AsyncNotifierProvider<
+    BodyMeasurementsList, List<ent.BodyMeasurement>> {
+  BodyMeasurementsListProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'bodyMeasurementsListProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$bodyMeasurementsListHash();
+
+  @$internal
+  @override
+  BodyMeasurementsList create() => BodyMeasurementsList();
+}
+
 String _$bodyMeasurementsListHash() =>
     r'c28d4395516e2b2ed3b78ea519f6a4111338bb55';
 
-/// See also [BodyMeasurementsList].
-@ProviderFor(BodyMeasurementsList)
-final bodyMeasurementsListProvider = AutoDisposeAsyncNotifierProvider<
-    BodyMeasurementsList, List<ent.BodyMeasurement>>.internal(
-  BodyMeasurementsList.new,
-  name: r'bodyMeasurementsListProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$bodyMeasurementsListHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-typedef _$BodyMeasurementsList
-    = AutoDisposeAsyncNotifier<List<ent.BodyMeasurement>>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+abstract class _$BodyMeasurementsList
+    extends $AsyncNotifier<List<ent.BodyMeasurement>> {
+  FutureOr<List<ent.BodyMeasurement>> build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<AsyncValue<List<ent.BodyMeasurement>>,
+        List<ent.BodyMeasurement>>;
+    final element = ref.element as $ClassProviderElement<
+        AnyNotifier<AsyncValue<List<ent.BodyMeasurement>>,
+            List<ent.BodyMeasurement>>,
+        AsyncValue<List<ent.BodyMeasurement>>,
+        Object?,
+        Object?>;
+    element.handleCreate(ref, build);
+  }
+}

@@ -6,8 +6,7 @@ part of 'logged_set.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$LoggedSetImpl _$$LoggedSetImplFromJson(Map<String, dynamic> json) =>
-    _$LoggedSetImpl(
+_LoggedSet _$LoggedSetFromJson(Map<String, dynamic> json) => _LoggedSet(
       id: (json['id'] as num).toInt(),
       workoutId: (json['workoutId'] as num).toInt(),
       exerciseId: (json['exerciseId'] as num).toInt(),
@@ -28,7 +27,7 @@ _$LoggedSetImpl _$$LoggedSetImplFromJson(Map<String, dynamic> json) =>
       supersetGroupId: json['supersetGroupId'] as String?,
     );
 
-Map<String, dynamic> _$$LoggedSetImplToJson(_$LoggedSetImpl instance) =>
+Map<String, dynamic> _$LoggedSetToJson(_LoggedSet instance) =>
     <String, dynamic>{
       'id': instance.id,
       'workoutId': instance.workoutId,

@@ -6,21 +6,46 @@ part of 'programs_notifier.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$programsNotifierHash() => r'96d17a32e0b72fd61d7f9d3bf221e1af7ff81c54';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
 
-/// See also [ProgramsNotifier].
 @ProviderFor(ProgramsNotifier)
-final programsNotifierProvider =
-    AutoDisposeAsyncNotifierProvider<ProgramsNotifier, ProgramsState>.internal(
-  ProgramsNotifier.new,
-  name: r'programsNotifierProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$programsNotifierHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+final programsProvider = ProgramsNotifierProvider._();
 
-typedef _$ProgramsNotifier = AutoDisposeAsyncNotifier<ProgramsState>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+final class ProgramsNotifierProvider
+    extends $AsyncNotifierProvider<ProgramsNotifier, ProgramsState> {
+  ProgramsNotifierProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'programsProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$programsNotifierHash();
+
+  @$internal
+  @override
+  ProgramsNotifier create() => ProgramsNotifier();
+}
+
+String _$programsNotifierHash() => r'8ce14c4df14653284130bb1bad93d0ceb7343126';
+
+abstract class _$ProgramsNotifier extends $AsyncNotifier<ProgramsState> {
+  FutureOr<ProgramsState> build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<AsyncValue<ProgramsState>, ProgramsState>;
+    final element = ref.element as $ClassProviderElement<
+        AnyNotifier<AsyncValue<ProgramsState>, ProgramsState>,
+        AsyncValue<ProgramsState>,
+        Object?,
+        Object?>;
+    element.handleCreate(ref, build);
+  }
+}

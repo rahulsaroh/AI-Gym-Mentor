@@ -1,0 +1,458 @@
+{
+  "name": "Rahul — 6-Day Push Pull Legs Warrior Program",
+  "description": "V-taper + combat physique program. Push A/B, Pull A/B, Legs+Abs A/B repeated across 6 days. Based on home gym: dumbbells, pull-up/dip station, cable pulley, resistance bands, adjustable bench, punching bag. Beginner to advanced progression across 4 phases.",
+  "days": [
+    {
+      "name": "Day 1 — Push A (Chest, Shoulders, Triceps)",
+      "order": 0,
+      "exercises": [
+        {
+          "exerciseName": "Dumbbell Arnold Press",
+          "order": 0,
+          "setType": "normal",
+          "setsJson": "[{\"reps\":12,\"weight\":10.0},{\"reps\":12,\"weight\":10.0},{\"reps\":12,\"weight\":10.0}]",
+          "restTime": 75,
+          "notes": "Rotate palms from facing you to facing forward as you press. Hits all 3 delt heads. Primary V-taper builder. Increase weight when all 3 sets complete."
+        },
+        {
+          "exerciseName": "Dumbbell Lateral Raise",
+          "order": 1,
+          "setType": "normal",
+          "setsJson": "[{\"reps\":15,\"weight\":6.0},{\"reps\":15,\"weight\":6.0},{\"reps\":15,\"weight\":6.0}]",
+          "restTime": 60,
+          "notes": "3 second negative on the way down. Elbows slightly bent. Most important exercise for shoulder width and V-taper. Never skip."
+        },
+        {
+          "exerciseName": "Dumbbell Flat Bench Press",
+          "order": 2,
+          "setType": "normal",
+          "setsJson": "[{\"reps\":12,\"weight\":16.0},{\"reps\":12,\"weight\":16.0},{\"reps\":12,\"weight\":16.0}]",
+          "restTime": 90,
+          "notes": "Flat bench. Full ROM. Elbows at 45 degrees to body, not flared. Touch chest at bottom. Chest width adds to upper body V shape."
+        },
+        {
+          "exerciseName": "Dumbbell Incline Press",
+          "order": 3,
+          "setType": "normal",
+          "setsJson": "[{\"reps\":12,\"weight\":14.0},{\"reps\":12,\"weight\":14.0},{\"reps\":12,\"weight\":14.0}]",
+          "restTime": 90,
+          "notes": "Bench at 30-45 degrees. Upper chest focus. Upper chest development creates that full athletic look. Control the descent."
+        },
+        {
+          "exerciseName": "Cable Chest Fly",
+          "order": 4,
+          "setType": "normal",
+          "setsJson": "[{\"reps\":15,\"weight\":8.0},{\"reps\":15,\"weight\":8.0},{\"reps\":15,\"weight\":8.0}]",
+          "restTime": 60,
+          "notes": "Use pulley system at shoulder height. Deep stretch at the bottom. Squeeze hard at the top. Weight is resistance, not the goal — feel the stretch."
+        },
+        {
+          "exerciseName": "Tricep Pushdown (Band or Cable)",
+          "order": 5,
+          "setType": "normal",
+          "setsJson": "[{\"reps\":15,\"weight\":10.0},{\"reps\":15,\"weight\":10.0},{\"reps\":15,\"weight\":10.0}]",
+          "restTime": 60,
+          "notes": "Elbows pinned to sides throughout. Full extension at bottom. Triceps are 2/3 of arm size — build these for big arms."
+        },
+        {
+          "exerciseName": "Dumbbell Overhead Tricep Extension",
+          "order": 6,
+          "setType": "normal",
+          "setsJson": "[{\"reps\":15,\"weight\":12.0},{\"reps\":15,\"weight\":12.0}]",
+          "restTime": 60,
+          "notes": "Hold one heavy dumbbell with both hands overhead. Full stretch at bottom, full extension at top. Long head activation makes arms look bigger from behind."
+        },
+        {
+          "exerciseName": "Punching Bag — Straight Punch Rounds",
+          "order": 7,
+          "setType": "normal",
+          "setsJson": "[{\"reps\":60,\"weight\":0.0},{\"reps\":60,\"weight\":0.0},{\"reps\":60,\"weight\":0.0}]",
+          "restTime": 60,
+          "notes": "Reps = seconds. 3 rounds of 1 minute. Hands up, exhale on every punch, alternate jab and cross. Shoulder endurance finisher. Burn out the delts."
+        }
+      ]
+    },
+    {
+      "name": "Day 2 — Pull A (Back, Biceps, Rear Delts)",
+      "order": 1,
+      "exercises": [
+        {
+          "exerciseName": "Pull-Up (Wide Grip)",
+          "order": 0,
+          "setType": "normal",
+          "setsJson": "[{\"reps\":6,\"weight\":0.0},{\"reps\":6,\"weight\":0.0},{\"reps\":6,\"weight\":0.0}]",
+          "restTime": 90,
+          "notes": "Use pull-up station. Wide grip. Full hang at bottom, chin over bar at top. Use resistance band for assistance if needed. V-TAPER KING — never skip this exercise."
+        },
+        {
+          "exerciseName": "Dumbbell Bent-Over Row",
+          "order": 1,
+          "setType": "normal",
+          "setsJson": "[{\"reps\":12,\"weight\":18.0},{\"reps\":12,\"weight\":18.0},{\"reps\":12,\"weight\":18.0}]",
+          "restTime": 90,
+          "notes": "Hinge at hips 45 degrees, back flat. Drive elbows back not flared out. Squeeze at the top 1 second. Mid-back thickness. Core braced throughout."
+        },
+        {
+          "exerciseName": "Lat Pulldown (Cable Pulley)",
+          "order": 2,
+          "setType": "normal",
+          "setsJson": "[{\"reps\":12,\"weight\":20.0},{\"reps\":12,\"weight\":20.0},{\"reps\":12,\"weight\":20.0}]",
+          "restTime": 75,
+          "notes": "Wide grip. Full stretch at the top — let shoulder blades rise. Pull to upper chest. Think about pulling elbows down to your hips, not pulling the bar."
+        },
+        {
+          "exerciseName": "Dumbbell Single-Arm Row",
+          "order": 3,
+          "setType": "normal",
+          "setsJson": "[{\"reps\":12,\"weight\":20.0},{\"reps\":12,\"weight\":20.0},{\"reps\":12,\"weight\":20.0}]",
+          "restTime": 75,
+          "notes": "Knee and same-side hand on bench. Opposite leg on floor. Full ROM — full hang at bottom. Go heavy here. Unilateral back thickness and strength."
+        },
+        {
+          "exerciseName": "Dumbbell Reverse Fly",
+          "order": 4,
+          "setType": "normal",
+          "setsJson": "[{\"reps\":15,\"weight\":8.0},{\"reps\":15,\"weight\":8.0},{\"reps\":15,\"weight\":8.0}]",
+          "restTime": 60,
+          "notes": "Bent over at 45 degrees. Slow controlled arc upward. Rear delts create 3D shoulder look. Essential for posture and combat stability."
+        },
+        {
+          "exerciseName": "Dumbbell Face Pull Simulation",
+          "order": 5,
+          "setType": "normal",
+          "setsJson": "[{\"reps\":15,\"weight\":6.0},{\"reps\":15,\"weight\":6.0},{\"reps\":15,\"weight\":6.0}]",
+          "restTime": 60,
+          "notes": "Bent over, pull dumbbells to face level with elbows high and flared. External rotation at the top. Rotator cuff health, posture correction, punch power base."
+        },
+        {
+          "exerciseName": "Dumbbell Incline Curl",
+          "order": 6,
+          "setType": "normal",
+          "setsJson": "[{\"reps\":12,\"weight\":10.0},{\"reps\":12,\"weight\":10.0},{\"reps\":12,\"weight\":10.0}]",
+          "restTime": 60,
+          "notes": "Bench at 60 degrees. Arms hang behind body at bottom for full stretch. Long head of bicep. Creates that peak when flexing. No swinging."
+        },
+        {
+          "exerciseName": "Dumbbell Hammer Curl",
+          "order": 7,
+          "setType": "normal",
+          "setsJson": "[{\"reps\":12,\"weight\":10.0},{\"reps\":12,\"weight\":10.0}]",
+          "restTime": 60,
+          "notes": "Neutral grip — thumbs up. Hits brachialis muscle which pushes bicep up. Makes arms look thicker and bigger from all angles. Alternate arms."
+        },
+        {
+          "exerciseName": "Punching Bag — Hooks and Uppercuts",
+          "order": 8,
+          "setType": "normal",
+          "setsJson": "[{\"reps\":60,\"weight\":0.0},{\"reps\":60,\"weight\":0.0},{\"reps\":60,\"weight\":0.0}]",
+          "restTime": 60,
+          "notes": "Reps = seconds. 3 rounds of 1 minute. Rotate hips into every hook. Uppercut rises from legs not arm. Power starts from the floor, not the shoulder."
+        }
+      ]
+    },
+    {
+      "name": "Day 3 — Legs + Abs A (Quads, Glutes, Core, Kicks)",
+      "order": 2,
+      "exercises": [
+        {
+          "exerciseName": "Dumbbell Goblet Squat",
+          "order": 0,
+          "setType": "normal",
+          "setsJson": "[{\"reps\":12,\"weight\":16.0},{\"reps\":12,\"weight\":16.0},{\"reps\":12,\"weight\":16.0}]",
+          "restTime": 90,
+          "notes": "Hold one heavy dumbbell at chest. Full depth — hips below knees. Knees track over toes. Core braced. Heels flat. Best beginner squat pattern."
+        },
+        {
+          "exerciseName": "Dumbbell Romanian Deadlift",
+          "order": 1,
+          "setType": "normal",
+          "setsJson": "[{\"reps\":12,\"weight\":18.0},{\"reps\":12,\"weight\":18.0},{\"reps\":12,\"weight\":18.0}]",
+          "restTime": 90,
+          "notes": "Hip hinge, not squat. Push hips back, slight knee bend. Feel hamstring stretch at bottom. This is the biggest glute builder you have. Slow and controlled descent."
+        },
+        {
+          "exerciseName": "Dumbbell Reverse Lunge",
+          "order": 2,
+          "setType": "normal",
+          "setsJson": "[{\"reps\":12,\"weight\":12.0},{\"reps\":12,\"weight\":12.0},{\"reps\":12,\"weight\":12.0}]",
+          "restTime": 75,
+          "notes": "Step backward, not forward. Less knee stress. Front knee tracks toe. Back knee touches floor lightly. Dumbbells in hands. 12 reps each leg."
+        },
+        {
+          "exerciseName": "Resistance Band Squat",
+          "order": 3,
+          "setType": "normal",
+          "setsJson": "[{\"reps\":15,\"weight\":0.0},{\"reps\":15,\"weight\":0.0},{\"reps\":15,\"weight\":0.0}]",
+          "restTime": 60,
+          "notes": "Band above knees throughout. Activates glute medius — the muscle that gives hip width. Also trains the hip stability needed for powerful kicks. Push knees out against band."
+        },
+        {
+          "exerciseName": "Dumbbell Calf Raise",
+          "order": 4,
+          "setType": "normal",
+          "setsJson": "[{\"reps\":20,\"weight\":20.0},{\"reps\":20,\"weight\":20.0},{\"reps\":20,\"weight\":20.0}]",
+          "restTime": 45,
+          "notes": "Stand on edge of step if available. Full ROM — heel below step at bottom, full rise at top. 3 second negative. Calves need high reps and volume to grow."
+        },
+        {
+          "exerciseName": "Front Kick Raise (Slow)",
+          "order": 5,
+          "setType": "normal",
+          "setsJson": "[{\"reps\":10,\"weight\":0.0},{\"reps\":10,\"weight\":0.0},{\"reps\":10,\"weight\":0.0}]",
+          "restTime": 45,
+          "notes": "Lift knee to chest first, then extend leg forward. Hold 1 second extended. Slow and deliberate. Trains hip flexors and kick mechanics. 10 reps each leg. Wall for balance."
+        },
+        {
+          "exerciseName": "Side Kick Leg Raise",
+          "order": 6,
+          "setType": "normal",
+          "setsJson": "[{\"reps\":10,\"weight\":0.0},{\"reps\":10,\"weight\":0.0},{\"reps\":10,\"weight\":0.0}]",
+          "restTime": 45,
+          "notes": "Hold wall or bag for balance. Lift leg laterally as high as hip flexibility allows. Hold 1 second. Hip abductor strength for side kick height. 10 reps each leg."
+        },
+        {
+          "exerciseName": "Ab Wheel Rollout",
+          "order": 7,
+          "setType": "normal",
+          "setsJson": "[{\"reps\":8,\"weight\":0.0},{\"reps\":8,\"weight\":0.0},{\"reps\":8,\"weight\":0.0}]",
+          "restTime": 60,
+          "notes": "From knees. Roll out slowly, pause at full extension, roll back. Never let lower back sag. Best core exercise you own. Add 1 rep per week progressively."
+        },
+        {
+          "exerciseName": "Hanging Knee Raise",
+          "order": 8,
+          "setType": "normal",
+          "setsJson": "[{\"reps\":12,\"weight\":0.0},{\"reps\":12,\"weight\":0.0},{\"reps\":12,\"weight\":0.0}]",
+          "restTime": 60,
+          "notes": "Pull-up bar. Dead hang start. Pull knees to chest, lower SLOWLY. No swinging. Lower abs are the hardest to develop — these are the key exercise for them."
+        },
+        {
+          "exerciseName": "Plank and Side Plank",
+          "order": 9,
+          "setType": "normal",
+          "setsJson": "[{\"reps\":30,\"weight\":0.0},{\"reps\":30,\"weight\":0.0},{\"reps\":30,\"weight\":0.0}]",
+          "restTime": 45,
+          "notes": "Reps = seconds. Front plank 30 sec, then side plank 30 sec each side = 1 set. Oblique definition comes from side planks. Hips never sag. Body perfectly straight."
+        }
+      ]
+    },
+    {
+      "name": "Day 4 — Push B (Shoulder Focus, Chest, Triceps)",
+      "order": 3,
+      "exercises": [
+        {
+          "exerciseName": "Dumbbell Shoulder Press",
+          "order": 0,
+          "setType": "normal",
+          "setsJson": "[{\"reps\":12,\"weight\":14.0},{\"reps\":12,\"weight\":14.0},{\"reps\":12,\"weight\":14.0}]",
+          "restTime": 75,
+          "notes": "Standing or seated. Elbows at 90 degrees at bottom. Full extension at top. Core braced to protect lower back. Primary mass builder for shoulders."
+        },
+        {
+          "exerciseName": "Dumbbell Front Raise",
+          "order": 1,
+          "setType": "normal",
+          "setsJson": "[{\"reps\":12,\"weight\":8.0},{\"reps\":12,\"weight\":8.0},{\"reps\":12,\"weight\":8.0}]",
+          "restTime": 60,
+          "notes": "Alternate arms. Raise to shoulder height only — not higher. Slow and controlled. Anterior delt. No momentum or body swing. Light weight, strict form."
+        },
+        {
+          "exerciseName": "Dumbbell Lateral Raise — Drop Set",
+          "order": 2,
+          "setType": "drop",
+          "setsJson": "[{\"reps\":12,\"weight\":8.0},{\"reps\":8,\"weight\":5.0},{\"reps\":12,\"weight\":8.0},{\"reps\":8,\"weight\":5.0},{\"reps\":12,\"weight\":8.0},{\"reps\":8,\"weight\":5.0}]",
+          "restTime": 75,
+          "notes": "Do 12 reps at working weight, immediately drop to lighter weight and do 8 more without rest. That is 1 set. Lateral raises respond extremely well to drop sets — maximum shoulder pump."
+        },
+        {
+          "exerciseName": "Elevated Push-Up (Feet on Bench)",
+          "order": 3,
+          "setType": "normal",
+          "setsJson": "[{\"reps\":12,\"weight\":0.0},{\"reps\":12,\"weight\":0.0},{\"reps\":12,\"weight\":0.0}]",
+          "restTime": 75,
+          "notes": "Feet on bench, hands on floor. Shifts load to upper chest. Full ROM. Elbows at 45 degrees. This is your upper chest bodyweight press. Add reps every session."
+        },
+        {
+          "exerciseName": "Dumbbell Decline Press",
+          "order": 4,
+          "setType": "normal",
+          "setsJson": "[{\"reps\":12,\"weight\":14.0},{\"reps\":12,\"weight\":14.0},{\"reps\":12,\"weight\":14.0}]",
+          "restTime": 75,
+          "notes": "Decline angle on bench. Lower chest definition. Hook feet under bench pad. Full ROM. Lower chest gives the chest a complete look from all angles."
+        },
+        {
+          "exerciseName": "Overhead Tricep Extension (Band or Cable)",
+          "order": 5,
+          "setType": "normal",
+          "setsJson": "[{\"reps\":15,\"weight\":10.0},{\"reps\":15,\"weight\":10.0},{\"reps\":15,\"weight\":10.0}]",
+          "restTime": 60,
+          "notes": "Face away from anchor. Hands behind head. Extend fully. Long head of tricep stretch — this adds width and thickness to arms viewed from behind."
+        },
+        {
+          "exerciseName": "Diamond Push-Up",
+          "order": 6,
+          "setType": "normal",
+          "setsJson": "[{\"reps\":10,\"weight\":0.0},{\"reps\":10,\"weight\":0.0},{\"reps\":10,\"weight\":0.0}]",
+          "restTime": 60,
+          "notes": "Hands form a diamond under chest. Elbows stay close to body. Medial and lateral tricep head. Bodyweight finisher. Go to failure in Phase 3+."
+        },
+        {
+          "exerciseName": "Punching Bag — 4-Punch Combo",
+          "order": 7,
+          "setType": "normal",
+          "setsJson": "[{\"reps\":90,\"weight\":0.0},{\"reps\":90,\"weight\":0.0},{\"reps\":90,\"weight\":0.0}]",
+          "restTime": 90,
+          "notes": "Reps = seconds. 3 rounds of 90 seconds. Jab-cross-hook-cross, then move head left or right. This is reflex and combination training. Stay light on feet between combos."
+        }
+      ]
+    },
+    {
+      "name": "Day 5 — Pull B (Back Width, Thickness, Rear Chain)",
+      "order": 4,
+      "exercises": [
+        {
+          "exerciseName": "Pull-Up (Close Grip)",
+          "order": 0,
+          "setType": "normal",
+          "setsJson": "[{\"reps\":6,\"weight\":0.0},{\"reps\":6,\"weight\":0.0},{\"reps\":6,\"weight\":0.0}]",
+          "restTime": 90,
+          "notes": "Shoulder-width or close grip. Different lat recruitment than wide grip. Full hang at bottom. Squeeze lats hard at top. Vary grip from Pull A for full lat development."
+        },
+        {
+          "exerciseName": "Dumbbell Seated Cable Row",
+          "order": 1,
+          "setType": "normal",
+          "setsJson": "[{\"reps\":12,\"weight\":20.0},{\"reps\":12,\"weight\":20.0},{\"reps\":12,\"weight\":12.0}]",
+          "restTime": 90,
+          "notes": "Use pulley system at floor level. Neutral grip attachment. Sit tall, retract scapula, pull to belly button. Mid-back thickness — the muscle that makes your back look 3D."
+        },
+        {
+          "exerciseName": "Dumbbell Shrug",
+          "order": 2,
+          "setType": "normal",
+          "setsJson": "[{\"reps\":15,\"weight\":22.0},{\"reps\":15,\"weight\":22.0},{\"reps\":15,\"weight\":22.0}]",
+          "restTime": 60,
+          "notes": "Heavy dumbbells. Straight up — do not roll shoulders. Hold at top 1 second. Trapezius development adds to athletic thick-necked warrior look."
+        },
+        {
+          "exerciseName": "Resistance Band Pull-Apart (Supinated)",
+          "order": 3,
+          "setType": "normal",
+          "setsJson": "[{\"reps\":20,\"weight\":0.0},{\"reps\":20,\"weight\":0.0},{\"reps\":20,\"weight\":0.0}]",
+          "restTime": 45,
+          "notes": "Hold band in front, palms up (supinated). Pull apart to sides at shoulder height. Rear delts and external rotators. Arm health, posture, punching power base. Never skip."
+        },
+        {
+          "exerciseName": "Dumbbell Bent-Over Reverse Fly",
+          "order": 4,
+          "setType": "normal",
+          "setsJson": "[{\"reps\":15,\"weight\":8.0},{\"reps\":15,\"weight\":8.0},{\"reps\":15,\"weight\":8.0}]",
+          "restTime": 60,
+          "notes": "Hinge 45 degrees. Arc dumbbells up and out. Pinch shoulder blades at top. Rear delts are often underdeveloped — these are what make shoulders look round and full from behind."
+        },
+        {
+          "exerciseName": "Dumbbell Concentration Curl",
+          "order": 5,
+          "setType": "normal",
+          "setsJson": "[{\"reps\":12,\"weight\":10.0},{\"reps\":12,\"weight\":10.0},{\"reps\":12,\"weight\":10.0}]",
+          "restTime": 60,
+          "notes": "Seated. Elbow on inner thigh. Curl slowly. Maximum mind-muscle connection. This is peak isolation for bicep shape. 12 reps each arm. No body movement."
+        },
+        {
+          "exerciseName": "Dumbbell Hammer Curl",
+          "order": 6,
+          "setType": "normal",
+          "setsJson": "[{\"reps\":12,\"weight\":12.0},{\"reps\":12,\"weight\":12.0},{\"reps\":12,\"weight\":12.0}]",
+          "restTime": 60,
+          "notes": "Both arms simultaneously or alternating. Neutral grip. Brachialis — the muscle that sits under the bicep and makes arms look thicker. Heavy and strict."
+        },
+        {
+          "exerciseName": "Punching Bag — Power Shots",
+          "order": 7,
+          "setType": "normal",
+          "setsJson": "[{\"reps\":5,\"weight\":0.0},{\"reps\":5,\"weight\":0.0},{\"reps\":5,\"weight\":0.0}]",
+          "restTime": 90,
+          "notes": "5 maximum-power punches each hand per set. Full wind-up. Rotate from the hip. Exhale and tighten core on impact. This trains POWER not cardio. Quality over speed here."
+        }
+      ]
+    },
+    {
+      "name": "Day 6 — Legs + Abs B (Posterior Chain, Calves, Combat Core)",
+      "order": 5,
+      "exercises": [
+        {
+          "exerciseName": "Dumbbell Stiff-Leg Deadlift",
+          "order": 0,
+          "setType": "normal",
+          "setsJson": "[{\"reps\":12,\"weight\":18.0},{\"reps\":12,\"weight\":18.0},{\"reps\":12,\"weight\":18.0}]",
+          "restTime": 90,
+          "notes": "Legs straighter than RDL — more hamstring focus. Hinge at hips. Bar travels close to shins. Full stretch at bottom. Slower tempo than RDL. Feel every inch of the hamstring."
+        },
+        {
+          "exerciseName": "Dumbbell Hip Thrust",
+          "order": 1,
+          "setType": "normal",
+          "setsJson": "[{\"reps\":12,\"weight\":20.0},{\"reps\":12,\"weight\":20.0},{\"reps\":12,\"weight\":20.0}]",
+          "restTime": 90,
+          "notes": "Upper back on bench. Dumbbell on hips. Drive hips up, squeeze glutes hard at top 2 seconds. Lower slowly. Best glute max exercise. Powerful hips = powerful kicks."
+        },
+        {
+          "exerciseName": "Bulgarian Split Squat",
+          "order": 2,
+          "setType": "normal",
+          "setsJson": "[{\"reps\":8,\"weight\":10.0},{\"reps\":8,\"weight\":10.0},{\"reps\":8,\"weight\":10.0}]",
+          "restTime": 120,
+          "notes": "Rear foot on bench. Front foot forward. Lower until rear knee nearly touches floor. Dumbbells in hands. Hardest leg exercise in this program. Do it anyway. 8 reps each leg."
+        },
+        {
+          "exerciseName": "Resistance Band Glute Kickback",
+          "order": 3,
+          "setType": "normal",
+          "setsJson": "[{\"reps\":15,\"weight\":0.0},{\"reps\":15,\"weight\":0.0},{\"reps\":15,\"weight\":0.0}]",
+          "restTime": 45,
+          "notes": "On all fours. Band around ankle. Kick leg back and up. Squeeze glute at top. Glute medius and maximus isolation. Also trains the hip extension you need for front kicks."
+        },
+        {
+          "exerciseName": "Dumbbell Calf Raise — Slow Negative",
+          "order": 4,
+          "setType": "normal",
+          "setsJson": "[{\"reps\":20,\"weight\":22.0},{\"reps\":20,\"weight\":22.0},{\"reps\":20,\"weight\":22.0}]",
+          "restTime": 45,
+          "notes": "4 second negative on every rep. Full stretch at bottom. Calves have slow-twitch fiber dominance — they respond to volume and time under tension, not just weight."
+        },
+        {
+          "exerciseName": "Jump Squat",
+          "order": 5,
+          "setType": "normal",
+          "setsJson": "[{\"reps\":10,\"weight\":0.0},{\"reps\":10,\"weight\":0.0},{\"reps\":10,\"weight\":0.0},{\"reps\":10,\"weight\":0.0}]",
+          "restTime": 60,
+          "notes": "Squat down, explode up, land softly. Bend knees on landing to absorb impact. Explosive leg power directly transfers to kick power. Essential combat conditioning."
+        },
+        {
+          "exerciseName": "Ab Wheel Rollout — Advanced",
+          "order": 6,
+          "setType": "normal",
+          "setsJson": "[{\"reps\":10,\"weight\":0.0},{\"reps\":10,\"weight\":0.0},{\"reps\":10,\"weight\":0.0}]",
+          "restTime": 60,
+          "notes": "Phase 1-2: from knees. Phase 3: attempt from toes. Phase 4: single-arm or feet elevated. Add 1 rep every session. This is your core strength benchmark."
+        },
+        {
+          "exerciseName": "Decline Sit-Up with Rotation",
+          "order": 7,
+          "setType": "normal",
+          "setsJson": "[{\"reps\":15,\"weight\":0.0},{\"reps\":15,\"weight\":0.0},{\"reps\":15,\"weight\":0.0}]",
+          "restTime": 60,
+          "notes": "Hook feet on bench in decline. Sit up and rotate elbow to opposite knee. Obliques and upper abs. Add a dumbbell to chest when bodyweight becomes easy. Obliques create waist definition."
+        },
+        {
+          "exerciseName": "Hanging Leg Raise",
+          "order": 8,
+          "setType": "normal",
+          "setsJson": "[{\"reps\":10,\"weight\":0.0},{\"reps\":10,\"weight\":0.0},{\"reps\":10,\"weight\":0.0}]",
+          "restTime": 60,
+          "notes": "Pull-up bar. Raise straight legs to 90 degrees or higher. Lower SLOWLY — 3 seconds down. No swinging. Progression from knee raises. Lower abs and hip flexors. Critical for kick height."
+        }
+      ]
+    }
+  ]
+}

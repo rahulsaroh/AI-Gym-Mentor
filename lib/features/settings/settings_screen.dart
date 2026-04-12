@@ -5,11 +5,9 @@ import 'package:intl/intl.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:ai_gym_mentor/features/settings/models/settings_state.dart';
 import 'package:ai_gym_mentor/features/settings/settings_provider.dart';
-import 'package:ai_gym_mentor/core/auth/auth_provider.dart';
 import 'package:ai_gym_mentor/services/backup_service.dart';
 import 'package:ai_gym_mentor/features/settings/csv_export_screen.dart';
 import 'package:ai_gym_mentor/features/settings/import_wizard_screen.dart';
-import 'package:ai_gym_mentor/services/sync_worker.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -105,15 +103,12 @@ class SettingsScreen extends ConsumerWidget {
                   .updateSettings(settings.copyWith(showPreviousData: v)),
             ),
             const Divider(height: 32),
-            _buildSectionHeader(context, 'Google Sheets Sync'),
-            _buildSheetsSyncSection(context, ref, settings),
-            const Divider(height: 32),
             _buildSectionHeader(context, 'Data Management'),
             _buildTile(
               context,
               title: 'Export JSON Backup',
               subtitle: 'Full snapshot for transfer',
-              icon: LucideIcons.fileJson,
+              icon: LucideIcons.fileDigit,
               onTap: () =>
                   ref.read(backupServiceProvider.notifier).exportToLocalFile(),
             ),
@@ -150,7 +145,7 @@ class SettingsScreen extends ConsumerWidget {
             const SizedBox(height: 64),
             _buildTile(
               context,
-              title: 'About GYM Kilo',
+              title: 'About Gym Mentor',
               icon: LucideIcons.info,
               onTap: () => context.push('/settings/about'),
             ),
@@ -159,157 +154,6 @@ class SettingsScreen extends ConsumerWidget {
         ),
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text('Error loading settings: $e')),
-      ),
-    );
-  }
-
-  Widget _buildSectionHeader(BuildContext context, String title,
-      {bool isDanger = false}) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-      child: Text(
-        title.toUpperCase(),
-        style: Theme.of(context).textTheme.labelMedium?.copyWith(
-              color:
-                  isDanger ? Colors.red : Theme.of(context).colorScheme.primary,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 1.2,
-            ),
-      ),
-    );
-  }
-
-  Widget _buildTile(BuildContext context,
-      {required String title,
-      String? subtitle,
-      required IconData icon,
-      VoidCallback? onTap}) {
-    return ListTile(
-      leading:
-          Icon(icon, color: Theme.of(context).colorScheme.onSurfaceVariant),
-      title: Text(title),
-      subtitle: subtitle != null
-          ? Text(subtitle,
-              style: TextStyle(color: Theme.of(context).colorScheme.primary))
-          : null,
-      trailing: const Icon(Icons.chevron_right, size: 20),
-      onTap: onTap,
-    );
-  }
-
-  Widget _buildSwitchTile(BuildContext context,
-      {required String title,
-      String? subtitle,
-      required bool value,
-      required ValueChanged<bool> onChanged}) {
-    return SwitchListTile(
-      title: Text(title),
-      subtitle: subtitle != null ? Text(subtitle) : null,
-      value: value,
-      onChanged: onChanged,
-    );
-  }
-
-  Widget _buildSheetsSyncSection(
-      BuildContext context, WidgetRef ref, SettingsState settings) {
-    if (settings.googleDriveEmail == null) {
-      return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        child: FilledButton.icon(
-          onPressed: () => context.push('/settings/sheets-setup'),
-          icon: const Icon(LucideIcons.cloud),
-          label: const Text('Connect Google Account'),
-          style: FilledButton.styleFrom(
-              minimumSize: const Size(double.infinity, 48)),
-        ),
-      );
-    }
-
-    final syncStatus = ref.watch(syncWorkerProvider);
-    final isSyncing = syncStatus == SyncStatus.syncing;
-
-    return Column(
-      children: [
-        ListTile(
-          leading: const CircleAvatar(child: Icon(LucideIcons.user, size: 20)),
-          title: Text(settings.googleDriveEmail!),
-          subtitle: Text(settings.lastSynced != null
-              ? 'Last synced: ${DateFormat.yMd().add_jm().format(settings.lastSynced!)}'
-              : 'Not synced yet'),
-        ),
-        _buildSwitchTile(
-          context,
-          title: 'Auto-Sync Workouts',
-          subtitle: 'Syncs automatically after finishing',
-          value: settings.autoBackup,
-          onChanged: (v) => ref
-              .read(settingsProvider.notifier)
-              .updateSettings(settings.copyWith(autoBackup: v)),
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: Row(
-            children: [
-              Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: isSyncing
-                      ? null
-                      : () =>
-                          ref.read(syncWorkerProvider.notifier).processQueue(),
-                  icon: isSyncing
-                      ? const SizedBox(
-                          width: 16,
-                          height: 16,
-                          child: CircularProgressIndicator(strokeWidth: 2))
-                      : const Icon(LucideIcons.refreshCw, size: 18),
-                  label: Text(isSyncing ? 'Syncing...' : 'Sync Now'),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: () => _showSignOutConfirmation(context, ref),
-                  icon: const Icon(LucideIcons.logOut, size: 18),
-                  label: const Text('Sign Out'),
-                  style: OutlinedButton.styleFrom(foregroundColor: Colors.red),
-                ),
-              ),
-            ],
-          ),
-        ),
-        ListTile(
-          leading: const Icon(LucideIcons.history, size: 20),
-          title: const Text('View Sync History'),
-          subtitle: const Text('Detailed logs of recent cloud syncs'),
-          trailing: const Icon(Icons.chevron_right, size: 20),
-          onTap: () => context.push('/settings/sync-log'),
-        ),
-      ],
-    );
-  }
-
-  void _showSignOutConfirmation(BuildContext context, WidgetRef ref) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Sign Out?'),
-        content: const Text(
-            'Your local data will remain, but automatic sync to Google Sheets will stop.'),
-        actions: [
-          TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel')),
-          FilledButton(
-            onPressed: () async {
-              await ref.read(googleSignInProvider).signOut();
-              await ref.read(settingsProvider.notifier).updateSettings(
-                  (await ref.read(settingsProvider.future))
-                      .copyWith(googleDriveEmail: null));
-              if (context.mounted) Navigator.pop(context);
-            },
-            child: const Text('Sign Out'),
-          ),
-        ],
       ),
     );
   }
@@ -712,4 +556,51 @@ class SettingsScreen extends ConsumerWidget {
   }
 
   String _capitalize(String s) => s[0].toUpperCase() + s.substring(1);
+
+  Widget _buildSectionHeader(BuildContext context, String title,
+      {bool isDanger = false}) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+      child: Text(
+        title.toUpperCase(),
+        style: Theme.of(context).textTheme.labelMedium?.copyWith(
+              color:
+                  isDanger ? Colors.red : Theme.of(context).colorScheme.primary,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1.2,
+            ),
+      ),
+    );
+  }
+
+  Widget _buildTile(BuildContext context,
+      {required String title,
+      String? subtitle,
+      required IconData icon,
+      VoidCallback? onTap}) {
+    return ListTile(
+      leading:
+          Icon(icon, color: Theme.of(context).colorScheme.onSurfaceVariant),
+      title: Text(title),
+      subtitle: subtitle != null
+          ? Text(subtitle,
+              style: TextStyle(color: Theme.of(context).colorScheme.primary))
+          : null,
+      trailing: const Icon(Icons.chevron_right, size: 20),
+      onTap: onTap,
+    );
+  }
+
+  Widget _buildSwitchTile(BuildContext context,
+      {required String title,
+      String? subtitle,
+      required bool value,
+      required ValueChanged<bool> onChanged}) {
+    return SwitchListTile(
+      title: Text(title),
+      subtitle: subtitle != null ? Text(subtitle) : null,
+      value: value,
+      onChanged: onChanged,
+    );
+  }
 }

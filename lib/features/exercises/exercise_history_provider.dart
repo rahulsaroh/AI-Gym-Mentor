@@ -5,21 +5,21 @@ part 'exercise_history_provider.g.dart';
 
 @riverpod
 Future<Map<String, dynamic>> exerciseStats(
-    ExerciseStatsRef ref, int exerciseId) async {
+    Ref ref, int exerciseId) async {
   final repo = ref.watch(exerciseHistoryRepositoryProvider);
   return await repo.getExerciseStats(exerciseId);
 }
 
 @riverpod
 Future<List<Map<String, dynamic>>> exerciseHistory(
-    ExerciseHistoryRef ref, int exerciseId) async {
+    Ref ref, int exerciseId) async {
   final repo = ref.watch(exerciseHistoryRepositoryProvider);
   return await repo.getExerciseHistory(exerciseId);
 }
 
 @riverpod
 Future<List<Map<String, dynamic>>> exerciseChartData(
-    ExerciseChartDataRef ref, int exerciseId, Duration range) async {
+    Ref ref, int exerciseId, Duration range) async {
   final repo = ref.watch(exerciseHistoryRepositoryProvider);
   return await repo.getChartData(exerciseId, range);
 }

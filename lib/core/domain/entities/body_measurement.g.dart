@@ -6,9 +6,8 @@ part of 'body_measurement.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$BodyMeasurementImpl _$$BodyMeasurementImplFromJson(
-        Map<String, dynamic> json) =>
-    _$BodyMeasurementImpl(
+_BodyMeasurement _$BodyMeasurementFromJson(Map<String, dynamic> json) =>
+    _BodyMeasurement(
       id: (json['id'] as num).toInt(),
       date: DateTime.parse(json['date'] as String),
       weight: (json['weight'] as num?)?.toDouble(),
@@ -29,8 +28,7 @@ _$BodyMeasurementImpl _$$BodyMeasurementImplFromJson(
       notes: json['notes'] as String?,
     );
 
-Map<String, dynamic> _$$BodyMeasurementImplToJson(
-        _$BodyMeasurementImpl instance) =>
+Map<String, dynamic> _$BodyMeasurementToJson(_BodyMeasurement instance) =>
     <String, dynamic>{
       'id': instance.id,
       'date': instance.date.toIso8601String(),

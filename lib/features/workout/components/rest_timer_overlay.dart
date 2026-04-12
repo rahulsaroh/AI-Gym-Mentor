@@ -16,15 +16,15 @@ class RestTimerOverlay extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final timerState = ref.watch(timerNotifierProvider);
-    final notifier = ref.read(timerNotifierProvider.notifier);
+    final timerState = ref.watch(timerProvider);
+    final notifier = ref.read(timerProvider.notifier);
 
     final double progress = timerState.initialDuration > 0
         ? timerState.remainingSeconds / timerState.initialDuration
         : 0;
 
     // Auto-close overlay when timer finishes or stops
-    ref.listen(timerNotifierProvider, (previous, next) {
+    ref.listen(timerProvider, (previous, next) {
       if (!next.isRunning && next.remainingSeconds == 0) {
         onClose();
       }

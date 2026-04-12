@@ -1,3 +1,5 @@
+import 'dart:io';
+import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -8,56 +10,294 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:ai_gym_mentor/features/workout/workout_repository.dart';
 import 'package:ai_gym_mentor/features/workout/providers/workout_home_notifier.dart';
 
-class ProgramsScreen extends ConsumerWidget {
+class ProgramsScreen extends ConsumerStatefulWidget {
   const ProgramsScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final stateAsync = ref.watch(programsNotifierProvider);
+  ConsumerState<ProgramsScreen> createState() => _ProgramsScreenState();
+}
+
+class _ProgramsScreenState extends ConsumerState<ProgramsScreen> {
+  String _selectedGoal = 'All Goals';
+  final List<String> _goals = [
+    'All Goals',
+    'Aesthetics',
+    'Athletic Performance',
+    'Muscle Gain',
+    'Fat Loss',
+    'Strength',
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    final stateAsync = ref.watch(programsProvider);
 
     return Scaffold(
+      backgroundColor: Colors.grey[50],
       appBar: AppBar(
         title: Text('Exercise Plans',
             style: GoogleFonts.outfit(fontWeight: FontWeight.bold)),
         actions: [
           IconButton(
-            icon: const Icon(LucideIcons.fileJson),
-            onPressed: () =>
-                ref.read(programsNotifierProvider.notifier).exportSampleJson(),
-            tooltip: 'Sample Format',
+            icon: const Icon(LucideIcons.rotateCcw),
+            tooltip: 'Reset to Sample',
+            onPressed: () => _showResetConfirm(context),
           ),
           IconButton(
             icon: const Icon(LucideIcons.download),
-            onPressed: () =>
-                ref.read(programsNotifierProvider.notifier).importTemplate(),
+            onPressed: () => _showImportOptions(context, ref),
             tooltip: 'Import JSON',
           ),
         ],
       ),
-      body: stateAsync.when(
-        data: (state) {
-          if (state.templates.isEmpty) {
-            return _buildEmptyState(context, ref);
-          }
-          return RefreshIndicator(
-            onRefresh: () =>
-                ref.read(programsNotifierProvider.notifier).refresh(),
-            child: ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: state.templates.length,
-              itemBuilder: (context, index) {
-                final template = state.templates[index];
-                return _ProgramCard(template: template);
+      body: Column(
+        children: [
+          _buildFilters(),
+          Expanded(
+            child: stateAsync.when(
+              data: (state) {
+                final filteredTemplates = _selectedGoal == 'All Goals'
+                    ? state.templates
+                    : state.templates.where((t) {
+                        // Assuming goal or tags contains the selected goal
+                        // We check both the 'goal' field and 'description' as fallback
+                        final g = (t as dynamic).goal?.toString().toLowerCase() ?? '';
+                        return g.contains(_selectedGoal.toLowerCase());
+                      }).toList();
+
+                if (state.templates.isEmpty) {
+                  return _buildEmptyState(context, ref);
+                }
+                return RefreshIndicator(
+                  onRefresh: () => ref.read(programsProvider.notifier).refresh(),
+                  child: ListView.builder(
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 100),
+                    itemCount: filteredTemplates.length,
+                    itemBuilder: (context, index) {
+                      final template = filteredTemplates[index];
+                      return _ProgramCard(template: template);
+                    },
+                  ),
+                );
               },
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (e, s) => Center(child: Text('Error: $e')),
+            ),
+          ),
+        ],
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: SizedBox(
+          width: double.infinity,
+          height: 56,
+          child: FloatingActionButton.extended(
+            onPressed: () => context.push('/programs/create'),
+            backgroundColor: Colors.orange[700],
+            icon: const Icon(LucideIcons.plus, color: Colors.white),
+            label: Text(
+              'New Plan',
+              style: GoogleFonts.outfit(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFilters() {
+    return Container(
+      height: 60,
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        itemCount: _goals.length,
+        itemBuilder: (context, index) {
+          final goal = _goals[index];
+          final isSelected = _selectedGoal == goal;
+          return Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: FilterChip(
+              selected: isSelected,
+              label: Text(goal),
+              onSelected: (selected) {
+                setState(() => _selectedGoal = goal);
+              },
+              labelStyle: GoogleFonts.outfit(
+                color: isSelected ? Colors.teal[900] : Colors.grey[700],
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+              ),
+              backgroundColor: Colors.white,
+              selectedColor: Colors.teal[50],
+              checkmarkColor: Colors.teal[900],
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+                side: BorderSide(
+                  color: isSelected ? Colors.teal[200]! : Colors.grey[300]!,
+                ),
+              ),
             ),
           );
         },
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, s) => Center(child: Text('Error: $e')),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => context.push('/programs/create'),
-        child: const Icon(LucideIcons.plus),
+    );
+  }
+
+  void _showResetConfirm(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Reset All Plans?'),
+        content: const Text(
+            'This will delete all current programs and restore the professional sample plan. This cannot be undone.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              ref.read(programsProvider.notifier).resetPrograms();
+              Navigator.pop(context);
+            },
+            child: const Text('Reset Now', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showImportOptions(BuildContext context, WidgetRef ref) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              const SizedBox(height: 20),
+              Text(
+                'Import Plan',
+                style: GoogleFonts.outfit(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 20),
+              ListTile(
+                leading: const Icon(LucideIcons.file),
+                title: const Text('Choose JSON File'),
+                subtitle: const Text('Import from a .json file'),
+                onTap: () {
+                  Navigator.pop(context);
+                  ref.read(programsProvider.notifier).importTemplate();
+                },
+              ),
+              ListTile(
+                leading: const Icon(LucideIcons.clipboard),
+                title: const Text('Paste JSON Data'),
+                subtitle: const Text('Paste copied JSON content'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _showPasteJsonDialog(context, ref);
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showPasteJsonDialog(BuildContext context, WidgetRef ref) async {
+    final controller = TextEditingController();
+    final clipboardData = await Clipboard.getData(Clipboard.kTextPlain);
+    if (clipboardData?.text != null) {
+      controller.text = clipboardData!.text!;
+    }
+    
+    if (!context.mounted) return;
+    
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text('Paste JSON Data', style: GoogleFonts.outfit(fontWeight: FontWeight.bold)),
+            TextButton.icon(
+              onPressed: () async {
+                final data = await Clipboard.getData(Clipboard.kTextPlain);
+                if (data?.text != null) {
+                  controller.text = data!.text!;
+                }
+              },
+              icon: const Icon(LucideIcons.clipboard, size: 16),
+              label: const Text('Paste'),
+            ),
+          ],
+        ),
+        content: SizedBox(
+          width: double.maxFinite,
+          child: TextField(
+            controller: controller,
+            maxLines: 10,
+            decoration: InputDecoration(
+              hintText: 'Paste your JSON here...',
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: Text('Cancel', style: GoogleFonts.outfit(color: Colors.grey)),
+          ),
+          TextButton(
+            onPressed: () async {
+              final jsonStr = controller.text.trim();
+              if (jsonStr.isEmpty) {
+                return;
+              }
+              Navigator.pop(dialogContext);
+              try {
+                await ref.read(programsProvider.notifier).importTemplateFromString(jsonStr);
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Plan imported successfully')),
+                  );
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Error importing plan: $e')),
+                  );
+                }
+              }
+            },
+            child: Text('Import', style: GoogleFonts.outfit(fontWeight: FontWeight.bold)),
+          ),
+        ],
       ),
     );
   }
@@ -90,9 +330,7 @@ class ProgramsScreen extends ConsumerWidget {
               ),
               const SizedBox(width: 12),
               OutlinedButton.icon(
-                onPressed: () => ref
-                    .read(programsNotifierProvider.notifier)
-                    .importTemplate(),
+                onPressed: () => _showImportOptions(context, ref),
                 icon: const Icon(LucideIcons.download),
                 label: const Text('Import'),
               ),
@@ -110,20 +348,23 @@ class _ProgramCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Determine colors based on goal
+    final goal = (template as dynamic).goal?.toString() ?? 'Aesthetics';
+    final duration = (template as dynamic).duration?.toString() ?? '12 weeks';
+
     return Card(
-      margin: const EdgeInsets.only(bottom: 16),
-      elevation: 0,
+      margin: const EdgeInsets.only(bottom: 20),
+      elevation: 2,
+      shadowColor: Colors.black12,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: BorderSide(
-            color:
-                Theme.of(context).colorScheme.outlineVariant.withOpacity(0.5)),
+        borderRadius: BorderRadius.circular(20),
+        side: BorderSide(color: Colors.grey[200]!),
       ),
       child: InkWell(
-        onTap: () => context.push('/programs/edit/${template.id}'),
-        borderRadius: BorderRadius.circular(16),
+        onTap: () => context.push('/programs/details/${template.id}'),
+        borderRadius: BorderRadius.circular(20),
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -134,77 +375,30 @@ class _ProgramCard extends ConsumerWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Row(
-                          children: [
-                            Text(
-                              template.name,
-                              style: GoogleFonts.outfit(
-                                  fontSize: 18, fontWeight: FontWeight.bold),
-                            ),
-                            const SizedBox(width: 8),
-                            FutureBuilder<bool>(
-                              future: ref
-                                  .read(workoutRepositoryProvider)
-                                  .getActiveTemplate()
-                                  .then((t) => t?.id == template.id),
-                              builder: (context, snapshot) {
-                                if (snapshot.data == true) {
-                                  return Container(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 8, vertical: 2),
-                                    decoration: BoxDecoration(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .primary
-                                          .withOpacity(0.1),
-                                      borderRadius: BorderRadius.circular(4),
-                                      border: Border.all(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .primary
-                                              .withOpacity(0.5)),
-                                    ),
-                                    child: Text(
-                                      'ACTIVE',
-                                      style: TextStyle(
-                                        fontSize: 10,
-                                        fontWeight: FontWeight.bold,
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .primary,
-                                      ),
-                                    ),
-                                  );
-                                }
-                                return const SizedBox.shrink();
-                              },
-                            ),
-                          ],
+                        Text(
+                          template.name,
+                          style: GoogleFonts.outfit(
+                              fontSize: 20, fontWeight: FontWeight.w900, letterSpacing: -0.5),
                         ),
-                        if (template.description != null) ...[
-                          const SizedBox(height: 4),
-                          Text(
-                            template.description!,
-                            style: GoogleFonts.outfit(
-                                fontSize: 14, color: Colors.grey[600]),
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ],
+                        const SizedBox(height: 4),
+                        Text(
+                          duration,
+                          style: GoogleFonts.outfit(
+                              fontSize: 14, color: Colors.grey[600], fontWeight: FontWeight.w500),
+                        ),
                       ],
                     ),
                   ),
                   PopupMenuButton<String>(
                     icon: const Icon(LucideIcons.ellipsisVertical, size: 20),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12)),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     itemBuilder: (context) => [
                       const PopupMenuItem(
-                        value: 'default',
+                        value: 'edit',
                         child: Row(children: [
-                          Icon(LucideIcons.star, size: 18),
+                          Icon(LucideIcons.pencil, size: 18),
                           SizedBox(width: 8),
-                          Text('Set as Default')
+                          Text('Edit Plan')
                         ]),
                       ),
                       const PopupMenuItem(
@@ -225,14 +419,10 @@ class _ProgramCard extends ConsumerWidget {
                       ),
                     ],
                     onSelected: (val) {
-                      if (val == 'default') {
-                        ref
-                            .read(programsNotifierProvider.notifier)
-                            .makeDefault(template.id);
+                      if (val == 'edit') {
+                        context.push('/programs/edit/${template.id}');
                       } else if (val == 'export') {
-                        ref
-                            .read(programsNotifierProvider.notifier)
-                            .exportTemplate(template.id);
+                        ref.read(programsProvider.notifier).exportTemplate(template.id);
                       } else if (val == 'delete') {
                         _showDeleteDialog(context, ref);
                       }
@@ -240,41 +430,52 @@ class _ProgramCard extends ConsumerWidget {
                   ),
                 ],
               ),
+              const SizedBox(height: 12),
+              Wrap(
+                spacing: 8,
+                children: [
+                  _tag(goal, Colors.teal),
+                  _tag('Muscle Gain', Colors.orange),
+                  _tag('Fat Loss', Colors.blue),
+                ],
+              ),
               const SizedBox(height: 16),
-              const Divider(height: 1),
-              const SizedBox(height: 16),
+              if (template.description != null) ...[
+                Text(
+                  template.description!,
+                  style: GoogleFonts.outfit(
+                      fontSize: 14, color: Colors.grey[600], height: 1.4),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 20),
+              ],
               Row(
                 children: [
-                  _buildStat(context, LucideIcons.calendarDays, 'Split'),
-                  const SizedBox(width: 24),
-                  _buildStat(context, LucideIcons.layers, 'Unlimited'),
-                  const SizedBox(width: 24),
-                  _buildStat(context, LucideIcons.zap, 'Pro'),
+                  TextButton.icon(
+                    onPressed: () => context.push('/programs/details/${template.id}'),
+                    icon: const Icon(LucideIcons.info, size: 18),
+                    label: const Text('Details'),
+                    style: TextButton.styleFrom(
+                      foregroundColor: Colors.teal[700],
+                      padding: const EdgeInsets.symmetric(horizontal: 0),
+                    ),
+                  ),
                   const Spacer(),
                   ElevatedButton.icon(
                     onPressed: () async {
-                      final repo = ref.read(workoutRepositoryProvider);
-                      final days = await repo.getTemplateDays(template.id);
-                      if (days.isNotEmpty && context.mounted) {
-                        final id = await ref
-                            .read(workoutHomeNotifierProvider.notifier)
-                            .startWorkout(
-                              templateId: template.id,
-                              dayId: days.first.id,
-                              name: template.name,
-                            );
-                        if (context.mounted) {
-                          context.push('/app/workout/active?id=$id');
-                        }
-                      }
+                      ref.read(programsProvider.notifier).makeDefault(template.id);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('${template.name} set as default')),
+                      );
                     },
-                    icon: const Icon(LucideIcons.play, size: 14),
-                    label: const Text('Start'),
+                    icon: const Icon(LucideIcons.star, size: 16),
+                    label: const Text('Set Default'),
                     style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.teal[900],
+                      foregroundColor: Colors.white,
                       elevation: 0,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 8),
-                      minimumSize: const Size(0, 36),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     ),
                   ),
                 ],
@@ -282,6 +483,21 @@ class _ProgramCard extends ConsumerWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _tag(String text, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: color.withOpacity(0.2)),
+      ),
+      child: Text(
+        text,
+        style: TextStyle(color: color.withOpacity(0.8), fontSize: 13, fontWeight: FontWeight.bold),
       ),
     );
   }
@@ -322,7 +538,7 @@ class _ProgramCard extends ConsumerWidget {
           TextButton(
             onPressed: () {
               ref
-                  .read(programsNotifierProvider.notifier)
+                  .read(programsProvider.notifier)
                   .deleteTemplate(template.id);
               Navigator.pop(context);
             },

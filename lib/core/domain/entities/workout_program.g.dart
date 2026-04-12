@@ -6,8 +6,8 @@ part of 'workout_program.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$WorkoutProgramImpl _$$WorkoutProgramImplFromJson(Map<String, dynamic> json) =>
-    _$WorkoutProgramImpl(
+_WorkoutProgram _$WorkoutProgramFromJson(Map<String, dynamic> json) =>
+    _WorkoutProgram(
       id: (json['id'] as num).toInt(),
       name: json['name'] as String,
       description: json['description'] as String?,
@@ -20,8 +20,7 @@ _$WorkoutProgramImpl _$$WorkoutProgramImplFromJson(Map<String, dynamic> json) =>
           const [],
     );
 
-Map<String, dynamic> _$$WorkoutProgramImplToJson(
-        _$WorkoutProgramImpl instance) =>
+Map<String, dynamic> _$WorkoutProgramToJson(_WorkoutProgram instance) =>
     <String, dynamic>{
       'id': instance.id,
       'name': instance.name,
@@ -30,8 +29,7 @@ Map<String, dynamic> _$$WorkoutProgramImplToJson(
       'days': instance.days,
     };
 
-_$ProgramDayImpl _$$ProgramDayImplFromJson(Map<String, dynamic> json) =>
-    _$ProgramDayImpl(
+_ProgramDay _$ProgramDayFromJson(Map<String, dynamic> json) => _ProgramDay(
       id: (json['id'] as num).toInt(),
       templateId: (json['templateId'] as num).toInt(),
       name: json['name'] as String,
@@ -42,7 +40,7 @@ _$ProgramDayImpl _$$ProgramDayImplFromJson(Map<String, dynamic> json) =>
           const [],
     );
 
-Map<String, dynamic> _$$ProgramDayImplToJson(_$ProgramDayImpl instance) =>
+Map<String, dynamic> _$ProgramDayToJson(_ProgramDay instance) =>
     <String, dynamic>{
       'id': instance.id,
       'templateId': instance.templateId,
@@ -51,9 +49,8 @@ Map<String, dynamic> _$$ProgramDayImplToJson(_$ProgramDayImpl instance) =>
       'exercises': instance.exercises,
     };
 
-_$ProgramExerciseImpl _$$ProgramExerciseImplFromJson(
-        Map<String, dynamic> json) =>
-    _$ProgramExerciseImpl(
+_ProgramExercise _$ProgramExerciseFromJson(Map<String, dynamic> json) =>
+    _ProgramExercise(
       id: (json['id'] as num).toInt(),
       dayId: (json['dayId'] as num).toInt(),
       exercise: Exercise.fromJson(json['exercise'] as Map<String, dynamic>),
@@ -65,8 +62,7 @@ _$ProgramExerciseImpl _$$ProgramExerciseImplFromJson(
       supersetGroupId: json['supersetGroupId'] as String?,
     );
 
-Map<String, dynamic> _$$ProgramExerciseImplToJson(
-        _$ProgramExerciseImpl instance) =>
+Map<String, dynamic> _$ProgramExerciseToJson(_ProgramExercise instance) =>
     <String, dynamic>{
       'id': instance.id,
       'dayId': instance.dayId,

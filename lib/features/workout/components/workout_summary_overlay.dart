@@ -6,7 +6,6 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:lottie/lottie.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ai_gym_mentor/core/domain/entities/exercise.dart' as entity;
-import 'package:ai_gym_mentor/services/sync_worker.dart';
 import 'package:ai_gym_mentor/services/plateau_service.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -186,8 +185,6 @@ class _WorkoutSummaryOverlayState extends ConsumerState<WorkoutSummaryOverlay>
                                       ),
                                 ),
                               ),
-                              const SizedBox(height: 4),
-                              const _SyncStatusChip(),
                             ],
                           ),
                         ),
@@ -497,79 +494,8 @@ class _WorkoutSummaryOverlayState extends ConsumerState<WorkoutSummaryOverlay>
   }
 }
 
-class _SyncStatusChip extends ConsumerWidget {
-  const _SyncStatusChip();
 
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final syncStatus = ref.watch(syncWorkerProvider);
 
-    Color color;
-    String label;
-    IconData icon;
-    bool spinning = false;
-
-    switch (syncStatus) {
-      case SyncStatus.syncing:
-        color = Colors.blue;
-        label = 'Syncing...';
-        icon = LucideIcons.refreshCw;
-        spinning = true;
-        break;
-      case SyncStatus.success:
-        color = Colors.green;
-        label = 'Synced to Sheets';
-        icon = LucideIcons.circleCheck;
-        break;
-      case SyncStatus.failed:
-        color = Colors.orange;
-        label = 'Sync Pending';
-        icon = LucideIcons.clock;
-        break;
-      case SyncStatus.authenticationRequired:
-        color = Colors.grey;
-        label = 'Not Connected';
-        icon = LucideIcons.cloudOff;
-        break;
-      case SyncStatus.idle:
-        return const SizedBox.shrink();
-    }
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withValues(alpha: 0.3)),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (spinning)
-            SizedBox(
-              width: 12,
-              height: 12,
-              child: CircularProgressIndicator(strokeWidth: 2, color: color),
-            )
-          else
-            Icon(icon, size: 12, color: color),
-          const SizedBox(width: 6),
-          Flexible(
-            child: Text(
-              label,
-              style: TextStyle(
-                fontSize: 10,
-                fontWeight: FontWeight.bold,
-                color: color,
-              ),
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
 
 class _PlateauTransparencyCard extends StatelessWidget {
   final List<PlateauResult> results;

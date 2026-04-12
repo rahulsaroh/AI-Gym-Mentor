@@ -911,6 +911,17 @@ class $WorkoutTemplatesTable extends WorkoutTemplates
   late final GeneratedColumn<String> description = GeneratedColumn<String>(
       'description', aliasedName, true,
       type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _goalMeta = const VerificationMeta('goal');
+  @override
+  late final GeneratedColumn<String> goal = GeneratedColumn<String>(
+      'goal', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _durationMeta =
+      const VerificationMeta('duration');
+  @override
+  late final GeneratedColumn<String> duration = GeneratedColumn<String>(
+      'duration', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
   static const VerificationMeta _lastUsedMeta =
       const VerificationMeta('lastUsed');
   @override
@@ -918,7 +929,8 @@ class $WorkoutTemplatesTable extends WorkoutTemplates
       'last_used', aliasedName, true,
       type: DriftSqlType.dateTime, requiredDuringInsert: false);
   @override
-  List<GeneratedColumn> get $columns => [id, name, description, lastUsed];
+  List<GeneratedColumn> get $columns =>
+      [id, name, description, goal, duration, lastUsed];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -944,6 +956,14 @@ class $WorkoutTemplatesTable extends WorkoutTemplates
           description.isAcceptableOrUnknown(
               data['description']!, _descriptionMeta));
     }
+    if (data.containsKey('goal')) {
+      context.handle(
+          _goalMeta, goal.isAcceptableOrUnknown(data['goal']!, _goalMeta));
+    }
+    if (data.containsKey('duration')) {
+      context.handle(_durationMeta,
+          duration.isAcceptableOrUnknown(data['duration']!, _durationMeta));
+    }
     if (data.containsKey('last_used')) {
       context.handle(_lastUsedMeta,
           lastUsed.isAcceptableOrUnknown(data['last_used']!, _lastUsedMeta));
@@ -963,6 +983,10 @@ class $WorkoutTemplatesTable extends WorkoutTemplates
           .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
       description: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}description']),
+      goal: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}goal']),
+      duration: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}duration']),
       lastUsed: attachedDatabase.typeMapping
           .read(DriftSqlType.dateTime, data['${effectivePrefix}last_used']),
     );
@@ -978,9 +1002,16 @@ class WorkoutTemplate extends DataClass implements Insertable<WorkoutTemplate> {
   final int id;
   final String name;
   final String? description;
+  final String? goal;
+  final String? duration;
   final DateTime? lastUsed;
   const WorkoutTemplate(
-      {required this.id, required this.name, this.description, this.lastUsed});
+      {required this.id,
+      required this.name,
+      this.description,
+      this.goal,
+      this.duration,
+      this.lastUsed});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -988,6 +1019,12 @@ class WorkoutTemplate extends DataClass implements Insertable<WorkoutTemplate> {
     map['name'] = Variable<String>(name);
     if (!nullToAbsent || description != null) {
       map['description'] = Variable<String>(description);
+    }
+    if (!nullToAbsent || goal != null) {
+      map['goal'] = Variable<String>(goal);
+    }
+    if (!nullToAbsent || duration != null) {
+      map['duration'] = Variable<String>(duration);
     }
     if (!nullToAbsent || lastUsed != null) {
       map['last_used'] = Variable<DateTime>(lastUsed);
@@ -1002,6 +1039,10 @@ class WorkoutTemplate extends DataClass implements Insertable<WorkoutTemplate> {
       description: description == null && nullToAbsent
           ? const Value.absent()
           : Value(description),
+      goal: goal == null && nullToAbsent ? const Value.absent() : Value(goal),
+      duration: duration == null && nullToAbsent
+          ? const Value.absent()
+          : Value(duration),
       lastUsed: lastUsed == null && nullToAbsent
           ? const Value.absent()
           : Value(lastUsed),
@@ -1015,6 +1056,8 @@ class WorkoutTemplate extends DataClass implements Insertable<WorkoutTemplate> {
       id: serializer.fromJson<int>(json['id']),
       name: serializer.fromJson<String>(json['name']),
       description: serializer.fromJson<String?>(json['description']),
+      goal: serializer.fromJson<String?>(json['goal']),
+      duration: serializer.fromJson<String?>(json['duration']),
       lastUsed: serializer.fromJson<DateTime?>(json['lastUsed']),
     );
   }
@@ -1025,6 +1068,8 @@ class WorkoutTemplate extends DataClass implements Insertable<WorkoutTemplate> {
       'id': serializer.toJson<int>(id),
       'name': serializer.toJson<String>(name),
       'description': serializer.toJson<String?>(description),
+      'goal': serializer.toJson<String?>(goal),
+      'duration': serializer.toJson<String?>(duration),
       'lastUsed': serializer.toJson<DateTime?>(lastUsed),
     };
   }
@@ -1033,11 +1078,15 @@ class WorkoutTemplate extends DataClass implements Insertable<WorkoutTemplate> {
           {int? id,
           String? name,
           Value<String?> description = const Value.absent(),
+          Value<String?> goal = const Value.absent(),
+          Value<String?> duration = const Value.absent(),
           Value<DateTime?> lastUsed = const Value.absent()}) =>
       WorkoutTemplate(
         id: id ?? this.id,
         name: name ?? this.name,
         description: description.present ? description.value : this.description,
+        goal: goal.present ? goal.value : this.goal,
+        duration: duration.present ? duration.value : this.duration,
         lastUsed: lastUsed.present ? lastUsed.value : this.lastUsed,
       );
   WorkoutTemplate copyWithCompanion(WorkoutTemplatesCompanion data) {
@@ -1046,6 +1095,8 @@ class WorkoutTemplate extends DataClass implements Insertable<WorkoutTemplate> {
       name: data.name.present ? data.name.value : this.name,
       description:
           data.description.present ? data.description.value : this.description,
+      goal: data.goal.present ? data.goal.value : this.goal,
+      duration: data.duration.present ? data.duration.value : this.duration,
       lastUsed: data.lastUsed.present ? data.lastUsed.value : this.lastUsed,
     );
   }
@@ -1056,13 +1107,16 @@ class WorkoutTemplate extends DataClass implements Insertable<WorkoutTemplate> {
           ..write('id: $id, ')
           ..write('name: $name, ')
           ..write('description: $description, ')
+          ..write('goal: $goal, ')
+          ..write('duration: $duration, ')
           ..write('lastUsed: $lastUsed')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, name, description, lastUsed);
+  int get hashCode =>
+      Object.hash(id, name, description, goal, duration, lastUsed);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -1070,6 +1124,8 @@ class WorkoutTemplate extends DataClass implements Insertable<WorkoutTemplate> {
           other.id == this.id &&
           other.name == this.name &&
           other.description == this.description &&
+          other.goal == this.goal &&
+          other.duration == this.duration &&
           other.lastUsed == this.lastUsed);
 }
 
@@ -1077,29 +1133,39 @@ class WorkoutTemplatesCompanion extends UpdateCompanion<WorkoutTemplate> {
   final Value<int> id;
   final Value<String> name;
   final Value<String?> description;
+  final Value<String?> goal;
+  final Value<String?> duration;
   final Value<DateTime?> lastUsed;
   const WorkoutTemplatesCompanion({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
     this.description = const Value.absent(),
+    this.goal = const Value.absent(),
+    this.duration = const Value.absent(),
     this.lastUsed = const Value.absent(),
   });
   WorkoutTemplatesCompanion.insert({
     this.id = const Value.absent(),
     required String name,
     this.description = const Value.absent(),
+    this.goal = const Value.absent(),
+    this.duration = const Value.absent(),
     this.lastUsed = const Value.absent(),
   }) : name = Value(name);
   static Insertable<WorkoutTemplate> custom({
     Expression<int>? id,
     Expression<String>? name,
     Expression<String>? description,
+    Expression<String>? goal,
+    Expression<String>? duration,
     Expression<DateTime>? lastUsed,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (name != null) 'name': name,
       if (description != null) 'description': description,
+      if (goal != null) 'goal': goal,
+      if (duration != null) 'duration': duration,
       if (lastUsed != null) 'last_used': lastUsed,
     });
   }
@@ -1108,11 +1174,15 @@ class WorkoutTemplatesCompanion extends UpdateCompanion<WorkoutTemplate> {
       {Value<int>? id,
       Value<String>? name,
       Value<String?>? description,
+      Value<String?>? goal,
+      Value<String?>? duration,
       Value<DateTime?>? lastUsed}) {
     return WorkoutTemplatesCompanion(
       id: id ?? this.id,
       name: name ?? this.name,
       description: description ?? this.description,
+      goal: goal ?? this.goal,
+      duration: duration ?? this.duration,
       lastUsed: lastUsed ?? this.lastUsed,
     );
   }
@@ -1129,6 +1199,12 @@ class WorkoutTemplatesCompanion extends UpdateCompanion<WorkoutTemplate> {
     if (description.present) {
       map['description'] = Variable<String>(description.value);
     }
+    if (goal.present) {
+      map['goal'] = Variable<String>(goal.value);
+    }
+    if (duration.present) {
+      map['duration'] = Variable<String>(duration.value);
+    }
     if (lastUsed.present) {
       map['last_used'] = Variable<DateTime>(lastUsed.value);
     }
@@ -1141,6 +1217,8 @@ class WorkoutTemplatesCompanion extends UpdateCompanion<WorkoutTemplate> {
           ..write('id: $id, ')
           ..write('name: $name, ')
           ..write('description: $description, ')
+          ..write('goal: $goal, ')
+          ..write('duration: $duration, ')
           ..write('lastUsed: $lastUsed')
           ..write(')'))
         .toString();
@@ -5428,6 +5506,8 @@ typedef $$WorkoutTemplatesTableCreateCompanionBuilder
   Value<int> id,
   required String name,
   Value<String?> description,
+  Value<String?> goal,
+  Value<String?> duration,
   Value<DateTime?> lastUsed,
 });
 typedef $$WorkoutTemplatesTableUpdateCompanionBuilder
@@ -5435,6 +5515,8 @@ typedef $$WorkoutTemplatesTableUpdateCompanionBuilder
   Value<int> id,
   Value<String> name,
   Value<String?> description,
+  Value<String?> goal,
+  Value<String?> duration,
   Value<DateTime?> lastUsed,
 });
 
@@ -5491,6 +5573,12 @@ class $$WorkoutTemplatesTableFilterComposer
 
   ColumnFilters<String> get description => $composableBuilder(
       column: $table.description, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get goal => $composableBuilder(
+      column: $table.goal, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get duration => $composableBuilder(
+      column: $table.duration, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<DateTime> get lastUsed => $composableBuilder(
       column: $table.lastUsed, builder: (column) => ColumnFilters(column));
@@ -5556,6 +5644,12 @@ class $$WorkoutTemplatesTableOrderingComposer
   ColumnOrderings<String> get description => $composableBuilder(
       column: $table.description, builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<String> get goal => $composableBuilder(
+      column: $table.goal, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get duration => $composableBuilder(
+      column: $table.duration, builder: (column) => ColumnOrderings(column));
+
   ColumnOrderings<DateTime> get lastUsed => $composableBuilder(
       column: $table.lastUsed, builder: (column) => ColumnOrderings(column));
 }
@@ -5577,6 +5671,12 @@ class $$WorkoutTemplatesTableAnnotationComposer
 
   GeneratedColumn<String> get description => $composableBuilder(
       column: $table.description, builder: (column) => column);
+
+  GeneratedColumn<String> get goal =>
+      $composableBuilder(column: $table.goal, builder: (column) => column);
+
+  GeneratedColumn<String> get duration =>
+      $composableBuilder(column: $table.duration, builder: (column) => column);
 
   GeneratedColumn<DateTime> get lastUsed =>
       $composableBuilder(column: $table.lastUsed, builder: (column) => column);
@@ -5651,24 +5751,32 @@ class $$WorkoutTemplatesTableTableManager extends RootTableManager<
             Value<int> id = const Value.absent(),
             Value<String> name = const Value.absent(),
             Value<String?> description = const Value.absent(),
+            Value<String?> goal = const Value.absent(),
+            Value<String?> duration = const Value.absent(),
             Value<DateTime?> lastUsed = const Value.absent(),
           }) =>
               WorkoutTemplatesCompanion(
             id: id,
             name: name,
             description: description,
+            goal: goal,
+            duration: duration,
             lastUsed: lastUsed,
           ),
           createCompanionCallback: ({
             Value<int> id = const Value.absent(),
             required String name,
             Value<String?> description = const Value.absent(),
+            Value<String?> goal = const Value.absent(),
+            Value<String?> duration = const Value.absent(),
             Value<DateTime?> lastUsed = const Value.absent(),
           }) =>
               WorkoutTemplatesCompanion.insert(
             id: id,
             name: name,
             description: description,
+            goal: goal,
+            duration: duration,
             lastUsed: lastUsed,
           ),
           withReferenceMapper: (p0) => p0
@@ -8804,21 +8912,46 @@ class $AppDatabaseManager {
 // RiverpodGenerator
 // **************************************************************************
 
-String _$appDatabaseHash() => r'96b544ff7ce456f0fc1edbdafdf332306a9affed';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
 
-/// See also [appDatabase].
 @ProviderFor(appDatabase)
-final appDatabaseProvider = Provider<AppDatabase>.internal(
-  appDatabase,
-  name: r'appDatabaseProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$appDatabaseHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+final appDatabaseProvider = AppDatabaseProvider._();
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef AppDatabaseRef = ProviderRef<AppDatabase>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+final class AppDatabaseProvider
+    extends $FunctionalProvider<AppDatabase, AppDatabase, AppDatabase>
+    with $Provider<AppDatabase> {
+  AppDatabaseProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'appDatabaseProvider',
+          isAutoDispose: false,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$appDatabaseHash();
+
+  @$internal
+  @override
+  $ProviderElement<AppDatabase> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  AppDatabase create(Ref ref) {
+    return appDatabase(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(AppDatabase value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<AppDatabase>(value),
+    );
+  }
+}
+
+String _$appDatabaseHash() => r'59cce38d45eeaba199eddd097d8e149d66f9f3e1';

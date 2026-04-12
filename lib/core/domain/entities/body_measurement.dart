@@ -4,7 +4,9 @@ part 'body_measurement.freezed.dart';
 part 'body_measurement.g.dart';
 
 @freezed
-class BodyMeasurement with _$BodyMeasurement {
+abstract class BodyMeasurement with _$BodyMeasurement {
+  const BodyMeasurement._();
+
   const factory BodyMeasurement({
     required int id,
     required DateTime date,

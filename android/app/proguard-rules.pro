@@ -17,6 +17,7 @@
 -keep class com.google.android.gms.** { *; }
 -dontwarn com.google.firebase.**
 -dontwarn com.google.android.gms.**
+-dontwarn com.google.android.play.core.**
 
 # Lucide Icons / Material Icons
 -keep class com.lucide_icons.** { *; }

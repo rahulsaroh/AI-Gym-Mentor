@@ -6,22 +6,48 @@ part of 'workout_home_notifier.dart';
 // RiverpodGenerator
 // **************************************************************************
 
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
+
+@ProviderFor(WorkoutHomeNotifier)
+final workoutHomeProvider = WorkoutHomeNotifierProvider._();
+
+final class WorkoutHomeNotifierProvider
+    extends $AsyncNotifierProvider<WorkoutHomeNotifier, WorkoutHomeState> {
+  WorkoutHomeNotifierProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'workoutHomeProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$workoutHomeNotifierHash();
+
+  @$internal
+  @override
+  WorkoutHomeNotifier create() => WorkoutHomeNotifier();
+}
+
 String _$workoutHomeNotifierHash() =>
     r'5d038d5dc40e2b2b8eeb7c8dd0a342eb7486cf89';
 
-/// See also [WorkoutHomeNotifier].
-@ProviderFor(WorkoutHomeNotifier)
-final workoutHomeNotifierProvider = AutoDisposeAsyncNotifierProvider<
-    WorkoutHomeNotifier, WorkoutHomeState>.internal(
-  WorkoutHomeNotifier.new,
-  name: r'workoutHomeNotifierProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$workoutHomeNotifierHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-typedef _$WorkoutHomeNotifier = AutoDisposeAsyncNotifier<WorkoutHomeState>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+abstract class _$WorkoutHomeNotifier extends $AsyncNotifier<WorkoutHomeState> {
+  FutureOr<WorkoutHomeState> build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref =
+        this.ref as $Ref<AsyncValue<WorkoutHomeState>, WorkoutHomeState>;
+    final element = ref.element as $ClassProviderElement<
+        AnyNotifier<AsyncValue<WorkoutHomeState>, WorkoutHomeState>,
+        AsyncValue<WorkoutHomeState>,
+        Object?,
+        Object?>;
+    element.handleCreate(ref, build);
+  }
+}

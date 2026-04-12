@@ -6,193 +6,153 @@ part of 'workout_providers.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$activeWorkoutHash() => r'8c9afd07828c334e2dfe41e38c200b35e2d12b01';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
 
-/// See also [activeWorkout].
 @ProviderFor(activeWorkout)
-final activeWorkoutProvider =
-    AutoDisposeFutureProvider<WorkoutSession?>.internal(
-  activeWorkout,
-  name: r'activeWorkoutProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$activeWorkoutHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+final activeWorkoutProvider = ActiveWorkoutProvider._();
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef ActiveWorkoutRef = AutoDisposeFutureProviderRef<WorkoutSession?>;
-String _$workoutTemplatesHash() => r'f4868254b79f56c8b8e88cf9ee89ae7308637a58';
-
-/// See also [workoutTemplates].
-@ProviderFor(workoutTemplates)
-final workoutTemplatesProvider =
-    AutoDisposeFutureProvider<List<WorkoutProgram>>.internal(
-  workoutTemplates,
-  name: r'workoutTemplatesProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$workoutTemplatesHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef WorkoutTemplatesRef
-    = AutoDisposeFutureProviderRef<List<WorkoutProgram>>;
-String _$templateDaysHash() => r'9a833cf6d9bbd98c12854d1e531a19ea2819ca8a';
-
-/// Copied from Dart SDK
-class _SystemHash {
-  _SystemHash._();
-
-  static int combine(int hash, int value) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + value);
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x0007ffff & hash) << 10));
-    return hash ^ (hash >> 6);
-  }
-
-  static int finish(int hash) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x03ffffff & hash) << 3));
-    // ignore: parameter_assignments
-    hash = hash ^ (hash >> 11);
-    return 0x1fffffff & (hash + ((0x00003fff & hash) << 15));
-  }
-}
-
-/// See also [templateDays].
-@ProviderFor(templateDays)
-const templateDaysProvider = TemplateDaysFamily();
-
-/// See also [templateDays].
-class TemplateDaysFamily extends Family<AsyncValue<List<ProgramDay>>> {
-  /// See also [templateDays].
-  const TemplateDaysFamily();
-
-  /// See also [templateDays].
-  TemplateDaysProvider call(
-    int templateId,
-  ) {
-    return TemplateDaysProvider(
-      templateId,
-    );
-  }
-
-  @override
-  TemplateDaysProvider getProviderOverride(
-    covariant TemplateDaysProvider provider,
-  ) {
-    return call(
-      provider.templateId,
-    );
-  }
-
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'templateDaysProvider';
-}
-
-/// See also [templateDays].
-class TemplateDaysProvider extends AutoDisposeFutureProvider<List<ProgramDay>> {
-  /// See also [templateDays].
-  TemplateDaysProvider(
-    int templateId,
-  ) : this._internal(
-          (ref) => templateDays(
-            ref as TemplateDaysRef,
-            templateId,
-          ),
-          from: templateDaysProvider,
-          name: r'templateDaysProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$templateDaysHash,
-          dependencies: TemplateDaysFamily._dependencies,
-          allTransitiveDependencies:
-              TemplateDaysFamily._allTransitiveDependencies,
-          templateId: templateId,
+final class ActiveWorkoutProvider extends $FunctionalProvider<
+        AsyncValue<WorkoutSession?>, WorkoutSession?, FutureOr<WorkoutSession?>>
+    with $FutureModifier<WorkoutSession?>, $FutureProvider<WorkoutSession?> {
+  ActiveWorkoutProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'activeWorkoutProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
         );
 
-  TemplateDaysProvider._internal(
-    super._createNotifier, {
-    required super.name,
-    required super.dependencies,
-    required super.allTransitiveDependencies,
-    required super.debugGetCreateSourceHash,
-    required super.from,
-    required this.templateId,
-  }) : super.internal();
+  @override
+  String debugGetCreateSourceHash() => _$activeWorkoutHash();
 
-  final int templateId;
+  @$internal
+  @override
+  $FutureProviderElement<WorkoutSession?> $createElement(
+          $ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
 
   @override
-  Override overrideWith(
-    FutureOr<List<ProgramDay>> Function(TemplateDaysRef provider) create,
-  ) {
-    return ProviderOverride(
-      origin: this,
-      override: TemplateDaysProvider._internal(
-        (ref) => create(ref as TemplateDaysRef),
-        from: from,
-        name: null,
-        dependencies: null,
-        allTransitiveDependencies: null,
-        debugGetCreateSourceHash: null,
-        templateId: templateId,
-      ),
-    );
+  FutureOr<WorkoutSession?> create(Ref ref) {
+    return activeWorkout(ref);
+  }
+}
+
+String _$activeWorkoutHash() => r'54bfd337b7b877eed606682712eb12666703e9ad';
+
+@ProviderFor(workoutTemplates)
+final workoutTemplatesProvider = WorkoutTemplatesProvider._();
+
+final class WorkoutTemplatesProvider extends $FunctionalProvider<
+        AsyncValue<List<WorkoutProgram>>,
+        List<WorkoutProgram>,
+        FutureOr<List<WorkoutProgram>>>
+    with
+        $FutureModifier<List<WorkoutProgram>>,
+        $FutureProvider<List<WorkoutProgram>> {
+  WorkoutTemplatesProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'workoutTemplatesProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$workoutTemplatesHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<List<WorkoutProgram>> $createElement(
+          $ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<List<WorkoutProgram>> create(Ref ref) {
+    return workoutTemplates(ref);
+  }
+}
+
+String _$workoutTemplatesHash() => r'9d0f0d5d0cfe48521a923d0a672c396681bed72a';
+
+@ProviderFor(templateDays)
+final templateDaysProvider = TemplateDaysFamily._();
+
+final class TemplateDaysProvider extends $FunctionalProvider<
+        AsyncValue<List<ProgramDay>>,
+        List<ProgramDay>,
+        FutureOr<List<ProgramDay>>>
+    with $FutureModifier<List<ProgramDay>>, $FutureProvider<List<ProgramDay>> {
+  TemplateDaysProvider._(
+      {required TemplateDaysFamily super.from, required int super.argument})
+      : super(
+          retry: null,
+          name: r'templateDaysProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$templateDaysHash();
+
+  @override
+  String toString() {
+    return r'templateDaysProvider'
+        ''
+        '($argument)';
   }
 
+  @$internal
   @override
-  AutoDisposeFutureProviderElement<List<ProgramDay>> createElement() {
-    return _TemplateDaysProviderElement(this);
+  $FutureProviderElement<List<ProgramDay>> $createElement(
+          $ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<List<ProgramDay>> create(Ref ref) {
+    final argument = this.argument as int;
+    return templateDays(
+      ref,
+      argument,
+    );
   }
 
   @override
   bool operator ==(Object other) {
-    return other is TemplateDaysProvider && other.templateId == templateId;
+    return other is TemplateDaysProvider && other.argument == argument;
   }
 
   @override
   int get hashCode {
-    var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, templateId.hashCode);
-
-    return _SystemHash.finish(hash);
+    return argument.hashCode;
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-mixin TemplateDaysRef on AutoDisposeFutureProviderRef<List<ProgramDay>> {
-  /// The parameter `templateId` of this provider.
-  int get templateId;
-}
+String _$templateDaysHash() => r'05495a10cfa8159fe1f876db84d3ff93fb4c5f0d';
 
-class _TemplateDaysProviderElement
-    extends AutoDisposeFutureProviderElement<List<ProgramDay>>
-    with TemplateDaysRef {
-  _TemplateDaysProviderElement(super.provider);
+final class TemplateDaysFamily extends $Family
+    with $FunctionalFamilyOverride<FutureOr<List<ProgramDay>>, int> {
+  TemplateDaysFamily._()
+      : super(
+          retry: null,
+          name: r'templateDaysProvider',
+          dependencies: null,
+          $allTransitiveDependencies: null,
+          isAutoDispose: true,
+        );
+
+  TemplateDaysProvider call(
+    int templateId,
+  ) =>
+      TemplateDaysProvider._(argument: templateId, from: this);
 
   @override
-  int get templateId => (origin as TemplateDaysProvider).templateId;
+  String toString() => r'templateDaysProvider';
 }
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

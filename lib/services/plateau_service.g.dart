@@ -6,21 +6,51 @@ part of 'plateau_service.dart';
 // RiverpodGenerator
 // **************************************************************************
 
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
+
+@ProviderFor(PlateauService)
+final plateauServiceProvider = PlateauServiceProvider._();
+
+final class PlateauServiceProvider
+    extends $NotifierProvider<PlateauService, void> {
+  PlateauServiceProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'plateauServiceProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$plateauServiceHash();
+
+  @$internal
+  @override
+  PlateauService create() => PlateauService();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(void value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<void>(value),
+    );
+  }
+}
+
 String _$plateauServiceHash() => r'7ab0904866792ec1f250cc8437cb7215574034fb';
 
-/// See also [PlateauService].
-@ProviderFor(PlateauService)
-final plateauServiceProvider =
-    AutoDisposeNotifierProvider<PlateauService, void>.internal(
-  PlateauService.new,
-  name: r'plateauServiceProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$plateauServiceHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-typedef _$PlateauService = AutoDisposeNotifier<void>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+abstract class _$PlateauService extends $Notifier<void> {
+  void build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<void, void>;
+    final element = ref.element as $ClassProviderElement<
+        AnyNotifier<void, void>, void, Object?, Object?>;
+    element.handleCreate(ref, build);
+  }
+}

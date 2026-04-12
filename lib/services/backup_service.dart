@@ -7,9 +7,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
 import 'package:ai_gym_mentor/features/settings/settings_repository.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:http/http.dart' as http;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:ai_gym_mentor/services/sheets_api_client.dart';
 
 part 'backup_service.g.dart';
 
@@ -74,52 +72,8 @@ class BackupService extends _$BackupService {
 
     await Share.shareXFiles(
       [XFile(file.path)],
-      subject: 'GYM Kilo Backup - $date',
+      subject: 'Gym Mentor Backup - $date',
     );
-  }
-
-  // Google Drive Integration (Lightweight)
-  Future<void> uploadToDrive(http.Client client) async {
-    final apiClient = SheetsApiClient(client);
-    final backup = await createFullBackup();
-    final jsonStr = jsonEncode(backup);
-
-    // Check if file already exists
-    final files = await apiClient
-        .listFiles("name = 'GYM Kilo Backup' and trashed = false");
-    String? existingId;
-    if (files.isNotEmpty) {
-      existingId = files.first['id'] as String?;
-    }
-
-    await apiClient.uploadFile(
-      name: 'GYM Kilo Backup',
-      mimeType: 'application/json',
-      content: jsonStr,
-      fileId: existingId,
-    );
-  }
-
-  Future<List<Map<String, dynamic>>> listDriveBackups(
-      http.Client client) async {
-    final apiClient = SheetsApiClient(client);
-    final files = await apiClient.listFiles(
-      "name contains 'Backup' and trashed = false",
-      orderBy: 'modifiedTime desc',
-    );
-    return files.cast<Map<String, dynamic>>();
-  }
-
-  Future<Map<String, dynamic>> downloadFromDrive(
-      http.Client client, String fileId) async {
-    final apiClient = SheetsApiClient(client);
-    final content = await apiClient.downloadFile(fileId);
-
-    if (content == null) {
-      throw Exception('Failed to download backup from Drive');
-    }
-
-    return jsonDecode(content);
   }
 
   // Data Management
@@ -128,7 +82,7 @@ class BackupService extends _$BackupService {
     await db.transaction(() async {
       await db.delete(db.workoutSets).go();
       await db.delete(db.workouts).go();
-      await db.delete(db.syncQueue).go();
+      // syncQueue is kept in DB but we don't clear it here anymore as it's unused
     });
   }
 
@@ -145,3 +99,4 @@ class BackupService extends _$BackupService {
     }
   }
 }
+

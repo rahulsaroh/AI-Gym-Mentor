@@ -33,7 +33,7 @@ class ExerciseLibraryFilters extends _$ExerciseLibraryFilters {
 
 @riverpod
 Future<List<Exercise>> filteredLibraryExercises(
-    FilteredLibraryExercisesRef ref) async {
+    Ref ref) async {
   final repository = ref.watch(exerciseLibraryRepositoryProvider);
   final query = ref.watch(exerciseLibrarySearchProvider);
   final filters = ref.watch(exerciseLibraryFiltersProvider);

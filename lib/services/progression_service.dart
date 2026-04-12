@@ -2,6 +2,7 @@ import 'dart:math';
 import 'package:drift/drift.dart';
 import 'package:ai_gym_mentor/core/database/database.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 part 'progression_service.g.dart';
 

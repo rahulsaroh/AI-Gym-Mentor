@@ -1,5 +1,5 @@
-// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// coverage:ignore-file
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
@@ -9,100 +9,58 @@ part of 'workout_program.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// dart format off
 T _$identity<T>(T value) => value;
-
-final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
-
-WorkoutProgram _$WorkoutProgramFromJson(Map<String, dynamic> json) {
-  return _WorkoutProgram.fromJson(json);
-}
 
 /// @nodoc
 mixin _$WorkoutProgram {
-  int get id => throw _privateConstructorUsedError;
-  String get name => throw _privateConstructorUsedError;
-  String? get description => throw _privateConstructorUsedError;
-  DateTime? get lastUsed => throw _privateConstructorUsedError;
-  List<ProgramDay> get days => throw _privateConstructorUsedError;
-
-  /// Serializes this WorkoutProgram to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  int get id;
+  String get name;
+  String? get description;
+  DateTime? get lastUsed;
+  List<ProgramDay> get days;
 
   /// Create a copy of WorkoutProgram
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
-  $WorkoutProgramCopyWith<WorkoutProgram> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $WorkoutProgramCopyWith<$Res> {
-  factory $WorkoutProgramCopyWith(
-          WorkoutProgram value, $Res Function(WorkoutProgram) then) =
-      _$WorkoutProgramCopyWithImpl<$Res, WorkoutProgram>;
-  @useResult
-  $Res call(
-      {int id,
-      String name,
-      String? description,
-      DateTime? lastUsed,
-      List<ProgramDay> days});
-}
-
-/// @nodoc
-class _$WorkoutProgramCopyWithImpl<$Res, $Val extends WorkoutProgram>
-    implements $WorkoutProgramCopyWith<$Res> {
-  _$WorkoutProgramCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of WorkoutProgram
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
+  $WorkoutProgramCopyWith<WorkoutProgram> get copyWith =>
+      _$WorkoutProgramCopyWithImpl<WorkoutProgram>(
+          this as WorkoutProgram, _$identity);
+
+  /// Serializes this WorkoutProgram to a JSON map.
+  Map<String, dynamic> toJson();
+
   @override
-  $Res call({
-    Object? id = null,
-    Object? name = null,
-    Object? description = freezed,
-    Object? lastUsed = freezed,
-    Object? days = null,
-  }) {
-    return _then(_value.copyWith(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as int,
-      name: null == name
-          ? _value.name
-          : name // ignore: cast_nullable_to_non_nullable
-              as String,
-      description: freezed == description
-          ? _value.description
-          : description // ignore: cast_nullable_to_non_nullable
-              as String?,
-      lastUsed: freezed == lastUsed
-          ? _value.lastUsed
-          : lastUsed // ignore: cast_nullable_to_non_nullable
-              as DateTime?,
-      days: null == days
-          ? _value.days
-          : days // ignore: cast_nullable_to_non_nullable
-              as List<ProgramDay>,
-    ) as $Val);
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is WorkoutProgram &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.name, name) || other.name == name) &&
+            (identical(other.description, description) ||
+                other.description == description) &&
+            (identical(other.lastUsed, lastUsed) ||
+                other.lastUsed == lastUsed) &&
+            const DeepCollectionEquality().equals(other.days, days));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, id, name, description, lastUsed,
+      const DeepCollectionEquality().hash(days));
+
+  @override
+  String toString() {
+    return 'WorkoutProgram(id: $id, name: $name, description: $description, lastUsed: $lastUsed, days: $days)';
   }
 }
 
 /// @nodoc
-abstract class _$$WorkoutProgramImplCopyWith<$Res>
-    implements $WorkoutProgramCopyWith<$Res> {
-  factory _$$WorkoutProgramImplCopyWith(_$WorkoutProgramImpl value,
-          $Res Function(_$WorkoutProgramImpl) then) =
-      __$$WorkoutProgramImplCopyWithImpl<$Res>;
-  @override
+abstract mixin class $WorkoutProgramCopyWith<$Res> {
+  factory $WorkoutProgramCopyWith(
+          WorkoutProgram value, $Res Function(WorkoutProgram) _then) =
+      _$WorkoutProgramCopyWithImpl;
   @useResult
   $Res call(
       {int id,
@@ -113,12 +71,12 @@ abstract class _$$WorkoutProgramImplCopyWith<$Res>
 }
 
 /// @nodoc
-class __$$WorkoutProgramImplCopyWithImpl<$Res>
-    extends _$WorkoutProgramCopyWithImpl<$Res, _$WorkoutProgramImpl>
-    implements _$$WorkoutProgramImplCopyWith<$Res> {
-  __$$WorkoutProgramImplCopyWithImpl(
-      _$WorkoutProgramImpl _value, $Res Function(_$WorkoutProgramImpl) _then)
-      : super(_value, _then);
+class _$WorkoutProgramCopyWithImpl<$Res>
+    implements $WorkoutProgramCopyWith<$Res> {
+  _$WorkoutProgramCopyWithImpl(this._self, this._then);
+
+  final WorkoutProgram _self;
+  final $Res Function(WorkoutProgram) _then;
 
   /// Create a copy of WorkoutProgram
   /// with the given fields replaced by the non-null parameter values.
@@ -131,44 +89,210 @@ class __$$WorkoutProgramImplCopyWithImpl<$Res>
     Object? lastUsed = freezed,
     Object? days = null,
   }) {
-    return _then(_$WorkoutProgramImpl(
+    return _then(_self.copyWith(
       id: null == id
-          ? _value.id
+          ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
               as int,
       name: null == name
-          ? _value.name
+          ? _self.name
           : name // ignore: cast_nullable_to_non_nullable
               as String,
       description: freezed == description
-          ? _value.description
+          ? _self.description
           : description // ignore: cast_nullable_to_non_nullable
               as String?,
       lastUsed: freezed == lastUsed
-          ? _value.lastUsed
+          ? _self.lastUsed
           : lastUsed // ignore: cast_nullable_to_non_nullable
               as DateTime?,
       days: null == days
-          ? _value._days
+          ? _self.days
           : days // ignore: cast_nullable_to_non_nullable
               as List<ProgramDay>,
     ));
   }
 }
 
+/// Adds pattern-matching-related methods to [WorkoutProgram].
+extension WorkoutProgramPatterns on WorkoutProgram {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_WorkoutProgram value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _WorkoutProgram() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_WorkoutProgram value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _WorkoutProgram():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_WorkoutProgram value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _WorkoutProgram() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(int id, String name, String? description,
+            DateTime? lastUsed, List<ProgramDay> days)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _WorkoutProgram() when $default != null:
+        return $default(_that.id, _that.name, _that.description, _that.lastUsed,
+            _that.days);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(int id, String name, String? description,
+            DateTime? lastUsed, List<ProgramDay> days)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _WorkoutProgram():
+        return $default(_that.id, _that.name, _that.description, _that.lastUsed,
+            _that.days);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(int id, String name, String? description,
+            DateTime? lastUsed, List<ProgramDay> days)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _WorkoutProgram() when $default != null:
+        return $default(_that.id, _that.name, _that.description, _that.lastUsed,
+            _that.days);
+      case _:
+        return null;
+    }
+  }
+}
+
 /// @nodoc
 @JsonSerializable()
-class _$WorkoutProgramImpl implements _WorkoutProgram {
-  const _$WorkoutProgramImpl(
+class _WorkoutProgram extends WorkoutProgram {
+  const _WorkoutProgram(
       {required this.id,
       required this.name,
       this.description,
       this.lastUsed,
       final List<ProgramDay> days = const []})
-      : _days = days;
-
-  factory _$WorkoutProgramImpl.fromJson(Map<String, dynamic> json) =>
-      _$$WorkoutProgramImplFromJson(json);
+      : _days = days,
+        super._();
+  factory _WorkoutProgram.fromJson(Map<String, dynamic> json) =>
+      _$WorkoutProgramFromJson(json);
 
   @override
   final int id;
@@ -187,16 +311,26 @@ class _$WorkoutProgramImpl implements _WorkoutProgram {
     return EqualUnmodifiableListView(_days);
   }
 
+  /// Create a copy of WorkoutProgram
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  String toString() {
-    return 'WorkoutProgram(id: $id, name: $name, description: $description, lastUsed: $lastUsed, days: $days)';
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$WorkoutProgramCopyWith<_WorkoutProgram> get copyWith =>
+      __$WorkoutProgramCopyWithImpl<_WorkoutProgram>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$WorkoutProgramToJson(
+      this,
+    );
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$WorkoutProgramImpl &&
+            other is _WorkoutProgram &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.name, name) || other.name == name) &&
             (identical(other.description, description) ||
@@ -211,142 +345,119 @@ class _$WorkoutProgramImpl implements _WorkoutProgram {
   int get hashCode => Object.hash(runtimeType, id, name, description, lastUsed,
       const DeepCollectionEquality().hash(_days));
 
-  /// Create a copy of WorkoutProgram
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  @pragma('vm:prefer-inline')
-  _$$WorkoutProgramImplCopyWith<_$WorkoutProgramImpl> get copyWith =>
-      __$$WorkoutProgramImplCopyWithImpl<_$WorkoutProgramImpl>(
-          this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$WorkoutProgramImplToJson(
-      this,
-    );
+  String toString() {
+    return 'WorkoutProgram(id: $id, name: $name, description: $description, lastUsed: $lastUsed, days: $days)';
   }
 }
 
-abstract class _WorkoutProgram implements WorkoutProgram {
-  const factory _WorkoutProgram(
-      {required final int id,
-      required final String name,
-      final String? description,
-      final DateTime? lastUsed,
-      final List<ProgramDay> days}) = _$WorkoutProgramImpl;
+/// @nodoc
+abstract mixin class _$WorkoutProgramCopyWith<$Res>
+    implements $WorkoutProgramCopyWith<$Res> {
+  factory _$WorkoutProgramCopyWith(
+          _WorkoutProgram value, $Res Function(_WorkoutProgram) _then) =
+      __$WorkoutProgramCopyWithImpl;
+  @override
+  @useResult
+  $Res call(
+      {int id,
+      String name,
+      String? description,
+      DateTime? lastUsed,
+      List<ProgramDay> days});
+}
 
-  factory _WorkoutProgram.fromJson(Map<String, dynamic> json) =
-      _$WorkoutProgramImpl.fromJson;
+/// @nodoc
+class __$WorkoutProgramCopyWithImpl<$Res>
+    implements _$WorkoutProgramCopyWith<$Res> {
+  __$WorkoutProgramCopyWithImpl(this._self, this._then);
 
-  @override
-  int get id;
-  @override
-  String get name;
-  @override
-  String? get description;
-  @override
-  DateTime? get lastUsed;
-  @override
-  List<ProgramDay> get days;
+  final _WorkoutProgram _self;
+  final $Res Function(_WorkoutProgram) _then;
 
   /// Create a copy of WorkoutProgram
   /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$WorkoutProgramImplCopyWith<_$WorkoutProgramImpl> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-ProgramDay _$ProgramDayFromJson(Map<String, dynamic> json) {
-  return _ProgramDay.fromJson(json);
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? id = null,
+    Object? name = null,
+    Object? description = freezed,
+    Object? lastUsed = freezed,
+    Object? days = null,
+  }) {
+    return _then(_WorkoutProgram(
+      id: null == id
+          ? _self.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as int,
+      name: null == name
+          ? _self.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      description: freezed == description
+          ? _self.description
+          : description // ignore: cast_nullable_to_non_nullable
+              as String?,
+      lastUsed: freezed == lastUsed
+          ? _self.lastUsed
+          : lastUsed // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      days: null == days
+          ? _self._days
+          : days // ignore: cast_nullable_to_non_nullable
+              as List<ProgramDay>,
+    ));
+  }
 }
 
 /// @nodoc
 mixin _$ProgramDay {
-  int get id => throw _privateConstructorUsedError;
-  int get templateId => throw _privateConstructorUsedError;
-  String get name => throw _privateConstructorUsedError;
-  int get order => throw _privateConstructorUsedError;
-  List<ProgramExercise> get exercises => throw _privateConstructorUsedError;
-
-  /// Serializes this ProgramDay to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  int get id;
+  int get templateId;
+  String get name;
+  int get order;
+  List<ProgramExercise> get exercises;
 
   /// Create a copy of ProgramDay
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
-  $ProgramDayCopyWith<ProgramDay> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $ProgramDayCopyWith<$Res> {
-  factory $ProgramDayCopyWith(
-          ProgramDay value, $Res Function(ProgramDay) then) =
-      _$ProgramDayCopyWithImpl<$Res, ProgramDay>;
-  @useResult
-  $Res call(
-      {int id,
-      int templateId,
-      String name,
-      int order,
-      List<ProgramExercise> exercises});
-}
-
-/// @nodoc
-class _$ProgramDayCopyWithImpl<$Res, $Val extends ProgramDay>
-    implements $ProgramDayCopyWith<$Res> {
-  _$ProgramDayCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of ProgramDay
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
+  $ProgramDayCopyWith<ProgramDay> get copyWith =>
+      _$ProgramDayCopyWithImpl<ProgramDay>(this as ProgramDay, _$identity);
+
+  /// Serializes this ProgramDay to a JSON map.
+  Map<String, dynamic> toJson();
+
   @override
-  $Res call({
-    Object? id = null,
-    Object? templateId = null,
-    Object? name = null,
-    Object? order = null,
-    Object? exercises = null,
-  }) {
-    return _then(_value.copyWith(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as int,
-      templateId: null == templateId
-          ? _value.templateId
-          : templateId // ignore: cast_nullable_to_non_nullable
-              as int,
-      name: null == name
-          ? _value.name
-          : name // ignore: cast_nullable_to_non_nullable
-              as String,
-      order: null == order
-          ? _value.order
-          : order // ignore: cast_nullable_to_non_nullable
-              as int,
-      exercises: null == exercises
-          ? _value.exercises
-          : exercises // ignore: cast_nullable_to_non_nullable
-              as List<ProgramExercise>,
-    ) as $Val);
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is ProgramDay &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.templateId, templateId) ||
+                other.templateId == templateId) &&
+            (identical(other.name, name) || other.name == name) &&
+            (identical(other.order, order) || other.order == order) &&
+            const DeepCollectionEquality().equals(other.exercises, exercises));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, id, templateId, name, order,
+      const DeepCollectionEquality().hash(exercises));
+
+  @override
+  String toString() {
+    return 'ProgramDay(id: $id, templateId: $templateId, name: $name, order: $order, exercises: $exercises)';
   }
 }
 
 /// @nodoc
-abstract class _$$ProgramDayImplCopyWith<$Res>
-    implements $ProgramDayCopyWith<$Res> {
-  factory _$$ProgramDayImplCopyWith(
-          _$ProgramDayImpl value, $Res Function(_$ProgramDayImpl) then) =
-      __$$ProgramDayImplCopyWithImpl<$Res>;
-  @override
+abstract mixin class $ProgramDayCopyWith<$Res> {
+  factory $ProgramDayCopyWith(
+          ProgramDay value, $Res Function(ProgramDay) _then) =
+      _$ProgramDayCopyWithImpl;
   @useResult
   $Res call(
       {int id,
@@ -357,12 +468,11 @@ abstract class _$$ProgramDayImplCopyWith<$Res>
 }
 
 /// @nodoc
-class __$$ProgramDayImplCopyWithImpl<$Res>
-    extends _$ProgramDayCopyWithImpl<$Res, _$ProgramDayImpl>
-    implements _$$ProgramDayImplCopyWith<$Res> {
-  __$$ProgramDayImplCopyWithImpl(
-      _$ProgramDayImpl _value, $Res Function(_$ProgramDayImpl) _then)
-      : super(_value, _then);
+class _$ProgramDayCopyWithImpl<$Res> implements $ProgramDayCopyWith<$Res> {
+  _$ProgramDayCopyWithImpl(this._self, this._then);
+
+  final ProgramDay _self;
+  final $Res Function(ProgramDay) _then;
 
   /// Create a copy of ProgramDay
   /// with the given fields replaced by the non-null parameter values.
@@ -375,44 +485,210 @@ class __$$ProgramDayImplCopyWithImpl<$Res>
     Object? order = null,
     Object? exercises = null,
   }) {
-    return _then(_$ProgramDayImpl(
+    return _then(_self.copyWith(
       id: null == id
-          ? _value.id
+          ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
               as int,
       templateId: null == templateId
-          ? _value.templateId
+          ? _self.templateId
           : templateId // ignore: cast_nullable_to_non_nullable
               as int,
       name: null == name
-          ? _value.name
+          ? _self.name
           : name // ignore: cast_nullable_to_non_nullable
               as String,
       order: null == order
-          ? _value.order
+          ? _self.order
           : order // ignore: cast_nullable_to_non_nullable
               as int,
       exercises: null == exercises
-          ? _value._exercises
+          ? _self.exercises
           : exercises // ignore: cast_nullable_to_non_nullable
               as List<ProgramExercise>,
     ));
   }
 }
 
+/// Adds pattern-matching-related methods to [ProgramDay].
+extension ProgramDayPatterns on ProgramDay {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_ProgramDay value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _ProgramDay() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_ProgramDay value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _ProgramDay():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_ProgramDay value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _ProgramDay() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(int id, int templateId, String name, int order,
+            List<ProgramExercise> exercises)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _ProgramDay() when $default != null:
+        return $default(_that.id, _that.templateId, _that.name, _that.order,
+            _that.exercises);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(int id, int templateId, String name, int order,
+            List<ProgramExercise> exercises)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _ProgramDay():
+        return $default(_that.id, _that.templateId, _that.name, _that.order,
+            _that.exercises);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(int id, int templateId, String name, int order,
+            List<ProgramExercise> exercises)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _ProgramDay() when $default != null:
+        return $default(_that.id, _that.templateId, _that.name, _that.order,
+            _that.exercises);
+      case _:
+        return null;
+    }
+  }
+}
+
 /// @nodoc
 @JsonSerializable()
-class _$ProgramDayImpl implements _ProgramDay {
-  const _$ProgramDayImpl(
+class _ProgramDay extends ProgramDay {
+  const _ProgramDay(
       {required this.id,
       required this.templateId,
       required this.name,
       required this.order,
       final List<ProgramExercise> exercises = const []})
-      : _exercises = exercises;
-
-  factory _$ProgramDayImpl.fromJson(Map<String, dynamic> json) =>
-      _$$ProgramDayImplFromJson(json);
+      : _exercises = exercises,
+        super._();
+  factory _ProgramDay.fromJson(Map<String, dynamic> json) =>
+      _$ProgramDayFromJson(json);
 
   @override
   final int id;
@@ -431,16 +707,26 @@ class _$ProgramDayImpl implements _ProgramDay {
     return EqualUnmodifiableListView(_exercises);
   }
 
+  /// Create a copy of ProgramDay
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  String toString() {
-    return 'ProgramDay(id: $id, templateId: $templateId, name: $name, order: $order, exercises: $exercises)';
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$ProgramDayCopyWith<_ProgramDay> get copyWith =>
+      __$ProgramDayCopyWithImpl<_ProgramDay>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$ProgramDayToJson(
+      this,
+    );
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$ProgramDayImpl &&
+            other is _ProgramDay &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.templateId, templateId) ||
                 other.templateId == templateId) &&
@@ -455,84 +741,130 @@ class _$ProgramDayImpl implements _ProgramDay {
   int get hashCode => Object.hash(runtimeType, id, templateId, name, order,
       const DeepCollectionEquality().hash(_exercises));
 
-  /// Create a copy of ProgramDay
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  @pragma('vm:prefer-inline')
-  _$$ProgramDayImplCopyWith<_$ProgramDayImpl> get copyWith =>
-      __$$ProgramDayImplCopyWithImpl<_$ProgramDayImpl>(this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$ProgramDayImplToJson(
-      this,
-    );
+  String toString() {
+    return 'ProgramDay(id: $id, templateId: $templateId, name: $name, order: $order, exercises: $exercises)';
   }
 }
 
-abstract class _ProgramDay implements ProgramDay {
-  const factory _ProgramDay(
-      {required final int id,
-      required final int templateId,
-      required final String name,
-      required final int order,
-      final List<ProgramExercise> exercises}) = _$ProgramDayImpl;
+/// @nodoc
+abstract mixin class _$ProgramDayCopyWith<$Res>
+    implements $ProgramDayCopyWith<$Res> {
+  factory _$ProgramDayCopyWith(
+          _ProgramDay value, $Res Function(_ProgramDay) _then) =
+      __$ProgramDayCopyWithImpl;
+  @override
+  @useResult
+  $Res call(
+      {int id,
+      int templateId,
+      String name,
+      int order,
+      List<ProgramExercise> exercises});
+}
 
-  factory _ProgramDay.fromJson(Map<String, dynamic> json) =
-      _$ProgramDayImpl.fromJson;
+/// @nodoc
+class __$ProgramDayCopyWithImpl<$Res> implements _$ProgramDayCopyWith<$Res> {
+  __$ProgramDayCopyWithImpl(this._self, this._then);
 
-  @override
-  int get id;
-  @override
-  int get templateId;
-  @override
-  String get name;
-  @override
-  int get order;
-  @override
-  List<ProgramExercise> get exercises;
+  final _ProgramDay _self;
+  final $Res Function(_ProgramDay) _then;
 
   /// Create a copy of ProgramDay
   /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$ProgramDayImplCopyWith<_$ProgramDayImpl> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-ProgramExercise _$ProgramExerciseFromJson(Map<String, dynamic> json) {
-  return _ProgramExercise.fromJson(json);
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? id = null,
+    Object? templateId = null,
+    Object? name = null,
+    Object? order = null,
+    Object? exercises = null,
+  }) {
+    return _then(_ProgramDay(
+      id: null == id
+          ? _self.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as int,
+      templateId: null == templateId
+          ? _self.templateId
+          : templateId // ignore: cast_nullable_to_non_nullable
+              as int,
+      name: null == name
+          ? _self.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      order: null == order
+          ? _self.order
+          : order // ignore: cast_nullable_to_non_nullable
+              as int,
+      exercises: null == exercises
+          ? _self._exercises
+          : exercises // ignore: cast_nullable_to_non_nullable
+              as List<ProgramExercise>,
+    ));
+  }
 }
 
 /// @nodoc
 mixin _$ProgramExercise {
-  int get id => throw _privateConstructorUsedError;
-  int get dayId => throw _privateConstructorUsedError;
-  Exercise get exercise => throw _privateConstructorUsedError;
-  int get order => throw _privateConstructorUsedError;
-  String get setType => throw _privateConstructorUsedError;
-  String get setsJson =>
-      throw _privateConstructorUsedError; // Simplified for now, or use typed sets
-  int get restTime => throw _privateConstructorUsedError;
-  String? get notes => throw _privateConstructorUsedError;
-  String? get supersetGroupId => throw _privateConstructorUsedError;
-
-  /// Serializes this ProgramExercise to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  int get id;
+  int get dayId;
+  Exercise get exercise;
+  int get order;
+  String get setType;
+  String get setsJson; // Simplified for now, or use typed sets
+  int get restTime;
+  String? get notes;
+  String? get supersetGroupId;
 
   /// Create a copy of ProgramExercise
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
   $ProgramExerciseCopyWith<ProgramExercise> get copyWith =>
-      throw _privateConstructorUsedError;
+      _$ProgramExerciseCopyWithImpl<ProgramExercise>(
+          this as ProgramExercise, _$identity);
+
+  /// Serializes this ProgramExercise to a JSON map.
+  Map<String, dynamic> toJson();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is ProgramExercise &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.dayId, dayId) || other.dayId == dayId) &&
+            (identical(other.exercise, exercise) ||
+                other.exercise == exercise) &&
+            (identical(other.order, order) || other.order == order) &&
+            (identical(other.setType, setType) || other.setType == setType) &&
+            (identical(other.setsJson, setsJson) ||
+                other.setsJson == setsJson) &&
+            (identical(other.restTime, restTime) ||
+                other.restTime == restTime) &&
+            (identical(other.notes, notes) || other.notes == notes) &&
+            (identical(other.supersetGroupId, supersetGroupId) ||
+                other.supersetGroupId == supersetGroupId));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, id, dayId, exercise, order,
+      setType, setsJson, restTime, notes, supersetGroupId);
+
+  @override
+  String toString() {
+    return 'ProgramExercise(id: $id, dayId: $dayId, exercise: $exercise, order: $order, setType: $setType, setsJson: $setsJson, restTime: $restTime, notes: $notes, supersetGroupId: $supersetGroupId)';
+  }
 }
 
 /// @nodoc
-abstract class $ProgramExerciseCopyWith<$Res> {
+abstract mixin class $ProgramExerciseCopyWith<$Res> {
   factory $ProgramExerciseCopyWith(
-          ProgramExercise value, $Res Function(ProgramExercise) then) =
-      _$ProgramExerciseCopyWithImpl<$Res, ProgramExercise>;
+          ProgramExercise value, $Res Function(ProgramExercise) _then) =
+      _$ProgramExerciseCopyWithImpl;
   @useResult
   $Res call(
       {int id,
@@ -549,14 +881,12 @@ abstract class $ProgramExerciseCopyWith<$Res> {
 }
 
 /// @nodoc
-class _$ProgramExerciseCopyWithImpl<$Res, $Val extends ProgramExercise>
+class _$ProgramExerciseCopyWithImpl<$Res>
     implements $ProgramExerciseCopyWith<$Res> {
-  _$ProgramExerciseCopyWithImpl(this._value, this._then);
+  _$ProgramExerciseCopyWithImpl(this._self, this._then);
 
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
+  final ProgramExercise _self;
+  final $Res Function(ProgramExercise) _then;
 
   /// Create a copy of ProgramExercise
   /// with the given fields replaced by the non-null parameter values.
@@ -573,44 +903,44 @@ class _$ProgramExerciseCopyWithImpl<$Res, $Val extends ProgramExercise>
     Object? notes = freezed,
     Object? supersetGroupId = freezed,
   }) {
-    return _then(_value.copyWith(
+    return _then(_self.copyWith(
       id: null == id
-          ? _value.id
+          ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
               as int,
       dayId: null == dayId
-          ? _value.dayId
+          ? _self.dayId
           : dayId // ignore: cast_nullable_to_non_nullable
               as int,
       exercise: null == exercise
-          ? _value.exercise
+          ? _self.exercise
           : exercise // ignore: cast_nullable_to_non_nullable
               as Exercise,
       order: null == order
-          ? _value.order
+          ? _self.order
           : order // ignore: cast_nullable_to_non_nullable
               as int,
       setType: null == setType
-          ? _value.setType
+          ? _self.setType
           : setType // ignore: cast_nullable_to_non_nullable
               as String,
       setsJson: null == setsJson
-          ? _value.setsJson
+          ? _self.setsJson
           : setsJson // ignore: cast_nullable_to_non_nullable
               as String,
       restTime: null == restTime
-          ? _value.restTime
+          ? _self.restTime
           : restTime // ignore: cast_nullable_to_non_nullable
               as int,
       notes: freezed == notes
-          ? _value.notes
+          ? _self.notes
           : notes // ignore: cast_nullable_to_non_nullable
               as String?,
       supersetGroupId: freezed == supersetGroupId
-          ? _value.supersetGroupId
+          ? _self.supersetGroupId
           : supersetGroupId // ignore: cast_nullable_to_non_nullable
               as String?,
-    ) as $Val);
+    ));
   }
 
   /// Create a copy of ProgramExercise
@@ -618,103 +948,230 @@ class _$ProgramExerciseCopyWithImpl<$Res, $Val extends ProgramExercise>
   @override
   @pragma('vm:prefer-inline')
   $ExerciseCopyWith<$Res> get exercise {
-    return $ExerciseCopyWith<$Res>(_value.exercise, (value) {
-      return _then(_value.copyWith(exercise: value) as $Val);
+    return $ExerciseCopyWith<$Res>(_self.exercise, (value) {
+      return _then(_self.copyWith(exercise: value));
     });
   }
 }
 
-/// @nodoc
-abstract class _$$ProgramExerciseImplCopyWith<$Res>
-    implements $ProgramExerciseCopyWith<$Res> {
-  factory _$$ProgramExerciseImplCopyWith(_$ProgramExerciseImpl value,
-          $Res Function(_$ProgramExerciseImpl) then) =
-      __$$ProgramExerciseImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call(
-      {int id,
-      int dayId,
-      Exercise exercise,
-      int order,
-      String setType,
-      String setsJson,
-      int restTime,
-      String? notes,
-      String? supersetGroupId});
+/// Adds pattern-matching-related methods to [ProgramExercise].
+extension ProgramExercisePatterns on ProgramExercise {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
 
-  @override
-  $ExerciseCopyWith<$Res> get exercise;
-}
-
-/// @nodoc
-class __$$ProgramExerciseImplCopyWithImpl<$Res>
-    extends _$ProgramExerciseCopyWithImpl<$Res, _$ProgramExerciseImpl>
-    implements _$$ProgramExerciseImplCopyWith<$Res> {
-  __$$ProgramExerciseImplCopyWithImpl(
-      _$ProgramExerciseImpl _value, $Res Function(_$ProgramExerciseImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of ProgramExercise
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? id = null,
-    Object? dayId = null,
-    Object? exercise = null,
-    Object? order = null,
-    Object? setType = null,
-    Object? setsJson = null,
-    Object? restTime = null,
-    Object? notes = freezed,
-    Object? supersetGroupId = freezed,
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_ProgramExercise value)? $default, {
+    required TResult orElse(),
   }) {
-    return _then(_$ProgramExerciseImpl(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as int,
-      dayId: null == dayId
-          ? _value.dayId
-          : dayId // ignore: cast_nullable_to_non_nullable
-              as int,
-      exercise: null == exercise
-          ? _value.exercise
-          : exercise // ignore: cast_nullable_to_non_nullable
-              as Exercise,
-      order: null == order
-          ? _value.order
-          : order // ignore: cast_nullable_to_non_nullable
-              as int,
-      setType: null == setType
-          ? _value.setType
-          : setType // ignore: cast_nullable_to_non_nullable
-              as String,
-      setsJson: null == setsJson
-          ? _value.setsJson
-          : setsJson // ignore: cast_nullable_to_non_nullable
-              as String,
-      restTime: null == restTime
-          ? _value.restTime
-          : restTime // ignore: cast_nullable_to_non_nullable
-              as int,
-      notes: freezed == notes
-          ? _value.notes
-          : notes // ignore: cast_nullable_to_non_nullable
-              as String?,
-      supersetGroupId: freezed == supersetGroupId
-          ? _value.supersetGroupId
-          : supersetGroupId // ignore: cast_nullable_to_non_nullable
-              as String?,
-    ));
+    final _that = this;
+    switch (_that) {
+      case _ProgramExercise() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_ProgramExercise value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _ProgramExercise():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_ProgramExercise value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _ProgramExercise() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(
+            int id,
+            int dayId,
+            Exercise exercise,
+            int order,
+            String setType,
+            String setsJson,
+            int restTime,
+            String? notes,
+            String? supersetGroupId)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _ProgramExercise() when $default != null:
+        return $default(
+            _that.id,
+            _that.dayId,
+            _that.exercise,
+            _that.order,
+            _that.setType,
+            _that.setsJson,
+            _that.restTime,
+            _that.notes,
+            _that.supersetGroupId);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(
+            int id,
+            int dayId,
+            Exercise exercise,
+            int order,
+            String setType,
+            String setsJson,
+            int restTime,
+            String? notes,
+            String? supersetGroupId)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _ProgramExercise():
+        return $default(
+            _that.id,
+            _that.dayId,
+            _that.exercise,
+            _that.order,
+            _that.setType,
+            _that.setsJson,
+            _that.restTime,
+            _that.notes,
+            _that.supersetGroupId);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(
+            int id,
+            int dayId,
+            Exercise exercise,
+            int order,
+            String setType,
+            String setsJson,
+            int restTime,
+            String? notes,
+            String? supersetGroupId)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _ProgramExercise() when $default != null:
+        return $default(
+            _that.id,
+            _that.dayId,
+            _that.exercise,
+            _that.order,
+            _that.setType,
+            _that.setsJson,
+            _that.restTime,
+            _that.notes,
+            _that.supersetGroupId);
+      case _:
+        return null;
+    }
   }
 }
 
 /// @nodoc
 @JsonSerializable()
-class _$ProgramExerciseImpl implements _ProgramExercise {
-  const _$ProgramExerciseImpl(
+class _ProgramExercise extends ProgramExercise {
+  const _ProgramExercise(
       {required this.id,
       required this.dayId,
       required this.exercise,
@@ -723,10 +1180,10 @@ class _$ProgramExerciseImpl implements _ProgramExercise {
       this.setsJson = '[]',
       this.restTime = 90,
       this.notes,
-      this.supersetGroupId});
-
-  factory _$ProgramExerciseImpl.fromJson(Map<String, dynamic> json) =>
-      _$$ProgramExerciseImplFromJson(json);
+      this.supersetGroupId})
+      : super._();
+  factory _ProgramExercise.fromJson(Map<String, dynamic> json) =>
+      _$ProgramExerciseFromJson(json);
 
   @override
   final int id;
@@ -751,16 +1208,26 @@ class _$ProgramExerciseImpl implements _ProgramExercise {
   @override
   final String? supersetGroupId;
 
+  /// Create a copy of ProgramExercise
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  String toString() {
-    return 'ProgramExercise(id: $id, dayId: $dayId, exercise: $exercise, order: $order, setType: $setType, setsJson: $setsJson, restTime: $restTime, notes: $notes, supersetGroupId: $supersetGroupId)';
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$ProgramExerciseCopyWith<_ProgramExercise> get copyWith =>
+      __$ProgramExerciseCopyWithImpl<_ProgramExercise>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$ProgramExerciseToJson(
+      this,
+    );
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$ProgramExerciseImpl &&
+            other is _ProgramExercise &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.dayId, dayId) || other.dayId == dayId) &&
             (identical(other.exercise, exercise) ||
@@ -781,61 +1248,107 @@ class _$ProgramExerciseImpl implements _ProgramExercise {
   int get hashCode => Object.hash(runtimeType, id, dayId, exercise, order,
       setType, setsJson, restTime, notes, supersetGroupId);
 
-  /// Create a copy of ProgramExercise
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  @pragma('vm:prefer-inline')
-  _$$ProgramExerciseImplCopyWith<_$ProgramExerciseImpl> get copyWith =>
-      __$$ProgramExerciseImplCopyWithImpl<_$ProgramExerciseImpl>(
-          this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$ProgramExerciseImplToJson(
-      this,
-    );
+  String toString() {
+    return 'ProgramExercise(id: $id, dayId: $dayId, exercise: $exercise, order: $order, setType: $setType, setsJson: $setsJson, restTime: $restTime, notes: $notes, supersetGroupId: $supersetGroupId)';
   }
 }
 
-abstract class _ProgramExercise implements ProgramExercise {
-  const factory _ProgramExercise(
-      {required final int id,
-      required final int dayId,
-      required final Exercise exercise,
-      required final int order,
-      final String setType,
-      final String setsJson,
-      final int restTime,
-      final String? notes,
-      final String? supersetGroupId}) = _$ProgramExerciseImpl;
+/// @nodoc
+abstract mixin class _$ProgramExerciseCopyWith<$Res>
+    implements $ProgramExerciseCopyWith<$Res> {
+  factory _$ProgramExerciseCopyWith(
+          _ProgramExercise value, $Res Function(_ProgramExercise) _then) =
+      __$ProgramExerciseCopyWithImpl;
+  @override
+  @useResult
+  $Res call(
+      {int id,
+      int dayId,
+      Exercise exercise,
+      int order,
+      String setType,
+      String setsJson,
+      int restTime,
+      String? notes,
+      String? supersetGroupId});
 
-  factory _ProgramExercise.fromJson(Map<String, dynamic> json) =
-      _$ProgramExerciseImpl.fromJson;
+  @override
+  $ExerciseCopyWith<$Res> get exercise;
+}
 
-  @override
-  int get id;
-  @override
-  int get dayId;
-  @override
-  Exercise get exercise;
-  @override
-  int get order;
-  @override
-  String get setType;
-  @override
-  String get setsJson; // Simplified for now, or use typed sets
-  @override
-  int get restTime;
-  @override
-  String? get notes;
-  @override
-  String? get supersetGroupId;
+/// @nodoc
+class __$ProgramExerciseCopyWithImpl<$Res>
+    implements _$ProgramExerciseCopyWith<$Res> {
+  __$ProgramExerciseCopyWithImpl(this._self, this._then);
+
+  final _ProgramExercise _self;
+  final $Res Function(_ProgramExercise) _then;
 
   /// Create a copy of ProgramExercise
   /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$ProgramExerciseImplCopyWith<_$ProgramExerciseImpl> get copyWith =>
-      throw _privateConstructorUsedError;
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? id = null,
+    Object? dayId = null,
+    Object? exercise = null,
+    Object? order = null,
+    Object? setType = null,
+    Object? setsJson = null,
+    Object? restTime = null,
+    Object? notes = freezed,
+    Object? supersetGroupId = freezed,
+  }) {
+    return _then(_ProgramExercise(
+      id: null == id
+          ? _self.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as int,
+      dayId: null == dayId
+          ? _self.dayId
+          : dayId // ignore: cast_nullable_to_non_nullable
+              as int,
+      exercise: null == exercise
+          ? _self.exercise
+          : exercise // ignore: cast_nullable_to_non_nullable
+              as Exercise,
+      order: null == order
+          ? _self.order
+          : order // ignore: cast_nullable_to_non_nullable
+              as int,
+      setType: null == setType
+          ? _self.setType
+          : setType // ignore: cast_nullable_to_non_nullable
+              as String,
+      setsJson: null == setsJson
+          ? _self.setsJson
+          : setsJson // ignore: cast_nullable_to_non_nullable
+              as String,
+      restTime: null == restTime
+          ? _self.restTime
+          : restTime // ignore: cast_nullable_to_non_nullable
+              as int,
+      notes: freezed == notes
+          ? _self.notes
+          : notes // ignore: cast_nullable_to_non_nullable
+              as String?,
+      supersetGroupId: freezed == supersetGroupId
+          ? _self.supersetGroupId
+          : supersetGroupId // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ));
+  }
+
+  /// Create a copy of ProgramExercise
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $ExerciseCopyWith<$Res> get exercise {
+    return $ExerciseCopyWith<$Res>(_self.exercise, (value) {
+      return _then(_self.copyWith(exercise: value));
+    });
+  }
 }
+
+// dart format on

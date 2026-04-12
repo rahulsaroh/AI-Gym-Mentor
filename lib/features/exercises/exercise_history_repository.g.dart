@@ -6,25 +6,49 @@ part of 'exercise_history_repository.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$exerciseHistoryRepositoryHash() =>
-    r'303db16b5dfb840963d99ceead39944992eafb2e';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
 
-/// See also [exerciseHistoryRepository].
 @ProviderFor(exerciseHistoryRepository)
-final exerciseHistoryRepositoryProvider =
-    AutoDisposeProvider<ExerciseHistoryRepository>.internal(
-  exerciseHistoryRepository,
-  name: r'exerciseHistoryRepositoryProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$exerciseHistoryRepositoryHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+final exerciseHistoryRepositoryProvider = ExerciseHistoryRepositoryProvider._();
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef ExerciseHistoryRepositoryRef
-    = AutoDisposeProviderRef<ExerciseHistoryRepository>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+final class ExerciseHistoryRepositoryProvider extends $FunctionalProvider<
+    ExerciseHistoryRepository,
+    ExerciseHistoryRepository,
+    ExerciseHistoryRepository> with $Provider<ExerciseHistoryRepository> {
+  ExerciseHistoryRepositoryProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'exerciseHistoryRepositoryProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$exerciseHistoryRepositoryHash();
+
+  @$internal
+  @override
+  $ProviderElement<ExerciseHistoryRepository> $createElement(
+          $ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  ExerciseHistoryRepository create(Ref ref) {
+    return exerciseHistoryRepository(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(ExerciseHistoryRepository value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<ExerciseHistoryRepository>(value),
+    );
+  }
+}
+
+String _$exerciseHistoryRepositoryHash() =>
+    r'cc17dc143e5bb09903172b1cd7147f866b7af959';

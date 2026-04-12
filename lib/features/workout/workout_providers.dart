@@ -6,20 +6,20 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'workout_providers.g.dart';
 
 @riverpod
-Future<WorkoutSession?> activeWorkout(ActiveWorkoutRef ref) async {
+Future<WorkoutSession?> activeWorkout(Ref ref) async {
   final repo = ref.watch(workoutRepositoryProvider);
   return await repo.getActiveWorkoutDraft();
 }
 
 @riverpod
-Future<List<WorkoutProgram>> workoutTemplates(WorkoutTemplatesRef ref) async {
+Future<List<WorkoutProgram>> workoutTemplates(Ref ref) async {
   final repo = ref.watch(workoutRepositoryProvider);
   return await repo.getAllTemplates();
 }
 
 @riverpod
 Future<List<ProgramDay>> templateDays(
-    TemplateDaysRef ref, int templateId) async {
+    Ref ref, int templateId) async {
   final repo = ref.watch(workoutRepositoryProvider);
   return await repo.getTemplateDays(templateId);
 }

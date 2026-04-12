@@ -1,8 +1,6 @@
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:ai_gym_mentor/core/router/router.dart';
 import 'package:ai_gym_mentor/core/widgets/global_error_handler.dart';
 import 'dart:ui';
@@ -10,51 +8,33 @@ import 'package:ai_gym_mentor/core/services/notification_service.dart';
 import 'package:ai_gym_mentor/core/services/timer_service.dart';
 import 'package:ai_gym_mentor/features/settings/models/settings_state.dart';
 import 'package:ai_gym_mentor/features/settings/settings_provider.dart';
-import 'package:ai_gym_mentor/services/connectivity_service.dart';
-import 'package:ai_gym_mentor/services/sync_worker.dart';
 import 'package:ai_gym_mentor/services/background_worker.dart';
-import 'package:ai_gym_mentor/firebase_options.dart';
-import 'package:ai_gym_mentor/core/cloud/cloud_integration_state.dart';
 
 void main() async {
   // Ensure Flutter is initialized before any async code
   WidgetsFlutterBinding.ensureInitialized();
 
-  // 1. Firebase Initialization (Wrap in try/catch to maintain offline functionality)
-  bool firebaseInitialized = false;
+  // 1. Notification Service Initialization
   try {
-    if (kDebugMode) debugPrint('Step 1: Initializing Firebase...');
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    ).timeout(const Duration(seconds: 5));
-    firebaseInitialized = true;
-    if (kDebugMode) debugPrint('Firebase Initialized Successfully');
-  } catch (e) {
-    debugPrint(
-        'Firebase Initialization Failed (App will run in offline mode): $e');
-  }
-
-  // 2. Notification Service Initialization
-  try {
-    if (kDebugMode) debugPrint('Step 2: Initializing Notifications...');
+    if (kDebugMode) debugPrint('Step 1: Initializing Notifications...');
     await NotificationService().init();
     if (kDebugMode) debugPrint('Notifications Initialized Successfully');
   } catch (e) {
     debugPrint('Notifications Initialization Failed: $e');
   }
 
-  // 3. Timer Service Initialization
+  // 2. Timer Service Initialization
   try {
-    if (kDebugMode) debugPrint('Step 3: Initializing Timer Service...');
+    if (kDebugMode) debugPrint('Step 2: Initializing Timer Service...');
     await TimerService.initialize();
     if (kDebugMode) debugPrint('Timer Service Initialized Successfully');
   } catch (e) {
     debugPrint('Timer Service Initialization Failed: $e');
   }
 
-  // Background workers initialization
+  // 3. Background workers initialization
   try {
-    if (kDebugMode) debugPrint('Step 4: Initializing Background Worker...');
+    if (kDebugMode) debugPrint('Step 3: Initializing Background Worker...');
     await BackgroundWorker.initialize();
     if (kDebugMode) debugPrint('Background Worker Initialized Successfully');
   } catch (e) {
@@ -76,90 +56,13 @@ void main() async {
     return GlobalErrorScreen(details: details);
   };
 
-  if (kDebugMode) debugPrint('--- APP STARTUP COMPLETE ---');
+  if (kDebugMode) debugPrint('--- APP STARTUP COMPLETE (OFFLINE MODE) ---');
 
   runApp(
     ProviderScope(
-      overrides: [
-        // We can't easily override a Notifier state before it's created via ProviderScope,
-        // so we'll set it in the ConnectivityInitializer.
-      ],
-      child: ConnectivityInitializer(
-        firebaseInitialized: firebaseInitialized,
-        child: const GymGeminiApp(),
-      ),
+      child: const GymGeminiApp(),
     ),
   );
-}
-
-class ConnectivityInitializer extends ConsumerStatefulWidget {
-  final Widget child;
-  final bool firebaseInitialized;
-
-  const ConnectivityInitializer({
-    super.key,
-    required this.child,
-    required this.firebaseInitialized,
-  });
-
-  @override
-  ConsumerState<ConnectivityInitializer> createState() =>
-      _ConnectivityInitializerState();
-}
-
-class _ConnectivityInitializerState extends ConsumerState<ConnectivityInitializer> {
-  @override
-  void initState() {
-    super.initState();
-    // Set initial status in the next frame
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref
-          .read(cloudIntegrationProvider.notifier)
-          .setFirebaseInitialized(widget.firebaseInitialized);
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    if (!widget.firebaseInitialized) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        // Only show once
-        if (ScaffoldMessenger.maybeOf(context) != null) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text(
-                  'Running in offline mode. Cloud features will be limited.'),
-              backgroundColor: Colors.orange,
-              duration: Duration(seconds: 4),
-            ),
-          );
-        }
-      });
-    }
-
-    // Initialize connectivity listener
-    ref.listen(connectivityServiceProvider, (prev, next) {
-      final status = next.value;
-      if (status != null && status != ConnectivityResult.none) {
-        // Trigger background sync when online
-        ref.read(syncWorkerProvider.notifier).processQueue();
-      }
-    });
-
-    // Schedule weekly backup if enabled
-    ref.listen(settingsProvider, (prev, next) {
-      final settings = next.value;
-      if (settings != null && settings.autoBackup) {
-        BackgroundWorker.scheduleWeeklyBackup();
-      }
-      
-      if (settings != null) {
-        ref.read(cloudIntegrationProvider.notifier).setSyncEnabled(settings.googleDriveEmail != null);
-      }
-    });
-
-    return widget.child;
-  }
 }
 
 class GymGeminiApp extends ConsumerWidget {
@@ -171,7 +74,7 @@ class GymGeminiApp extends ConsumerWidget {
 
     return settingsAsync.when(
       data: (settings) => MaterialApp.router(
-        title: 'Gym Gemini Pro',
+        title: 'Gym Mentor',
         debugShowCheckedModeBanner: false,
         themeMode: settings.themeMode,
         theme: _buildTheme(

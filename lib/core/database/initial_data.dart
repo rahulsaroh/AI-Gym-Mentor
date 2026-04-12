@@ -748,6 +748,126 @@ final initialExercises = [
       equipment: Value('Dumbbell'),
       setType: Value('Straight'),
       restTime: Value(60)),
+  const ExercisesCompanion(
+      name: Value('Push-up burpee'),
+      primaryMuscle: Value('Cardio'),
+      equipment: Value('Bodyweight'),
+      setType: Value('Timed'),
+      restTime: Value(20)),
+  const ExercisesCompanion(
+      name: Value('Mountain climbers'),
+      primaryMuscle: Value('Abs'),
+      equipment: Value('Bodyweight'),
+      setType: Value('Timed'),
+      restTime: Value(20)),
+  const ExercisesCompanion(
+      name: Value('High knees'),
+      primaryMuscle: Value('Cardio'),
+      equipment: Value('Bodyweight'),
+      setType: Value('Timed'),
+      restTime: Value(20)),
+  const ExercisesCompanion(
+      name: Value('Lateral skater jumps'),
+      primaryMuscle: Value('Legs'),
+      equipment: Value('Bodyweight'),
+      setType: Value('Timed'),
+      restTime: Value(20)),
+  const ExercisesCompanion(
+      name: Value('Dumbbell thruster'),
+      primaryMuscle: Value('Full Body'),
+      equipment: Value('Dumbbell'),
+      setType: Value('Straight'),
+      restTime: Value(60)),
+  const ExercisesCompanion(
+      name: Value('Dumbbell swing'),
+      primaryMuscle: Value('Legs'),
+      equipment: Value('Dumbbell'),
+      setType: Value('Straight'),
+      restTime: Value(60)),
+  const ExercisesCompanion(
+      name: Value('Dumbbell renegade row'),
+      primaryMuscle: Value('Abs'),
+      equipment: Value('Dumbbell'),
+      setType: Value('Straight'),
+      restTime: Value(60)),
+  const ExercisesCompanion(
+      name: Value('Farmer\'s carry'),
+      primaryMuscle: Value('Full Body'),
+      equipment: Value('Dumbbell'),
+      setType: Value('Straight'),
+      restTime: Value(60)),
+  const ExercisesCompanion(
+      name: Value('Dumbbell clean and press'),
+      primaryMuscle: Value('Full Body'),
+      equipment: Value('Dumbbell'),
+      setType: Value('Straight'),
+      restTime: Value(60)),
+  const ExercisesCompanion(
+      name: Value('Dead bug'),
+      primaryMuscle: Value('Abs'),
+      equipment: Value('Bodyweight'),
+      setType: Value('Timed'),
+      restTime: Value(15)),
+  const ExercisesCompanion(
+      name: Value('Bicycle crunch'),
+      primaryMuscle: Value('Abs'),
+      equipment: Value('Bodyweight'),
+      setType: Value('Straight'),
+      restTime: Value(15)),
+  const ExercisesCompanion(
+      name: Value('Leg raise (lying flat)'),
+      primaryMuscle: Value('Abs'),
+      equipment: Value('Bodyweight'),
+      setType: Value('Straight'),
+      restTime: Value(15)),
+  const ExercisesCompanion(
+      name: Value('Pulley rope crunch'),
+      primaryMuscle: Value('Abs'),
+      equipment: Value('Cable'),
+      setType: Value('Straight'),
+      restTime: Value(15)),
+  const ExercisesCompanion(
+      name: Value('Russian twist (DB)'),
+      primaryMuscle: Value('Abs'),
+      equipment: Value('Dumbbell'),
+      setType: Value('Straight'),
+      restTime: Value(15)),
+  const ExercisesCompanion(
+      name: Value('Side plank'),
+      primaryMuscle: Value('Abs'),
+      equipment: Value('Bodyweight'),
+      setType: Value('Timed'),
+      restTime: Value(15)),
+  const ExercisesCompanion(
+      name: Value('Brisk walk'),
+      primaryMuscle: Value('Cardio'),
+      equipment: Value('Bodyweight'),
+      setType: Value('Timed'),
+      restTime: Value(0)),
+  const ExercisesCompanion(
+      name: Value('Step-ups on bench'),
+      primaryMuscle: Value('Legs'),
+      equipment: Value('Bench'),
+      setType: Value('Timed'),
+      restTime: Value(0)),
+  const ExercisesCompanion(
+      name: Value('Shadow boxing / dance'),
+      primaryMuscle: Value('Cardio'),
+      equipment: Value('Bodyweight'),
+      setType: Value('Timed'),
+      restTime: Value(0)),
+  const ExercisesCompanion(
+      name: Value('Scapular squeeze holds'),
+      primaryMuscle: Value('Warmup'),
+      equipment: Value('Bodyweight'),
+      setType: Value('Straight'),
+      restTime: Value(30)),
+  const ExercisesCompanion(
+      name: Value('Jump squats'),
+      primaryMuscle: Value('Legs'),
+      equipment: Value('Bodyweight'),
+      setType: Value('Straight'),
+      restTime: Value(60)),
 ];
 
 class SampleProgramExercise {
@@ -766,9 +886,41 @@ class SampleProgramDay {
 class SampleProgram {
   final String name;
   final String description;
+  final String? goal;
+  final String? duration;
   final List<SampleProgramDay> days;
-  SampleProgram(
-      {required this.name, required this.description, required this.days});
+  SampleProgram({
+    required this.name,
+    required this.description,
+    this.goal,
+    this.duration,
+    required this.days,
+  });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'description': description,
+      'goal': goal,
+      'duration': duration,
+      'days': days
+          .map((d) => {
+                'name': d.name,
+                'order': days.indexOf(d),
+                'exercises': d.exercises
+                    .map((e) => {
+                          'exerciseName': e.name,
+                          'order': d.exercises.indexOf(e),
+                          'setType': 'straight',
+                          'setsJson': e.setsJson,
+                          'restTime': 90,
+                          'notes': e.notes,
+                        })
+                    .toList(),
+              })
+          .toList(),
+    };
+  }
 }
 
 final samplePPLProgram = SampleProgram(
@@ -1093,3 +1245,310 @@ final elitePPLProgram = SampleProgram(
     ),
   ],
 );
+
+final womenFatLossProgram = SampleProgram(
+  name: 'Women 6 days fat loss program',
+  description:
+      'A professional 24-week metabolic rebuilding plan. Focused on fat loss while protecting lean muscle via Push-Pull-Legs and HIIT. Designed for home setups with dumbbells and cables.',
+  goal: 'Fat Loss',
+  duration: '24 Weeks',
+  days: [
+    SampleProgramDay(
+      name: 'Day 1: Push Day (Chest, Shoulders, Triceps)',
+      exercises: [
+        SampleProgramExercise(
+            name: 'Arm circles + shoulder rolls', notes: 'Warmup: 30 sec each'),
+        SampleProgramExercise(name: 'Push-ups', notes: 'Warmup: Wall push-ups x15'),
+        SampleProgramExercise(
+            name: 'Band pull-apart', notes: 'Warmup: 15 reps'),
+        SampleProgramExercise(
+            name: 'Dumbbell flat bench press',
+            notes: 'BLOCK A: Barbell bench press. Control descent (2 sec).',
+            setsJson: '[{"reps": 10, "weight": 20.0}, {"reps": 10, "weight": 20.0}, {"reps": 10, "weight": 20.0}, {"reps": 10, "weight": 20.0}]'),
+        SampleProgramExercise(
+            name: 'Dumbbell incline press',
+            notes: 'BLOCK A: Incline press 30-45°. Go heavier weekly.',
+            setsJson: '[{"reps": 12, "weight": 10.0}, {"reps": 12, "weight": 10.0}, {"reps": 12, "weight": 10.0}]'),
+        SampleProgramExercise(
+            name: 'Dumbbell Flyes',
+            notes: 'BLOCK A: DB chest fly. Light weight, focus on stretch.',
+            setsJson: '[{"reps": 15, "weight": 5.0}, {"reps": 15, "weight": 5.0}, {"reps": 15, "weight": 5.0}]'),
+        SampleProgramExercise(
+            name: 'Standing dumbbell OHP',
+            notes: 'BLOCK B: Shoulders. Core tight, no back arch.',
+            setsJson: '[{"reps": 12, "weight": 7.5}, {"reps": 12, "weight": 7.5}, {"reps": 12, "weight": 7.5}]'),
+        SampleProgramExercise(
+            name: 'Dumbbell lateral raise',
+            notes: 'BLOCK B: Lead with elbows, not wrists.',
+            setsJson: '[{"reps": 15, "weight": 2.5}, {"reps": 15, "weight": 2.5}, {"reps": 15, "weight": 2.5}]'),
+        SampleProgramExercise(
+            name: 'Dumbbell front raise',
+            notes: 'BLOCK B: Pulley/DB front raise. Slow and controlled.',
+            setsJson: '[{"reps": 12, "weight": 5.0}, {"reps": 12, "weight": 5.0}, {"reps": 12, "weight": 5.0}]'),
+        SampleProgramExercise(
+            name: 'Overhead DB Tricep Extension',
+            notes: 'BLOCK C: Triceps. Long head stretch.',
+            setsJson: '[{"reps": 15, "weight": 7.5}, {"reps": 15, "weight": 7.5}, {"reps": 15, "weight": 7.5}]'),
+        SampleProgramExercise(
+            name: 'Triceps Pushdown',
+            notes: 'BLOCK C: Elbows fixed to sides.',
+            setsJson: '[{"reps": 15, "weight": 10.0}, {"reps": 15, "weight": 10.0}, {"reps": 15, "weight": 10.0}]'),
+        SampleProgramExercise(
+            name: 'Push-ups', notes: 'FINISHER: Push-ups to failure x2 sets'),
+        SampleProgramExercise(
+            name: 'Side plank', notes: 'FINISHER: 30 sec plank after each set'),
+        SampleProgramExercise(
+            name: 'Door-frame chest stretch', notes: 'Cooldown: 45 sec'),
+        SampleProgramExercise(
+            name: 'Across-body shoulder stretch', notes: 'Cooldown: 30 sec'),
+        SampleProgramExercise(
+            name: 'Tricep Overhead Stretch', notes: 'Cooldown: 30 sec'),
+        SampleProgramExercise(name: 'Child\'s Pose', notes: 'Cooldown: 1 min'),
+      ],
+    ),
+    SampleProgramDay(
+      name: 'Day 2: Pull Day (Back, Biceps)',
+      exercises: [
+        SampleProgramExercise(
+            name: 'Cat-cow spinal decompression', notes: 'Warmup: x10 reps'),
+        SampleProgramExercise(
+            name: 'Band pull-apart', notes: 'Warmup: Towel row x15'),
+        SampleProgramExercise(
+            name: 'Single-arm dumbbell row', notes: 'Warmup: x12 each side'),
+        SampleProgramExercise(
+            name: 'Scapular squeeze holds', notes: 'Warmup: x10 holds'),
+        SampleProgramExercise(
+            name: 'Barbell Row',
+            notes: 'BLOCK A: Bent-over row. Pull bar to belly button.',
+            setsJson: '[{"reps": 10, "weight": 20.0}, {"reps": 10, "weight": 22.5}, {"reps": 10, "weight": 25.0}, {"reps": 10, "weight": 25.0}]'),
+        SampleProgramExercise(
+            name: 'Single-arm dumbbell row',
+            notes: 'BLOCK A: Brace against bench. drive elbow back.',
+            setsJson: '[{"reps": 12, "weight": 10.0}, {"reps": 12, "weight": 10.0}, {"reps": 12, "weight": 10.0}]'),
+        SampleProgramExercise(
+            name: 'Cable/pulley seated row',
+            notes: 'BLOCK A: Pull to sternum. Squeeze for 1 sec.',
+            setsJson: '[{"reps": 12, "weight": 15.0}, {"reps": 12, "weight": 15.0}, {"reps": 12, "weight": 15.0}]'),
+        SampleProgramExercise(
+            name: 'Dumbbell Reverse Fly',
+            notes: 'BLOCK B: Rear delts. Hinge 45, arms wide.',
+            setsJson: '[{"reps": 15, "weight": 2.5}, {"reps": 15, "weight": 2.5}, {"reps": 15, "weight": 2.5}]'),
+        SampleProgramExercise(
+            name: 'Dumbbell Face Pull (bent over)',
+            notes: 'BLOCK B: Pulley face pull. High attachment.',
+            setsJson: '[{"reps": 20, "weight": 10.0}, {"reps": 20, "weight": 10.0}, {"reps": 20, "weight": 10.0}]'),
+        SampleProgramExercise(
+            name: 'Barbell Curl',
+            notes: 'BLOCK C: Biceps. Full peak focus.',
+            setsJson: '[{"reps": 12, "weight": 10.0}, {"reps": 12, "weight": 10.0}, {"reps": 12, "weight": 10.0}]'),
+        SampleProgramExercise(
+            name: 'Dumbbell Hammer Curl',
+            notes: 'BLOCK C: Brachialis focus.',
+            setsJson: '[{"reps": 12, "weight": 5.0}, {"reps": 12, "weight": 5.0}, {"reps": 12, "weight": 5.0}]'),
+        SampleProgramExercise(
+            name: 'Cable/pulley seated row',
+            notes: 'BLOCK C: Standing low curl. Elbows forward.',
+            setsJson: '[{"reps": 15, "weight": 10.0}, {"reps": 15, "weight": 10.0}, {"reps": 15, "weight": 10.0}]'),
+        SampleProgramExercise(
+            name: 'Band pull-apart', notes: 'FINISHER: Posture circuit x2 rounds'),
+        SampleProgramExercise(
+            name: 'Plank Variations', notes: 'FINISHER: Superman hold x10 sec'),
+        SampleProgramExercise(
+            name: 'Door-frame chest stretch', notes: 'FINISHER: Stretch 45 sec'),
+        SampleProgramExercise(
+            name: 'Doorway lat stretch', notes: 'Cooldown: 45 sec each'),
+        SampleProgramExercise(
+            name: 'Child\'s Pose', notes: 'Cooldown: 1 min'),
+      ],
+    ),
+    SampleProgramDay(
+      name: 'Day 3: Lower Body Day',
+      exercises: [
+        SampleProgramExercise(
+            name: 'Hip circles + leg swings', notes: 'Warmup: 30 sec each'),
+        SampleProgramExercise(
+            name: 'Bodyweight squat (slow)', notes: 'Warmup: x15 slow'),
+        SampleProgramExercise(
+            name: 'Dumbbell Reverse Lunge', notes: 'Warmup: x10 each leg'),
+        SampleProgramExercise(name: 'Glute bridges', notes: 'Warmup: x15'),
+        SampleProgramExercise(
+            name: 'Squat',
+            notes: 'BLOCK A: Barbell back squat. Fat-burning powerhouse.',
+            setsJson: '[{"reps": 10, "weight": 20.0}, {"reps": 10, "weight": 25.0}, {"reps": 10, "weight": 30.0}, {"reps": 10, "weight": 30.0}]'),
+        SampleProgramExercise(
+            name: 'Dumbbell Goblet Squat',
+            notes: 'BLOCK A: One heavy DB at chest. Sit back.',
+            setsJson: '[{"reps": 15, "weight": 15.0}, {"reps": 15, "weight": 15.0}, {"reps": 15, "weight": 15.0}]'),
+        SampleProgramExercise(
+            name: 'Dumbbell Reverse Lunge',
+            notes: 'BLOCK A: step back, knee hovers 1in off floor.',
+            setsJson: '[{"reps": 12, "weight": 10.0}, {"reps": 12, "weight": 10.0}, {"reps": 12, "weight": 10.0}]'),
+        SampleProgramExercise(
+            name: 'Dumbbell Hip Thrust (Bench)',
+            notes: 'BLOCK B: Glute max. Squeeze at top 1s.',
+            setsJson: '[{"reps": 15, "weight": 15.0}, {"reps": 15, "weight": 20.0}, {"reps": 15, "weight": 20.0}, {"reps": 15, "weight": 20.0}]'),
+        SampleProgramExercise(
+            name: 'Dumbbell Romanian Deadlift',
+            notes: 'BLOCK B: Soft knees, hinge at hips.',
+            setsJson: '[{"reps": 12, "weight": 20.0}, {"reps": 12, "weight": 20.0}, {"reps": 12, "weight": 20.0}]'),
+        SampleProgramExercise(
+            name: 'Dumbbell Sumo Squat',
+            notes: 'BLOCK B: Wide stance, toes out 45°. Targets inner thigh.',
+            setsJson: '[{"reps": 15, "weight": 15.0}, {"reps": 15, "weight": 15.0}, {"reps": 15, "weight": 15.0}]'),
+        SampleProgramExercise(
+            name: 'Dumbbell Calf Raise (Standing)',
+            notes: 'BLOCK C: Pause at bottom for stretch.',
+            setsJson: '[{"reps": 20, "weight": 10.0}, {"reps": 20, "weight": 10.0}, {"reps": 20, "weight": 10.0}, {"reps": 20, "weight": 10.0}]'),
+        SampleProgramExercise(
+            name: 'Jump squats', notes: 'FINISHER: Leg burnout - Jump squats x15'),
+        SampleProgramExercise(
+            name: 'Glute bridges', notes: 'FINISHER: Glute bridge hold 30s'),
+        SampleProgramExercise(
+            name: 'Standing quad stretch', notes: 'Cooldown: 45 sec each'),
+        SampleProgramExercise(
+            name: 'Seated hamstring stretch', notes: 'Cooldown: 1 min'),
+        SampleProgramExercise(
+            name: 'Pigeon pose (hip flexor)', notes: 'Cooldown: 1 min each side'),
+      ],
+    ),
+    SampleProgramDay(
+      name: 'Day 4: HIIT & Metabolic Circuit',
+      exercises: [
+        SampleProgramExercise(
+            name: 'Shadow boxing / dance', notes: 'Warmup: 3 min gradually increasing'),
+        SampleProgramExercise(
+            name: 'High knees', notes: 'Warmup: 30 sec moderate pace'),
+        SampleProgramExercise(
+            name: 'Jump squats',
+            notes: 'HIIT BLOCK: 40s ON / 20s OFF. 4 rounds.',
+            setsJson: '[{"reps": 40, "weight": 0.0}, {"reps": 40, "weight": 0.0}, {"reps": 40, "weight": 0.0}, {"reps": 40, "weight": 0.0}]'),
+        SampleProgramExercise(
+            name: 'Push-up burpee',
+            notes: 'HIIT BLOCK: 40s ON / 20s OFF. 4 rounds. Do full push-up.',
+            setsJson: '[{"reps": 40, "weight": 0.0}, {"reps": 40, "weight": 0.0}, {"reps": 40, "weight": 0.0}, {"reps": 40, "weight": 0.0}]'),
+        SampleProgramExercise(
+            name: 'Mountain climbers',
+            notes: 'HIIT BLOCK: 40s ON / 20s OFF. 4 rounds. Fast pace.',
+            setsJson: '[{"reps": 40, "weight": 0.0}, {"reps": 40, "weight": 0.0}, {"reps": 40, "weight": 0.0}, {"reps": 40, "weight": 0.0}]'),
+        SampleProgramExercise(
+            name: 'High knees',
+            notes: 'HIIT BLOCK: 40s ON / 20s OFF. 4 rounds. Sprint intensity.',
+            setsJson: '[{"reps": 40, "weight": 0.0}, {"reps": 40, "weight": 0.0}, {"reps": 40, "weight": 0.0}, {"reps": 40, "weight": 0.0}]'),
+        SampleProgramExercise(
+            name: 'Lateral skater jumps',
+            notes: 'HIIT BLOCK: 40s ON / 20s OFF. 4 rounds. Land on one foot.',
+            setsJson: '[{"reps": 40, "weight": 0.0}, {"reps": 40, "weight": 0.0}, {"reps": 40, "weight": 0.0}, {"reps": 40, "weight": 0.0}]'),
+        SampleProgramExercise(
+            name: 'Dumbbell thruster',
+            notes: 'METABOLIC: Squat to press. 3 rounds 45s each.',
+            setsJson: '[{"reps": 45, "weight": 5.0}, {"reps": 45, "weight": 5.0}, {"reps": 45, "weight": 5.0}]'),
+        SampleProgramExercise(
+            name: 'Dumbbell swing',
+            notes: 'METABOLIC: Hinge and drive. 3 rounds 45s each.',
+            setsJson: '[{"reps": 45, "weight": 7.5}, {"reps": 45, "weight": 7.5}, {"reps": 45, "weight": 7.5}]'),
+        SampleProgramExercise(
+            name: 'Dumbbell renegade row',
+            notes: 'METABOLIC: Plank rows. 3 rounds 45s each.',
+            setsJson: '[{"reps": 45, "weight": 5.0}, {"reps": 45, "weight": 5.0}, {"reps": 45, "weight": 5.0}]'),
+        SampleProgramExercise(
+            name: 'Brisk walk', notes: 'Cooldown: Walk in place 2 min'),
+        SampleProgramExercise(
+            name: 'Seated hamstring stretch', notes: 'Cooldown: Forward fold 1 min'),
+      ],
+    ),
+    SampleProgramDay(
+      name: 'Day 5: Full Body Strength',
+      exercises: [
+        SampleProgramExercise(
+            name: 'Inchworm Walk-outs', notes: 'Warmup: x8 reps'),
+        SampleProgramExercise(
+            name: 'Bodyweight squat (slow)', notes: 'Warmup: x15 reps'),
+        SampleProgramExercise(
+            name: 'Deadlift',
+            notes: 'BLOCK A: Barbell deadlift. Neutral back. Fat loss KING.',
+            setsJson: '[{"reps": 8, "weight": 20.0}, {"reps": 8, "weight": 30.0}, {"reps": 8, "weight": 40.0}, {"reps": 8, "weight": 40.0}]'),
+        SampleProgramExercise(
+            name: 'Dumbbell Romanian Deadlift',
+            notes: 'BLOCK A: Hamstrings focus.',
+            setsJson: '[{"reps": 10, "weight": 15.0}, {"reps": 10, "weight": 15.0}, {"reps": 10, "weight": 15.0}]'),
+        SampleProgramExercise(
+            name: 'Dumbbell flat bench press',
+            notes: 'BLOCK B: SUPERSET A (Push).',
+            setsJson: '[{"reps": 12, "weight": 10.0}, {"reps": 12, "weight": 10.0}, {"reps": 12, "weight": 10.0}]'),
+        SampleProgramExercise(
+            name: 'Lat Pulldown',
+            notes: 'BLOCK B: SUPERSET B (Pull). 60s rest after this.',
+            setsJson: '[{"reps": 12, "weight": 15.0}, {"reps": 12, "weight": 15.0}, {"reps": 12, "weight": 15.0}]'),
+        SampleProgramExercise(
+            name: 'Standing dumbbell OHP',
+            notes: 'BLOCK B: SUPERSET A (Push - Shoulders).',
+            setsJson: '[{"reps": 10, "weight": 7.5}, {"reps": 10, "weight": 7.5}, {"reps": 10, "weight": 7.5}]'),
+        SampleProgramExercise(
+            name: 'Dumbbell Face Pull (bent over)',
+            notes: 'BLOCK B: SUPERSET B (Pull - Posture).',
+            setsJson: '[{"reps": 15, "weight": 5.0}, {"reps": 15, "weight": 5.0}, {"reps": 15, "weight": 5.0}]'),
+        SampleProgramExercise(
+            name: 'Farmer\'s carry',
+            notes: 'BLOCK C: heavy DBs, walk 20m. Core stability.',
+            setsJson: '[{"reps": 1, "weight": 15.0}, {"reps": 1, "weight": 15.0}, {"reps": 1, "weight": 15.0}]'),
+        SampleProgramExercise(
+            name: 'Dumbbell clean and press',
+            notes: 'BLOCK C: explosive movement. Swing to shoulder then press.',
+            setsJson: '[{"reps": 10, "weight": 7.5}, {"reps": 10, "weight": 7.5}, {"reps": 10, "weight": 7.5}]'),
+        SampleProgramExercise(
+            name: 'Push-ups', notes: 'FINISHER: 5-min AMRAP of Push-up(10), JumpSquat(10), Plank(20s)'),
+        SampleProgramExercise(
+            name: 'Cat-cow thoracic rotation', notes: 'Cooldown: 1 min each side'),
+        SampleProgramExercise(
+            name: 'Supine Spinal Twist', notes: 'Cooldown: 1 min each side'),
+      ],
+    ),
+    SampleProgramDay(
+      name: 'Day 6: Core, Abs & LISS',
+      exercises: [
+        SampleProgramExercise(name: 'Dead bug', notes: 'Warmup: x10 reps'),
+        SampleProgramExercise(name: 'Glute bridges', notes: 'Warmup: x15 reps'),
+        SampleProgramExercise(name: 'Mountain climbers', notes: 'Warmup: slow x20 reps'),
+        SampleProgramExercise(
+            name: 'Plank Variations',
+            notes: 'CORE: Forearm plank. 3 rounds 45s.',
+            setsJson: '[{"reps": 45, "weight": 0.0}, {"reps": 45, "weight": 0.0}, {"reps": 45, "weight": 0.0}]'),
+        SampleProgramExercise(
+            name: 'Dead bug',
+            notes: 'CORE: Lower abs. Alternate slow. 12 each.',
+            setsJson: '[{"reps": 12, "weight": 0.0}, {"reps": 12, "weight": 0.0}, {"reps": 12, "weight": 0.0}]'),
+        SampleProgramExercise(
+            name: 'Bicycle crunch',
+            notes: 'CORE: Obliques. 20 each side.',
+            setsJson: '[{"reps": 20, "weight": 0.0}, {"reps": 20, "weight": 0.0}, {"reps": 20, "weight": 0.0}]'),
+        SampleProgramExercise(
+            name: 'Leg raise (lying flat)',
+            notes: 'CORE: Lower belly fat focus. 15 reps.',
+            setsJson: '[{"reps": 15, "weight": 0.0}, {"reps": 15, "weight": 0.0}, {"reps": 15, "weight": 0.0}]'),
+        SampleProgramExercise(
+            name: 'Pulley rope crunch',
+            notes: 'CORE: Kneeling rope crunch. Round spine.',
+            setsJson: '[{"reps": 15, "weight": 10.0}, {"reps": 15, "weight": 10.0}, {"reps": 15, "weight": 10.0}]'),
+        SampleProgramExercise(
+            name: 'Russian twist (DB)',
+            notes: 'CORE: Love handles focus. 20 each side.',
+            setsJson: '[{"reps": 20, "weight": 5.0}, {"reps": 20, "weight": 5.0}, {"reps": 20, "weight": 5.0}]'),
+        SampleProgramExercise(
+            name: 'Side plank',
+            notes: 'CORE: Sculpts the waist. 30s each.',
+            setsJson: '[{"reps": 30, "weight": 0.0}, {"reps": 30, "weight": 0.0}, {"reps": 30, "weight": 0.0}]'),
+        SampleProgramExercise(
+            name: 'Brisk walk', notes: 'LISS: Steady state fat burning. 30 min.'),
+        SampleProgramExercise(
+            name: 'Step-ups on bench', notes: 'LISS OPTION: 30 min continuous.'),
+        SampleProgramExercise(
+            name: 'Child\'s Pose', notes: 'Cooldown: 2 min with deep breathing'),
+      ],
+    ),
+  ],
+);
+
+final allSamplePrograms = [
+  womenFatLossProgram,
+  elitePPLProgram,
+];

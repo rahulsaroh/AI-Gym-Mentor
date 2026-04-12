@@ -6,21 +6,51 @@ part of 'timer_notifier.dart';
 // RiverpodGenerator
 // **************************************************************************
 
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
+
+@ProviderFor(TimerNotifier)
+final timerProvider = TimerNotifierProvider._();
+
+final class TimerNotifierProvider
+    extends $NotifierProvider<TimerNotifier, TimerState> {
+  TimerNotifierProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'timerProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$timerNotifierHash();
+
+  @$internal
+  @override
+  TimerNotifier create() => TimerNotifier();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(TimerState value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<TimerState>(value),
+    );
+  }
+}
+
 String _$timerNotifierHash() => r'7dec33344c58249a72c1e7ac2d2820d2b82701fe';
 
-/// See also [TimerNotifier].
-@ProviderFor(TimerNotifier)
-final timerNotifierProvider =
-    AutoDisposeNotifierProvider<TimerNotifier, TimerState>.internal(
-  TimerNotifier.new,
-  name: r'timerNotifierProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$timerNotifierHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-typedef _$TimerNotifier = AutoDisposeNotifier<TimerState>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+abstract class _$TimerNotifier extends $Notifier<TimerState> {
+  TimerState build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<TimerState, TimerState>;
+    final element = ref.element as $ClassProviderElement<
+        AnyNotifier<TimerState, TimerState>, TimerState, Object?, Object?>;
+    element.handleCreate(ref, build);
+  }
+}

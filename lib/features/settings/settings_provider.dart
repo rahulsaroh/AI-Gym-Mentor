@@ -67,6 +67,6 @@ class Settings extends _$Settings {
 }
 
 @riverpod
-DataService dataService(DataServiceRef ref) {
+DataService dataService(Ref ref) {
   return DataService(ref.watch(appDatabaseProvider));
 }

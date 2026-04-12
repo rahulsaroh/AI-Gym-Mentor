@@ -44,7 +44,7 @@ class NotificationService {
     );
 
     await _notificationsPlugin.initialize(
-      initializationSettings,
+      settings: initializationSettings,
       onDidReceiveNotificationResponse: (details) {
         if (details.actionId == 'skip_rest') {
           FlutterBackgroundService().invoke('skip');
@@ -99,10 +99,10 @@ class NotificationService {
     );
 
     await _notificationsPlugin.show(
-      timerNotificationId,
-      'Resting: $timeStr',
-      exerciseName != null ? 'Previous: $exerciseName' : 'Take a breath',
-      NotificationDetails(android: androidDetails, iOS: iosDetails),
+      id: timerNotificationId,
+      title: 'Resting: $timeStr',
+      body: exerciseName != null ? 'Previous: $exerciseName' : 'Take a breath',
+      notificationDetails: NotificationDetails(android: androidDetails, iOS: iosDetails),
     );
   }
 
@@ -125,15 +125,15 @@ class NotificationService {
     );
 
     await _notificationsPlugin.show(
-      timerNotificationId + 1,
-      'Rest Complete!',
-      nextExercise != null ? 'Time for $nextExercise' : 'Get back to work!',
-      NotificationDetails(android: androidDetails, iOS: iosDetails),
+      id: timerNotificationId + 1,
+      title: 'Rest Complete!',
+      body: nextExercise != null ? 'Time for $nextExercise' : 'Get back to work!',
+      notificationDetails: NotificationDetails(android: androidDetails, iOS: iosDetails),
     );
   }
 
   Future<void> cancelTimerNotification() async {
-    await _notificationsPlugin.cancel(timerNotificationId);
+    await _notificationsPlugin.cancel(id: timerNotificationId);
   }
 
   // --- Simple Scheduled Notifications ---
@@ -145,11 +145,11 @@ class NotificationService {
     required DateTime scheduledTime,
   }) async {
     await _notificationsPlugin.zonedSchedule(
-      id,
-      title,
-      body,
-      tz.TZDateTime.from(scheduledTime, tz.local),
-      const NotificationDetails(
+      id: id,
+      title: title,
+      body: body,
+      scheduledDate: tz.TZDateTime.from(scheduledTime, tz.local),
+      notificationDetails: const NotificationDetails(
         android: AndroidNotificationDetails(
           'workout_timer',
           'Workout Timer',
@@ -165,12 +165,10 @@ class NotificationService {
         ),
       ),
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-      uiLocalNotificationDateInterpretation:
-          UILocalNotificationDateInterpretation.absoluteTime,
     );
   }
 
   Future<void> cancelNotification(int id) async {
-    await _notificationsPlugin.cancel(id);
+    await _notificationsPlugin.cancel(id: id);
   }
 }

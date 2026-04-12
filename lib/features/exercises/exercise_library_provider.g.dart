@@ -6,59 +6,138 @@ part of 'exercise_library_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$filteredLibraryExercisesHash() =>
-    r'ff240b60f86634c8ae8b09e5cd51da539b28aebd';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
 
-/// See also [filteredLibraryExercises].
-@ProviderFor(filteredLibraryExercises)
-final filteredLibraryExercisesProvider =
-    AutoDisposeFutureProvider<List<Exercise>>.internal(
-  filteredLibraryExercises,
-  name: r'filteredLibraryExercisesProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$filteredLibraryExercisesHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+@ProviderFor(ExerciseLibrarySearch)
+final exerciseLibrarySearchProvider = ExerciseLibrarySearchProvider._();
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef FilteredLibraryExercisesRef
-    = AutoDisposeFutureProviderRef<List<Exercise>>;
+final class ExerciseLibrarySearchProvider
+    extends $NotifierProvider<ExerciseLibrarySearch, String> {
+  ExerciseLibrarySearchProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'exerciseLibrarySearchProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$exerciseLibrarySearchHash();
+
+  @$internal
+  @override
+  ExerciseLibrarySearch create() => ExerciseLibrarySearch();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(String value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<String>(value),
+    );
+  }
+}
+
 String _$exerciseLibrarySearchHash() =>
     r'9ec41f8ee81bb2f312ec28427d161de3b5bba9bb';
 
-/// See also [ExerciseLibrarySearch].
-@ProviderFor(ExerciseLibrarySearch)
-final exerciseLibrarySearchProvider =
-    AutoDisposeNotifierProvider<ExerciseLibrarySearch, String>.internal(
-  ExerciseLibrarySearch.new,
-  name: r'exerciseLibrarySearchProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$exerciseLibrarySearchHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+abstract class _$ExerciseLibrarySearch extends $Notifier<String> {
+  String build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<String, String>;
+    final element = ref.element as $ClassProviderElement<
+        AnyNotifier<String, String>, String, Object?, Object?>;
+    element.handleCreate(ref, build);
+  }
+}
 
-typedef _$ExerciseLibrarySearch = AutoDisposeNotifier<String>;
+@ProviderFor(ExerciseLibraryFilters)
+final exerciseLibraryFiltersProvider = ExerciseLibraryFiltersProvider._();
+
+final class ExerciseLibraryFiltersProvider
+    extends $NotifierProvider<ExerciseLibraryFilters, Map<String, String?>> {
+  ExerciseLibraryFiltersProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'exerciseLibraryFiltersProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$exerciseLibraryFiltersHash();
+
+  @$internal
+  @override
+  ExerciseLibraryFilters create() => ExerciseLibraryFilters();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(Map<String, String?> value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<Map<String, String?>>(value),
+    );
+  }
+}
+
 String _$exerciseLibraryFiltersHash() =>
     r'0e138f908f92d1db0b5a5045d9d02c8a4a21721e';
 
-/// See also [ExerciseLibraryFilters].
-@ProviderFor(ExerciseLibraryFilters)
-final exerciseLibraryFiltersProvider = AutoDisposeNotifierProvider<
-    ExerciseLibraryFilters, Map<String, String?>>.internal(
-  ExerciseLibraryFilters.new,
-  name: r'exerciseLibraryFiltersProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$exerciseLibraryFiltersHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+abstract class _$ExerciseLibraryFilters
+    extends $Notifier<Map<String, String?>> {
+  Map<String, String?> build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<Map<String, String?>, Map<String, String?>>;
+    final element = ref.element as $ClassProviderElement<
+        AnyNotifier<Map<String, String?>, Map<String, String?>>,
+        Map<String, String?>,
+        Object?,
+        Object?>;
+    element.handleCreate(ref, build);
+  }
+}
 
-typedef _$ExerciseLibraryFilters = AutoDisposeNotifier<Map<String, String?>>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+@ProviderFor(filteredLibraryExercises)
+final filteredLibraryExercisesProvider = FilteredLibraryExercisesProvider._();
+
+final class FilteredLibraryExercisesProvider extends $FunctionalProvider<
+        AsyncValue<List<Exercise>>, List<Exercise>, FutureOr<List<Exercise>>>
+    with $FutureModifier<List<Exercise>>, $FutureProvider<List<Exercise>> {
+  FilteredLibraryExercisesProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'filteredLibraryExercisesProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$filteredLibraryExercisesHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<List<Exercise>> $createElement(
+          $ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<List<Exercise>> create(Ref ref) {
+    return filteredLibraryExercises(ref);
+  }
+}
+
+String _$filteredLibraryExercisesHash() =>
+    r'3beb9a319d7de4cd50e918f3ceccc8ef7aeaf6ad';

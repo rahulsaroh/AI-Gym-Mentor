@@ -1,5 +1,5 @@
-// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// coverage:ignore-file
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
@@ -9,395 +9,46 @@ part of 'body_measurement.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// dart format off
 T _$identity<T>(T value) => value;
-
-final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
-
-BodyMeasurement _$BodyMeasurementFromJson(Map<String, dynamic> json) {
-  return _BodyMeasurement.fromJson(json);
-}
 
 /// @nodoc
 mixin _$BodyMeasurement {
-  int get id => throw _privateConstructorUsedError;
-  DateTime get date => throw _privateConstructorUsedError;
-  double? get weight => throw _privateConstructorUsedError;
-  double? get bodyFat => throw _privateConstructorUsedError;
-  double? get neck => throw _privateConstructorUsedError;
-  double? get chest => throw _privateConstructorUsedError;
-  double? get shoulders => throw _privateConstructorUsedError;
-  double? get armLeft => throw _privateConstructorUsedError;
-  double? get armRight => throw _privateConstructorUsedError;
-  double? get forearmLeft => throw _privateConstructorUsedError;
-  double? get forearmRight => throw _privateConstructorUsedError;
-  double? get waist => throw _privateConstructorUsedError;
-  double? get hips => throw _privateConstructorUsedError;
-  double? get thighLeft => throw _privateConstructorUsedError;
-  double? get thighRight => throw _privateConstructorUsedError;
-  double? get calfLeft => throw _privateConstructorUsedError;
-  double? get calfRight => throw _privateConstructorUsedError;
-  String? get notes => throw _privateConstructorUsedError;
-
-  /// Serializes this BodyMeasurement to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  int get id;
+  DateTime get date;
+  double? get weight;
+  double? get bodyFat;
+  double? get neck;
+  double? get chest;
+  double? get shoulders;
+  double? get armLeft;
+  double? get armRight;
+  double? get forearmLeft;
+  double? get forearmRight;
+  double? get waist;
+  double? get hips;
+  double? get thighLeft;
+  double? get thighRight;
+  double? get calfLeft;
+  double? get calfRight;
+  String? get notes;
 
   /// Create a copy of BodyMeasurement
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
   $BodyMeasurementCopyWith<BodyMeasurement> get copyWith =>
-      throw _privateConstructorUsedError;
-}
+      _$BodyMeasurementCopyWithImpl<BodyMeasurement>(
+          this as BodyMeasurement, _$identity);
 
-/// @nodoc
-abstract class $BodyMeasurementCopyWith<$Res> {
-  factory $BodyMeasurementCopyWith(
-          BodyMeasurement value, $Res Function(BodyMeasurement) then) =
-      _$BodyMeasurementCopyWithImpl<$Res, BodyMeasurement>;
-  @useResult
-  $Res call(
-      {int id,
-      DateTime date,
-      double? weight,
-      double? bodyFat,
-      double? neck,
-      double? chest,
-      double? shoulders,
-      double? armLeft,
-      double? armRight,
-      double? forearmLeft,
-      double? forearmRight,
-      double? waist,
-      double? hips,
-      double? thighLeft,
-      double? thighRight,
-      double? calfLeft,
-      double? calfRight,
-      String? notes});
-}
-
-/// @nodoc
-class _$BodyMeasurementCopyWithImpl<$Res, $Val extends BodyMeasurement>
-    implements $BodyMeasurementCopyWith<$Res> {
-  _$BodyMeasurementCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of BodyMeasurement
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? id = null,
-    Object? date = null,
-    Object? weight = freezed,
-    Object? bodyFat = freezed,
-    Object? neck = freezed,
-    Object? chest = freezed,
-    Object? shoulders = freezed,
-    Object? armLeft = freezed,
-    Object? armRight = freezed,
-    Object? forearmLeft = freezed,
-    Object? forearmRight = freezed,
-    Object? waist = freezed,
-    Object? hips = freezed,
-    Object? thighLeft = freezed,
-    Object? thighRight = freezed,
-    Object? calfLeft = freezed,
-    Object? calfRight = freezed,
-    Object? notes = freezed,
-  }) {
-    return _then(_value.copyWith(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as int,
-      date: null == date
-          ? _value.date
-          : date // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      weight: freezed == weight
-          ? _value.weight
-          : weight // ignore: cast_nullable_to_non_nullable
-              as double?,
-      bodyFat: freezed == bodyFat
-          ? _value.bodyFat
-          : bodyFat // ignore: cast_nullable_to_non_nullable
-              as double?,
-      neck: freezed == neck
-          ? _value.neck
-          : neck // ignore: cast_nullable_to_non_nullable
-              as double?,
-      chest: freezed == chest
-          ? _value.chest
-          : chest // ignore: cast_nullable_to_non_nullable
-              as double?,
-      shoulders: freezed == shoulders
-          ? _value.shoulders
-          : shoulders // ignore: cast_nullable_to_non_nullable
-              as double?,
-      armLeft: freezed == armLeft
-          ? _value.armLeft
-          : armLeft // ignore: cast_nullable_to_non_nullable
-              as double?,
-      armRight: freezed == armRight
-          ? _value.armRight
-          : armRight // ignore: cast_nullable_to_non_nullable
-              as double?,
-      forearmLeft: freezed == forearmLeft
-          ? _value.forearmLeft
-          : forearmLeft // ignore: cast_nullable_to_non_nullable
-              as double?,
-      forearmRight: freezed == forearmRight
-          ? _value.forearmRight
-          : forearmRight // ignore: cast_nullable_to_non_nullable
-              as double?,
-      waist: freezed == waist
-          ? _value.waist
-          : waist // ignore: cast_nullable_to_non_nullable
-              as double?,
-      hips: freezed == hips
-          ? _value.hips
-          : hips // ignore: cast_nullable_to_non_nullable
-              as double?,
-      thighLeft: freezed == thighLeft
-          ? _value.thighLeft
-          : thighLeft // ignore: cast_nullable_to_non_nullable
-              as double?,
-      thighRight: freezed == thighRight
-          ? _value.thighRight
-          : thighRight // ignore: cast_nullable_to_non_nullable
-              as double?,
-      calfLeft: freezed == calfLeft
-          ? _value.calfLeft
-          : calfLeft // ignore: cast_nullable_to_non_nullable
-              as double?,
-      calfRight: freezed == calfRight
-          ? _value.calfRight
-          : calfRight // ignore: cast_nullable_to_non_nullable
-              as double?,
-      notes: freezed == notes
-          ? _value.notes
-          : notes // ignore: cast_nullable_to_non_nullable
-              as String?,
-    ) as $Val);
-  }
-}
-
-/// @nodoc
-abstract class _$$BodyMeasurementImplCopyWith<$Res>
-    implements $BodyMeasurementCopyWith<$Res> {
-  factory _$$BodyMeasurementImplCopyWith(_$BodyMeasurementImpl value,
-          $Res Function(_$BodyMeasurementImpl) then) =
-      __$$BodyMeasurementImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call(
-      {int id,
-      DateTime date,
-      double? weight,
-      double? bodyFat,
-      double? neck,
-      double? chest,
-      double? shoulders,
-      double? armLeft,
-      double? armRight,
-      double? forearmLeft,
-      double? forearmRight,
-      double? waist,
-      double? hips,
-      double? thighLeft,
-      double? thighRight,
-      double? calfLeft,
-      double? calfRight,
-      String? notes});
-}
-
-/// @nodoc
-class __$$BodyMeasurementImplCopyWithImpl<$Res>
-    extends _$BodyMeasurementCopyWithImpl<$Res, _$BodyMeasurementImpl>
-    implements _$$BodyMeasurementImplCopyWith<$Res> {
-  __$$BodyMeasurementImplCopyWithImpl(
-      _$BodyMeasurementImpl _value, $Res Function(_$BodyMeasurementImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of BodyMeasurement
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? id = null,
-    Object? date = null,
-    Object? weight = freezed,
-    Object? bodyFat = freezed,
-    Object? neck = freezed,
-    Object? chest = freezed,
-    Object? shoulders = freezed,
-    Object? armLeft = freezed,
-    Object? armRight = freezed,
-    Object? forearmLeft = freezed,
-    Object? forearmRight = freezed,
-    Object? waist = freezed,
-    Object? hips = freezed,
-    Object? thighLeft = freezed,
-    Object? thighRight = freezed,
-    Object? calfLeft = freezed,
-    Object? calfRight = freezed,
-    Object? notes = freezed,
-  }) {
-    return _then(_$BodyMeasurementImpl(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as int,
-      date: null == date
-          ? _value.date
-          : date // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      weight: freezed == weight
-          ? _value.weight
-          : weight // ignore: cast_nullable_to_non_nullable
-              as double?,
-      bodyFat: freezed == bodyFat
-          ? _value.bodyFat
-          : bodyFat // ignore: cast_nullable_to_non_nullable
-              as double?,
-      neck: freezed == neck
-          ? _value.neck
-          : neck // ignore: cast_nullable_to_non_nullable
-              as double?,
-      chest: freezed == chest
-          ? _value.chest
-          : chest // ignore: cast_nullable_to_non_nullable
-              as double?,
-      shoulders: freezed == shoulders
-          ? _value.shoulders
-          : shoulders // ignore: cast_nullable_to_non_nullable
-              as double?,
-      armLeft: freezed == armLeft
-          ? _value.armLeft
-          : armLeft // ignore: cast_nullable_to_non_nullable
-              as double?,
-      armRight: freezed == armRight
-          ? _value.armRight
-          : armRight // ignore: cast_nullable_to_non_nullable
-              as double?,
-      forearmLeft: freezed == forearmLeft
-          ? _value.forearmLeft
-          : forearmLeft // ignore: cast_nullable_to_non_nullable
-              as double?,
-      forearmRight: freezed == forearmRight
-          ? _value.forearmRight
-          : forearmRight // ignore: cast_nullable_to_non_nullable
-              as double?,
-      waist: freezed == waist
-          ? _value.waist
-          : waist // ignore: cast_nullable_to_non_nullable
-              as double?,
-      hips: freezed == hips
-          ? _value.hips
-          : hips // ignore: cast_nullable_to_non_nullable
-              as double?,
-      thighLeft: freezed == thighLeft
-          ? _value.thighLeft
-          : thighLeft // ignore: cast_nullable_to_non_nullable
-              as double?,
-      thighRight: freezed == thighRight
-          ? _value.thighRight
-          : thighRight // ignore: cast_nullable_to_non_nullable
-              as double?,
-      calfLeft: freezed == calfLeft
-          ? _value.calfLeft
-          : calfLeft // ignore: cast_nullable_to_non_nullable
-              as double?,
-      calfRight: freezed == calfRight
-          ? _value.calfRight
-          : calfRight // ignore: cast_nullable_to_non_nullable
-              as double?,
-      notes: freezed == notes
-          ? _value.notes
-          : notes // ignore: cast_nullable_to_non_nullable
-              as String?,
-    ));
-  }
-}
-
-/// @nodoc
-@JsonSerializable()
-class _$BodyMeasurementImpl implements _BodyMeasurement {
-  const _$BodyMeasurementImpl(
-      {required this.id,
-      required this.date,
-      this.weight,
-      this.bodyFat,
-      this.neck,
-      this.chest,
-      this.shoulders,
-      this.armLeft,
-      this.armRight,
-      this.forearmLeft,
-      this.forearmRight,
-      this.waist,
-      this.hips,
-      this.thighLeft,
-      this.thighRight,
-      this.calfLeft,
-      this.calfRight,
-      this.notes});
-
-  factory _$BodyMeasurementImpl.fromJson(Map<String, dynamic> json) =>
-      _$$BodyMeasurementImplFromJson(json);
-
-  @override
-  final int id;
-  @override
-  final DateTime date;
-  @override
-  final double? weight;
-  @override
-  final double? bodyFat;
-  @override
-  final double? neck;
-  @override
-  final double? chest;
-  @override
-  final double? shoulders;
-  @override
-  final double? armLeft;
-  @override
-  final double? armRight;
-  @override
-  final double? forearmLeft;
-  @override
-  final double? forearmRight;
-  @override
-  final double? waist;
-  @override
-  final double? hips;
-  @override
-  final double? thighLeft;
-  @override
-  final double? thighRight;
-  @override
-  final double? calfLeft;
-  @override
-  final double? calfRight;
-  @override
-  final String? notes;
-
-  @override
-  String toString() {
-    return 'BodyMeasurement(id: $id, date: $date, weight: $weight, bodyFat: $bodyFat, neck: $neck, chest: $chest, shoulders: $shoulders, armLeft: $armLeft, armRight: $armRight, forearmLeft: $forearmLeft, forearmRight: $forearmRight, waist: $waist, hips: $hips, thighLeft: $thighLeft, thighRight: $thighRight, calfLeft: $calfLeft, calfRight: $calfRight, notes: $notes)';
-  }
+  /// Serializes this BodyMeasurement to a JSON map.
+  Map<String, dynamic> toJson();
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$BodyMeasurementImpl &&
+            other is BodyMeasurement &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.date, date) || other.date == date) &&
             (identical(other.weight, weight) || other.weight == weight) &&
@@ -449,88 +100,692 @@ class _$BodyMeasurementImpl implements _BodyMeasurement {
       calfRight,
       notes);
 
-  /// Create a copy of BodyMeasurement
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  @pragma('vm:prefer-inline')
-  _$$BodyMeasurementImplCopyWith<_$BodyMeasurementImpl> get copyWith =>
-      __$$BodyMeasurementImplCopyWithImpl<_$BodyMeasurementImpl>(
-          this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$BodyMeasurementImplToJson(
-      this,
-    );
+  String toString() {
+    return 'BodyMeasurement(id: $id, date: $date, weight: $weight, bodyFat: $bodyFat, neck: $neck, chest: $chest, shoulders: $shoulders, armLeft: $armLeft, armRight: $armRight, forearmLeft: $forearmLeft, forearmRight: $forearmRight, waist: $waist, hips: $hips, thighLeft: $thighLeft, thighRight: $thighRight, calfLeft: $calfLeft, calfRight: $calfRight, notes: $notes)';
   }
 }
 
-abstract class _BodyMeasurement implements BodyMeasurement {
-  const factory _BodyMeasurement(
-      {required final int id,
-      required final DateTime date,
-      final double? weight,
-      final double? bodyFat,
-      final double? neck,
-      final double? chest,
-      final double? shoulders,
-      final double? armLeft,
-      final double? armRight,
-      final double? forearmLeft,
-      final double? forearmRight,
-      final double? waist,
-      final double? hips,
-      final double? thighLeft,
-      final double? thighRight,
-      final double? calfLeft,
-      final double? calfRight,
-      final String? notes}) = _$BodyMeasurementImpl;
+/// @nodoc
+abstract mixin class $BodyMeasurementCopyWith<$Res> {
+  factory $BodyMeasurementCopyWith(
+          BodyMeasurement value, $Res Function(BodyMeasurement) _then) =
+      _$BodyMeasurementCopyWithImpl;
+  @useResult
+  $Res call(
+      {int id,
+      DateTime date,
+      double? weight,
+      double? bodyFat,
+      double? neck,
+      double? chest,
+      double? shoulders,
+      double? armLeft,
+      double? armRight,
+      double? forearmLeft,
+      double? forearmRight,
+      double? waist,
+      double? hips,
+      double? thighLeft,
+      double? thighRight,
+      double? calfLeft,
+      double? calfRight,
+      String? notes});
+}
 
-  factory _BodyMeasurement.fromJson(Map<String, dynamic> json) =
-      _$BodyMeasurementImpl.fromJson;
+/// @nodoc
+class _$BodyMeasurementCopyWithImpl<$Res>
+    implements $BodyMeasurementCopyWith<$Res> {
+  _$BodyMeasurementCopyWithImpl(this._self, this._then);
+
+  final BodyMeasurement _self;
+  final $Res Function(BodyMeasurement) _then;
+
+  /// Create a copy of BodyMeasurement
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? date = null,
+    Object? weight = freezed,
+    Object? bodyFat = freezed,
+    Object? neck = freezed,
+    Object? chest = freezed,
+    Object? shoulders = freezed,
+    Object? armLeft = freezed,
+    Object? armRight = freezed,
+    Object? forearmLeft = freezed,
+    Object? forearmRight = freezed,
+    Object? waist = freezed,
+    Object? hips = freezed,
+    Object? thighLeft = freezed,
+    Object? thighRight = freezed,
+    Object? calfLeft = freezed,
+    Object? calfRight = freezed,
+    Object? notes = freezed,
+  }) {
+    return _then(_self.copyWith(
+      id: null == id
+          ? _self.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as int,
+      date: null == date
+          ? _self.date
+          : date // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      weight: freezed == weight
+          ? _self.weight
+          : weight // ignore: cast_nullable_to_non_nullable
+              as double?,
+      bodyFat: freezed == bodyFat
+          ? _self.bodyFat
+          : bodyFat // ignore: cast_nullable_to_non_nullable
+              as double?,
+      neck: freezed == neck
+          ? _self.neck
+          : neck // ignore: cast_nullable_to_non_nullable
+              as double?,
+      chest: freezed == chest
+          ? _self.chest
+          : chest // ignore: cast_nullable_to_non_nullable
+              as double?,
+      shoulders: freezed == shoulders
+          ? _self.shoulders
+          : shoulders // ignore: cast_nullable_to_non_nullable
+              as double?,
+      armLeft: freezed == armLeft
+          ? _self.armLeft
+          : armLeft // ignore: cast_nullable_to_non_nullable
+              as double?,
+      armRight: freezed == armRight
+          ? _self.armRight
+          : armRight // ignore: cast_nullable_to_non_nullable
+              as double?,
+      forearmLeft: freezed == forearmLeft
+          ? _self.forearmLeft
+          : forearmLeft // ignore: cast_nullable_to_non_nullable
+              as double?,
+      forearmRight: freezed == forearmRight
+          ? _self.forearmRight
+          : forearmRight // ignore: cast_nullable_to_non_nullable
+              as double?,
+      waist: freezed == waist
+          ? _self.waist
+          : waist // ignore: cast_nullable_to_non_nullable
+              as double?,
+      hips: freezed == hips
+          ? _self.hips
+          : hips // ignore: cast_nullable_to_non_nullable
+              as double?,
+      thighLeft: freezed == thighLeft
+          ? _self.thighLeft
+          : thighLeft // ignore: cast_nullable_to_non_nullable
+              as double?,
+      thighRight: freezed == thighRight
+          ? _self.thighRight
+          : thighRight // ignore: cast_nullable_to_non_nullable
+              as double?,
+      calfLeft: freezed == calfLeft
+          ? _self.calfLeft
+          : calfLeft // ignore: cast_nullable_to_non_nullable
+              as double?,
+      calfRight: freezed == calfRight
+          ? _self.calfRight
+          : calfRight // ignore: cast_nullable_to_non_nullable
+              as double?,
+      notes: freezed == notes
+          ? _self.notes
+          : notes // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ));
+  }
+}
+
+/// Adds pattern-matching-related methods to [BodyMeasurement].
+extension BodyMeasurementPatterns on BodyMeasurement {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_BodyMeasurement value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _BodyMeasurement() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_BodyMeasurement value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _BodyMeasurement():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_BodyMeasurement value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _BodyMeasurement() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(
+            int id,
+            DateTime date,
+            double? weight,
+            double? bodyFat,
+            double? neck,
+            double? chest,
+            double? shoulders,
+            double? armLeft,
+            double? armRight,
+            double? forearmLeft,
+            double? forearmRight,
+            double? waist,
+            double? hips,
+            double? thighLeft,
+            double? thighRight,
+            double? calfLeft,
+            double? calfRight,
+            String? notes)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _BodyMeasurement() when $default != null:
+        return $default(
+            _that.id,
+            _that.date,
+            _that.weight,
+            _that.bodyFat,
+            _that.neck,
+            _that.chest,
+            _that.shoulders,
+            _that.armLeft,
+            _that.armRight,
+            _that.forearmLeft,
+            _that.forearmRight,
+            _that.waist,
+            _that.hips,
+            _that.thighLeft,
+            _that.thighRight,
+            _that.calfLeft,
+            _that.calfRight,
+            _that.notes);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(
+            int id,
+            DateTime date,
+            double? weight,
+            double? bodyFat,
+            double? neck,
+            double? chest,
+            double? shoulders,
+            double? armLeft,
+            double? armRight,
+            double? forearmLeft,
+            double? forearmRight,
+            double? waist,
+            double? hips,
+            double? thighLeft,
+            double? thighRight,
+            double? calfLeft,
+            double? calfRight,
+            String? notes)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _BodyMeasurement():
+        return $default(
+            _that.id,
+            _that.date,
+            _that.weight,
+            _that.bodyFat,
+            _that.neck,
+            _that.chest,
+            _that.shoulders,
+            _that.armLeft,
+            _that.armRight,
+            _that.forearmLeft,
+            _that.forearmRight,
+            _that.waist,
+            _that.hips,
+            _that.thighLeft,
+            _that.thighRight,
+            _that.calfLeft,
+            _that.calfRight,
+            _that.notes);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(
+            int id,
+            DateTime date,
+            double? weight,
+            double? bodyFat,
+            double? neck,
+            double? chest,
+            double? shoulders,
+            double? armLeft,
+            double? armRight,
+            double? forearmLeft,
+            double? forearmRight,
+            double? waist,
+            double? hips,
+            double? thighLeft,
+            double? thighRight,
+            double? calfLeft,
+            double? calfRight,
+            String? notes)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _BodyMeasurement() when $default != null:
+        return $default(
+            _that.id,
+            _that.date,
+            _that.weight,
+            _that.bodyFat,
+            _that.neck,
+            _that.chest,
+            _that.shoulders,
+            _that.armLeft,
+            _that.armRight,
+            _that.forearmLeft,
+            _that.forearmRight,
+            _that.waist,
+            _that.hips,
+            _that.thighLeft,
+            _that.thighRight,
+            _that.calfLeft,
+            _that.calfRight,
+            _that.notes);
+      case _:
+        return null;
+    }
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _BodyMeasurement extends BodyMeasurement {
+  const _BodyMeasurement(
+      {required this.id,
+      required this.date,
+      this.weight,
+      this.bodyFat,
+      this.neck,
+      this.chest,
+      this.shoulders,
+      this.armLeft,
+      this.armRight,
+      this.forearmLeft,
+      this.forearmRight,
+      this.waist,
+      this.hips,
+      this.thighLeft,
+      this.thighRight,
+      this.calfLeft,
+      this.calfRight,
+      this.notes})
+      : super._();
+  factory _BodyMeasurement.fromJson(Map<String, dynamic> json) =>
+      _$BodyMeasurementFromJson(json);
 
   @override
-  int get id;
+  final int id;
   @override
-  DateTime get date;
+  final DateTime date;
   @override
-  double? get weight;
+  final double? weight;
   @override
-  double? get bodyFat;
+  final double? bodyFat;
   @override
-  double? get neck;
+  final double? neck;
   @override
-  double? get chest;
+  final double? chest;
   @override
-  double? get shoulders;
+  final double? shoulders;
   @override
-  double? get armLeft;
+  final double? armLeft;
   @override
-  double? get armRight;
+  final double? armRight;
   @override
-  double? get forearmLeft;
+  final double? forearmLeft;
   @override
-  double? get forearmRight;
+  final double? forearmRight;
   @override
-  double? get waist;
+  final double? waist;
   @override
-  double? get hips;
+  final double? hips;
   @override
-  double? get thighLeft;
+  final double? thighLeft;
   @override
-  double? get thighRight;
+  final double? thighRight;
   @override
-  double? get calfLeft;
+  final double? calfLeft;
   @override
-  double? get calfRight;
+  final double? calfRight;
   @override
-  String? get notes;
+  final String? notes;
 
   /// Create a copy of BodyMeasurement
   /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$BodyMeasurementImplCopyWith<_$BodyMeasurementImpl> get copyWith =>
-      throw _privateConstructorUsedError;
+  @pragma('vm:prefer-inline')
+  _$BodyMeasurementCopyWith<_BodyMeasurement> get copyWith =>
+      __$BodyMeasurementCopyWithImpl<_BodyMeasurement>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$BodyMeasurementToJson(
+      this,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _BodyMeasurement &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.date, date) || other.date == date) &&
+            (identical(other.weight, weight) || other.weight == weight) &&
+            (identical(other.bodyFat, bodyFat) || other.bodyFat == bodyFat) &&
+            (identical(other.neck, neck) || other.neck == neck) &&
+            (identical(other.chest, chest) || other.chest == chest) &&
+            (identical(other.shoulders, shoulders) ||
+                other.shoulders == shoulders) &&
+            (identical(other.armLeft, armLeft) || other.armLeft == armLeft) &&
+            (identical(other.armRight, armRight) ||
+                other.armRight == armRight) &&
+            (identical(other.forearmLeft, forearmLeft) ||
+                other.forearmLeft == forearmLeft) &&
+            (identical(other.forearmRight, forearmRight) ||
+                other.forearmRight == forearmRight) &&
+            (identical(other.waist, waist) || other.waist == waist) &&
+            (identical(other.hips, hips) || other.hips == hips) &&
+            (identical(other.thighLeft, thighLeft) ||
+                other.thighLeft == thighLeft) &&
+            (identical(other.thighRight, thighRight) ||
+                other.thighRight == thighRight) &&
+            (identical(other.calfLeft, calfLeft) ||
+                other.calfLeft == calfLeft) &&
+            (identical(other.calfRight, calfRight) ||
+                other.calfRight == calfRight) &&
+            (identical(other.notes, notes) || other.notes == notes));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType,
+      id,
+      date,
+      weight,
+      bodyFat,
+      neck,
+      chest,
+      shoulders,
+      armLeft,
+      armRight,
+      forearmLeft,
+      forearmRight,
+      waist,
+      hips,
+      thighLeft,
+      thighRight,
+      calfLeft,
+      calfRight,
+      notes);
+
+  @override
+  String toString() {
+    return 'BodyMeasurement(id: $id, date: $date, weight: $weight, bodyFat: $bodyFat, neck: $neck, chest: $chest, shoulders: $shoulders, armLeft: $armLeft, armRight: $armRight, forearmLeft: $forearmLeft, forearmRight: $forearmRight, waist: $waist, hips: $hips, thighLeft: $thighLeft, thighRight: $thighRight, calfLeft: $calfLeft, calfRight: $calfRight, notes: $notes)';
+  }
 }
+
+/// @nodoc
+abstract mixin class _$BodyMeasurementCopyWith<$Res>
+    implements $BodyMeasurementCopyWith<$Res> {
+  factory _$BodyMeasurementCopyWith(
+          _BodyMeasurement value, $Res Function(_BodyMeasurement) _then) =
+      __$BodyMeasurementCopyWithImpl;
+  @override
+  @useResult
+  $Res call(
+      {int id,
+      DateTime date,
+      double? weight,
+      double? bodyFat,
+      double? neck,
+      double? chest,
+      double? shoulders,
+      double? armLeft,
+      double? armRight,
+      double? forearmLeft,
+      double? forearmRight,
+      double? waist,
+      double? hips,
+      double? thighLeft,
+      double? thighRight,
+      double? calfLeft,
+      double? calfRight,
+      String? notes});
+}
+
+/// @nodoc
+class __$BodyMeasurementCopyWithImpl<$Res>
+    implements _$BodyMeasurementCopyWith<$Res> {
+  __$BodyMeasurementCopyWithImpl(this._self, this._then);
+
+  final _BodyMeasurement _self;
+  final $Res Function(_BodyMeasurement) _then;
+
+  /// Create a copy of BodyMeasurement
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? id = null,
+    Object? date = null,
+    Object? weight = freezed,
+    Object? bodyFat = freezed,
+    Object? neck = freezed,
+    Object? chest = freezed,
+    Object? shoulders = freezed,
+    Object? armLeft = freezed,
+    Object? armRight = freezed,
+    Object? forearmLeft = freezed,
+    Object? forearmRight = freezed,
+    Object? waist = freezed,
+    Object? hips = freezed,
+    Object? thighLeft = freezed,
+    Object? thighRight = freezed,
+    Object? calfLeft = freezed,
+    Object? calfRight = freezed,
+    Object? notes = freezed,
+  }) {
+    return _then(_BodyMeasurement(
+      id: null == id
+          ? _self.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as int,
+      date: null == date
+          ? _self.date
+          : date // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      weight: freezed == weight
+          ? _self.weight
+          : weight // ignore: cast_nullable_to_non_nullable
+              as double?,
+      bodyFat: freezed == bodyFat
+          ? _self.bodyFat
+          : bodyFat // ignore: cast_nullable_to_non_nullable
+              as double?,
+      neck: freezed == neck
+          ? _self.neck
+          : neck // ignore: cast_nullable_to_non_nullable
+              as double?,
+      chest: freezed == chest
+          ? _self.chest
+          : chest // ignore: cast_nullable_to_non_nullable
+              as double?,
+      shoulders: freezed == shoulders
+          ? _self.shoulders
+          : shoulders // ignore: cast_nullable_to_non_nullable
+              as double?,
+      armLeft: freezed == armLeft
+          ? _self.armLeft
+          : armLeft // ignore: cast_nullable_to_non_nullable
+              as double?,
+      armRight: freezed == armRight
+          ? _self.armRight
+          : armRight // ignore: cast_nullable_to_non_nullable
+              as double?,
+      forearmLeft: freezed == forearmLeft
+          ? _self.forearmLeft
+          : forearmLeft // ignore: cast_nullable_to_non_nullable
+              as double?,
+      forearmRight: freezed == forearmRight
+          ? _self.forearmRight
+          : forearmRight // ignore: cast_nullable_to_non_nullable
+              as double?,
+      waist: freezed == waist
+          ? _self.waist
+          : waist // ignore: cast_nullable_to_non_nullable
+              as double?,
+      hips: freezed == hips
+          ? _self.hips
+          : hips // ignore: cast_nullable_to_non_nullable
+              as double?,
+      thighLeft: freezed == thighLeft
+          ? _self.thighLeft
+          : thighLeft // ignore: cast_nullable_to_non_nullable
+              as double?,
+      thighRight: freezed == thighRight
+          ? _self.thighRight
+          : thighRight // ignore: cast_nullable_to_non_nullable
+              as double?,
+      calfLeft: freezed == calfLeft
+          ? _self.calfLeft
+          : calfLeft // ignore: cast_nullable_to_non_nullable
+              as double?,
+      calfRight: freezed == calfRight
+          ? _self.calfRight
+          : calfRight // ignore: cast_nullable_to_non_nullable
+              as double?,
+      notes: freezed == notes
+          ? _self.notes
+          : notes // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ));
+  }
+}
+
+// dart format on

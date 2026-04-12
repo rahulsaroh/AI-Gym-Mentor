@@ -6,23 +6,48 @@ part of 'workout_repository.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$workoutRepositoryHash() => r'c73c4a9775d97a2902daf496cd76962c3584ba1c';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
 
-/// See also [workoutRepository].
 @ProviderFor(workoutRepository)
-final workoutRepositoryProvider =
-    AutoDisposeProvider<WorkoutRepository>.internal(
-  workoutRepository,
-  name: r'workoutRepositoryProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$workoutRepositoryHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+final workoutRepositoryProvider = WorkoutRepositoryProvider._();
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef WorkoutRepositoryRef = AutoDisposeProviderRef<WorkoutRepository>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+final class WorkoutRepositoryProvider extends $FunctionalProvider<
+    WorkoutRepository,
+    WorkoutRepository,
+    WorkoutRepository> with $Provider<WorkoutRepository> {
+  WorkoutRepositoryProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'workoutRepositoryProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$workoutRepositoryHash();
+
+  @$internal
+  @override
+  $ProviderElement<WorkoutRepository> $createElement(
+          $ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  WorkoutRepository create(Ref ref) {
+    return workoutRepository(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(WorkoutRepository value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<WorkoutRepository>(value),
+    );
+  }
+}
+
+String _$workoutRepositoryHash() => r'bbc94ec1d29508141663d0fbf8c9d57b2372457e';

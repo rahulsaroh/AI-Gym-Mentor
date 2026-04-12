@@ -6,37 +6,37 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'analytics_providers.g.dart';
 
 @riverpod
-Future<Map<String, dynamic>> dashboardStats(DashboardStatsRef ref) async {
+Future<Map<String, dynamic>> dashboardStats(Ref ref) async {
   final repo = ref.watch(statsRepositoryProvider);
   return await repo.getOverviewStats();
 }
 
 @riverpod
-Future<List<Map<String, dynamic>>> volumeTrend(VolumeTrendRef ref) async {
+Future<List<Map<String, dynamic>>> volumeTrend(Ref ref) async {
   final repo = ref.watch(statsRepositoryProvider);
   return await repo.getWeeklyVolumeTrend();
 }
 
 @riverpod
-Future<List<Map<String, dynamic>>> frequencyTrend(FrequencyTrendRef ref) async {
+Future<List<Map<String, dynamic>>> frequencyTrend(Ref ref) async {
   final repo = ref.watch(statsRepositoryProvider);
   return await repo.getWorkoutFrequency();
 }
 
 @riverpod
-Future<Map<String, dynamic>> muscleBalance(MuscleBalanceRef ref) async {
+Future<Map<String, dynamic>> muscleBalance(Ref ref) async {
   final repo = ref.watch(statsRepositoryProvider);
   return await repo.getMuscleBalance();
 }
 
 @riverpod
-Future<List<Map<String, dynamic>>> plateauAlerts(PlateauAlertsRef ref) async {
+Future<List<Map<String, dynamic>>> plateauAlerts(Ref ref) async {
   final repo = ref.watch(statsRepositoryProvider);
   return await repo.getPlateauAlerts();
 }
 
 @riverpod
-Future<List<Map<String, dynamic>>> recentPRs(RecentPRsRef ref) async {
+Future<List<Map<String, dynamic>>> recentPRs(Ref ref) async {
   final repo = ref.watch(statsRepositoryProvider);
   return await repo.getRecentPRs();
 }

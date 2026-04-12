@@ -5,7 +5,9 @@ part 'workout_program.freezed.dart';
 part 'workout_program.g.dart';
 
 @freezed
-class WorkoutProgram with _$WorkoutProgram {
+abstract class WorkoutProgram with _$WorkoutProgram {
+  const WorkoutProgram._();
+
   const factory WorkoutProgram({
     required int id,
     required String name,
@@ -18,7 +20,9 @@ class WorkoutProgram with _$WorkoutProgram {
 }
 
 @freezed
-class ProgramDay with _$ProgramDay {
+abstract class ProgramDay with _$ProgramDay {
+  const ProgramDay._();
+
   const factory ProgramDay({
     required int id,
     required int templateId,
@@ -31,7 +35,9 @@ class ProgramDay with _$ProgramDay {
 }
 
 @freezed
-class ProgramExercise with _$ProgramExercise {
+abstract class ProgramExercise with _$ProgramExercise {
+  const ProgramExercise._();
+
   const factory ProgramExercise({
     required int id,
     required int dayId,

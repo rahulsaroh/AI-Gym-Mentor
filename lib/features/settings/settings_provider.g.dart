@@ -6,36 +6,87 @@ part of 'settings_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$dataServiceHash() => r'c23e54ac8c8f52748f72bc5159e183843a4e72b6';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
 
-/// See also [dataService].
-@ProviderFor(dataService)
-final dataServiceProvider = AutoDisposeProvider<DataService>.internal(
-  dataService,
-  name: r'dataServiceProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$dataServiceHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+@ProviderFor(Settings)
+final settingsProvider = SettingsProvider._();
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef DataServiceRef = AutoDisposeProviderRef<DataService>;
+final class SettingsProvider
+    extends $AsyncNotifierProvider<Settings, SettingsState> {
+  SettingsProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'settingsProvider',
+          isAutoDispose: false,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$settingsHash();
+
+  @$internal
+  @override
+  Settings create() => Settings();
+}
+
 String _$settingsHash() => r'374df1393faa783907ebbf2e020b6afa5691a493';
 
-/// See also [Settings].
-@ProviderFor(Settings)
-final settingsProvider =
-    AsyncNotifierProvider<Settings, SettingsState>.internal(
-  Settings.new,
-  name: r'settingsProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$settingsHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+abstract class _$Settings extends $AsyncNotifier<SettingsState> {
+  FutureOr<SettingsState> build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<AsyncValue<SettingsState>, SettingsState>;
+    final element = ref.element as $ClassProviderElement<
+        AnyNotifier<AsyncValue<SettingsState>, SettingsState>,
+        AsyncValue<SettingsState>,
+        Object?,
+        Object?>;
+    element.handleCreate(ref, build);
+  }
+}
 
-typedef _$Settings = AsyncNotifier<SettingsState>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+@ProviderFor(dataService)
+final dataServiceProvider = DataServiceProvider._();
+
+final class DataServiceProvider
+    extends $FunctionalProvider<DataService, DataService, DataService>
+    with $Provider<DataService> {
+  DataServiceProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'dataServiceProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$dataServiceHash();
+
+  @$internal
+  @override
+  $ProviderElement<DataService> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  DataService create(Ref ref) {
+    return dataService(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(DataService value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<DataService>(value),
+    );
+  }
+}
+
+String _$dataServiceHash() => r'b708822fcf0e79883558f3d33a8e9ae6c77a1c1e';

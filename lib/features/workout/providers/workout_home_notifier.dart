@@ -13,7 +13,9 @@ part 'workout_home_notifier.freezed.dart';
 part 'workout_home_notifier.g.dart';
 
 @freezed
-class MotivationTip with _$MotivationTip {
+abstract class MotivationTip with _$MotivationTip {
+  const MotivationTip._();
+
   const factory MotivationTip({
     required String text,
     required String category,
@@ -21,7 +23,7 @@ class MotivationTip with _$MotivationTip {
 }
 
 @freezed
-class WorkoutHomeState with _$WorkoutHomeState {
+abstract class WorkoutHomeState with _$WorkoutHomeState {
   const factory WorkoutHomeState({
     required String greeting,
     required String userName,

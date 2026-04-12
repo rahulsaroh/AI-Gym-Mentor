@@ -3,8 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:ai_gym_mentor/core/auth/auth_provider.dart';
-import 'package:ai_gym_mentor/services/sync_worker.dart';
 
 class OnboardingSlide {
   final String title;
@@ -30,21 +28,14 @@ final List<OnboardingSlide> slides = [
     icon: LucideIcons.chartLine,
   ),
   OnboardingSlide(
-    title: 'AI-ready JSON export',
-    subtitle: 'Export your data in a structured format ready for AI analysis.',
-    icon: LucideIcons.brainCircuit,
+    title: 'Offline First',
+    subtitle: 'Your data stays on your device. Privacy and speed guaranteed.',
+    icon: LucideIcons.shieldCheck,
   ),
   OnboardingSlide(
-    title: 'Your data, your Google Sheet',
-    subtitle:
-        'Sync seamlessly with Google Sheets for ultimate control and ownership.',
-    icon: LucideIcons.tableProperties,
-  ),
-  OnboardingSlide(
-    title: 'Connect Cloud Sync',
-    subtitle:
-        'Securely backup your workouts to your personal Google Drive automatically.',
-    icon: LucideIcons.cloud,
+    title: 'Structured Export',
+    subtitle: 'Export your data as JSON or CSV for your personal records.',
+    icon: LucideIcons.fileOutput,
   ),
 ];
 
@@ -116,10 +107,10 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                                 .withOpacity(0.3),
                             shape: BoxShape.circle,
                           ),
-                          child: const Icon(
-                            LucideIcons.dumbbell,
+                          child: Icon(
+                            slide.icon,
                             size: 64,
-                            color: Colors.white,
+                            color: Theme.of(context).colorScheme.primary,
                           ),
                         ),
                         const SizedBox(height: 48),
@@ -145,10 +136,6 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                                         .onSurfaceVariant,
                                   ),
                         ),
-                        if (index == slides.length - 1) ...[
-                          const SizedBox(height: 32),
-                          _GoogleSignInButton(onSuccess: _onNext),
-                        ],
                       ],
                     ),
                   );
@@ -212,34 +199,6 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class _GoogleSignInButton extends ConsumerWidget {
-  final VoidCallback onSuccess;
-  const _GoogleSignInButton({required this.onSuccess});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return SizedBox(
-      width: double.infinity,
-      child: OutlinedButton.icon(
-        onPressed: () async {
-          final success = await ref.read(authProvider.notifier).signIn();
-          if (success) {
-            ref.read(syncWorkerProvider.notifier).processQueue();
-            onSuccess();
-          }
-        },
-        icon: const Icon(LucideIcons.chrome, size: 20),
-        label: const Text('Connect Google Drive'),
-        style: OutlinedButton.styleFrom(
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         ),
       ),
     );
