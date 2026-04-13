@@ -34,7 +34,7 @@ class ProgramDetailScreen extends ConsumerWidget {
                   _buildAppBar(context, program),
                   _buildHeader(context, program),
                   _buildOverview(context, program),
-                  _buildSchedule(context, program),
+                  _buildSchedule(context, ref, program),
                   const SliverPadding(padding: EdgeInsets.only(bottom: 120)),
                 ],
               ),
@@ -190,7 +190,7 @@ class ProgramDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildSchedule(BuildContext context, ent.WorkoutProgram program) {
+  Widget _buildSchedule(BuildContext context, WidgetRef ref, ent.WorkoutProgram program) {
     return SliverToBoxAdapter(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(20, 32, 20, 0),
@@ -223,7 +223,7 @@ class ProgramDetailScreen extends ConsumerWidget {
                   ),
                 ),
                 trailing: Icon(LucideIcons.chevronUp, color: Colors.teal[900]),
-                children: program.days.map((day) => _buildDayItem(context, day)).toList(),
+                children: program.days.map((day) => _buildDayItem(context, ref, day, program.name)).toList(),
               ),
             ),
           ],
@@ -232,7 +232,7 @@ class ProgramDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildDayItem(BuildContext context, ent.ProgramDay day) {
+  Widget _buildDayItem(BuildContext context, WidgetRef ref, ent.ProgramDay day, String programName) {
     final muscleGroups = _deriveMuscleGroups(day);
 
     return Container(
@@ -251,20 +251,36 @@ class ProgramDetailScreen extends ConsumerWidget {
                   color: Colors.black,
                 ),
               ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: Colors.orange[50],
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: Text(
-                  muscleGroups,
-                  style: GoogleFonts.outfit(
-                    fontSize: 11,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.orange[700],
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Colors.orange[50],
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Text(
+                      muscleGroups,
+                      style: GoogleFonts.outfit(
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.orange[700],
+                      ),
+                    ),
                   ),
-                ),
+                  const SizedBox(width: 8),
+                  IconButton(
+                    icon: const Icon(LucideIcons.play, size: 20, color: Colors.green),
+                    onPressed: () => _showStartDayConfirm(context, ref, day, programName),
+                    style: IconButton.styleFrom(
+                      backgroundColor: Colors.green.withOpacity(0.1),
+                      padding: const EdgeInsets.all(4),
+                    ),
+                    constraints: const BoxConstraints(),
+                    visualDensity: VisualDensity.compact,
+                    tooltip: 'Start this day',
+                  ),
+                ],
               ),
             ],
           ),
@@ -292,7 +308,7 @@ class ProgramDetailScreen extends ConsumerWidget {
 
   String _deriveMuscleGroups(ent.ProgramDay day) {
     if (day.exercises.isEmpty) return 'Rest Day';
-    final muscles = day.exercises.map((e) => e.exercise.primaryMuscle).toSet().toList();
+    final muscles = day.exercises.map((e) => e.exercise.primaryMuscles.firstOrNull ?? "Other").toSet().toList();
     if (muscles.length > 2) return '${muscles[0]} & More';
     return muscles.join(' & ');
   }
@@ -341,7 +357,7 @@ class ProgramDetailScreen extends ConsumerWidget {
               elevation: 0,
             ),
             child: Text(
-              'Start This Plan',
+              'Start Default Schedule',
               style: GoogleFonts.outfit(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -349,6 +365,36 @@ class ProgramDetailScreen extends ConsumerWidget {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  void _showStartDayConfirm(BuildContext context, WidgetRef ref, ent.ProgramDay day, String programName) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Start ${day.name}?'),
+        content: Text('Do you want to start this specific workout session now?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(context);
+              final id = await ref.read(workoutHomeProvider.notifier).startWorkout(
+                templateId: day.templateId,
+                dayId: day.id,
+                name: programName,
+              );
+              if (context.mounted) {
+                context.push('/app/workout/active?id=$id&dayId=${day.id}');
+              }
+            },
+            child: const Text('Start Now', style: TextStyle(fontWeight: FontWeight.bold)),
+          ),
+        ],
       ),
     );
   }

@@ -281,6 +281,7 @@ class _ImportWizardScreenState extends ConsumerState<ImportWizardScreen> {
       for (var ex in customExs) {
         final exercise = ExerciseTable(
           id: ex['id'] as int,
+          exerciseId: ex['exerciseId'] as String?,
           name: ex['name'] as String,
           description: ex['description'] as String?,
           category: ex['category'] as String? ?? 'Strength',
@@ -298,6 +299,8 @@ class _ImportWizardScreenState extends ConsumerState<ImportWizardScreen> {
           force: ex['force'] as String?,
           source: ex['source'] as String? ?? 'local',
           isCustom: ex['isCustom'] as bool? ?? false,
+          isFavorite: ex['isFavorite'] as bool? ?? false,
+          isEnriched: ex['isEnriched'] as bool? ?? false,
           lastUsed: ex['lastUsed'] != null ? DateTime.parse(ex['lastUsed'] as String) : null,
         );
         await db.into(db.exercises).insertOnConflictUpdate(exercise);

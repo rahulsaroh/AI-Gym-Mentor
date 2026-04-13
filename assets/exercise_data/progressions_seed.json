@@ -1,0 +1,147 @@
+[
+  {
+    "base_id": "Push_Up",
+    "chain": [
+      {"id": "Wall_Push_Up", "position": -2},
+      {"id": "Knee_Push_Up", "position": -1},
+      {"id": "Push_Up", "position": 0},
+      {"id": "Archer_Push_Up", "position": 1},
+      {"id": "One_Arm_Push_Up", "position": 2}
+    ]
+  },
+  {
+    "base_id": "Squat",
+    "chain": [
+      {"id": "Assisted_Squat", "position": -2},
+      {"id": "Bodyweight_Squat", "position": -1},
+      {"id": "Squat", "position": 0},
+      {"id": "Goblet_Squat", "position": 1},
+      {"id": "Barbell_Squat", "position": 2}
+    ]
+  },
+  {
+    "base_id": "Deadlift",
+    "chain": [
+      {"id": "Romanian_Deadlift", "position": -2},
+      {"id": "Sumo_Deadlift", "position": -1},
+      {"id": "Deadlift", "position": 0},
+      {"id": "Conventional_Deadlift", "position": 1},
+      {"id": "Deficit_Deadlift", "position": 2}
+    ]
+  },
+  {
+    "base_id": "Pull_Up",
+    "chain": [
+      {"id": "Dead_Hang", "position": -2},
+      {"id": "Scapular_Pull_Up", "position": -1},
+      {"id": "Pull_Up", "position": 0},
+      {"id": "Weighted_Pull_Up", "position": 1},
+      {"id": "Muscle_Up", "position": 2}
+    ]
+  },
+  {
+    "base_id": "Plank",
+    "chain": [
+      {"id": "Knee_Plank", "position": -2},
+      {"id": "Wall_Plank", "position": -1},
+      {"id": "Plank", "position": 0},
+      {"id": "Long_Lever_Plank", "position": 1},
+      {"id": "Plank_Press_Up", "position": 2}
+    ]
+  },
+  {
+    "base_id": "Bent_Over_Row",
+    "chain": [
+      {"id": "Inverted_Row", "position": -2},
+      {"id": "Single_Arm_Row", "position": -1},
+      {"id": "Bent_Over_Row", "position": 0},
+      {"id": "Barbell_Row", "position": 1},
+      {"id": "Weighted_Row", "position": 2}
+    ]
+  },
+  {
+    "base_id": "Lunge",
+    "chain": [
+      {"id": "Static_Lunge", "position": -2},
+      {"id": "Reverse_Lunge", "position": -1},
+      {"id": "Lunge", "position": 0},
+      {"id": "Walking_Lunge", "position": 1},
+      {"id": "Weighted_Lunge", "position": 2}
+    ]
+  },
+  {
+    "base_id": "Shoulder_Press",
+    "chain": [
+      {"id": "Seated_Press", "position": -2},
+      {"id": "Landmine_Press", "position": -1},
+      {"id": "Shoulder_Press", "position": 0},
+      {"id": "Overhead_Press", "position": 1},
+      {"id": "Push_Press", "position": 2}
+    ]
+  },
+  {
+    "base_id": "Bicep_Curl",
+    "chain": [
+      {"id": "Bicep_Curl", "position": 0},
+      {"id": "Hammer_Curl", "position": 1},
+      {"id": "Incline_Curl", "position": 2},
+      {"id": "Preacher_Curl", "position": 3},
+      {"id": "Weighted_Curl", "position": 4}
+    ]
+  },
+  {
+    "base_id": "Tricep_Dip",
+    "chain": [
+      {"id": "Bench_Dip", "position": -2},
+      {"id": "Box_Dip", "position": -1},
+      {"id": "Tricep_Dip", "position": 0},
+      {"id": "Weighted_Dip", "position": 1},
+      {"id": "Ring_Dip", "position": 2}
+    ]
+  },
+  {
+    "base_id": "Bench_Press",
+    "chain": [
+      {"id": "Floor_Press", "position": -2},
+      {"id": "Landmine_Press", "position": -1},
+      {"id": "Bench_Press", "position": 0},
+      {"id": "Incline_Bench_Press", "position": 1},
+      {"id": "Weighted_Bench_Press", "position": 2}
+    ]
+  },
+  {
+    "base_id": "Lat_Pulldown",
+    "chain": [
+      {"id": "Assisted_Chin_Up", "position": -2},
+      {"id": "Lat_Pulldown", "position": 0},
+      {"id": "Weighted_Pulldown", "position": 1},
+      {"id": "Close_Grip_Pulldown", "position": 2}
+    ]
+  },
+  {
+    "base_id": "Leg_Press",
+    "chain": [
+      {"id": "Leg_Press", "position": 0},
+      {"id": "Single_Leg_Press", "position": 1},
+      {"id": "Weighted_Leg_Press", "position": 2}
+    ]
+  },
+  {
+    "base_id": "Hip_Thrust",
+    "chain": [
+      {"id": "Glute_Bridge", "position": -2},
+      {"id": "Single_Leg_Bridge", "position": -1},
+      {"id": "Hip_Thrust", "position": 0},
+      {"id": "Weighted_Hip_Thrust", "position": 1},
+      {"id": "Banded_Hip_Thrust", "position": 2}
+    ]
+  },
+  {
+    "base_id": "Dumbbell_Row",
+    "chain": [
+      {"id": "Single_Arm_Dumbbell_Row", "position": 0},
+      {"id": "Renegade_Row", "position": 1},
+      {"id": "Weighted_Row", "position": 2}
+    ]
+  }
+]

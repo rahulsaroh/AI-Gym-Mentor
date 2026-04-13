@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ai_gym_mentor/core/database/database.dart';
-import 'package:ai_gym_mentor/features/exercises/exercises_provider.dart';
+import 'package:ai_gym_mentor/features/exercise_database/presentation/providers/exercise_providers.dart';
 import 'package:ai_gym_mentor/features/settings/services/csv_service.dart';
 import 'package:ai_gym_mentor/features/settings/settings_provider.dart';
 import 'package:ai_gym_mentor/features/settings/models/settings_state.dart';

@@ -8,10 +8,11 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:ai_gym_mentor/core/database/database.dart' as db;
 import 'package:uuid/uuid.dart';
 import 'package:drift/drift.dart' hide Column;
-import 'package:ai_gym_mentor/features/exercises/exercises_provider.dart';
-import 'package:ai_gym_mentor/features/exercises/exercise_repository.dart';
-import 'package:ai_gym_mentor/core/domain/entities/exercise.dart';
-import 'package:ai_gym_mentor/core/domain/entities/exercise.dart' as entity;
+import 'package:ai_gym_mentor/features/exercise_database/presentation/providers/exercise_providers.dart';
+import 'package:ai_gym_mentor/features/exercise_database/presentation/providers/repository_provider.dart';
+import 'package:ai_gym_mentor/features/exercise_database/domain/entities/exercise_entity.dart';
+import 'package:ai_gym_mentor/features/exercise_database/domain/entities/exercise_entity.dart' as entity;
+import 'package:ai_gym_mentor/features/exercise_database/presentation/widgets/exercise_picker_overlay.dart';
 import 'package:confetti/confetti.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:ai_gym_mentor/core/widgets/speed_dial_fab.dart';
@@ -28,7 +29,8 @@ import 'package:ai_gym_mentor/core/utils/weight_converter.dart';
 import 'package:ai_gym_mentor/features/settings/models/settings_state.dart';
 import 'package:ai_gym_mentor/features/workout/providers/workout_duration_provider.dart';
 import 'package:ai_gym_mentor/features/workout/components/plate_calculator_dialog.dart';
-import 'package:ai_gym_mentor/features/exercises/components/exercise_picker_overlay.dart';
+
+typedef Exercise = ExerciseEntity;
 
 class ActiveWorkoutScreen extends ConsumerStatefulWidget {
   final int workoutId;
@@ -519,10 +521,8 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
                           spacing: 4,
                           runSpacing: 4,
                           children: [
-                            _buildMuscleChip(exercise.primaryMuscle),
-                            if (exercise.secondaryMuscle != null)
-                              _buildMuscleChip(exercise.secondaryMuscle!,
-                                  isSecondary: true),
+                            ...exercise.primaryMuscles.map((m) => _buildMuscleChip(m)),
+                            ...exercise.secondaryMuscles.map((m) => _buildMuscleChip(m, isSecondary: true)),
                           ],
                         ),
                       ],
@@ -665,7 +665,7 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
     );
   }
 
-  Widget _buildSetRow(db.WorkoutSet set, int index, entity.Exercise exercise,
+  Widget _buildSetRow(db.WorkoutSet set, int index, entity.ExerciseEntity exercise,
       ExerciseBlock block, List<ExerciseBlock> allBlocks) {
     final isCompleted = set.completed;
     final settings = ref.watch(settingsProvider).value ?? const SettingsState();
@@ -1121,7 +1121,7 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
     );
   }
 
-  Future<void> _toggleSet(db.WorkoutSet set, entity.Exercise exercise,
+  Future<void> _toggleSet(db.WorkoutSet set, entity.ExerciseEntity exercise,
       ExerciseBlock block, List<ExerciseBlock> allBlocks) async {
     final database = ref.read(db.appDatabaseProvider);
     final newCompleted = !set.completed;
@@ -1204,7 +1204,7 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
         ));
   }
 
-  Future<void> _checkPR(db.WorkoutSet set, entity.Exercise exercise) async {
+  Future<void> _checkPR(db.WorkoutSet set, entity.ExerciseEntity exercise) async {
     if (set.weight <= 0 || set.reps <= 0) return;
     final database = ref.read(db.appDatabaseProvider);
     final double currentRM = set.weight * (1 + set.reps / 30);
@@ -1379,7 +1379,7 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
         builder: (context) => PlateCalculatorDialog(targetWeight: weight));
   }
 
-  void _showExerciseMenu(ExerciseBlock block, entity.Exercise exercise) {
+  void _showExerciseMenu(ExerciseBlock block, entity.ExerciseEntity exercise) {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,

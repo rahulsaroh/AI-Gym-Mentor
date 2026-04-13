@@ -1,6 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'logged_set.dart';
-import 'exercise.dart';
 
 part 'workout_session.freezed.dart';
 part 'workout_session.g.dart';

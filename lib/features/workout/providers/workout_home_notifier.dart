@@ -42,6 +42,7 @@ abstract class WorkoutHomeState with _$WorkoutHomeState {
     @Default(0) int estimatedDuration,
     int? nextDayId,
     int? templateId,
+    int? manualDayId,
   }) = _WorkoutHomeState;
 
   const WorkoutHomeState._();
@@ -169,7 +170,10 @@ class WorkoutHomeNotifier extends _$WorkoutHomeNotifier {
           }
         }
 
-        final nextDay = templateDays[nextDayIndex];
+        final nextDay = (manualDayId != null) 
+            ? templateDays.firstWhere((d) => d.id == manualDayId, orElse: () => templateDays[nextDayIndex])
+            : templateDays[nextDayIndex];
+            
         todayDayName = nextDay.name;
         nextDayId = nextDay.id;
 
@@ -180,7 +184,7 @@ class WorkoutHomeNotifier extends _$WorkoutHomeNotifier {
         estimatedDuration =
             templateExercises.length * 12; // Estimate: 12 mins per exercise
 
-        isRestDay = completedToday;
+        isRestDay = completedToday && manualDayId == null;
       }
     }
 
@@ -210,7 +214,30 @@ class WorkoutHomeNotifier extends _$WorkoutHomeNotifier {
       estimatedDuration: estimatedDuration,
       nextDayId: nextDayId,
       templateId: activeTemplateId,
+      manualDayId: null, // This gets overridden by state in the actual notifier behavior if we use state.value
     );
+  }
+
+  // Helper to get manualDayId from current state
+  int? get _currentManualDayId => state.asData?.value.manualDayId;
+
+  Future<void> setManualDay(int dayId) async {
+    final currentState = state.asData?.value;
+    if (currentState == null) return;
+    
+    state = AsyncValue.data(currentState.copyWith(manualDayId: dayId));
+    // Re-fetch to update exercises and name based on this new day
+    state = await AsyncValue.guard(() async {
+      final fresh = await _fetchHomeData();
+      return fresh.copyWith(manualDayId: dayId);
+    });
+  }
+
+  Future<void> resetManualDay() async {
+    final currentState = state.asData?.value;
+    if (currentState == null) return;
+    state = AsyncValue.data(currentState.copyWith(manualDayId: null));
+    refresh();
   }
 
   Future<void> deleteWorkout(int id) async {

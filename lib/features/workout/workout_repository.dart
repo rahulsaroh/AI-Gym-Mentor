@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:drift/drift.dart';
 import 'package:ai_gym_mentor/core/database/database.dart';
-import 'package:ai_gym_mentor/core/domain/entities/exercise.dart' as ent;
+import 'package:ai_gym_mentor/features/exercise_database/domain/entities/exercise_entity.dart';
 import 'package:ai_gym_mentor/core/domain/entities/logged_set.dart' as ent;
 import 'package:ai_gym_mentor/core/domain/entities/workout_session.dart' as ent;
 import 'package:ai_gym_mentor/core/domain/entities/workout_program.dart' as ent;
@@ -429,25 +429,28 @@ class WorkoutRepository {
       final ex = row.readTable(_db.exercises);
       
       // Map back to Exercise Library Repository instance or use toEntity
-      final exerciseEntity = ent.Exercise(
+      final exerciseEntity = ExerciseEntity(
         id: ex.id,
+        exerciseId: ex.exerciseId ?? '',
         name: ex.name,
-        description: ex.description,
+        overview: ex.description,
         category: ex.category,
         difficulty: ex.difficulty,
-        primaryMuscle: ex.primaryMuscle,
-        secondaryMuscle: ex.secondaryMuscle,
+        primaryMuscles: [ex.primaryMuscle],
+        secondaryMuscles: ex.secondaryMuscle != null ? [ex.secondaryMuscle!] : [],
         equipment: ex.equipment,
         setType: ex.setType,
         restTime: ex.restTime,
-        instructions: ex.instructions?.split('|'),
+        instructions: ex.instructions?.split('|') ?? [],
         gifUrl: ex.gifUrl,
-        imageUrl: ex.imageUrl,
+        imageUrls: ex.imageUrl != null ? [ex.imageUrl!] : [],
         videoUrl: ex.videoUrl,
         mechanic: ex.mechanic,
         force: ex.force,
         source: ex.source,
         isCustom: ex.isCustom,
+        isFavorite: ex.isFavorite,
+        isEnriched: ex.isEnriched,
         lastUsed: ex.lastUsed,
       );
 

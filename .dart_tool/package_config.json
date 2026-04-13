@@ -224,6 +224,18 @@
       "languageVersion": "2.17"
     },
     {
+      "name": "connectivity_plus",
+      "rootUri": "file:///C:/Users/rahul/AppData/Local/Pub/Cache/hosted/pub.dev/connectivity_plus-6.1.5",
+      "packageUri": "lib/",
+      "languageVersion": "3.2"
+    },
+    {
+      "name": "connectivity_plus_platform_interface",
+      "rootUri": "file:///C:/Users/rahul/AppData/Local/Pub/Cache/hosted/pub.dev/connectivity_plus_platform_interface-2.1.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.18"
+    },
+    {
       "name": "convert",
       "rootUri": "file:///C:/Users/rahul/AppData/Local/Pub/Cache/hosted/pub.dev/convert-3.1.2",
       "packageUri": "lib/",
@@ -368,6 +380,12 @@
       "languageVersion": "3.0"
     },
     {
+      "name": "flutter_dotenv",
+      "rootUri": "file:///C:/Users/rahul/AppData/Local/Pub/Cache/hosted/pub.dev/flutter_dotenv-6.0.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
       "name": "flutter_driver",
       "rootUri": "file:///C:/flutter/packages/flutter_driver",
       "packageUri": "lib/",
@@ -440,6 +458,12 @@
       "languageVersion": "3.6"
     },
     {
+      "name": "flutter_svg",
+      "rootUri": "file:///C:/Users/rahul/AppData/Local/Pub/Cache/hosted/pub.dev/flutter_svg-2.2.4",
+      "packageUri": "lib/",
+      "languageVersion": "3.9"
+    },
+    {
       "name": "flutter_test",
       "rootUri": "file:///C:/flutter/packages/flutter_test",
       "packageUri": "lib/",
@@ -476,6 +500,12 @@
       "languageVersion": "3.9"
     },
     {
+      "name": "gif_view",
+      "rootUri": "file:///C:/Users/rahul/AppData/Local/Pub/Cache/hosted/pub.dev/gif_view-0.4.4",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
       "name": "glob",
       "rootUri": "file:///C:/Users/rahul/AppData/Local/Pub/Cache/hosted/pub.dev/glob-2.1.3",
       "packageUri": "lib/",
@@ -492,6 +522,12 @@
       "rootUri": "file:///C:/Users/rahul/AppData/Local/Pub/Cache/hosted/pub.dev/google_fonts-8.0.2",
       "packageUri": "lib/",
       "languageVersion": "3.9"
+    },
+    {
+      "name": "google_generative_ai",
+      "rootUri": "file:///C:/Users/rahul/AppData/Local/Pub/Cache/hosted/pub.dev/google_generative_ai-0.4.7",
+      "packageUri": "lib/",
+      "languageVersion": "3.1"
     },
     {
       "name": "graphs",
@@ -634,6 +670,12 @@
     {
       "name": "mocktail",
       "rootUri": "file:///C:/Users/rahul/AppData/Local/Pub/Cache/hosted/pub.dev/mocktail-1.0.5",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
+      "name": "nm",
+      "rootUri": "file:///C:/Users/rahul/AppData/Local/Pub/Cache/hosted/pub.dev/nm-0.5.0",
       "packageUri": "lib/",
       "languageVersion": "2.12"
     },
@@ -1182,6 +1224,24 @@
       "rootUri": "file:///C:/Users/rahul/AppData/Local/Pub/Cache/hosted/pub.dev/uuid-4.5.3",
       "packageUri": "lib/",
       "languageVersion": "3.0"
+    },
+    {
+      "name": "vector_graphics",
+      "rootUri": "file:///C:/Users/rahul/AppData/Local/Pub/Cache/hosted/pub.dev/vector_graphics-1.1.21",
+      "packageUri": "lib/",
+      "languageVersion": "3.9"
+    },
+    {
+      "name": "vector_graphics_codec",
+      "rootUri": "file:///C:/Users/rahul/AppData/Local/Pub/Cache/hosted/pub.dev/vector_graphics_codec-1.1.13",
+      "packageUri": "lib/",
+      "languageVersion": "3.4"
+    },
+    {
+      "name": "vector_graphics_compiler",
+      "rootUri": "file:///C:/Users/rahul/AppData/Local/Pub/Cache/hosted/pub.dev/vector_graphics_compiler-1.2.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.9"
     },
     {
       "name": "vector_math",

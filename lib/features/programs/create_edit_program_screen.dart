@@ -5,9 +5,9 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:ai_gym_mentor/core/database/database.dart';
-import 'package:ai_gym_mentor/core/domain/entities/exercise.dart';
-import 'package:ai_gym_mentor/features/exercises/exercises_provider.dart';
-import 'package:ai_gym_mentor/features/exercises/components/exercise_picker_overlay.dart';
+import 'package:ai_gym_mentor/features/exercise_database/domain/entities/exercise_entity.dart';
+import 'package:ai_gym_mentor/features/exercise_database/presentation/providers/exercise_providers.dart';
+import 'package:ai_gym_mentor/features/exercise_database/presentation/widgets/exercise_picker_overlay.dart';
 import 'package:ai_gym_mentor/features/programs/providers/programs_notifier.dart';
 import 'package:drift/drift.dart' hide Column;
 
@@ -621,7 +621,7 @@ class _DayCardState extends ConsumerState<_DayCard> {
 }
 
 class _ExerciseConfigRow extends StatelessWidget {
-  final Exercise exercise;
+  final ExerciseEntity exercise;
   final _SetData config;
   final Function(_SetData) onUpdate;
   final VoidCallback onRemove;

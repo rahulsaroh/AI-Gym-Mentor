@@ -5,14 +5,14 @@ import 'package:ai_gym_mentor/core/widgets/number_ticker.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:lottie/lottie.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:ai_gym_mentor/core/domain/entities/exercise.dart' as entity;
+import 'package:ai_gym_mentor/features/exercise_database/domain/entities/exercise_entity.dart';
 import 'package:ai_gym_mentor/services/plateau_service.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class WorkoutSummaryOverlay extends ConsumerStatefulWidget {
   final db.Workout workout;
   final List<db.WorkoutSet> sets;
-  final List<entity.Exercise> exercises;
+  final List<ExerciseEntity> exercises;
   final int elapsedSeconds;
   final int prsAchieved;
   final Function(String) onSave;

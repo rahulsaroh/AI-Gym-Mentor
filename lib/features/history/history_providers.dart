@@ -2,6 +2,7 @@ import 'package:ai_gym_mentor/core/database/database.dart';
 import 'package:ai_gym_mentor/core/domain/entities/logged_set.dart' as ent;
 import 'package:ai_gym_mentor/core/domain/entities/workout_session.dart' as ent;
 import 'package:ai_gym_mentor/features/workout/workout_repository.dart';
+import 'package:ai_gym_mentor/features/workout/providers/workout_home_notifier.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'history_providers.g.dart';
@@ -68,6 +69,8 @@ class HistoryList extends _$HistoryList {
     try {
       await repo.deleteWorkout(id);
       ref.invalidate(historyStatsProvider);
+      // Also invalidate home provider to refresh streaks and volume
+      ref.invalidate(workoutHomeProvider);
     } catch (e) {
       // Rollback on error
       state = AsyncValue.data(currentList);

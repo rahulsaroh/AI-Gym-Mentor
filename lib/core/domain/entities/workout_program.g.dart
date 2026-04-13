@@ -53,7 +53,8 @@ _ProgramExercise _$ProgramExerciseFromJson(Map<String, dynamic> json) =>
     _ProgramExercise(
       id: (json['id'] as num).toInt(),
       dayId: (json['dayId'] as num).toInt(),
-      exercise: Exercise.fromJson(json['exercise'] as Map<String, dynamic>),
+      exercise:
+          ExerciseEntity.fromJson(json['exercise'] as Map<String, dynamic>),
       order: (json['order'] as num).toInt(),
       setType: json['setType'] as String? ?? 'Straight',
       setsJson: json['setsJson'] as String? ?? '[]',

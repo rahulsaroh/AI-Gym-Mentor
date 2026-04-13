@@ -18,6 +18,7 @@ import 'package:path_provider_foundation/path_provider_foundation.dart' as path_
 import 'package:shared_preferences_foundation/shared_preferences_foundation.dart' as shared_preferences_foundation;
 import 'package:sqflite_darwin/sqflite_darwin.dart' as sqflite_darwin;
 import 'package:url_launcher_ios/url_launcher_ios.dart' as url_launcher_ios;
+import 'package:connectivity_plus/connectivity_plus.dart' as connectivity_plus;
 import 'package:file_picker/file_picker.dart' as file_picker;
 import 'package:flutter_local_notifications_linux/flutter_local_notifications_linux.dart' as flutter_local_notifications_linux;
 import 'package:package_info_plus/package_info_plus.dart' as package_info_plus;
@@ -155,6 +156,15 @@ class _PluginRegistrant {
       }
 
     } else if (Platform.isLinux) {
+      try {
+        connectivity_plus.ConnectivityPlusLinuxPlugin.registerWith();
+      } catch (err) {
+        print(
+          '`connectivity_plus` threw an error: $err. '
+          'The app may not function as expected until you remove this plugin from pubspec.yaml'
+        );
+      }
+
       try {
         file_picker.FilePickerLinux.registerWith();
       } catch (err) {

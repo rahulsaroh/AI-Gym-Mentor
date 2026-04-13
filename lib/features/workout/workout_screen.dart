@@ -274,14 +274,46 @@ class _TodayPlanSection extends ConsumerWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            state.isRestDay ? 'REST DAY' : 'TODAY\'S PLAN',
-                            style: GoogleFonts.outfit(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w800,
-                              letterSpacing: 1.5,
-                              color: Colors.white.withValues(alpha: 0.7),
-                            ),
+                          Row(
+                            children: [
+                              Text(
+                                state.isRestDay ? 'REST DAY' : 'TODAY\'S PLAN',
+                                style: GoogleFonts.outfit(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w800,
+                                  letterSpacing: 1.5,
+                                  color: Colors.white.withValues(alpha: 0.7),
+                                ),
+                              ),
+                              if (!state.isRestDay && state.templateId != null) ...[
+                                const SizedBox(width: 8),
+                                InkWell(
+                                  onTap: () => _showDayOverridePicker(context, ref, state),
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withValues(alpha: 0.2),
+                                      borderRadius: BorderRadius.circular(4),
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        const Icon(LucideIcons.repeat, size: 10, color: Colors.white),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          'CHANGE',
+                                          style: GoogleFonts.outfit(
+                                            fontSize: 9,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ],
                           ),
                           Text(
                             state.isRestDay
@@ -309,6 +341,7 @@ class _TodayPlanSection extends ConsumerWidget {
                     ),
                   ],
                 ),
+
                 const SizedBox(height: 16),
                 if (!state.isRestDay) ...[
                   Row(
@@ -382,8 +415,66 @@ class _TodayPlanSection extends ConsumerWidget {
         ),
       ),
     );
+  Future<void> _showDayOverridePicker(
+      BuildContext context, WidgetRef ref, WorkoutHomeState state) async {
+    final templateId = state.templateId;
+    if (templateId == null) return;
+
+    final repo = ref.read(workoutRepositoryProvider);
+    final days = await repo.getTemplateDays(templateId);
+
+    if (context.mounted) {
+      final selectedDayId = await showDialog<int>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Switch Workout Day',
+              style: GoogleFonts.outfit(fontWeight: FontWeight.bold)),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: days.length,
+              itemBuilder: (context, index) {
+                final day = days[index];
+                final isCurrent = day.id == state.nextDayId;
+                return ListTile(
+                  title: Text(day.name,
+                      style: GoogleFonts.outfit(
+                        fontWeight: isCurrent ? FontWeight.bold : FontWeight.normal,
+                        color: isCurrent ? Theme.of(context).colorScheme.primary : null,
+                      )),
+                  trailing: isCurrent ? const Icon(LucideIcons.check, size: 16) : null,
+                  onTap: () => Navigator.pop(context, day.id),
+                );
+              },
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                ref.read(workoutHomeProvider.notifier).resetManualDay();
+                Navigator.pop(context);
+              },
+              child: const Text('RESET TO SCHEDULE'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('CANCEL'),
+            ),
+          ],
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        ),
+      );
+
+      if (selectedDayId != null && context.mounted) {
+        await ref
+            .read(workoutHomeProvider.notifier)
+            .setManualDay(selectedDayId);
+      }
+    }
   }
 }
+
 
 class _StatChip extends StatelessWidget {
   final IconData icon;

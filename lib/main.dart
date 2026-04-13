@@ -9,10 +9,20 @@ import 'package:ai_gym_mentor/core/services/timer_service.dart';
 import 'package:ai_gym_mentor/features/settings/models/settings_state.dart';
 import 'package:ai_gym_mentor/features/settings/settings_provider.dart';
 import 'package:ai_gym_mentor/services/background_worker.dart';
+import 'package:ai_gym_mentor/features/exercise_database/data/datasources/exercise_db_seeder.dart';
+
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 void main() async {
   // Ensure Flutter is initialized before any async code
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Load environment variables
+  try {
+    await dotenv.load(fileName: ".env");
+  } catch (e) {
+    debugPrint('Warning: .env file not found. AI features may require an API key.');
+  }
 
   // 1. Notification Service Initialization
   try {
@@ -39,6 +49,15 @@ void main() async {
     if (kDebugMode) debugPrint('Background Worker Initialized Successfully');
   } catch (e) {
     debugPrint('Background Worker Initialization Failed: $e');
+  }
+
+  // 4. Exercise Database Seeding
+  try {
+    if (kDebugMode) debugPrint('Step 4: Seeding Exercise Database...');
+    await ExerciseDbSeeder.instance.seed();
+    if (kDebugMode) debugPrint('Exercise Database Seeded Successfully');
+  } catch (e) {
+    debugPrint('Exercise Database Seeding Failed: $e');
   }
 
   // 4. Framework error catchers

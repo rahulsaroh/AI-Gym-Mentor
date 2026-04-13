@@ -1,5 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'exercise.dart';
+import 'package:ai_gym_mentor/features/exercise_database/domain/entities/exercise_entity.dart';
 
 part 'workout_program.freezed.dart';
 part 'workout_program.g.dart';
@@ -41,7 +41,7 @@ abstract class ProgramExercise with _$ProgramExercise {
   const factory ProgramExercise({
     required int id,
     required int dayId,
-    required Exercise exercise,
+    required ExerciseEntity exercise,
     required int order,
     @Default('Straight') String setType,
     @Default('[]') String setsJson, // Simplified for now, or use typed sets

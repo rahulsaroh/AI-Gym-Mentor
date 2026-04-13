@@ -10,6 +10,7 @@
         "audioplayers",
         "cached_network_image",
         "confetti",
+        "connectivity_plus",
         "csv",
         "cupertino_icons",
         "drift",
@@ -18,13 +19,18 @@
         "flutter",
         "flutter_background_service",
         "flutter_cache_manager",
+        "flutter_dotenv",
         "flutter_local_notifications",
         "flutter_localizations",
         "flutter_riverpod",
         "flutter_slidable",
+        "flutter_svg",
         "freezed_annotation",
+        "gif_view",
         "go_router",
         "google_fonts",
+        "google_generative_ai",
+        "http",
         "intl",
         "json_annotation",
         "lottie",
@@ -249,6 +255,62 @@
         "stream_channel",
         "test_api",
         "vector_math"
+      ]
+    },
+    {
+      "name": "flutter_dotenv",
+      "version": "6.0.0",
+      "dependencies": [
+        "flutter"
+      ]
+    },
+    {
+      "name": "google_generative_ai",
+      "version": "0.4.7",
+      "dependencies": [
+        "http"
+      ]
+    },
+    {
+      "name": "http",
+      "version": "1.6.0",
+      "dependencies": [
+        "async",
+        "http_parser",
+        "meta",
+        "web"
+      ]
+    },
+    {
+      "name": "gif_view",
+      "version": "0.4.4",
+      "dependencies": [
+        "flutter",
+        "http"
+      ]
+    },
+    {
+      "name": "flutter_svg",
+      "version": "2.2.4",
+      "dependencies": [
+        "flutter",
+        "http",
+        "vector_graphics",
+        "vector_graphics_codec",
+        "vector_graphics_compiler"
+      ]
+    },
+    {
+      "name": "connectivity_plus",
+      "version": "6.1.5",
+      "dependencies": [
+        "collection",
+        "connectivity_plus_platform_interface",
+        "flutter",
+        "flutter_web_plugins",
+        "meta",
+        "nm",
+        "web"
       ]
     },
     {
@@ -1220,6 +1282,63 @@
       ]
     },
     {
+      "name": "web",
+      "version": "1.1.1",
+      "dependencies": []
+    },
+    {
+      "name": "http_parser",
+      "version": "4.1.2",
+      "dependencies": [
+        "collection",
+        "source_span",
+        "string_scanner",
+        "typed_data"
+      ]
+    },
+    {
+      "name": "vector_graphics_compiler",
+      "version": "1.2.0",
+      "dependencies": [
+        "args",
+        "meta",
+        "path",
+        "path_parsing",
+        "vector_graphics_codec",
+        "xml"
+      ]
+    },
+    {
+      "name": "vector_graphics_codec",
+      "version": "1.1.13",
+      "dependencies": []
+    },
+    {
+      "name": "vector_graphics",
+      "version": "1.1.21",
+      "dependencies": [
+        "flutter",
+        "http",
+        "vector_graphics_codec"
+      ]
+    },
+    {
+      "name": "nm",
+      "version": "0.5.0",
+      "dependencies": [
+        "dbus"
+      ]
+    },
+    {
+      "name": "connectivity_plus_platform_interface",
+      "version": "2.1.0",
+      "dependencies": [
+        "flutter",
+        "meta",
+        "plugin_platform_interface"
+      ]
+    },
+    {
       "name": "workmanager_apple",
       "version": "0.9.1+2",
       "dependencies": [
@@ -1248,16 +1367,6 @@
       "name": "fixnum",
       "version": "1.1.1",
       "dependencies": []
-    },
-    {
-      "name": "http",
-      "version": "1.6.0",
-      "dependencies": [
-        "async",
-        "http_parser",
-        "meta",
-        "web"
-      ]
     },
     {
       "name": "archive",
@@ -1516,11 +1625,6 @@
       "dependencies": [
         "ffi"
       ]
-    },
-    {
-      "name": "web",
-      "version": "1.1.1",
-      "dependencies": []
     },
     {
       "name": "package_info_plus_platform_interface",
@@ -1835,16 +1939,6 @@
       "version": "1.0.1",
       "dependencies": [
         "web"
-      ]
-    },
-    {
-      "name": "http_parser",
-      "version": "4.1.2",
-      "dependencies": [
-        "collection",
-        "source_span",
-        "string_scanner",
-        "typed_data"
       ]
     },
     {

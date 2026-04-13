@@ -3,7 +3,7 @@ import 'package:csv/csv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:drift/drift.dart';
 import 'package:ai_gym_mentor/core/database/database.dart';
-import 'package:ai_gym_mentor/features/exercises/exercise_repository.dart';
+import 'package:ai_gym_mentor/features/exercise_database/presentation/providers/repository_provider.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';

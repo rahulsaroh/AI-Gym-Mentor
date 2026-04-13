@@ -810,7 +810,7 @@ class __$ProgramDayCopyWithImpl<$Res> implements _$ProgramDayCopyWith<$Res> {
 mixin _$ProgramExercise {
   int get id;
   int get dayId;
-  Exercise get exercise;
+  ExerciseEntity get exercise;
   int get order;
   String get setType;
   String get setsJson; // Simplified for now, or use typed sets
@@ -869,15 +869,13 @@ abstract mixin class $ProgramExerciseCopyWith<$Res> {
   $Res call(
       {int id,
       int dayId,
-      Exercise exercise,
+      ExerciseEntity exercise,
       int order,
       String setType,
       String setsJson,
       int restTime,
       String? notes,
       String? supersetGroupId});
-
-  $ExerciseCopyWith<$Res> get exercise;
 }
 
 /// @nodoc
@@ -915,7 +913,7 @@ class _$ProgramExerciseCopyWithImpl<$Res>
       exercise: null == exercise
           ? _self.exercise
           : exercise // ignore: cast_nullable_to_non_nullable
-              as Exercise,
+              as ExerciseEntity,
       order: null == order
           ? _self.order
           : order // ignore: cast_nullable_to_non_nullable
@@ -941,16 +939,6 @@ class _$ProgramExerciseCopyWithImpl<$Res>
           : supersetGroupId // ignore: cast_nullable_to_non_nullable
               as String?,
     ));
-  }
-
-  /// Create a copy of ProgramExercise
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @pragma('vm:prefer-inline')
-  $ExerciseCopyWith<$Res> get exercise {
-    return $ExerciseCopyWith<$Res>(_self.exercise, (value) {
-      return _then(_self.copyWith(exercise: value));
-    });
   }
 }
 
@@ -1050,7 +1038,7 @@ extension ProgramExercisePatterns on ProgramExercise {
     TResult Function(
             int id,
             int dayId,
-            Exercise exercise,
+            ExerciseEntity exercise,
             int order,
             String setType,
             String setsJson,
@@ -1096,7 +1084,7 @@ extension ProgramExercisePatterns on ProgramExercise {
     TResult Function(
             int id,
             int dayId,
-            Exercise exercise,
+            ExerciseEntity exercise,
             int order,
             String setType,
             String setsJson,
@@ -1140,7 +1128,7 @@ extension ProgramExercisePatterns on ProgramExercise {
     TResult? Function(
             int id,
             int dayId,
-            Exercise exercise,
+            ExerciseEntity exercise,
             int order,
             String setType,
             String setsJson,
@@ -1190,7 +1178,7 @@ class _ProgramExercise extends ProgramExercise {
   @override
   final int dayId;
   @override
-  final Exercise exercise;
+  final ExerciseEntity exercise;
   @override
   final int order;
   @override
@@ -1265,16 +1253,13 @@ abstract mixin class _$ProgramExerciseCopyWith<$Res>
   $Res call(
       {int id,
       int dayId,
-      Exercise exercise,
+      ExerciseEntity exercise,
       int order,
       String setType,
       String setsJson,
       int restTime,
       String? notes,
       String? supersetGroupId});
-
-  @override
-  $ExerciseCopyWith<$Res> get exercise;
 }
 
 /// @nodoc
@@ -1312,7 +1297,7 @@ class __$ProgramExerciseCopyWithImpl<$Res>
       exercise: null == exercise
           ? _self.exercise
           : exercise // ignore: cast_nullable_to_non_nullable
-              as Exercise,
+              as ExerciseEntity,
       order: null == order
           ? _self.order
           : order // ignore: cast_nullable_to_non_nullable
@@ -1338,16 +1323,6 @@ class __$ProgramExerciseCopyWithImpl<$Res>
           : supersetGroupId // ignore: cast_nullable_to_non_nullable
               as String?,
     ));
-  }
-
-  /// Create a copy of ProgramExercise
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @pragma('vm:prefer-inline')
-  $ExerciseCopyWith<$Res> get exercise {
-    return $ExerciseCopyWith<$Res>(_self.exercise, (value) {
-      return _then(_self.copyWith(exercise: value));
-    });
   }
 }
 

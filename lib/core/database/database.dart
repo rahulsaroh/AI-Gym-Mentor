@@ -25,6 +25,7 @@ enum SetType {
 @DataClassName('ExerciseTable')
 class Exercises extends Table {
   IntColumn get id => integer().autoIncrement()();
+  TextColumn get exerciseId => text().nullable()(); // String ID from source (e.g., yuhonas_3_4_Sit-Up)
   TextColumn get name => text().withLength(min: 1, max: 255)();
   TextColumn get description => text().nullable()();
   TextColumn get category => text().withDefault(const Constant('Strength'))();
@@ -42,6 +43,8 @@ class Exercises extends Table {
   TextColumn get force => text().nullable()(); // Push, Pull, Static
   TextColumn get source => text().withDefault(const Constant('local'))();
   BoolColumn get isCustom => boolean().withDefault(const Constant(false))();
+  BoolColumn get isFavorite => boolean().withDefault(const Constant(false))();
+  BoolColumn get isEnriched => boolean().withDefault(const Constant(false))();
   DateTimeColumn get lastUsed => dateTime().nullable()();
 }
 
@@ -154,6 +157,49 @@ class ExerciseProgressionSettings extends Table {
   BoolColumn get autoSuggest => boolean().withDefault(const Constant(true))();
 }
 
+// Phase 3: New tables for exercise database feature
+class ExerciseMuscles extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get exerciseId => integer().references(Exercises, #id)();
+  TextColumn get muscleName => text()();
+  BoolColumn get isPrimary => boolean().withDefault(const Constant(true))();
+}
+
+class ExerciseBodyParts extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get exerciseId => integer().references(Exercises, #id)();
+  TextColumn get bodyPart => text()();
+}
+
+class ExerciseEnrichedContent extends Table {
+  IntColumn get exerciseId => integer().references(Exercises, #id)();
+  TextColumn get safetyTips => text().nullable()(); // JSON-encoded List<String>
+  TextColumn get commonMistakes => text().nullable()(); // JSON-encoded List<String>
+  TextColumn get variations => text().nullable()(); // JSON-encoded List<String>
+  TextColumn get enrichedOverview => text().nullable()();
+  DateTimeColumn get enrichedAt => dateTime().nullable()();
+  TextColumn get enrichmentSource => text().nullable()(); // 'manual', 'llm-gemini', 'llm-gpt4', 'auto-extracted'
+}
+
+class RecentExercises extends Table {
+  IntColumn get exerciseId => integer().references(Exercises, #id)();
+  DateTimeColumn get viewedAt => dateTime()();
+}
+
+class ExerciseProgressions extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get exerciseId => integer().references(Exercises, #id)();
+  IntColumn get progressionExerciseId => integer().references(Exercises, #id)();
+  IntColumn get position => integer()(); // 0 = current, negative = easier, positive = harder
+}
+
+class ExerciseInstructions extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get exerciseId => integer().references(Exercises, #id)();
+  IntColumn get stepNumber => integer()();
+  TextColumn get instructionText => text()();
+}
+
 @DriftDatabase(tables: [
   Exercises,
   WorkoutTemplates,
@@ -164,12 +210,30 @@ class ExerciseProgressionSettings extends Table {
   BodyMeasurements,
   SyncQueue,
   ExerciseProgressionSettings,
+  ExerciseMuscles,
+  ExerciseBodyParts,
+  ExerciseEnrichedContent,
+  RecentExercises,
+  ExerciseProgressions,
+  ExerciseInstructions,
 ])
 class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? e]) : super(e ?? _openConnection());
 
+  Future<List<ExerciseTable>> searchExercises(String query) async {
+    final results = await customSelect(
+      'SELECT rowid FROM exercises_fts WHERE exercises_fts MATCH ?',
+      variables: [Variable.withString(query)],
+    ).get();
+    
+    final ids = results.map((row) => row.read<int>('rowid')).toList();
+    if (ids.isEmpty) return [];
+    
+    return (select(exercises)..where((t) => t.id.isIn(ids))).get();
+  }
+
   @override
-  int get schemaVersion => 12;
+  int get schemaVersion => 15;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -235,15 +299,33 @@ class AppDatabase extends _$AppDatabase {
           }
           if (from < 10) {
             // Bulk update for Unified Exercise Library
-            await customStatement('ALTER TABLE exercises ADD COLUMN description TEXT');
-            await customStatement("ALTER TABLE exercises ADD COLUMN category TEXT DEFAULT 'Strength'");
-            await customStatement("ALTER TABLE exercises ADD COLUMN difficulty TEXT DEFAULT 'Beginner'");
-            await customStatement('ALTER TABLE exercises ADD COLUMN gif_url TEXT');
-            await customStatement('ALTER TABLE exercises ADD COLUMN image_url TEXT');
-            await customStatement('ALTER TABLE exercises ADD COLUMN video_url TEXT');
-            await customStatement('ALTER TABLE exercises ADD COLUMN mechanic TEXT');
-            await customStatement('ALTER TABLE exercises ADD COLUMN force TEXT');
-            await customStatement("ALTER TABLE exercises ADD COLUMN source TEXT DEFAULT 'local'");
+            if (!await hasColumn('exercises', 'description')) {
+              await customStatement('ALTER TABLE exercises ADD COLUMN description TEXT');
+            }
+            if (!await hasColumn('exercises', 'category')) {
+              await customStatement("ALTER TABLE exercises ADD COLUMN category TEXT DEFAULT 'Strength'");
+            }
+            if (!await hasColumn('exercises', 'difficulty')) {
+              await customStatement("ALTER TABLE exercises ADD COLUMN difficulty TEXT DEFAULT 'Beginner'");
+            }
+            if (!await hasColumn('exercises', 'gif_url')) {
+              await customStatement('ALTER TABLE exercises ADD COLUMN gif_url TEXT');
+            }
+            if (!await hasColumn('exercises', 'image_url')) {
+              await customStatement('ALTER TABLE exercises ADD COLUMN image_url TEXT');
+            }
+            if (!await hasColumn('exercises', 'video_url')) {
+              await customStatement('ALTER TABLE exercises ADD COLUMN video_url TEXT');
+            }
+            if (!await hasColumn('exercises', 'mechanic')) {
+              await customStatement('ALTER TABLE exercises ADD COLUMN mechanic TEXT');
+            }
+            if (!await hasColumn('exercises', 'force')) {
+              await customStatement('ALTER TABLE exercises ADD COLUMN force TEXT');
+            }
+            if (!await hasColumn('exercises', 'source')) {
+              await customStatement("ALTER TABLE exercises ADD COLUMN source TEXT DEFAULT 'local'");
+            }
           }
           if (from < 12) {
             if (!await hasColumn('workout_templates', 'goal')) {
@@ -253,211 +335,70 @@ class AppDatabase extends _$AppDatabase {
               await m.addColumn(workoutTemplates, workoutTemplates.duration);
             }
           }
+          // Phase 3: New tables for exercise database
+          if (from < 13) {
+            if (!await hasColumn('exercises', 'is_favorite')) {
+              await m.addColumn(exercises, exercises.isFavorite);
+            }
+            await m.createTable(exerciseMuscles);
+            await m.createTable(exerciseBodyParts);
+          }
+          if (from < 13) {
+            await m.createTable(exerciseEnrichedContent);
+            await m.createTable(recentExercises);
+            await m.createTable(exerciseProgressions);
+          }
+          if (from < 14) {
+            await m.createTable(exerciseInstructions);
+            await _handleFtsSetup();
+          }
+          if (from < 15) {
+            if (!await hasColumn('exercises', 'exercise_id')) {
+              await m.addColumn(exercises, exercises.exerciseId);
+            }
+            if (!await hasColumn('exercises', 'is_custom')) {
+              await m.addColumn(exercises, exercises.isCustom);
+            }
+            if (!await hasColumn('exercises', 'is_enriched')) {
+              await m.addColumn(exercises, exercises.isEnriched);
+            }
+          }
         },
         beforeOpen: (details) async {
           await customStatement('PRAGMA foreign_keys = ON');
 
-          if (details.wasCreated) {
-            await batch((b) async {
-              await _seedInitialData(b);
-            });
-            await _seedSamplePrograms();
-          } else {
-            await seedExercisesIfEmpty();
-            await _seedProgramsIfMissing();
+          if (details.wasCreated || details.hadUpgrade) {
+            // Use the external seeder
+            // import is needed but we are inside the file. 
+            // I'll add the import at the top later or use a callback.
+            // For now, I'll trigger it from a provider or main.dart.
           }
         },
       );
 
-  Future<void> _seedInitialData(Batch batch) async {
-    try {
-      final jsonString =
-          await rootBundle.loadString('assets/data/exercises.json');
-      final List<dynamic> jsonList = json.decode(jsonString);
-
-      final exercisesToInsert = jsonList.map((item) {
-        return ExercisesCompanion.insert(
-          name: item['name'] as String,
-          primaryMuscle: item['primaryMuscle'] as String,
-          secondaryMuscle: Value(item['secondaryMuscle'] as String?),
-          equipment: item['equipment'] as String,
-          setType: item['setType'] as String,
-          restTime: Value(item['restTime'] as int? ?? 90),
-          instructions: Value(item['instructions'] as String?),
-          isCustom: const Value(false),
-        );
-      }).toList();
-
-      batch.insertAll(exercises, exercisesToInsert);
-    } catch (e) {
-      debugPrint('Error seeding from JSON: $e');
-      batch.insertAll(exercises, initialExercises);
-    }
+  Future<void> _handleFtsSetup() async {
+    // Create FTS5 virtual table
+    await customStatement('''
+      CREATE VIRTUAL TABLE IF NOT EXISTS exercises_fts USING fts5(
+        id UNINDEXED,
+        name,
+        category,
+        equipment,
+        primary_muscle,
+        content='exercises',
+        content_rowid='rowid'
+      );
+    ''');
+    // Trigger to keep FTS in sync
+    await customStatement('''
+      CREATE TRIGGER IF NOT EXISTS exercises_ai AFTER INSERT ON exercises BEGIN
+        INSERT INTO exercises_fts(rowid, id, name, category, equipment, primary_muscle)
+        VALUES (new.rowid, new.id, new.name, new.category, COALESCE(new.equipment, ''), new.primary_muscle);
+      END;
+    ''');
   }
 
-  Future<void> _seedSamplePrograms() async {
-    final allExercises = await select(exercises).get();
-    final exerciseMap = {for (var e in allExercises) e.name: e.id};
-
-    for (final program in allSamplePrograms) {
-      await _seedProgram(program, exerciseMap);
-    }
-    await _seedImportedPrograms(exerciseMap);
-  }
-
-  Future<void> _seedProgram(
-      SampleProgram program, Map<String, int> exerciseMap) async {
-    final templateId =
-        await into(workoutTemplates).insert(WorkoutTemplatesCompanion.insert(
-      name: program.name,
-      description: Value(program.description),
-      goal: Value(program.goal),
-      duration: Value(program.duration),
-    ));
-
-    for (int i = 0; i < program.days.length; i++) {
-      final day = program.days[i];
-      final dayId =
-          await into(templateDays).insert(TemplateDaysCompanion.insert(
-        templateId: templateId,
-        name: day.name,
-        order: i,
-      ));
-
-      for (int j = 0; j < day.exercises.length; j++) {
-        final ex = day.exercises[j];
-        final exId = exerciseMap[ex.name];
-        if (exId != null) {
-          await into(templateExercises)
-              .insert(TemplateExercisesCompanion.insert(
-            dayId: dayId,
-            exerciseId: exId,
-            order: j,
-            setsJson: ex.setsJson,
-            notes: Value(ex.notes),
-          ));
-        }
-      }
-    }
-  }
-
-  Future<void> seedExercisesIfEmpty() async {
-    final allEx = await select(exercises).get();
-    final existingNames = allEx.map((e) => e.name).toSet();
-
-    final missingExercises = initialExercises
-        .where((e) => !existingNames.contains(e.name.value))
-        .toList();
-
-    if (missingExercises.isNotEmpty) {
-      debugPrint(
-          'Database: Adding ${missingExercises.length} missing exercises...');
-      await batch((b) async {
-        b.insertAll(exercises, missingExercises);
-      });
-    }
-  }
-
-  Future<void> _seedProgramsIfMissing() async {
-    final allTemplates = await select(workoutTemplates).get();
-    final templateNames = allTemplates.map((t) => t.name).toSet();
-
-    final allExercises = await select(exercises).get();
-    final exerciseMap = {for (var e in allExercises) e.name: e.id};
-
-    for (final program in allSamplePrograms) {
-      if (!templateNames.contains(program.name)) {
-        await _seedProgram(program, exerciseMap);
-      }
-    }
-    await _seedImportedPrograms(exerciseMap);
-  }
-
-  Future<void> _seedImportedPrograms(Map<String, int> exerciseMap) async {
-    final templateNames = await select(workoutTemplates).get();
-    if (templateNames.any((t) => t.name == '6 Day PPL')) return;
-
-    try {
-      final jsonStr =
-          await rootBundle.loadString('assets/data/imported_ppl.json');
-      final data = jsonDecode(jsonStr);
-      final name = data['name'] as String;
-      final description = data['description'] as String?;
-      final days = data['days'] as List;
-
-      await transaction(() async {
-        final templateId = await into(workoutTemplates)
-            .insert(WorkoutTemplatesCompanion.insert(
-          name: name,
-          description: Value(description),
-        ));
-
-        for (final dayData in days) {
-          final dayId =
-              await into(templateDays).insert(TemplateDaysCompanion.insert(
-            templateId: templateId,
-            name: dayData['name'],
-            order: dayData['order'],
-          ));
-
-          final exercisesArr = dayData['exercises'] as List;
-
-          // Also create a "Completed Workout" for history for each Day in the Excel
-          final workoutId =
-              await into(workouts).insert(WorkoutsCompanion.insert(
-            name: 'PPL History: ${dayData['name']}',
-            date: DateTime.now().subtract(const Duration(days: 7)),
-            status: const Value('completed'),
-            templateId: Value(templateId),
-            dayId: Value(dayId),
-          ));
-
-          for (final exData in exercisesArr) {
-            final exerciseName = exData['exerciseName'] as String;
-            final exId = exerciseMap[exerciseName];
-
-            // If exercise not in Drift, we insert it as custom
-            final finalExId = exId ??
-                await into(exercises).insert(ExercisesCompanion.insert(
-                  name: exerciseName,
-                  primaryMuscle: 'Full Body',
-                  equipment: 'None',
-                  setType: 'Straight',
-                ));
-
-            exerciseMap[exerciseName] = finalExId;
-
-            // Add to template
-            await into(templateExercises)
-                .insert(TemplateExercisesCompanion.insert(
-              dayId: dayId,
-              exerciseId: finalExId,
-              order: exData['order'],
-              setsJson: exData['setsJson'],
-              notes: Value(exData['notes']),
-            ));
-
-            // Add to session history (Logs)
-            final setsData = jsonDecode(exData['setsJson']) as List;
-            for (int k = 0; k < setsData.length; k++) {
-              final setData = setsData[k];
-              await into(workoutSets).insert(WorkoutSetsCompanion.insert(
-                workoutId: workoutId,
-                exerciseId: finalExId,
-                exerciseOrder: exData['order'],
-                setNumber: k + 1,
-                reps: (setData['reps'] as num).toDouble(),
-                weight: (setData['weight'] as num).toDouble(),
-                completed: const Value(true),
-              ));
-            }
-          }
-        }
-      });
-    } catch (e) {
-      debugPrint('Database: Error seeding imported program: $e');
-    }
-  }
+  // Seeding is now handled by ExerciseDbSeeder
 }
 
 @Riverpod(keepAlive: true)

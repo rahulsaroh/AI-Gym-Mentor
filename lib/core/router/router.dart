@@ -12,12 +12,13 @@ import 'package:ai_gym_mentor/features/shell/placeholder_screens.dart'
 import 'package:ai_gym_mentor/features/splash/splash_screen.dart';
 import 'package:ai_gym_mentor/features/onboarding/onboarding_screen.dart';
 import 'package:ai_gym_mentor/features/setup/setup_screen.dart';
-import 'package:ai_gym_mentor/features/exercises/exercises_screen.dart';
+import 'package:ai_gym_mentor/features/exercise_database/presentation/screens/exercise_list_screen.dart';
+import 'package:ai_gym_mentor/features/exercise_database/presentation/screens/muscle_group_screen.dart';
+import 'package:ai_gym_mentor/features/exercise_database/presentation/screens/exercise_history_screen.dart';
+import 'package:ai_gym_mentor/features/exercise_database/presentation/screens/exercise_detail_screen.dart';
 import 'package:ai_gym_mentor/features/workout/active_workout_screen.dart';
 import 'package:ai_gym_mentor/features/history/history_screen.dart';
 import 'package:ai_gym_mentor/features/history/workout_detail_screen.dart';
-import 'package:ai_gym_mentor/features/exercises/exercise_history_screen.dart';
-import 'package:ai_gym_mentor/features/exercises/exercise_detail_screen.dart';
 import 'package:ai_gym_mentor/features/analytics/analytics_dashboard_screen.dart';
 import 'package:ai_gym_mentor/features/analytics/pr_hall_of_fame_screen.dart';
 import 'package:ai_gym_mentor/features/analytics/body_measurements_screen.dart';
@@ -28,8 +29,6 @@ import 'package:ai_gym_mentor/features/programs/programs_screen.dart';
 import 'package:ai_gym_mentor/features/programs/create_edit_program_screen.dart';
 import 'package:ai_gym_mentor/features/programs/program_details_screen.dart';
 import 'package:ai_gym_mentor/features/workout/start_workout_screen.dart';
-import 'package:ai_gym_mentor/features/exercises/exercise_library_screen.dart';
-import 'package:ai_gym_mentor/features/exercises/exercise_library_detail_screen.dart';
 
 final router = GoRouter(
   initialLocation: '/',
@@ -103,8 +102,16 @@ final router = GoRouter(
           routes: [
             GoRoute(
               path: '/exercises',
-              builder: (context, state) => const ExercisesScreen(),
+              builder: (context, state) => const MuscleGroupScreen(),
               routes: [
+                GoRoute(
+                  path: 'list',
+                  builder: (context, state) => const ExerciseListScreen(),
+                ),
+                GoRoute(
+                  path: 'muscle-groups',
+                  builder: (context, state) => const MuscleGroupScreen(),
+                ),
                 GoRoute(
                   path: 'create',
                   builder: (context, state) =>
@@ -137,19 +144,6 @@ final router = GoRouter(
                         int.tryParse(state.pathParameters['id'] ?? '0') ?? 0;
                     return ExerciseHistoryScreen(exerciseId: id);
                   },
-                ),
-                GoRoute(
-                  path: 'library',
-                  builder: (context, state) => const ExerciseLibraryScreen(),
-                  routes: [
-                    GoRoute(
-                      path: ':id',
-                      builder: (context, state) {
-                        final id = state.pathParameters['id'] ?? '';
-                        return ExerciseLibraryDetailScreen(exerciseId: id);
-                      },
-                    ),
-                  ],
                 ),
               ],
             ),

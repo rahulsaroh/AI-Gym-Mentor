@@ -146,24 +146,71 @@ class BeginSessionSheet extends ConsumerWidget {
       BuildContext context, WidgetRef ref, WorkoutProgram template) async {
     final repo = ref.read(workoutRepositoryProvider);
     final days = await repo.getTemplateDays(template.id);
-    int? dayId;
-    if (days.isNotEmpty) {
-      dayId = days.first.id;
-    }
-    final id = await ref.read(workoutHomeProvider.notifier).startWorkout(
-          templateId: template.id,
-          dayId: dayId,
-          name: '${template.name} - Session',
+    
+    if (days.isEmpty) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('This program has no days defined.')),
         );
-    if (context.mounted) {
-      Navigator.pop(context);
-      if (dayId != null) {
-        context.push('/app/workout/active?id=$id&dayId=$dayId');
-      } else {
-        context.push('/app/workout/active?id=$id');
+      }
+      return;
+    }
+
+    int? selectedDayId;
+
+    if (days.length == 1) {
+      selectedDayId = days.first.id;
+    } else {
+      // Show day picker dialog
+      if (context.mounted) {
+        selectedDayId = await showDialog<int>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text('Select Day', style: GoogleFonts.outfit(fontWeight: FontWeight.bold)),
+            content: SizedBox(
+              width: double.maxFinite,
+              child: ListView.builder(
+                shrinkWrap: true,
+                itemCount: days.length,
+                itemBuilder: (context, index) {
+                  final day = days[index];
+                  return ListTile(
+                    title: Text(day.name, style: GoogleFonts.outfit()),
+                    leading: CircleAvatar(
+                      backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+                      child: Text('${index + 1}', style: TextStyle(color: Theme.of(context).colorScheme.primary, fontSize: 12, fontWeight: FontWeight.bold)),
+                    ),
+                    onTap: () => Navigator.pop(context, day.id),
+                  );
+                },
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('CANCEL'),
+              ),
+            ],
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          ),
+        );
       }
     }
+
+    if (selectedDayId == null) return;
+
+    final id = await ref.read(workoutHomeProvider.notifier).startWorkout(
+          templateId: template.id,
+          dayId: selectedDayId,
+          name: '${template.name} - ${days.firstWhere((d) => d.id == selectedDayId).name}',
+        );
+
+    if (context.mounted) {
+      Navigator.pop(context);
+      context.push('/app/workout/active?id=$id&dayId=$selectedDayId');
+    }
   }
+
 
   Future<void> _startEmptyWorkout(BuildContext context, WidgetRef ref) async {
     final id =
