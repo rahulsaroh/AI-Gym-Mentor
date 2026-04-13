@@ -12,6 +12,8 @@ import 'package:ai_gym_mentor/features/workout/providers/workout_home_notifier.d
 import 'package:ai_gym_mentor/features/workout/components/begin_session_sheet.dart';
 import 'package:ai_gym_mentor/services/plateau_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:ai_gym_mentor/features/workout/workout_repository.dart';
+
 import 'package:ai_gym_mentor/core/widgets/skeleton_card.dart';
 
 class WorkoutHomeScreen extends ConsumerWidget {
@@ -415,7 +417,10 @@ class _TodayPlanSection extends ConsumerWidget {
         ),
       ),
     );
+  }
+
   Future<void> _showDayOverridePicker(
+
       BuildContext context, WidgetRef ref, WorkoutHomeState state) async {
     final templateId = state.templateId;
     if (templateId == null) return;

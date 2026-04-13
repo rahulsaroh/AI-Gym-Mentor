@@ -58,7 +58,7 @@ class WorkoutHomeNotifier extends _$WorkoutHomeNotifier {
     return _fetchHomeData();
   }
 
-  Future<WorkoutHomeState> _fetchHomeData() async {
+  Future<WorkoutHomeState> _fetchHomeData({int? forcedDayId}) async {
     final workoutRepo = ref.read(workoutRepositoryProvider);
     final stats = await workoutRepo.getStats();
     final lastWorkout = await workoutRepo.getLastWorkout();
@@ -170,8 +170,8 @@ class WorkoutHomeNotifier extends _$WorkoutHomeNotifier {
           }
         }
 
-        final nextDay = (manualDayId != null) 
-            ? templateDays.firstWhere((d) => d.id == manualDayId, orElse: () => templateDays[nextDayIndex])
+        final nextDay = (forcedDayId != null) 
+            ? templateDays.firstWhere((d) => d.id == forcedDayId, orElse: () => templateDays[nextDayIndex])
             : templateDays[nextDayIndex];
             
         todayDayName = nextDay.name;
@@ -184,7 +184,7 @@ class WorkoutHomeNotifier extends _$WorkoutHomeNotifier {
         estimatedDuration =
             templateExercises.length * 12; // Estimate: 12 mins per exercise
 
-        isRestDay = completedToday && manualDayId == null;
+        isRestDay = completedToday && forcedDayId == null;
       }
     }
 
@@ -228,7 +228,7 @@ class WorkoutHomeNotifier extends _$WorkoutHomeNotifier {
     state = AsyncValue.data(currentState.copyWith(manualDayId: dayId));
     // Re-fetch to update exercises and name based on this new day
     state = await AsyncValue.guard(() async {
-      final fresh = await _fetchHomeData();
+      final fresh = await _fetchHomeData(forcedDayId: dayId);
       return fresh.copyWith(manualDayId: dayId);
     });
   }

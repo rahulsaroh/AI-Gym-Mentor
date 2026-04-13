@@ -335,6 +335,7 @@ mixin _$WorkoutHomeState {
   int get estimatedDuration;
   int? get nextDayId;
   int? get templateId;
+  int? get manualDayId;
 
   /// Create a copy of WorkoutHomeState
   /// with the given fields replaced by the non-null parameter values.
@@ -380,7 +381,9 @@ mixin _$WorkoutHomeState {
             (identical(other.nextDayId, nextDayId) ||
                 other.nextDayId == nextDayId) &&
             (identical(other.templateId, templateId) ||
-                other.templateId == templateId));
+                other.templateId == templateId) &&
+            (identical(other.manualDayId, manualDayId) ||
+                other.manualDayId == manualDayId));
   }
 
   @override
@@ -401,11 +404,12 @@ mixin _$WorkoutHomeState {
       const DeepCollectionEquality().hash(todayExercises),
       estimatedDuration,
       nextDayId,
-      templateId);
+      templateId,
+      manualDayId);
 
   @override
   String toString() {
-    return 'WorkoutHomeState(greeting: $greeting, userName: $userName, dateString: $dateString, currentStreak: $currentStreak, dailyTip: $dailyTip, lastWorkout: $lastWorkout, activeDraft: $activeDraft, weeklyVolume: $weeklyVolume, lastWeight: $lastWeight, lastWorkoutSummary: $lastWorkoutSummary, isRestDay: $isRestDay, todayDayName: $todayDayName, todayExercises: $todayExercises, estimatedDuration: $estimatedDuration, nextDayId: $nextDayId, templateId: $templateId)';
+    return 'WorkoutHomeState(greeting: $greeting, userName: $userName, dateString: $dateString, currentStreak: $currentStreak, dailyTip: $dailyTip, lastWorkout: $lastWorkout, activeDraft: $activeDraft, weeklyVolume: $weeklyVolume, lastWeight: $lastWeight, lastWorkoutSummary: $lastWorkoutSummary, isRestDay: $isRestDay, todayDayName: $todayDayName, todayExercises: $todayExercises, estimatedDuration: $estimatedDuration, nextDayId: $nextDayId, templateId: $templateId, manualDayId: $manualDayId)';
   }
 }
 
@@ -431,7 +435,8 @@ abstract mixin class $WorkoutHomeStateCopyWith<$Res> {
       List<String> todayExercises,
       int estimatedDuration,
       int? nextDayId,
-      int? templateId});
+      int? templateId,
+      int? manualDayId});
 
   $MotivationTipCopyWith<$Res> get dailyTip;
   $WorkoutSessionCopyWith<$Res>? get lastWorkout;
@@ -468,6 +473,7 @@ class _$WorkoutHomeStateCopyWithImpl<$Res>
     Object? estimatedDuration = null,
     Object? nextDayId = freezed,
     Object? templateId = freezed,
+    Object? manualDayId = freezed,
   }) {
     return _then(_self.copyWith(
       greeting: null == greeting
@@ -533,6 +539,10 @@ class _$WorkoutHomeStateCopyWithImpl<$Res>
       templateId: freezed == templateId
           ? _self.templateId
           : templateId // ignore: cast_nullable_to_non_nullable
+              as int?,
+      manualDayId: freezed == manualDayId
+          ? _self.manualDayId
+          : manualDayId // ignore: cast_nullable_to_non_nullable
               as int?,
     ));
   }
@@ -699,7 +709,8 @@ extension WorkoutHomeStatePatterns on WorkoutHomeState {
             List<String> todayExercises,
             int estimatedDuration,
             int? nextDayId,
-            int? templateId)?
+            int? templateId,
+            int? manualDayId)?
         $default, {
     required TResult orElse(),
   }) {
@@ -722,7 +733,8 @@ extension WorkoutHomeStatePatterns on WorkoutHomeState {
             _that.todayExercises,
             _that.estimatedDuration,
             _that.nextDayId,
-            _that.templateId);
+            _that.templateId,
+            _that.manualDayId);
       case _:
         return orElse();
     }
@@ -759,7 +771,8 @@ extension WorkoutHomeStatePatterns on WorkoutHomeState {
             List<String> todayExercises,
             int estimatedDuration,
             int? nextDayId,
-            int? templateId)
+            int? templateId,
+            int? manualDayId)
         $default,
   ) {
     final _that = this;
@@ -781,7 +794,8 @@ extension WorkoutHomeStatePatterns on WorkoutHomeState {
             _that.todayExercises,
             _that.estimatedDuration,
             _that.nextDayId,
-            _that.templateId);
+            _that.templateId,
+            _that.manualDayId);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -817,7 +831,8 @@ extension WorkoutHomeStatePatterns on WorkoutHomeState {
             List<String> todayExercises,
             int estimatedDuration,
             int? nextDayId,
-            int? templateId)?
+            int? templateId,
+            int? manualDayId)?
         $default,
   ) {
     final _that = this;
@@ -839,7 +854,8 @@ extension WorkoutHomeStatePatterns on WorkoutHomeState {
             _that.todayExercises,
             _that.estimatedDuration,
             _that.nextDayId,
-            _that.templateId);
+            _that.templateId,
+            _that.manualDayId);
       case _:
         return null;
     }
@@ -865,7 +881,8 @@ class _WorkoutHomeState extends WorkoutHomeState {
       final List<String> todayExercises = const [],
       this.estimatedDuration = 0,
       this.nextDayId,
-      this.templateId})
+      this.templateId,
+      this.manualDayId})
       : _weeklyVolume = weeklyVolume,
         _todayExercises = todayExercises,
         super._();
@@ -921,6 +938,8 @@ class _WorkoutHomeState extends WorkoutHomeState {
   final int? nextDayId;
   @override
   final int? templateId;
+  @override
+  final int? manualDayId;
 
   /// Create a copy of WorkoutHomeState
   /// with the given fields replaced by the non-null parameter values.
@@ -966,7 +985,9 @@ class _WorkoutHomeState extends WorkoutHomeState {
             (identical(other.nextDayId, nextDayId) ||
                 other.nextDayId == nextDayId) &&
             (identical(other.templateId, templateId) ||
-                other.templateId == templateId));
+                other.templateId == templateId) &&
+            (identical(other.manualDayId, manualDayId) ||
+                other.manualDayId == manualDayId));
   }
 
   @override
@@ -987,11 +1008,12 @@ class _WorkoutHomeState extends WorkoutHomeState {
       const DeepCollectionEquality().hash(_todayExercises),
       estimatedDuration,
       nextDayId,
-      templateId);
+      templateId,
+      manualDayId);
 
   @override
   String toString() {
-    return 'WorkoutHomeState(greeting: $greeting, userName: $userName, dateString: $dateString, currentStreak: $currentStreak, dailyTip: $dailyTip, lastWorkout: $lastWorkout, activeDraft: $activeDraft, weeklyVolume: $weeklyVolume, lastWeight: $lastWeight, lastWorkoutSummary: $lastWorkoutSummary, isRestDay: $isRestDay, todayDayName: $todayDayName, todayExercises: $todayExercises, estimatedDuration: $estimatedDuration, nextDayId: $nextDayId, templateId: $templateId)';
+    return 'WorkoutHomeState(greeting: $greeting, userName: $userName, dateString: $dateString, currentStreak: $currentStreak, dailyTip: $dailyTip, lastWorkout: $lastWorkout, activeDraft: $activeDraft, weeklyVolume: $weeklyVolume, lastWeight: $lastWeight, lastWorkoutSummary: $lastWorkoutSummary, isRestDay: $isRestDay, todayDayName: $todayDayName, todayExercises: $todayExercises, estimatedDuration: $estimatedDuration, nextDayId: $nextDayId, templateId: $templateId, manualDayId: $manualDayId)';
   }
 }
 
@@ -1019,7 +1041,8 @@ abstract mixin class _$WorkoutHomeStateCopyWith<$Res>
       List<String> todayExercises,
       int estimatedDuration,
       int? nextDayId,
-      int? templateId});
+      int? templateId,
+      int? manualDayId});
 
   @override
   $MotivationTipCopyWith<$Res> get dailyTip;
@@ -1060,6 +1083,7 @@ class __$WorkoutHomeStateCopyWithImpl<$Res>
     Object? estimatedDuration = null,
     Object? nextDayId = freezed,
     Object? templateId = freezed,
+    Object? manualDayId = freezed,
   }) {
     return _then(_WorkoutHomeState(
       greeting: null == greeting
@@ -1125,6 +1149,10 @@ class __$WorkoutHomeStateCopyWithImpl<$Res>
       templateId: freezed == templateId
           ? _self.templateId
           : templateId // ignore: cast_nullable_to_non_nullable
+              as int?,
+      manualDayId: freezed == manualDayId
+          ? _self.manualDayId
+          : manualDayId // ignore: cast_nullable_to_non_nullable
               as int?,
     ));
   }
