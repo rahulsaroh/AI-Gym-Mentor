@@ -59,10 +59,8 @@ class _ProgramsScreenState extends ConsumerState<ProgramsScreen> {
                 final filteredTemplates = _selectedGoal == 'All Goals'
                     ? state.templates
                     : state.templates.where((t) {
-                        // Assuming goal or tags contains the selected goal
-                        // We check both the 'goal' field and 'description' as fallback
-                        final g = (t as dynamic).goal?.toString().toLowerCase() ?? '';
-                        return g.contains(_selectedGoal.toLowerCase());
+                        final desc = t.description?.toLowerCase() ?? '';
+                        return desc.contains(_selectedGoal.toLowerCase());
                       }).toList();
 
                 if (state.templates.isEmpty) {
@@ -349,8 +347,8 @@ class _ProgramCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // Determine colors based on goal
-    final goal = (template as dynamic).goal?.toString() ?? 'Aesthetics';
-    final duration = (template as dynamic).duration?.toString() ?? '12 weeks';
+    final goal = 'Aesthetics'; // Fallback since WorkoutProgram doesn't have a goal property
+    final duration = '12 weeks'; // Fallback since WorkoutProgram doesn't have a duration property
 
     return Card(
       margin: const EdgeInsets.only(bottom: 20),

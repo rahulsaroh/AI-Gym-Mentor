@@ -86,8 +86,8 @@ class ProgramDetailScreen extends ConsumerWidget {
   }
 
   Widget _buildHeader(BuildContext context, ent.WorkoutProgram program) {
-    final duration = (program as dynamic).duration?.toString() ?? '12 Weeks';
-    final goal = (program as dynamic).goal?.toString() ?? 'Aesthetics';
+    final duration = '12 Weeks'; // Fallback
+    final goal = 'Aesthetics'; // Fallback
 
     return SliverToBoxAdapter(
       child: Padding(
