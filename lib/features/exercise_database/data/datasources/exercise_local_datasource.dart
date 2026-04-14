@@ -19,26 +19,26 @@ class ExerciseLocalDatasource {
     final query = _db.select(_db.exercises);
 
     if (category != null) {
-      query.where((t) => t.category.equals(category));
+      query.where((t) => t.category.lower().equals(category.toLowerCase()));
     }
     if (equipment != null) {
-      query.where((t) => t.equipment.equals(equipment));
+      query.where((t) => t.equipment.lower().equals(equipment.toLowerCase()));
     }
     if (level != null) {
-      query.where((t) => t.difficulty.equals(level));
+      query.where((t) => t.difficulty.lower().equals(level.toLowerCase()));
     }
     if (favoritesOnly) {
       query.where((t) => t.isFavorite.equals(true));
     }
     if (bodyPart != null) {
       final exerciseIds = await (_db.select(_db.exerciseBodyParts)
-        ..where((t) => t.bodyPart.equals(bodyPart)))
+        ..where((t) => t.bodyPart.lower().equals(bodyPart.toLowerCase())))
         .get();
       final ids = exerciseIds.map((e) => e.exerciseId).toList();
       if (ids.isNotEmpty) {
         query.where((t) => t.id.isIn(ids));
       } else {
-        return []; // Body part filter active but no exercises found
+        return [];
       }
     }
 
@@ -127,7 +127,7 @@ class ExerciseLocalDatasource {
   Future<void> markRecentlyViewed(int exerciseId) async {
     await _db.into(_db.recentExercises).insertOnConflictUpdate(
       RecentExercisesCompanion.insert(
-        exerciseId: exerciseId,
+        exerciseId: Value(exerciseId),
         viewedAt: DateTime.now(),
       ),
     );
@@ -143,8 +143,12 @@ class ExerciseLocalDatasource {
   }
 
   Future<void> toggleFavorite(int exerciseId, bool isFavorite) async {
-    await (_db.update(_db.exercises)..where((t) => t.id.equals(exerciseId)))
-        .write(ExercisesCompanion(isFavorite: Value(isFavorite)));
+    await updateExercise(exerciseId, ExercisesCompanion(isFavorite: Value(isFavorite)));
+  }
+
+  Future<void> updateExercise(int id, ExercisesCompanion companion) async {
+    await (_db.update(_db.exercises)..where((t) => t.id.equals(id)))
+        .write(companion);
   }
 
   Future<List<String>> getAvailableBodyParts() async {

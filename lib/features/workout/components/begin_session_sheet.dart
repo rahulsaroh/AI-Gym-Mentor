@@ -206,8 +206,9 @@ class BeginSessionSheet extends ConsumerWidget {
         );
 
     if (context.mounted) {
-      Navigator.pop(context);
-      context.push('/app/workout/active?id=$id&dayId=$selectedDayId');
+      final router = GoRouter.of(context);
+      Navigator.pop(context); // Close sheet after creation
+      router.push('/app/workout/active?id=$id&dayId=$selectedDayId');
     }
   }
 
@@ -218,8 +219,9 @@ class BeginSessionSheet extends ConsumerWidget {
               name: 'Quick Workout',
             );
     if (context.mounted) {
-      Navigator.pop(context);
-      context.push('/app/workout/active?id=$id');
+      final router = GoRouter.of(context);
+      Navigator.pop(context); // Close sheet AFTER creation
+      router.push('/app/workout/active?id=$id');
     }
   }
 }
@@ -233,8 +235,9 @@ class _ResumeCard extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     return GestureDetector(
       onTap: () {
+        final router = GoRouter.of(context);
         Navigator.pop(context);
-        context.push('/app/workout/active?id=${workout.id}');
+        router.push('/app/workout/active?id=${workout.id}');
       },
       child: Container(
         margin: const EdgeInsets.only(bottom: 24),

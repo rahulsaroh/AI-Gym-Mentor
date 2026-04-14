@@ -8,10 +8,11 @@ import 'package:ai_gym_mentor/core/services/notification_service.dart';
 import 'package:ai_gym_mentor/core/services/timer_service.dart';
 import 'package:ai_gym_mentor/features/settings/models/settings_state.dart';
 import 'package:ai_gym_mentor/features/settings/settings_provider.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:ai_gym_mentor/l10n/app_localizations.dart';
 import 'package:ai_gym_mentor/services/background_worker.dart';
 import 'package:ai_gym_mentor/features/exercise_database/data/datasources/exercise_db_seeder.dart';
-
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 void main() async {
   // Ensure Flutter is initialized before any async code
@@ -100,6 +101,17 @@ class GymGeminiApp extends ConsumerWidget {
             Brightness.light, settings.accentColor, settings.fontSize),
         darkTheme: _buildTheme(
             Brightness.dark, settings.accentColor, settings.fontSize),
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: const [
+          Locale('en'), // English
+          Locale('hi'), // Hindi
+          Locale('mr'), // Marathi
+        ],
         routerConfig: router,
         builder: (context, child) {
           return AnimatedTheme(

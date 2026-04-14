@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:go_router/go_router.dart';
@@ -14,6 +15,7 @@ import 'package:ai_gym_mentor/features/exercise_database/presentation/providers/
 import 'package:ai_gym_mentor/features/exercise_database/presentation/providers/repository_provider.dart';
 import 'package:ai_gym_mentor/features/exercise_database/data/models/exercise_filter_model.dart';
 import 'package:ai_gym_mentor/features/exercise_database/domain/entities/exercise_entity.dart';
+import 'package:ai_gym_mentor/l10n/app_localizations.dart';
 
 class ExerciseListScreen extends ConsumerStatefulWidget {
   final bool selectionMode;
@@ -54,12 +56,21 @@ class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
 
   static const List<String> equipmentFilters = [
     'All',
-    'Bodyweight',
     'Barbell',
     'Dumbbell',
     'Cable',
     'Machine',
+    'Bodyweight',
+    'Kettlebell',
+    'Band',
+    'Plate',
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+  }
 
   @override
   void dispose() {
@@ -76,6 +87,13 @@ class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
         (filter) => filter.copyWith(searchQuery: query),
       );
     });
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 200) {
+      ref.read(exerciseListProvider.notifier).loadMore();
+    }
   }
 
   @override
@@ -108,7 +126,7 @@ class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
                       Padding(
                         padding: const EdgeInsets.fromLTRB(20, 24, 20, 12),
                         child: Text(
-                          'Recently Viewed',
+                          AppLocalizations.of(context)!.recently_viewed,
                           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                                 fontWeight: FontWeight.bold,
                                 letterSpacing: 0.5,
@@ -153,6 +171,11 @@ class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
               if (exercises.isEmpty) {
                 return _buildEmptyState(context);
               }
+
+              // Prefetch images for performance (Phase 8.4)
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                _prefetchFirstImages(exercises, context);
+              });
 
               return SliverPadding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -231,7 +254,9 @@ class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
         centerTitle: false,
         titlePadding: const EdgeInsets.only(left: 20, bottom: 16),
         title: Text(
-          widget.selectionMode ? 'Select Exercise' : 'Library',
+          widget.selectionMode 
+            ? AppLocalizations.of(context)!.select_exercise 
+            : AppLocalizations.of(context)!.library,
           style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.bold,
                 color: Theme.of(context).colorScheme.onSurface,
@@ -280,82 +305,134 @@ class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
   ) {
     return SliverToBoxAdapter(
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
-            child: Container(
-              decoration: BoxDecoration(
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.05),
-                    blurRadius: 20,
-                    offset: const Offset(0, 10),
-                  ),
-                ],
-              ),
-              child: TextField(
-                controller: _searchController,
-                onChanged: _onSearchChanged,
-                style: const TextStyle(fontSize: 15),
-                decoration: InputDecoration(
-                  hintText: 'Search movements, muscles...',
-                  hintStyle: TextStyle(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.7)),
-                  prefixIcon: Icon(LucideIcons.search, size: 20, color: Theme.of(context).colorScheme.primary),
-                  filled: true,
-                  fillColor: Theme.of(context).colorScheme.surface,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: BorderSide(color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.5)),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: BorderSide(color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.3)),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: BorderSide(color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.5), width: 1.5),
-                  ),
+            child: TextField(
+              controller: _searchController,
+              onChanged: _onSearchChanged,
+              style: const TextStyle(fontSize: 15),
+              decoration: InputDecoration(
+                hintText: AppLocalizations.of(context)!.search_hint,
+                prefixIcon: Icon(LucideIcons.search, size: 20, color: Theme.of(context).colorScheme.primary),
+                suffixIcon: _searchController.text.isNotEmpty 
+                  ? IconButton(
+                      icon: const Icon(LucideIcons.x, size: 16),
+                      onPressed: () {
+                        _searchController.clear();
+                        _onSearchChanged('');
+                      },
+                    )
+                  : null,
+                filled: true,
+                fillColor: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
                 ),
               ),
             ),
           ),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Row(
-              children: [
-                _buildFilterChip('Part: ${filter.bodyPart ?? "All"}', filter.bodyPart != null, () {
-                   _showFilterSheet(context, 'Body Part', bodyPartAsync.value ?? [], filter.bodyPart, (val) {
-                    ref.read(exerciseFilterStateProvider.notifier).updateFilter((s) => s.copyWith(bodyPart: val == 'All' ? null : val));
-                   });
-                }),
-                const SizedBox(width: 8),
-                _buildFilterChip('Difficulty: ${filter.difficulty ?? "All"}', filter.difficulty != null, () {
-                  _showFilterSheet(context, 'Difficulty', difficultyFilters, filter.difficulty, (val) {
-                    ref.read(exerciseFilterStateProvider.notifier).updateFilter((s) => s.copyWith(difficulty: val == 'All' ? null : val));
-                   });
-                }),
-                const SizedBox(width: 8),
-                _buildFilterChip('Equip: ${filter.equipment ?? "All"}', filter.equipment != null, () {
-                   _showFilterSheet(context, 'Equipment', equipmentAsync.value ?? [], filter.equipment, (val) {
-                    ref.read(exerciseFilterStateProvider.notifier).updateFilter((s) => s.copyWith(equipment: val == 'All' ? null : val));
-                   });
-                }),
-                if (filter.isActive) ...[
-                  const SizedBox(width: 12),
-                  TextButton(
-                    onPressed: () {
-                      _searchController.clear();
-                      ref.read(exerciseFilterStateProvider.notifier).updateFilter((_) => const ExerciseFilter());
-                    },
-                    child: const Text('Reset'),
-                  ),
-                ],
-              ],
+          
+          // Body Part Horizontal Filter
+          _buildFilterHeader('Body Part'),
+          SizedBox(
+            height: 50,
+            child: bodyPartAsync.when(
+              data: (parts) {
+                final displayParts = ['All', ...parts];
+                return ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  itemCount: displayParts.length,
+                  itemBuilder: (context, index) {
+                    final part = displayParts[index];
+                    final isSelected = (part == 'All' && filter.bodyPart == null) || filter.bodyPart == part;
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: ChoiceChip(
+                        label: Text(part),
+                        selected: isSelected,
+                        onSelected: (selected) {
+                          ref.read(exerciseFilterStateProvider.notifier).updateFilter(
+                            (s) => s.copyWith(bodyPart: part == 'All' ? null : part)
+                          );
+                        },
+                        showCheckmark: false,
+                        labelStyle: TextStyle(
+                          color: isSelected ? Theme.of(context).colorScheme.onPrimary : null,
+                          fontWeight: isSelected ? FontWeight.bold : null,
+                        ),
+                        selectedColor: Theme.of(context).colorScheme.primary,
+                      ),
+                    );
+                  },
+                );
+              },
+              loading: () => Center(child: CupertinoActivityIndicator()),
+              error: (_, __) => const SizedBox.shrink(),
             ),
           ),
+          const SizedBox(height: 12),
+          
+          // Equipment Horizontal Filter
+          _buildFilterHeader('Equipment'),
+          SizedBox(
+            height: 50,
+            child: equipmentAsync.when(
+              data: (equips) {
+                final displayEquips = ['All', ...equips];
+                return ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  itemCount: displayEquips.length,
+                  itemBuilder: (context, index) {
+                    final equip = displayEquips[index];
+                    final isSelected = (equip == 'All' && filter.equipment == null) || filter.equipment == equip;
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: ChoiceChip(
+                        label: Text(equip),
+                        selected: isSelected,
+                        onSelected: (selected) {
+                          ref.read(exerciseFilterStateProvider.notifier).updateFilter(
+                            (s) => s.copyWith(equipment: equip == 'All' ? null : equip)
+                          );
+                        },
+                        showCheckmark: false,
+                        labelStyle: TextStyle(
+                          color: isSelected ? Theme.of(context).colorScheme.onPrimary : null,
+                          fontWeight: isSelected ? FontWeight.bold : null,
+                        ),
+                        selectedColor: Theme.of(context).colorScheme.primary,
+                      ),
+                    );
+                  },
+                );
+              },
+              loading: () => Center(child: CupertinoActivityIndicator()),
+              error: (_, __) => const SizedBox.shrink(),
+            ),
+          ),
+          const SizedBox(height: 16),
         ],
+      ),
+    );
+  }
+
+  Widget _buildFilterHeader(String title) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
+      child: Text(
+        title.toUpperCase(),
+        style: TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w900,
+          color: Theme.of(context).colorScheme.outline,
+          letterSpacing: 1.2,
+        ),
       ),
     );
   }
@@ -414,6 +491,14 @@ class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
     );
   }
 
+  void _prefetchFirstImages(List<ExerciseEntity> exercises, BuildContext context) {
+    for (final ex in exercises.take(10)) {
+      if (ex.imageUrls.isNotEmpty) {
+        precacheImage(CachedNetworkImageProvider(ex.imageUrls.first), context);
+      }
+    }
+  }
+
   Widget _buildEmptyState(BuildContext context) {
     return SliverFillRemaining(
       hasScrollBody: false,
@@ -430,7 +515,7 @@ class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
               child: Icon(LucideIcons.searchX, size: 48, color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.5)),
             ),
             const SizedBox(height: 24),
-            Text('No Exercises Found', style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+            Text(AppLocalizations.of(context)!.no_exercises_found, style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
             Text(
               'Try adjusting your search or filters.',
@@ -443,7 +528,7 @@ class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
                 _searchController.clear();
                 ref.read(exerciseFilterStateProvider.notifier).updateFilter((_) => const ExerciseFilter());
               },
-              child: const Text('Clear All Filters'),
+              child: Text(AppLocalizations.of(context)!.clear_all_filters),
             ),
           ],
         ),
@@ -551,19 +636,35 @@ class _ExercisePremiumCard extends StatelessWidget {
             padding: const EdgeInsets.all(12),
             child: Row(
               children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(14),
-                  child: Hero(
-                    tag: 'ex_${exercise.id}',
-                    child: exercise.imageUrls.isNotEmpty
-                        ? CachedNetworkImage(
-                            imageUrl: exercise.imageUrls.first,
-                            width: 70,
-                            height: 70,
-                            fit: BoxFit.cover,
-                            errorWidget: (_, __, ___) => _FallbackImage(name: exercise.name, size: 70),
-                          )
-                        : _FallbackImage(name: exercise.name, size: 70),
+                SizedBox(
+                  width: 70,
+                  height: 70,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(14),
+                    child: Hero(
+                      tag: 'ex_${exercise.id}',
+                      child: Stack(
+                        fit: StackFit.expand,
+                        children: [
+                          exercise.imageUrls.isNotEmpty
+                              ? CachedNetworkImage(
+                                  imageUrl: exercise.imageUrls.first,
+                                  width: 70,
+                                  height: 70,
+                                  fit: BoxFit.cover,
+                                  errorWidget: (_, __, ___) => _FallbackImage(name: exercise.name, size: 70),
+                                )
+                              : _FallbackImage(name: exercise.name, size: 70),
+                          if (selectionMode)
+                            Container(
+                              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
+                              child: const Center(
+                                child: Icon(Icons.check_circle, color: Colors.white, size: 24),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
                 const SizedBox(width: 16),

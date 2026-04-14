@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 /// A Speed Dial FAB that expands to show mini-FABs on long press.
 /// Main FAB icon rotates 45° and mini-FABs slide up with stagger.
 class SpeedDialFab extends StatefulWidget {
+  final String? heroTagPrefix;
   final IconData icon;
   final List<SpeedDialChild> children;
   final Color? backgroundColor;
@@ -10,6 +11,7 @@ class SpeedDialFab extends StatefulWidget {
 
   const SpeedDialFab({
     super.key,
+    this.heroTagPrefix,
     required this.icon,
     required this.children,
     this.backgroundColor,
@@ -100,7 +102,7 @@ class _SpeedDialFabState extends State<SpeedDialFab>
                               const SizedBox(width: 8),
                             ],
                             FloatingActionButton.small(
-                              heroTag: 'speed_dial_${child.label ?? index}',
+                              heroTag: '${widget.heroTagPrefix ?? 'speed_dial'}_${child.label ?? index}',
                               onPressed: () {
                                 _toggle();
                                 child.onTap?.call();
@@ -138,7 +140,7 @@ class _SpeedDialFabState extends State<SpeedDialFab>
             }
           },
           child: FloatingActionButton(
-            heroTag: 'speed_dial_main',
+            heroTag: '${widget.heroTagPrefix ?? 'speed_dial'}_main',
             onPressed: null,
             backgroundColor:
                 widget.backgroundColor ?? Theme.of(context).colorScheme.primary,

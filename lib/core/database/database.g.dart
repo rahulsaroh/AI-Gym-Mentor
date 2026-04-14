@@ -157,6 +157,16 @@ class $ExercisesTable extends Exercises
       defaultConstraints:
           GeneratedColumn.constraintIsAlways('CHECK ("is_enriched" IN (0, 1))'),
       defaultValue: const Constant(false));
+  static const VerificationMeta _nameHiMeta = const VerificationMeta('nameHi');
+  @override
+  late final GeneratedColumn<String> nameHi = GeneratedColumn<String>(
+      'name_hi', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _nameMrMeta = const VerificationMeta('nameMr');
+  @override
+  late final GeneratedColumn<String> nameMr = GeneratedColumn<String>(
+      'name_mr', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
   static const VerificationMeta _lastUsedMeta =
       const VerificationMeta('lastUsed');
   @override
@@ -186,6 +196,8 @@ class $ExercisesTable extends Exercises
         isCustom,
         isFavorite,
         isEnriched,
+        nameHi,
+        nameMr,
         lastUsed
       ];
   @override
@@ -305,6 +317,14 @@ class $ExercisesTable extends Exercises
           isEnriched.isAcceptableOrUnknown(
               data['is_enriched']!, _isEnrichedMeta));
     }
+    if (data.containsKey('name_hi')) {
+      context.handle(_nameHiMeta,
+          nameHi.isAcceptableOrUnknown(data['name_hi']!, _nameHiMeta));
+    }
+    if (data.containsKey('name_mr')) {
+      context.handle(_nameMrMeta,
+          nameMr.isAcceptableOrUnknown(data['name_mr']!, _nameMrMeta));
+    }
     if (data.containsKey('last_used')) {
       context.handle(_lastUsedMeta,
           lastUsed.isAcceptableOrUnknown(data['last_used']!, _lastUsedMeta));
@@ -360,6 +380,10 @@ class $ExercisesTable extends Exercises
           .read(DriftSqlType.bool, data['${effectivePrefix}is_favorite'])!,
       isEnriched: attachedDatabase.typeMapping
           .read(DriftSqlType.bool, data['${effectivePrefix}is_enriched'])!,
+      nameHi: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}name_hi']),
+      nameMr: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}name_mr']),
       lastUsed: attachedDatabase.typeMapping
           .read(DriftSqlType.dateTime, data['${effectivePrefix}last_used']),
     );
@@ -393,6 +417,8 @@ class ExerciseTable extends DataClass implements Insertable<ExerciseTable> {
   final bool isCustom;
   final bool isFavorite;
   final bool isEnriched;
+  final String? nameHi;
+  final String? nameMr;
   final DateTime? lastUsed;
   const ExerciseTable(
       {required this.id,
@@ -416,6 +442,8 @@ class ExerciseTable extends DataClass implements Insertable<ExerciseTable> {
       required this.isCustom,
       required this.isFavorite,
       required this.isEnriched,
+      this.nameHi,
+      this.nameMr,
       this.lastUsed});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -459,6 +487,12 @@ class ExerciseTable extends DataClass implements Insertable<ExerciseTable> {
     map['is_custom'] = Variable<bool>(isCustom);
     map['is_favorite'] = Variable<bool>(isFavorite);
     map['is_enriched'] = Variable<bool>(isEnriched);
+    if (!nullToAbsent || nameHi != null) {
+      map['name_hi'] = Variable<String>(nameHi);
+    }
+    if (!nullToAbsent || nameMr != null) {
+      map['name_mr'] = Variable<String>(nameMr);
+    }
     if (!nullToAbsent || lastUsed != null) {
       map['last_used'] = Variable<DateTime>(lastUsed);
     }
@@ -504,6 +538,10 @@ class ExerciseTable extends DataClass implements Insertable<ExerciseTable> {
       isCustom: Value(isCustom),
       isFavorite: Value(isFavorite),
       isEnriched: Value(isEnriched),
+      nameHi:
+          nameHi == null && nullToAbsent ? const Value.absent() : Value(nameHi),
+      nameMr:
+          nameMr == null && nullToAbsent ? const Value.absent() : Value(nameMr),
       lastUsed: lastUsed == null && nullToAbsent
           ? const Value.absent()
           : Value(lastUsed),
@@ -535,6 +573,8 @@ class ExerciseTable extends DataClass implements Insertable<ExerciseTable> {
       isCustom: serializer.fromJson<bool>(json['isCustom']),
       isFavorite: serializer.fromJson<bool>(json['isFavorite']),
       isEnriched: serializer.fromJson<bool>(json['isEnriched']),
+      nameHi: serializer.fromJson<String?>(json['nameHi']),
+      nameMr: serializer.fromJson<String?>(json['nameMr']),
       lastUsed: serializer.fromJson<DateTime?>(json['lastUsed']),
     );
   }
@@ -563,6 +603,8 @@ class ExerciseTable extends DataClass implements Insertable<ExerciseTable> {
       'isCustom': serializer.toJson<bool>(isCustom),
       'isFavorite': serializer.toJson<bool>(isFavorite),
       'isEnriched': serializer.toJson<bool>(isEnriched),
+      'nameHi': serializer.toJson<String?>(nameHi),
+      'nameMr': serializer.toJson<String?>(nameMr),
       'lastUsed': serializer.toJson<DateTime?>(lastUsed),
     };
   }
@@ -589,6 +631,8 @@ class ExerciseTable extends DataClass implements Insertable<ExerciseTable> {
           bool? isCustom,
           bool? isFavorite,
           bool? isEnriched,
+          Value<String?> nameHi = const Value.absent(),
+          Value<String?> nameMr = const Value.absent(),
           Value<DateTime?> lastUsed = const Value.absent()}) =>
       ExerciseTable(
         id: id ?? this.id,
@@ -615,6 +659,8 @@ class ExerciseTable extends DataClass implements Insertable<ExerciseTable> {
         isCustom: isCustom ?? this.isCustom,
         isFavorite: isFavorite ?? this.isFavorite,
         isEnriched: isEnriched ?? this.isEnriched,
+        nameHi: nameHi.present ? nameHi.value : this.nameHi,
+        nameMr: nameMr.present ? nameMr.value : this.nameMr,
         lastUsed: lastUsed.present ? lastUsed.value : this.lastUsed,
       );
   ExerciseTable copyWithCompanion(ExercisesCompanion data) {
@@ -651,6 +697,8 @@ class ExerciseTable extends DataClass implements Insertable<ExerciseTable> {
           data.isFavorite.present ? data.isFavorite.value : this.isFavorite,
       isEnriched:
           data.isEnriched.present ? data.isEnriched.value : this.isEnriched,
+      nameHi: data.nameHi.present ? data.nameHi.value : this.nameHi,
+      nameMr: data.nameMr.present ? data.nameMr.value : this.nameMr,
       lastUsed: data.lastUsed.present ? data.lastUsed.value : this.lastUsed,
     );
   }
@@ -679,6 +727,8 @@ class ExerciseTable extends DataClass implements Insertable<ExerciseTable> {
           ..write('isCustom: $isCustom, ')
           ..write('isFavorite: $isFavorite, ')
           ..write('isEnriched: $isEnriched, ')
+          ..write('nameHi: $nameHi, ')
+          ..write('nameMr: $nameMr, ')
           ..write('lastUsed: $lastUsed')
           ..write(')'))
         .toString();
@@ -707,6 +757,8 @@ class ExerciseTable extends DataClass implements Insertable<ExerciseTable> {
         isCustom,
         isFavorite,
         isEnriched,
+        nameHi,
+        nameMr,
         lastUsed
       ]);
   @override
@@ -734,6 +786,8 @@ class ExerciseTable extends DataClass implements Insertable<ExerciseTable> {
           other.isCustom == this.isCustom &&
           other.isFavorite == this.isFavorite &&
           other.isEnriched == this.isEnriched &&
+          other.nameHi == this.nameHi &&
+          other.nameMr == this.nameMr &&
           other.lastUsed == this.lastUsed);
 }
 
@@ -759,6 +813,8 @@ class ExercisesCompanion extends UpdateCompanion<ExerciseTable> {
   final Value<bool> isCustom;
   final Value<bool> isFavorite;
   final Value<bool> isEnriched;
+  final Value<String?> nameHi;
+  final Value<String?> nameMr;
   final Value<DateTime?> lastUsed;
   const ExercisesCompanion({
     this.id = const Value.absent(),
@@ -782,6 +838,8 @@ class ExercisesCompanion extends UpdateCompanion<ExerciseTable> {
     this.isCustom = const Value.absent(),
     this.isFavorite = const Value.absent(),
     this.isEnriched = const Value.absent(),
+    this.nameHi = const Value.absent(),
+    this.nameMr = const Value.absent(),
     this.lastUsed = const Value.absent(),
   });
   ExercisesCompanion.insert({
@@ -806,6 +864,8 @@ class ExercisesCompanion extends UpdateCompanion<ExerciseTable> {
     this.isCustom = const Value.absent(),
     this.isFavorite = const Value.absent(),
     this.isEnriched = const Value.absent(),
+    this.nameHi = const Value.absent(),
+    this.nameMr = const Value.absent(),
     this.lastUsed = const Value.absent(),
   })  : name = Value(name),
         primaryMuscle = Value(primaryMuscle),
@@ -833,6 +893,8 @@ class ExercisesCompanion extends UpdateCompanion<ExerciseTable> {
     Expression<bool>? isCustom,
     Expression<bool>? isFavorite,
     Expression<bool>? isEnriched,
+    Expression<String>? nameHi,
+    Expression<String>? nameMr,
     Expression<DateTime>? lastUsed,
   }) {
     return RawValuesInsertable({
@@ -857,6 +919,8 @@ class ExercisesCompanion extends UpdateCompanion<ExerciseTable> {
       if (isCustom != null) 'is_custom': isCustom,
       if (isFavorite != null) 'is_favorite': isFavorite,
       if (isEnriched != null) 'is_enriched': isEnriched,
+      if (nameHi != null) 'name_hi': nameHi,
+      if (nameMr != null) 'name_mr': nameMr,
       if (lastUsed != null) 'last_used': lastUsed,
     });
   }
@@ -883,6 +947,8 @@ class ExercisesCompanion extends UpdateCompanion<ExerciseTable> {
       Value<bool>? isCustom,
       Value<bool>? isFavorite,
       Value<bool>? isEnriched,
+      Value<String?>? nameHi,
+      Value<String?>? nameMr,
       Value<DateTime?>? lastUsed}) {
     return ExercisesCompanion(
       id: id ?? this.id,
@@ -906,6 +972,8 @@ class ExercisesCompanion extends UpdateCompanion<ExerciseTable> {
       isCustom: isCustom ?? this.isCustom,
       isFavorite: isFavorite ?? this.isFavorite,
       isEnriched: isEnriched ?? this.isEnriched,
+      nameHi: nameHi ?? this.nameHi,
+      nameMr: nameMr ?? this.nameMr,
       lastUsed: lastUsed ?? this.lastUsed,
     );
   }
@@ -976,6 +1044,12 @@ class ExercisesCompanion extends UpdateCompanion<ExerciseTable> {
     if (isEnriched.present) {
       map['is_enriched'] = Variable<bool>(isEnriched.value);
     }
+    if (nameHi.present) {
+      map['name_hi'] = Variable<String>(nameHi.value);
+    }
+    if (nameMr.present) {
+      map['name_mr'] = Variable<String>(nameMr.value);
+    }
     if (lastUsed.present) {
       map['last_used'] = Variable<DateTime>(lastUsed.value);
     }
@@ -1006,6 +1080,8 @@ class ExercisesCompanion extends UpdateCompanion<ExerciseTable> {
           ..write('isCustom: $isCustom, ')
           ..write('isFavorite: $isFavorite, ')
           ..write('isEnriched: $isEnriched, ')
+          ..write('nameHi: $nameHi, ')
+          ..write('nameMr: $nameMr, ')
           ..write('lastUsed: $lastUsed')
           ..write(')'))
         .toString();
@@ -4185,6 +4261,603 @@ class BodyMeasurementsCompanion extends UpdateCompanion<BodyMeasurementTable> {
   }
 }
 
+class $BodyTargetsTable extends BodyTargets
+    with TableInfo<$BodyTargetsTable, BodyTarget> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $BodyTargetsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+      'id', aliasedName, false,
+      hasAutoIncrement: true,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+  static const VerificationMeta _metricMeta = const VerificationMeta('metric');
+  @override
+  late final GeneratedColumn<String> metric = GeneratedColumn<String>(
+      'metric', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _targetValueMeta =
+      const VerificationMeta('targetValue');
+  @override
+  late final GeneratedColumn<double> targetValue = GeneratedColumn<double>(
+      'target_value', aliasedName, false,
+      type: DriftSqlType.double, requiredDuringInsert: true);
+  static const VerificationMeta _deadlineMeta =
+      const VerificationMeta('deadline');
+  @override
+  late final GeneratedColumn<DateTime> deadline = GeneratedColumn<DateTime>(
+      'deadline', aliasedName, true,
+      type: DriftSqlType.dateTime, requiredDuringInsert: false);
+  static const VerificationMeta _createdAtMeta =
+      const VerificationMeta('createdAt');
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+      'created_at', aliasedName, false,
+      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  @override
+  List<GeneratedColumn> get $columns =>
+      [id, metric, targetValue, deadline, createdAt];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'body_targets';
+  @override
+  VerificationContext validateIntegrity(Insertable<BodyTarget> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('metric')) {
+      context.handle(_metricMeta,
+          metric.isAcceptableOrUnknown(data['metric']!, _metricMeta));
+    } else if (isInserting) {
+      context.missing(_metricMeta);
+    }
+    if (data.containsKey('target_value')) {
+      context.handle(
+          _targetValueMeta,
+          targetValue.isAcceptableOrUnknown(
+              data['target_value']!, _targetValueMeta));
+    } else if (isInserting) {
+      context.missing(_targetValueMeta);
+    }
+    if (data.containsKey('deadline')) {
+      context.handle(_deadlineMeta,
+          deadline.isAcceptableOrUnknown(data['deadline']!, _deadlineMeta));
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(_createdAtMeta,
+          createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  BodyTarget map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return BodyTarget(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
+      metric: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}metric'])!,
+      targetValue: attachedDatabase.typeMapping
+          .read(DriftSqlType.double, data['${effectivePrefix}target_value'])!,
+      deadline: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}deadline']),
+      createdAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
+    );
+  }
+
+  @override
+  $BodyTargetsTable createAlias(String alias) {
+    return $BodyTargetsTable(attachedDatabase, alias);
+  }
+}
+
+class BodyTarget extends DataClass implements Insertable<BodyTarget> {
+  final int id;
+  final String metric;
+  final double targetValue;
+  final DateTime? deadline;
+  final DateTime createdAt;
+  const BodyTarget(
+      {required this.id,
+      required this.metric,
+      required this.targetValue,
+      this.deadline,
+      required this.createdAt});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['metric'] = Variable<String>(metric);
+    map['target_value'] = Variable<double>(targetValue);
+    if (!nullToAbsent || deadline != null) {
+      map['deadline'] = Variable<DateTime>(deadline);
+    }
+    map['created_at'] = Variable<DateTime>(createdAt);
+    return map;
+  }
+
+  BodyTargetsCompanion toCompanion(bool nullToAbsent) {
+    return BodyTargetsCompanion(
+      id: Value(id),
+      metric: Value(metric),
+      targetValue: Value(targetValue),
+      deadline: deadline == null && nullToAbsent
+          ? const Value.absent()
+          : Value(deadline),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory BodyTarget.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return BodyTarget(
+      id: serializer.fromJson<int>(json['id']),
+      metric: serializer.fromJson<String>(json['metric']),
+      targetValue: serializer.fromJson<double>(json['targetValue']),
+      deadline: serializer.fromJson<DateTime?>(json['deadline']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'metric': serializer.toJson<String>(metric),
+      'targetValue': serializer.toJson<double>(targetValue),
+      'deadline': serializer.toJson<DateTime?>(deadline),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+    };
+  }
+
+  BodyTarget copyWith(
+          {int? id,
+          String? metric,
+          double? targetValue,
+          Value<DateTime?> deadline = const Value.absent(),
+          DateTime? createdAt}) =>
+      BodyTarget(
+        id: id ?? this.id,
+        metric: metric ?? this.metric,
+        targetValue: targetValue ?? this.targetValue,
+        deadline: deadline.present ? deadline.value : this.deadline,
+        createdAt: createdAt ?? this.createdAt,
+      );
+  BodyTarget copyWithCompanion(BodyTargetsCompanion data) {
+    return BodyTarget(
+      id: data.id.present ? data.id.value : this.id,
+      metric: data.metric.present ? data.metric.value : this.metric,
+      targetValue:
+          data.targetValue.present ? data.targetValue.value : this.targetValue,
+      deadline: data.deadline.present ? data.deadline.value : this.deadline,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('BodyTarget(')
+          ..write('id: $id, ')
+          ..write('metric: $metric, ')
+          ..write('targetValue: $targetValue, ')
+          ..write('deadline: $deadline, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, metric, targetValue, deadline, createdAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is BodyTarget &&
+          other.id == this.id &&
+          other.metric == this.metric &&
+          other.targetValue == this.targetValue &&
+          other.deadline == this.deadline &&
+          other.createdAt == this.createdAt);
+}
+
+class BodyTargetsCompanion extends UpdateCompanion<BodyTarget> {
+  final Value<int> id;
+  final Value<String> metric;
+  final Value<double> targetValue;
+  final Value<DateTime?> deadline;
+  final Value<DateTime> createdAt;
+  const BodyTargetsCompanion({
+    this.id = const Value.absent(),
+    this.metric = const Value.absent(),
+    this.targetValue = const Value.absent(),
+    this.deadline = const Value.absent(),
+    this.createdAt = const Value.absent(),
+  });
+  BodyTargetsCompanion.insert({
+    this.id = const Value.absent(),
+    required String metric,
+    required double targetValue,
+    this.deadline = const Value.absent(),
+    required DateTime createdAt,
+  })  : metric = Value(metric),
+        targetValue = Value(targetValue),
+        createdAt = Value(createdAt);
+  static Insertable<BodyTarget> custom({
+    Expression<int>? id,
+    Expression<String>? metric,
+    Expression<double>? targetValue,
+    Expression<DateTime>? deadline,
+    Expression<DateTime>? createdAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (metric != null) 'metric': metric,
+      if (targetValue != null) 'target_value': targetValue,
+      if (deadline != null) 'deadline': deadline,
+      if (createdAt != null) 'created_at': createdAt,
+    });
+  }
+
+  BodyTargetsCompanion copyWith(
+      {Value<int>? id,
+      Value<String>? metric,
+      Value<double>? targetValue,
+      Value<DateTime?>? deadline,
+      Value<DateTime>? createdAt}) {
+    return BodyTargetsCompanion(
+      id: id ?? this.id,
+      metric: metric ?? this.metric,
+      targetValue: targetValue ?? this.targetValue,
+      deadline: deadline ?? this.deadline,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (metric.present) {
+      map['metric'] = Variable<String>(metric.value);
+    }
+    if (targetValue.present) {
+      map['target_value'] = Variable<double>(targetValue.value);
+    }
+    if (deadline.present) {
+      map['deadline'] = Variable<DateTime>(deadline.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('BodyTargetsCompanion(')
+          ..write('id: $id, ')
+          ..write('metric: $metric, ')
+          ..write('targetValue: $targetValue, ')
+          ..write('deadline: $deadline, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $ProgressPhotosTable extends ProgressPhotos
+    with TableInfo<$ProgressPhotosTable, ProgressPhoto> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ProgressPhotosTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+      'id', aliasedName, false,
+      hasAutoIncrement: true,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+  static const VerificationMeta _dateMeta = const VerificationMeta('date');
+  @override
+  late final GeneratedColumn<DateTime> date = GeneratedColumn<DateTime>(
+      'date', aliasedName, false,
+      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  static const VerificationMeta _imagePathMeta =
+      const VerificationMeta('imagePath');
+  @override
+  late final GeneratedColumn<String> imagePath = GeneratedColumn<String>(
+      'image_path', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _categoryMeta =
+      const VerificationMeta('category');
+  @override
+  late final GeneratedColumn<String> category = GeneratedColumn<String>(
+      'category', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      defaultValue: const Constant('front'));
+  static const VerificationMeta _notesMeta = const VerificationMeta('notes');
+  @override
+  late final GeneratedColumn<String> notes = GeneratedColumn<String>(
+      'notes', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  @override
+  List<GeneratedColumn> get $columns => [id, date, imagePath, category, notes];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'progress_photos';
+  @override
+  VerificationContext validateIntegrity(Insertable<ProgressPhoto> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('date')) {
+      context.handle(
+          _dateMeta, date.isAcceptableOrUnknown(data['date']!, _dateMeta));
+    } else if (isInserting) {
+      context.missing(_dateMeta);
+    }
+    if (data.containsKey('image_path')) {
+      context.handle(_imagePathMeta,
+          imagePath.isAcceptableOrUnknown(data['image_path']!, _imagePathMeta));
+    } else if (isInserting) {
+      context.missing(_imagePathMeta);
+    }
+    if (data.containsKey('category')) {
+      context.handle(_categoryMeta,
+          category.isAcceptableOrUnknown(data['category']!, _categoryMeta));
+    }
+    if (data.containsKey('notes')) {
+      context.handle(
+          _notesMeta, notes.isAcceptableOrUnknown(data['notes']!, _notesMeta));
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  ProgressPhoto map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ProgressPhoto(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
+      date: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}date'])!,
+      imagePath: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}image_path'])!,
+      category: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}category'])!,
+      notes: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}notes']),
+    );
+  }
+
+  @override
+  $ProgressPhotosTable createAlias(String alias) {
+    return $ProgressPhotosTable(attachedDatabase, alias);
+  }
+}
+
+class ProgressPhoto extends DataClass implements Insertable<ProgressPhoto> {
+  final int id;
+  final DateTime date;
+  final String imagePath;
+  final String category;
+  final String? notes;
+  const ProgressPhoto(
+      {required this.id,
+      required this.date,
+      required this.imagePath,
+      required this.category,
+      this.notes});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['date'] = Variable<DateTime>(date);
+    map['image_path'] = Variable<String>(imagePath);
+    map['category'] = Variable<String>(category);
+    if (!nullToAbsent || notes != null) {
+      map['notes'] = Variable<String>(notes);
+    }
+    return map;
+  }
+
+  ProgressPhotosCompanion toCompanion(bool nullToAbsent) {
+    return ProgressPhotosCompanion(
+      id: Value(id),
+      date: Value(date),
+      imagePath: Value(imagePath),
+      category: Value(category),
+      notes:
+          notes == null && nullToAbsent ? const Value.absent() : Value(notes),
+    );
+  }
+
+  factory ProgressPhoto.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ProgressPhoto(
+      id: serializer.fromJson<int>(json['id']),
+      date: serializer.fromJson<DateTime>(json['date']),
+      imagePath: serializer.fromJson<String>(json['imagePath']),
+      category: serializer.fromJson<String>(json['category']),
+      notes: serializer.fromJson<String?>(json['notes']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'date': serializer.toJson<DateTime>(date),
+      'imagePath': serializer.toJson<String>(imagePath),
+      'category': serializer.toJson<String>(category),
+      'notes': serializer.toJson<String?>(notes),
+    };
+  }
+
+  ProgressPhoto copyWith(
+          {int? id,
+          DateTime? date,
+          String? imagePath,
+          String? category,
+          Value<String?> notes = const Value.absent()}) =>
+      ProgressPhoto(
+        id: id ?? this.id,
+        date: date ?? this.date,
+        imagePath: imagePath ?? this.imagePath,
+        category: category ?? this.category,
+        notes: notes.present ? notes.value : this.notes,
+      );
+  ProgressPhoto copyWithCompanion(ProgressPhotosCompanion data) {
+    return ProgressPhoto(
+      id: data.id.present ? data.id.value : this.id,
+      date: data.date.present ? data.date.value : this.date,
+      imagePath: data.imagePath.present ? data.imagePath.value : this.imagePath,
+      category: data.category.present ? data.category.value : this.category,
+      notes: data.notes.present ? data.notes.value : this.notes,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ProgressPhoto(')
+          ..write('id: $id, ')
+          ..write('date: $date, ')
+          ..write('imagePath: $imagePath, ')
+          ..write('category: $category, ')
+          ..write('notes: $notes')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, date, imagePath, category, notes);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ProgressPhoto &&
+          other.id == this.id &&
+          other.date == this.date &&
+          other.imagePath == this.imagePath &&
+          other.category == this.category &&
+          other.notes == this.notes);
+}
+
+class ProgressPhotosCompanion extends UpdateCompanion<ProgressPhoto> {
+  final Value<int> id;
+  final Value<DateTime> date;
+  final Value<String> imagePath;
+  final Value<String> category;
+  final Value<String?> notes;
+  const ProgressPhotosCompanion({
+    this.id = const Value.absent(),
+    this.date = const Value.absent(),
+    this.imagePath = const Value.absent(),
+    this.category = const Value.absent(),
+    this.notes = const Value.absent(),
+  });
+  ProgressPhotosCompanion.insert({
+    this.id = const Value.absent(),
+    required DateTime date,
+    required String imagePath,
+    this.category = const Value.absent(),
+    this.notes = const Value.absent(),
+  })  : date = Value(date),
+        imagePath = Value(imagePath);
+  static Insertable<ProgressPhoto> custom({
+    Expression<int>? id,
+    Expression<DateTime>? date,
+    Expression<String>? imagePath,
+    Expression<String>? category,
+    Expression<String>? notes,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (date != null) 'date': date,
+      if (imagePath != null) 'image_path': imagePath,
+      if (category != null) 'category': category,
+      if (notes != null) 'notes': notes,
+    });
+  }
+
+  ProgressPhotosCompanion copyWith(
+      {Value<int>? id,
+      Value<DateTime>? date,
+      Value<String>? imagePath,
+      Value<String>? category,
+      Value<String?>? notes}) {
+    return ProgressPhotosCompanion(
+      id: id ?? this.id,
+      date: date ?? this.date,
+      imagePath: imagePath ?? this.imagePath,
+      category: category ?? this.category,
+      notes: notes ?? this.notes,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (date.present) {
+      map['date'] = Variable<DateTime>(date.value);
+    }
+    if (imagePath.present) {
+      map['image_path'] = Variable<String>(imagePath.value);
+    }
+    if (category.present) {
+      map['category'] = Variable<String>(category.value);
+    }
+    if (notes.present) {
+      map['notes'] = Variable<String>(notes.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ProgressPhotosCompanion(')
+          ..write('id: $id, ')
+          ..write('date: $date, ')
+          ..write('imagePath: $imagePath, ')
+          ..write('category: $category, ')
+          ..write('notes: $notes')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $SyncQueueTable extends SyncQueue
     with TableInfo<$SyncQueueTable, SyncQueueData> {
   @override
@@ -5910,7 +6583,7 @@ class $RecentExercisesTable extends RecentExercises
   late final GeneratedColumn<int> exerciseId = GeneratedColumn<int>(
       'exercise_id', aliasedName, false,
       type: DriftSqlType.int,
-      requiredDuringInsert: true,
+      requiredDuringInsert: false,
       defaultConstraints:
           GeneratedColumn.constraintIsAlways('REFERENCES exercises (id)'));
   static const VerificationMeta _viewedAtMeta =
@@ -5936,8 +6609,6 @@ class $RecentExercisesTable extends RecentExercises
           _exerciseIdMeta,
           exerciseId.isAcceptableOrUnknown(
               data['exercise_id']!, _exerciseIdMeta));
-    } else if (isInserting) {
-      context.missing(_exerciseIdMeta);
     }
     if (data.containsKey('viewed_at')) {
       context.handle(_viewedAtMeta,
@@ -5949,7 +6620,7 @@ class $RecentExercisesTable extends RecentExercises
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => const {};
+  Set<GeneratedColumn> get $primaryKey => {exerciseId};
   @override
   RecentExercise map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
@@ -6038,36 +6709,29 @@ class RecentExercise extends DataClass implements Insertable<RecentExercise> {
 class RecentExercisesCompanion extends UpdateCompanion<RecentExercise> {
   final Value<int> exerciseId;
   final Value<DateTime> viewedAt;
-  final Value<int> rowid;
   const RecentExercisesCompanion({
     this.exerciseId = const Value.absent(),
     this.viewedAt = const Value.absent(),
-    this.rowid = const Value.absent(),
   });
   RecentExercisesCompanion.insert({
-    required int exerciseId,
+    this.exerciseId = const Value.absent(),
     required DateTime viewedAt,
-    this.rowid = const Value.absent(),
-  })  : exerciseId = Value(exerciseId),
-        viewedAt = Value(viewedAt);
+  }) : viewedAt = Value(viewedAt);
   static Insertable<RecentExercise> custom({
     Expression<int>? exerciseId,
     Expression<DateTime>? viewedAt,
-    Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (exerciseId != null) 'exercise_id': exerciseId,
       if (viewedAt != null) 'viewed_at': viewedAt,
-      if (rowid != null) 'rowid': rowid,
     });
   }
 
   RecentExercisesCompanion copyWith(
-      {Value<int>? exerciseId, Value<DateTime>? viewedAt, Value<int>? rowid}) {
+      {Value<int>? exerciseId, Value<DateTime>? viewedAt}) {
     return RecentExercisesCompanion(
       exerciseId: exerciseId ?? this.exerciseId,
       viewedAt: viewedAt ?? this.viewedAt,
-      rowid: rowid ?? this.rowid,
     );
   }
 
@@ -6080,9 +6744,6 @@ class RecentExercisesCompanion extends UpdateCompanion<RecentExercise> {
     if (viewedAt.present) {
       map['viewed_at'] = Variable<DateTime>(viewedAt.value);
     }
-    if (rowid.present) {
-      map['rowid'] = Variable<int>(rowid.value);
-    }
     return map;
   }
 
@@ -6090,8 +6751,7 @@ class RecentExercisesCompanion extends UpdateCompanion<RecentExercise> {
   String toString() {
     return (StringBuffer('RecentExercisesCompanion(')
           ..write('exerciseId: $exerciseId, ')
-          ..write('viewedAt: $viewedAt, ')
-          ..write('rowid: $rowid')
+          ..write('viewedAt: $viewedAt')
           ..write(')'))
         .toString();
   }
@@ -6672,6 +7332,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $WorkoutSetsTable workoutSets = $WorkoutSetsTable(this);
   late final $BodyMeasurementsTable bodyMeasurements =
       $BodyMeasurementsTable(this);
+  late final $BodyTargetsTable bodyTargets = $BodyTargetsTable(this);
+  late final $ProgressPhotosTable progressPhotos = $ProgressPhotosTable(this);
   late final $SyncQueueTable syncQueue = $SyncQueueTable(this);
   late final $ExerciseProgressionSettingsTable exerciseProgressionSettings =
       $ExerciseProgressionSettingsTable(this);
@@ -6699,6 +7361,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
         workouts,
         workoutSets,
         bodyMeasurements,
+        bodyTargets,
+        progressPhotos,
         syncQueue,
         exerciseProgressionSettings,
         exerciseMuscles,
@@ -6732,6 +7396,8 @@ typedef $$ExercisesTableCreateCompanionBuilder = ExercisesCompanion Function({
   Value<bool> isCustom,
   Value<bool> isFavorite,
   Value<bool> isEnriched,
+  Value<String?> nameHi,
+  Value<String?> nameMr,
   Value<DateTime?> lastUsed,
 });
 typedef $$ExercisesTableUpdateCompanionBuilder = ExercisesCompanion Function({
@@ -6756,6 +7422,8 @@ typedef $$ExercisesTableUpdateCompanionBuilder = ExercisesCompanion Function({
   Value<bool> isCustom,
   Value<bool> isFavorite,
   Value<bool> isEnriched,
+  Value<String?> nameHi,
+  Value<String?> nameMr,
   Value<DateTime?> lastUsed,
 });
 
@@ -6976,6 +7644,12 @@ class $$ExercisesTableFilterComposer
 
   ColumnFilters<bool> get isEnriched => $composableBuilder(
       column: $table.isEnriched, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get nameHi => $composableBuilder(
+      column: $table.nameHi, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get nameMr => $composableBuilder(
+      column: $table.nameMr, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<DateTime> get lastUsed => $composableBuilder(
       column: $table.lastUsed, builder: (column) => ColumnFilters(column));
@@ -7230,6 +7904,12 @@ class $$ExercisesTableOrderingComposer
   ColumnOrderings<bool> get isEnriched => $composableBuilder(
       column: $table.isEnriched, builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<String> get nameHi => $composableBuilder(
+      column: $table.nameHi, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get nameMr => $composableBuilder(
+      column: $table.nameMr, builder: (column) => ColumnOrderings(column));
+
   ColumnOrderings<DateTime> get lastUsed => $composableBuilder(
       column: $table.lastUsed, builder: (column) => ColumnOrderings(column));
 }
@@ -7305,6 +7985,12 @@ class $$ExercisesTableAnnotationComposer
 
   GeneratedColumn<bool> get isEnriched => $composableBuilder(
       column: $table.isEnriched, builder: (column) => column);
+
+  GeneratedColumn<String> get nameHi =>
+      $composableBuilder(column: $table.nameHi, builder: (column) => column);
+
+  GeneratedColumn<String> get nameMr =>
+      $composableBuilder(column: $table.nameMr, builder: (column) => column);
 
   GeneratedColumn<DateTime> get lastUsed =>
       $composableBuilder(column: $table.lastUsed, builder: (column) => column);
@@ -7539,6 +8225,8 @@ class $$ExercisesTableTableManager extends RootTableManager<
             Value<bool> isCustom = const Value.absent(),
             Value<bool> isFavorite = const Value.absent(),
             Value<bool> isEnriched = const Value.absent(),
+            Value<String?> nameHi = const Value.absent(),
+            Value<String?> nameMr = const Value.absent(),
             Value<DateTime?> lastUsed = const Value.absent(),
           }) =>
               ExercisesCompanion(
@@ -7563,6 +8251,8 @@ class $$ExercisesTableTableManager extends RootTableManager<
             isCustom: isCustom,
             isFavorite: isFavorite,
             isEnriched: isEnriched,
+            nameHi: nameHi,
+            nameMr: nameMr,
             lastUsed: lastUsed,
           ),
           createCompanionCallback: ({
@@ -7587,6 +8277,8 @@ class $$ExercisesTableTableManager extends RootTableManager<
             Value<bool> isCustom = const Value.absent(),
             Value<bool> isFavorite = const Value.absent(),
             Value<bool> isEnriched = const Value.absent(),
+            Value<String?> nameHi = const Value.absent(),
+            Value<String?> nameMr = const Value.absent(),
             Value<DateTime?> lastUsed = const Value.absent(),
           }) =>
               ExercisesCompanion.insert(
@@ -7611,6 +8303,8 @@ class $$ExercisesTableTableManager extends RootTableManager<
             isCustom: isCustom,
             isFavorite: isFavorite,
             isEnriched: isEnriched,
+            nameHi: nameHi,
+            nameMr: nameMr,
             lastUsed: lastUsed,
           ),
           withReferenceMapper: (p0) => p0
@@ -10467,6 +11161,335 @@ typedef $$BodyMeasurementsTableProcessedTableManager = ProcessedTableManager<
     (BodyMeasurementTable, $$BodyMeasurementsTableReferences),
     BodyMeasurementTable,
     PrefetchHooks Function({bool syncQueueRefs})>;
+typedef $$BodyTargetsTableCreateCompanionBuilder = BodyTargetsCompanion
+    Function({
+  Value<int> id,
+  required String metric,
+  required double targetValue,
+  Value<DateTime?> deadline,
+  required DateTime createdAt,
+});
+typedef $$BodyTargetsTableUpdateCompanionBuilder = BodyTargetsCompanion
+    Function({
+  Value<int> id,
+  Value<String> metric,
+  Value<double> targetValue,
+  Value<DateTime?> deadline,
+  Value<DateTime> createdAt,
+});
+
+class $$BodyTargetsTableFilterComposer
+    extends Composer<_$AppDatabase, $BodyTargetsTable> {
+  $$BodyTargetsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get metric => $composableBuilder(
+      column: $table.metric, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<double> get targetValue => $composableBuilder(
+      column: $table.targetValue, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get deadline => $composableBuilder(
+      column: $table.deadline, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnFilters(column));
+}
+
+class $$BodyTargetsTableOrderingComposer
+    extends Composer<_$AppDatabase, $BodyTargetsTable> {
+  $$BodyTargetsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get metric => $composableBuilder(
+      column: $table.metric, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<double> get targetValue => $composableBuilder(
+      column: $table.targetValue, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get deadline => $composableBuilder(
+      column: $table.deadline, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnOrderings(column));
+}
+
+class $$BodyTargetsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $BodyTargetsTable> {
+  $$BodyTargetsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get metric =>
+      $composableBuilder(column: $table.metric, builder: (column) => column);
+
+  GeneratedColumn<double> get targetValue => $composableBuilder(
+      column: $table.targetValue, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get deadline =>
+      $composableBuilder(column: $table.deadline, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+}
+
+class $$BodyTargetsTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $BodyTargetsTable,
+    BodyTarget,
+    $$BodyTargetsTableFilterComposer,
+    $$BodyTargetsTableOrderingComposer,
+    $$BodyTargetsTableAnnotationComposer,
+    $$BodyTargetsTableCreateCompanionBuilder,
+    $$BodyTargetsTableUpdateCompanionBuilder,
+    (BodyTarget, BaseReferences<_$AppDatabase, $BodyTargetsTable, BodyTarget>),
+    BodyTarget,
+    PrefetchHooks Function()> {
+  $$BodyTargetsTableTableManager(_$AppDatabase db, $BodyTargetsTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$BodyTargetsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$BodyTargetsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$BodyTargetsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            Value<String> metric = const Value.absent(),
+            Value<double> targetValue = const Value.absent(),
+            Value<DateTime?> deadline = const Value.absent(),
+            Value<DateTime> createdAt = const Value.absent(),
+          }) =>
+              BodyTargetsCompanion(
+            id: id,
+            metric: metric,
+            targetValue: targetValue,
+            deadline: deadline,
+            createdAt: createdAt,
+          ),
+          createCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            required String metric,
+            required double targetValue,
+            Value<DateTime?> deadline = const Value.absent(),
+            required DateTime createdAt,
+          }) =>
+              BodyTargetsCompanion.insert(
+            id: id,
+            metric: metric,
+            targetValue: targetValue,
+            deadline: deadline,
+            createdAt: createdAt,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $$BodyTargetsTableProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    $BodyTargetsTable,
+    BodyTarget,
+    $$BodyTargetsTableFilterComposer,
+    $$BodyTargetsTableOrderingComposer,
+    $$BodyTargetsTableAnnotationComposer,
+    $$BodyTargetsTableCreateCompanionBuilder,
+    $$BodyTargetsTableUpdateCompanionBuilder,
+    (BodyTarget, BaseReferences<_$AppDatabase, $BodyTargetsTable, BodyTarget>),
+    BodyTarget,
+    PrefetchHooks Function()>;
+typedef $$ProgressPhotosTableCreateCompanionBuilder = ProgressPhotosCompanion
+    Function({
+  Value<int> id,
+  required DateTime date,
+  required String imagePath,
+  Value<String> category,
+  Value<String?> notes,
+});
+typedef $$ProgressPhotosTableUpdateCompanionBuilder = ProgressPhotosCompanion
+    Function({
+  Value<int> id,
+  Value<DateTime> date,
+  Value<String> imagePath,
+  Value<String> category,
+  Value<String?> notes,
+});
+
+class $$ProgressPhotosTableFilterComposer
+    extends Composer<_$AppDatabase, $ProgressPhotosTable> {
+  $$ProgressPhotosTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get date => $composableBuilder(
+      column: $table.date, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get imagePath => $composableBuilder(
+      column: $table.imagePath, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get category => $composableBuilder(
+      column: $table.category, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get notes => $composableBuilder(
+      column: $table.notes, builder: (column) => ColumnFilters(column));
+}
+
+class $$ProgressPhotosTableOrderingComposer
+    extends Composer<_$AppDatabase, $ProgressPhotosTable> {
+  $$ProgressPhotosTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get date => $composableBuilder(
+      column: $table.date, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get imagePath => $composableBuilder(
+      column: $table.imagePath, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get category => $composableBuilder(
+      column: $table.category, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get notes => $composableBuilder(
+      column: $table.notes, builder: (column) => ColumnOrderings(column));
+}
+
+class $$ProgressPhotosTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ProgressPhotosTable> {
+  $$ProgressPhotosTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get date =>
+      $composableBuilder(column: $table.date, builder: (column) => column);
+
+  GeneratedColumn<String> get imagePath =>
+      $composableBuilder(column: $table.imagePath, builder: (column) => column);
+
+  GeneratedColumn<String> get category =>
+      $composableBuilder(column: $table.category, builder: (column) => column);
+
+  GeneratedColumn<String> get notes =>
+      $composableBuilder(column: $table.notes, builder: (column) => column);
+}
+
+class $$ProgressPhotosTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $ProgressPhotosTable,
+    ProgressPhoto,
+    $$ProgressPhotosTableFilterComposer,
+    $$ProgressPhotosTableOrderingComposer,
+    $$ProgressPhotosTableAnnotationComposer,
+    $$ProgressPhotosTableCreateCompanionBuilder,
+    $$ProgressPhotosTableUpdateCompanionBuilder,
+    (
+      ProgressPhoto,
+      BaseReferences<_$AppDatabase, $ProgressPhotosTable, ProgressPhoto>
+    ),
+    ProgressPhoto,
+    PrefetchHooks Function()> {
+  $$ProgressPhotosTableTableManager(
+      _$AppDatabase db, $ProgressPhotosTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ProgressPhotosTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ProgressPhotosTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ProgressPhotosTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            Value<DateTime> date = const Value.absent(),
+            Value<String> imagePath = const Value.absent(),
+            Value<String> category = const Value.absent(),
+            Value<String?> notes = const Value.absent(),
+          }) =>
+              ProgressPhotosCompanion(
+            id: id,
+            date: date,
+            imagePath: imagePath,
+            category: category,
+            notes: notes,
+          ),
+          createCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            required DateTime date,
+            required String imagePath,
+            Value<String> category = const Value.absent(),
+            Value<String?> notes = const Value.absent(),
+          }) =>
+              ProgressPhotosCompanion.insert(
+            id: id,
+            date: date,
+            imagePath: imagePath,
+            category: category,
+            notes: notes,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $$ProgressPhotosTableProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    $ProgressPhotosTable,
+    ProgressPhoto,
+    $$ProgressPhotosTableFilterComposer,
+    $$ProgressPhotosTableOrderingComposer,
+    $$ProgressPhotosTableAnnotationComposer,
+    $$ProgressPhotosTableCreateCompanionBuilder,
+    $$ProgressPhotosTableUpdateCompanionBuilder,
+    (
+      ProgressPhoto,
+      BaseReferences<_$AppDatabase, $ProgressPhotosTable, ProgressPhoto>
+    ),
+    ProgressPhoto,
+    PrefetchHooks Function()>;
 typedef $$SyncQueueTableCreateCompanionBuilder = SyncQueueCompanion Function({
   Value<int> id,
   Value<int?> workoutId,
@@ -11976,15 +12999,13 @@ typedef $$ExerciseEnrichedContentTableProcessedTableManager
         PrefetchHooks Function({bool exerciseId})>;
 typedef $$RecentExercisesTableCreateCompanionBuilder = RecentExercisesCompanion
     Function({
-  required int exerciseId,
+  Value<int> exerciseId,
   required DateTime viewedAt,
-  Value<int> rowid,
 });
 typedef $$RecentExercisesTableUpdateCompanionBuilder = RecentExercisesCompanion
     Function({
   Value<int> exerciseId,
   Value<DateTime> viewedAt,
-  Value<int> rowid,
 });
 
 final class $$RecentExercisesTableReferences extends BaseReferences<
@@ -12133,22 +13154,18 @@ class $$RecentExercisesTableTableManager extends RootTableManager<
           updateCompanionCallback: ({
             Value<int> exerciseId = const Value.absent(),
             Value<DateTime> viewedAt = const Value.absent(),
-            Value<int> rowid = const Value.absent(),
           }) =>
               RecentExercisesCompanion(
             exerciseId: exerciseId,
             viewedAt: viewedAt,
-            rowid: rowid,
           ),
           createCompanionCallback: ({
-            required int exerciseId,
+            Value<int> exerciseId = const Value.absent(),
             required DateTime viewedAt,
-            Value<int> rowid = const Value.absent(),
           }) =>
               RecentExercisesCompanion.insert(
             exerciseId: exerciseId,
             viewedAt: viewedAt,
-            rowid: rowid,
           ),
           withReferenceMapper: (p0) => p0
               .map((e) => (
@@ -12826,6 +13843,10 @@ class $AppDatabaseManager {
       $$WorkoutSetsTableTableManager(_db, _db.workoutSets);
   $$BodyMeasurementsTableTableManager get bodyMeasurements =>
       $$BodyMeasurementsTableTableManager(_db, _db.bodyMeasurements);
+  $$BodyTargetsTableTableManager get bodyTargets =>
+      $$BodyTargetsTableTableManager(_db, _db.bodyTargets);
+  $$ProgressPhotosTableTableManager get progressPhotos =>
+      $$ProgressPhotosTableTableManager(_db, _db.progressPhotos);
   $$SyncQueueTableTableManager get syncQueue =>
       $$SyncQueueTableTableManager(_db, _db.syncQueue);
   $$ExerciseProgressionSettingsTableTableManager
@@ -12893,4 +13914,4 @@ final class AppDatabaseProvider
   }
 }
 
-String _$appDatabaseHash() => r'59cce38d45eeaba199eddd097d8e149d66f9f3e1';
+String _$appDatabaseHash() => r'8c69eb46d45206533c176c88a926608e79ca927d';

@@ -384,12 +384,17 @@ class _TodayPlanSection extends ConsumerWidget {
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: () {
-                      showModalBottomSheet(
-                        context: context,
-                        isScrollControlled: true,
-                        backgroundColor: Colors.transparent,
-                        builder: (context) => const BeginSessionSheet(),
-                      );
+                      if (state.activeDraft != null) {
+                        // Navigate directly to the active workout — no need to ask anything
+                        context.push('/app/workout/active?id=${state.activeDraft!.id}');
+                      } else {
+                        showModalBottomSheet(
+                          context: context,
+                          isScrollControlled: true,
+                          backgroundColor: Colors.transparent,
+                          builder: (context) => const BeginSessionSheet(),
+                        );
+                      }
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white,
@@ -555,7 +560,7 @@ class _QuickActionSection extends StatelessWidget {
               icon: LucideIcons.dumbbell,
               label: 'EXERCISES',
               color: Colors.blue.shade400,
-              onTap: () => context.go('/exercises'),
+              onTap: () => context.push('/exercises'),
             ),
           ],
         ),
@@ -1177,9 +1182,11 @@ class _FloatingWorkoutBannerState extends State<_FloatingWorkoutBanner>
                         ),
                       );
                       if (confirm == true) {
-                        ref
+                        await ref
                             .read(workoutHomeProvider.notifier)
                             .deleteWorkout(widget.workout.id);
+                        // Refresh home state so banner disappears
+                        ref.invalidate(workoutHomeProvider);
                       }
                     },
                     tooltip: 'Discard workout',

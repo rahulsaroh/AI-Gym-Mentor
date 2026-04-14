@@ -45,6 +45,8 @@ class Exercises extends Table {
   BoolColumn get isCustom => boolean().withDefault(const Constant(false))();
   BoolColumn get isFavorite => boolean().withDefault(const Constant(false))();
   BoolColumn get isEnriched => boolean().withDefault(const Constant(false))();
+  TextColumn get nameHi => text().nullable()();
+  TextColumn get nameMr => text().nullable()();
   DateTimeColumn get lastUsed => dateTime().nullable()();
 }
 
@@ -133,6 +135,22 @@ class BodyMeasurements extends Table {
   TextColumn get notes => text().nullable()();
 }
 
+class BodyTargets extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get metric => text()(); // weight, body_fat, etc.
+  RealColumn get targetValue => real()();
+  DateTimeColumn get deadline => dateTime().nullable()();
+  DateTimeColumn get createdAt => dateTime()();
+}
+
+class ProgressPhotos extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  DateTimeColumn get date => dateTime()();
+  TextColumn get imagePath => text()();
+  TextColumn get category => text().withDefault(const Constant('front'))(); // front, side, back
+  TextColumn get notes => text().nullable()();
+}
+
 
 class SyncQueue extends Table {
   IntColumn get id => integer().autoIncrement()();
@@ -184,6 +202,9 @@ class ExerciseEnrichedContent extends Table {
 class RecentExercises extends Table {
   IntColumn get exerciseId => integer().references(Exercises, #id)();
   DateTimeColumn get viewedAt => dateTime()();
+
+  @override
+  Set<Column> get primaryKey => {exerciseId};
 }
 
 class ExerciseProgressions extends Table {
@@ -208,6 +229,8 @@ class ExerciseInstructions extends Table {
   Workouts,
   WorkoutSets,
   BodyMeasurements,
+  BodyTargets,
+  ProgressPhotos,
   SyncQueue,
   ExerciseProgressionSettings,
   ExerciseMuscles,
@@ -218,7 +241,9 @@ class ExerciseInstructions extends Table {
   ExerciseInstructions,
 ])
 class AppDatabase extends _$AppDatabase {
-  AppDatabase([QueryExecutor? e]) : super(e ?? _openConnection());
+  static final AppDatabase _instance = AppDatabase._internal();
+  factory AppDatabase() => _instance;
+  AppDatabase._internal() : super(_openConnection());
 
   Future<List<ExerciseTable>> searchExercises(String query) async {
     final results = await customSelect(
@@ -233,7 +258,7 @@ class AppDatabase extends _$AppDatabase {
   }
 
   @override
-  int get schemaVersion => 15;
+  int get schemaVersion => 18;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -363,6 +388,23 @@ class AppDatabase extends _$AppDatabase {
               await m.addColumn(exercises, exercises.isEnriched);
             }
           }
+          if (from < 16) {
+            if (!await hasColumn('exercises', 'name_hi')) {
+              await m.addColumn(exercises, exercises.nameHi);
+            }
+            if (!await hasColumn('exercises', 'name_mr')) {
+              await m.addColumn(exercises, exercises.nameMr);
+            }
+          }
+          if (from < 17) {
+            await m.createTable(bodyTargets);
+            await m.createTable(progressPhotos);
+          }
+          if (from < 18) {
+            // Recreate recent_exercises with primary key
+            await m.deleteTable('recent_exercises');
+            await m.createTable(recentExercises);
+          }
         },
         beforeOpen: (details) async {
           await customStatement('PRAGMA foreign_keys = ON');
@@ -403,9 +445,7 @@ class AppDatabase extends _$AppDatabase {
 
 @Riverpod(keepAlive: true)
 AppDatabase appDatabase(Ref ref) {
-  final db = AppDatabase();
-  ref.onDispose(db.close);
-  return db;
+  return AppDatabase();
 }
 
 LazyDatabase _openConnection() {

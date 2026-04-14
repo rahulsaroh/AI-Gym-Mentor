@@ -41,7 +41,7 @@ final class ExerciseQaCheckerProvider
   }
 }
 
-String _$exerciseQaCheckerHash() => r'0e7824227bbd3d8f40c447dc3d08d3473ec37b8e';
+String _$exerciseQaCheckerHash() => r'dd3f835b58f22447490a79505576812b29e9f412';
 
 abstract class _$ExerciseQaChecker extends $Notifier<void> {
   void build();

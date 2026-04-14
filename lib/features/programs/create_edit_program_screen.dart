@@ -9,6 +9,7 @@ import 'package:ai_gym_mentor/features/exercise_database/domain/entities/exercis
 import 'package:ai_gym_mentor/features/exercise_database/presentation/providers/exercise_providers.dart';
 import 'package:ai_gym_mentor/features/exercise_database/presentation/widgets/exercise_picker_overlay.dart';
 import 'package:ai_gym_mentor/features/programs/providers/programs_notifier.dart';
+import 'package:uuid/uuid.dart';
 import 'package:drift/drift.dart' hide Column;
 
 class CreateEditProgramScreen extends ConsumerStatefulWidget {
@@ -65,6 +66,7 @@ class _CreateEditProgramScreenState
           final exercisesData = <_ExerciseData>[];
           for (var ex in exercises) {
             exercisesData.add(_ExerciseData(
+              uniqueId: const Uuid().v4(),
               exerciseId: ex.exerciseId,
               sets: ex.setsJson.isNotEmpty
                   ? _parseSetsJson(ex.setsJson)
@@ -249,14 +251,11 @@ class _CreateEditProgramScreenState
                             setState(() => _days[index] = _days[index]
                                 .copyWith(exercises: updatedExercises));
                           },
-                          onUpdateExerciseSets: (exIndex, sets) {
-                            final updatedExercises =
-                                List<_ExerciseData>.from(_days[index].exercises);
-                            updatedExercises[exIndex] =
-                                updatedExercises[exIndex].copyWith(sets: sets);
-                            setState(() => _days[index] = _days[index]
-                                .copyWith(exercises: updatedExercises));
+                          onUpdateExercises: (dayIndex, updated) {
+                            setState(() => _days[dayIndex] = _days[dayIndex]
+                                .copyWith(exercises: updated));
                           },
+                          onSwapExercise: (dayIndex, exIndex) => _swapExerciseInDay(dayIndex, exIndex),
                           onDelete: () => setState(() => _days.removeAt(index)),
                         );
                       },
@@ -292,9 +291,32 @@ class _CreateEditProgramScreenState
     if (exerciseId != null) {
       setState(() {
         _days[dayIndex].exercises.add(_ExerciseData(
+              uniqueId: const Uuid().v4(),
               exerciseId: exerciseId,
               sets: [const _SetData(3, 10, 90)],
             ));
+      });
+    }
+  }
+
+  void _swapExerciseInDay(int dayIndex, int exIndex) async {
+    final exerciseId = await showModalBottomSheet<int>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => ExercisePickerOverlay(
+        onSelect: (id) => Navigator.pop(context, id),
+      ),
+    );
+
+    if (exerciseId != null) {
+      setState(() {
+        final existing = _days[dayIndex].exercises[exIndex];
+        _days[dayIndex].exercises[exIndex] = _ExerciseData(
+          uniqueId: existing.uniqueId, // Keep stable key!
+          exerciseId: exerciseId,
+          sets: existing.sets, // Keep settings? Or reset?
+        );
       });
     }
   }
@@ -428,12 +450,14 @@ class _DayData {
 }
 
 class _ExerciseData {
+  final String uniqueId;
   final int exerciseId;
   final List<_SetData> sets;
-  _ExerciseData({required this.exerciseId, required this.sets});
+  _ExerciseData({required this.uniqueId, required this.exerciseId, required this.sets});
 
   _ExerciseData copyWith({List<_SetData>? sets}) {
     return _ExerciseData(
+      uniqueId: uniqueId,
       exerciseId: exerciseId,
       sets: sets ?? this.sets,
     );
@@ -456,7 +480,8 @@ class _DayCard extends ConsumerStatefulWidget {
   final Function(String) onNameChanged;
   final VoidCallback onAddExercise;
   final Function(int) onRemoveExercise;
-  final Function(int, List<_SetData>) onUpdateExerciseSets;
+  final Function(int, List<_ExerciseData>) onUpdateExercises;
+  final Function(int, int) onSwapExercise;
   final VoidCallback onDelete;
 
   const _DayCard({
@@ -468,7 +493,8 @@ class _DayCard extends ConsumerStatefulWidget {
     required this.onNameChanged,
     required this.onAddExercise,
     required this.onRemoveExercise,
-    required this.onUpdateExerciseSets,
+    required this.onUpdateExercises,
+    required this.onSwapExercise,
     required this.onDelete,
   });
 
@@ -573,29 +599,47 @@ class _DayCardState extends ConsumerState<_DayCard> {
                       ),
                     )
                   else
-                    ...widget.day.exercises.asMap().entries.map((entry) {
-                      final exIndex = entry.key;
-                      final ex = entry.value;
-
-                      return exercisesAsync.when(
-                        data: (exercises) {
-                          final exercise = exercises.firstWhere(
-                            (e) => e.id == ex.exerciseId,
-                            orElse: () => exercises.first,
-                          );
-                          return _ExerciseConfigRow(
-                            exercise: exercise,
-                            config: ex.sets.first,
-                            onUpdate: (newConfig) => widget
-                                .onUpdateExerciseSets(exIndex, [newConfig]),
-                            onRemove: () => widget.onRemoveExercise(exIndex),
-                          );
-                        },
-                        loading: () =>
-                            const ListTile(title: Text('Loading...')),
-                        error: (_, __) => const ListTile(title: Text('Error')),
-                      );
-                    }),
+                    ReorderableListView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: widget.day.exercises.length,
+                      onReorder: (oldIndex, newIndex) {
+                        if (newIndex > oldIndex) newIndex--;
+                        final updated = List<_ExerciseData>.from(widget.day.exercises);
+                        final item = updated.removeAt(oldIndex);
+                        updated.insert(newIndex, item);
+                        widget.onUpdateExercises(widget.index, updated);
+                      },
+                       itemBuilder: (context, exIndex) {
+                        final ex = widget.day.exercises[exIndex];
+                        return Container(
+                          key: ValueKey(ex.uniqueId),
+                          child: exercisesAsync.when(
+                            data: (exercises) {
+                              final exercise = exercises.firstWhere(
+                                (e) => e.id == ex.exerciseId,
+                                orElse: () => exercises.first,
+                              );
+                                return _ExerciseConfigRow(
+                                  index: exIndex,
+                                  exercise: exercise,
+                                  config: ex.sets.first,
+                                  onUpdate: (newConfig) {
+                                    final updated = List<_ExerciseData>.from(widget.day.exercises);
+                                    updated[exIndex] = updated[exIndex].copyWith(sets: [newConfig]);
+                                    widget.onUpdateExercises(widget.index, updated);
+                                  },
+                                  onSwap: () => widget.onSwapExercise(widget.index, exIndex),
+                                  onRemove: () => widget.onRemoveExercise(exIndex),
+                                );
+                            },
+                            loading: () =>
+                                const ListTile(title: Text('Loading...')),
+                            error: (_, __) => const ListTile(title: Text('Error')),
+                          ),
+                        );
+                      },
+                    ),
                   const SizedBox(height: 8),
                   SizedBox(
                     width: double.infinity,
@@ -621,15 +665,19 @@ class _DayCardState extends ConsumerState<_DayCard> {
 }
 
 class _ExerciseConfigRow extends StatelessWidget {
+  final int index;
   final ExerciseEntity exercise;
   final _SetData config;
   final Function(_SetData) onUpdate;
+  final VoidCallback onSwap;
   final VoidCallback onRemove;
 
   const _ExerciseConfigRow({
+    required this.index,
     required this.exercise,
     required this.config,
     required this.onUpdate,
+    required this.onSwap,
     required this.onRemove,
   });
 
@@ -647,11 +695,17 @@ class _ExerciseConfigRow extends StatelessWidget {
       child: ExpansionTile(
         tilePadding: const EdgeInsets.symmetric(horizontal: 12),
         childrenPadding: const EdgeInsets.only(left: 12, right: 12, bottom: 12),
-        leading: const Icon(LucideIcons.dumbbell, size: 18),
-        title: Text(exercise.name,
-            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
-            overflow: TextOverflow.ellipsis,
-            maxLines: 1),
+        leading: ReorderableDragStartListener(
+          index: index,
+          child: const Icon(LucideIcons.gripVertical, size: 18, color: Colors.grey),
+        ),
+        title: GestureDetector(
+          onTap: onSwap,
+          child: Text(exercise.name,
+              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1),
+        ),
         subtitle: Text(
           '${config.sets} × ${config.reps} • ${config.type} • ${config.rest}s rest',
           style: const TextStyle(fontSize: 12, color: Colors.grey),

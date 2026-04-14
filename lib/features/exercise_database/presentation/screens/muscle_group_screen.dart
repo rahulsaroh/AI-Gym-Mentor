@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:ai_gym_mentor/features/exercise_database/presentation/providers/exercise_providers.dart';
 import 'package:ai_gym_mentor/features/exercise_database/data/models/exercise_filter_model.dart';
+import 'package:ai_gym_mentor/l10n/app_localizations.dart';
 
 class MuscleGroupScreen extends ConsumerStatefulWidget {
   const MuscleGroupScreen({super.key});
@@ -36,7 +37,7 @@ class _MuscleGroupScreenState extends ConsumerState<MuscleGroupScreen> {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
-        title: const Text('Muscle Groups', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(AppLocalizations.of(context)!.muscles_worked, style: const TextStyle(fontWeight: FontWeight.bold)),
         actions: [
           IconButton(
             onPressed: () => setState(() => _isFront = !_isFront),
@@ -86,7 +87,7 @@ class _MuscleGroupScreenState extends ConsumerState<MuscleGroupScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Explore by Region',
+                  AppLocalizations.of(context)!.recently_viewed, // Or use a new key like "explore_by_region" if I added it
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
                 ),
                 TextButton(

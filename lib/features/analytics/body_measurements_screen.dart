@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ai_gym_mentor/features/analytics/analytics_providers.dart';
 import 'package:intl/intl.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:ai_gym_mentor/core/domain/entities/body_target.dart' as target;
 import 'package:ai_gym_mentor/core/domain/entities/body_measurement.dart' as ent;
 
 class BodyMeasurementsScreen extends ConsumerStatefulWidget {
@@ -15,7 +16,8 @@ class BodyMeasurementsScreen extends ConsumerStatefulWidget {
 }
 
 class _BodyMeasurementsScreenState
-    extends ConsumerState<BodyMeasurementsScreen> {
+    extends ConsumerState<BodyMeasurementsScreen> with SingleTickerProviderStateMixin {
+  late TabController _tabController;
   String _selectedMetric = 'weight';
 
   final Map<String, String> _metrics = {
@@ -30,6 +32,17 @@ class _BodyMeasurementsScreenState
     'rightThigh': 'Right Thigh (cm)',
     'calves': 'Calves (cm)',
   };
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,60 +53,107 @@ class _BodyMeasurementsScreenState
       appBar: AppBar(
         title: const Text('Body Tracking'),
       ),
-      body: CustomScrollView(
-        slivers: [
-          SliverToBoxAdapter(
-            child: Column(
+      body: Column(
+        children: [
+          TabBar(
+            controller: _tabController,
+            tabs: const [
+              Tab(text: 'History'),
+              Tab(text: 'Targets'),
+            ],
+          ),
+          Expanded(
+            child: TabBarView(
+              controller: _tabController,
               children: [
-                _MetricSelector(
-                  selected: _selectedMetric,
-                  metrics: _metrics,
-                  onChanged: (v) => setState(() => _selectedMetric = v),
-                ),
-                SizedBox(
-                  height: 250,
-                  child: measurementsAsync.when(
-                    data: (data) => _MetricChart(
-                        data: data,
-                        metric: _selectedMetric,
-                        label: _metrics[_selectedMetric]!),
-                    loading: () =>
-                        const Center(child: CircularProgressIndicator()),
-                    error: (e, _) => Center(child: Text('Error: $e')),
-                  ),
-                ),
-                const Padding(
-                  padding: EdgeInsets.fromLTRB(16, 24, 16, 8),
-                  child: Row(
-                    children: [
-                      Text('History',
-                          style: TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.bold)),
-                    ],
-                  ),
-                ),
+                _buildHistoryTab(measurementsAsync),
+                _buildTargetsTab(),
               ],
             ),
-          ),
-          measurementsAsync.when(
-            data: (data) => SliverList(
-              delegate: SliverChildBuilderDelegate(
-                (context, index) => _MeasurementTile(measurement: data[index]),
-                childCount: data.length,
-              ),
-            ),
-            loading: () => const SliverFillRemaining(
-                child: Center(child: CircularProgressIndicator())),
-            error: (e, _) =>
-                SliverFillRemaining(child: Center(child: Text('Error: $e'))),
           ),
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _showAddDialog(context),
+        onPressed: () => _tabController.index == 0
+            ? _showAddDialog(context)
+            : _showAddTargetDialog(context),
         icon: const Icon(LucideIcons.plus),
-        label: const Text('New Entry'),
+        label: Text(_tabController.index == 0 ? 'New Entry' : 'Set Target'),
       ),
+    );
+  }
+
+  Widget _buildHistoryTab(AsyncValue<List<ent.BodyMeasurement>> measurementsAsync) {
+    return CustomScrollView(
+      slivers: [
+        SliverToBoxAdapter(
+          child: Column(
+            children: [
+              _MetricSelector(
+                selected: _selectedMetric,
+                metrics: _metrics,
+                onChanged: (v) => setState(() => _selectedMetric = v),
+              ),
+              // Target Progress at top if exists
+              _TargetProgressHeader(metric: _selectedMetric),
+              SizedBox(
+                height: 250,
+                child: measurementsAsync.when(
+                  data: (data) => _MetricChart(
+                      data: data,
+                      metric: _selectedMetric,
+                      label: _metrics[_selectedMetric]!),
+                  loading: () =>
+                      const Center(child: CircularProgressIndicator()),
+                  error: (e, _) => Center(child: Text('Error: $e')),
+                ),
+              ),
+              const Padding(
+                padding: EdgeInsets.fromLTRB(16, 24, 16, 8),
+                child: Row(
+                  children: [
+                    Text('History',
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold)),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+        measurementsAsync.when(
+          data: (data) => SliverList(
+            delegate: SliverChildBuilderDelegate(
+              (context, index) => _MeasurementTile(measurement: data[index]),
+              childCount: data.length,
+            ),
+          ),
+          loading: () => const SliverFillRemaining(
+              child: Center(child: CircularProgressIndicator())),
+          error: (e, _) =>
+              SliverFillRemaining(child: Center(child: Text('Error: $e'))),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTargetsTab() {
+    final targetsAsync = ref.watch(bodyTargetsListProvider);
+    return targetsAsync.when(
+      data: (targets) {
+        if (targets.isEmpty) {
+          return const Center(child: Text('No targets set yet. Let\'s go!'));
+        }
+        return ListView.builder(
+          padding: const EdgeInsets.all(16),
+          itemCount: targets.length,
+          itemBuilder: (context, index) {
+            return _TargetTile(bodyTarget: targets[index]);
+          },
+        );
+      },
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (e, _) => Center(child: Text('Error: $e')),
     );
   }
 
@@ -104,6 +164,201 @@ class _BodyMeasurementsScreenState
       builder: (context) => _AddMeasurementSheet(
         onAdd: (m) =>
             ref.read(bodyMeasurementsListProvider.notifier).addMeasurement(m),
+      ),
+    );
+  }
+
+  void _showAddTargetDialog(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) => _AddTargetSheet(
+        metric: _selectedMetric,
+        metricLabel: _metrics[_selectedMetric]!,
+        onAdd: (t) => ref.read(bodyTargetsListProvider.notifier).addTarget(t),
+      ),
+    );
+  }
+}
+
+class _TargetProgressHeader extends ConsumerWidget {
+  final String metric;
+  const _TargetProgressHeader({required this.metric});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final targetsAsync = ref.watch(bodyTargetsListProvider);
+    final measurementsAsync = ref.watch(bodyMeasurementsListProvider);
+
+    return targetsAsync.when(
+      data: (targets) {
+        final activeTarget = targets.where((t) => t.metric == metric).firstOrNull;
+        if (activeTarget == null) return const SizedBox.shrink();
+
+        return measurementsAsync.when(
+          data: (measurements) {
+            final lastVal = measurements.firstOrNull != null ? _getValue(measurements.first, metric) : null;
+            if (lastVal == null) return const SizedBox.shrink();
+
+            final targetVal = activeTarget.targetValue;
+            final startVal = measurements.lastOrNull != null ? _getValue(measurements.last, metric) : lastVal;
+            
+            // Basic progress calculation: (current - start) / (target - start)
+            double progress = 0;
+            if ((targetVal - startVal!).abs() > 0.01) {
+              progress = (lastVal - startVal) / (targetVal - startVal);
+            }
+            progress = progress.clamp(0.0, 1.0);
+
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Card(
+                color: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.3),
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text('Progress to Target', style: TextStyle(fontWeight: FontWeight.bold)),
+                          Text('${(progress * 100).toInt()}%', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      LinearProgressIndicator(
+                        value: progress,
+                        minHeight: 8,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text('Start: $startVal'),
+                          Text('Target: $targetVal', style: const TextStyle(fontWeight: FontWeight.bold)),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+          loading: () => const SizedBox.shrink(),
+          error: (_, __) => const SizedBox.shrink(),
+        );
+      },
+      loading: () => const SizedBox.shrink(),
+      error: (_, __) => const SizedBox.shrink(),
+    );
+  }
+
+  // Duplicate helper (minimalist approach)
+  double? _getValue(ent.BodyMeasurement m, String key) {
+    switch (key) {
+      case 'weight': return m.weight;
+      case 'bodyFat': return m.bodyFat;
+      case 'chest': return m.chest;
+      case 'waist': return m.waist;
+      case 'hips': return m.hips;
+      case 'leftArm': return m.armLeft;
+      case 'rightArm': return m.armRight;
+      case 'leftThigh': return m.thighLeft;
+      case 'rightThigh': return m.thighRight;
+      case 'calves': return m.calfLeft;
+      default: return null;
+    }
+  }
+}
+
+class _TargetTile extends ConsumerWidget {
+  final target.BodyTarget bodyTarget;
+  const _TargetTile({required this.bodyTarget});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 12),
+      child: ListTile(
+        title: Text('${bodyTarget.metric.toUpperCase()} Target: ${bodyTarget.targetValue}', style: const TextStyle(fontWeight: FontWeight.bold)),
+        subtitle: Text('Set on ${DateFormat('MMM d, yyyy').format(bodyTarget.createdAt)}' + 
+            (bodyTarget.deadline != null ? ' • Deadline: ${DateFormat('MMM d').format(bodyTarget.deadline!)}' : '')),
+        trailing: IconButton(
+          icon: const Icon(LucideIcons.trash2, size: 18, color: Colors.grey),
+          onPressed: () => ref.read(bodyTargetsListProvider.notifier).deleteTarget(bodyTarget.id),
+        ),
+      ),
+    );
+  }
+}
+
+class _AddTargetSheet extends StatefulWidget {
+  final String metric;
+  final String metricLabel;
+  final Function(target.BodyTarget) onAdd;
+  const _AddTargetSheet({required this.metric, required this.metricLabel, required this.onAdd});
+
+  @override
+  State<_AddTargetSheet> createState() => _AddTargetSheetState();
+}
+
+class _AddTargetSheetState extends State<_AddTargetSheet> {
+  final _targetValC = TextEditingController();
+  DateTime? _deadline;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(20, 20, 20, MediaQuery.of(context).viewInsets.bottom + 20),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text('Set Target for ${widget.metricLabel}', style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 20),
+          TextField(
+            controller: _targetValC,
+            autofocus: true,
+            keyboardType: TextInputType.number,
+            decoration: InputDecoration(
+              labelText: 'Target Value (${widget.metricLabel.contains('kg') ? 'kg' : 'cm/%'})',
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+          ),
+          const SizedBox(height: 12),
+          ListTile(
+            title: const Text('Deadline (Optional)'),
+            subtitle: Text(_deadline == null ? 'None' : DateFormat('MMM d, yyyy').format(_deadline!)),
+            trailing: const Icon(LucideIcons.calendar),
+            onTap: () async {
+              final d = await showDatePicker(
+                context: context,
+                initialDate: DateTime.now().add(const Duration(days: 30)),
+                firstDate: DateTime.now(),
+                lastDate: DateTime.now().add(const Duration(days: 365 * 2)),
+              );
+              if (d != null) setState(() => _deadline = d);
+            },
+          ),
+          const SizedBox(height: 24),
+          ElevatedButton(
+            onPressed: () {
+              final val = double.tryParse(_targetValC.text);
+              if (val != null) {
+                widget.onAdd(target.BodyTarget(
+                  id: 0,
+                  metric: widget.metric,
+                  targetValue: val,
+                  deadline: _deadline,
+                  createdAt: DateTime.now(),
+                ));
+                Navigator.pop(context);
+              }
+            },
+            child: const Text('Save Target'),
+          ),
+        ],
       ),
     );
   }

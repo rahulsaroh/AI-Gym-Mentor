@@ -5,7 +5,6 @@ import 'package:ai_gym_mentor/features/shell/placeholder_screens.dart'
     hide
         SplashScreen,
         OnboardingScreen,
-        ExerciseLibraryScreen,
         WorkoutScreen,
         HistoryScreen,
         SettingsScreen;
@@ -22,6 +21,7 @@ import 'package:ai_gym_mentor/features/history/workout_detail_screen.dart';
 import 'package:ai_gym_mentor/features/analytics/analytics_dashboard_screen.dart';
 import 'package:ai_gym_mentor/features/analytics/pr_hall_of_fame_screen.dart';
 import 'package:ai_gym_mentor/features/analytics/body_measurements_screen.dart';
+import 'package:ai_gym_mentor/features/analytics/progress_photos_screen.dart';
 import 'package:ai_gym_mentor/features/settings/settings_screen.dart';
 import 'package:ai_gym_mentor/features/settings/plates_config_screen.dart';
 import 'package:ai_gym_mentor/features/settings/about_screen.dart';
@@ -68,6 +68,50 @@ final router = GoRouter(
         return ProgramDetailScreen(templateId: id);
       },
     ),
+    // Exercise library — accessible via push from Settings or anywhere, not a bottom tab
+    GoRoute(
+      path: '/exercises',
+      builder: (context, state) => const ExerciseListScreen(),
+      routes: [
+        GoRoute(
+          path: 'muscle-groups',
+          builder: (context, state) => const MuscleGroupScreen(),
+        ),
+        GoRoute(
+          path: 'create',
+          builder: (context, state) =>
+              const ExerciseDetailScreen(exerciseId: 0),
+        ),
+        GoRoute(
+          path: ':id',
+          builder: (context, state) {
+            final idStr = state.pathParameters['id'];
+            if (idStr == 'create') {
+              return const ExerciseDetailScreen(exerciseId: 0);
+            }
+            final id = int.tryParse(idStr ?? '0') ?? 0;
+            return ExerciseDetailScreen(exerciseId: id);
+          },
+        ),
+        GoRoute(
+          path: ':id/edit',
+          builder: (context, state) {
+            final id =
+                int.tryParse(state.pathParameters['id'] ?? '0') ?? 0;
+            return ExerciseDetailScreen(
+                exerciseId: id, isEditing: true);
+          },
+        ),
+        GoRoute(
+          path: 'history/:id',
+          builder: (context, state) {
+            final id =
+                int.tryParse(state.pathParameters['id'] ?? '0') ?? 0;
+            return ExerciseHistoryScreen(exerciseId: id);
+          },
+        ),
+      ],
+    ),
     StatefulShellRoute.indexedStack(
       builder: (context, state, navigationShell) {
         return MainShell(child: navigationShell);
@@ -92,57 +136,6 @@ final router = GoRouter(
                         ? int.tryParse(state.uri.queryParameters['dayId']!)
                         : null;
                     return ActiveWorkoutScreen(workoutId: id, dayId: dayId);
-                  },
-                ),
-              ],
-            ),
-          ],
-        ),
-        StatefulShellBranch(
-          routes: [
-            GoRoute(
-              path: '/exercises',
-              builder: (context, state) => const MuscleGroupScreen(),
-              routes: [
-                GoRoute(
-                  path: 'list',
-                  builder: (context, state) => const ExerciseListScreen(),
-                ),
-                GoRoute(
-                  path: 'muscle-groups',
-                  builder: (context, state) => const MuscleGroupScreen(),
-                ),
-                GoRoute(
-                  path: 'create',
-                  builder: (context, state) =>
-                      const ExerciseDetailScreen(exerciseId: 0),
-                ),
-                GoRoute(
-                  path: ':id',
-                  builder: (context, state) {
-                    final idStr = state.pathParameters['id'];
-                    if (idStr == 'create') {
-                      return const ExerciseDetailScreen(exerciseId: 0);
-                    }
-                    final id = int.tryParse(idStr ?? '0') ?? 0;
-                    return ExerciseDetailScreen(exerciseId: id);
-                  },
-                ),
-                GoRoute(
-                  path: ':id/edit',
-                  builder: (context, state) {
-                    final id =
-                        int.tryParse(state.pathParameters['id'] ?? '0') ?? 0;
-                    return ExerciseDetailScreen(
-                        exerciseId: id, isEditing: true);
-                  },
-                ),
-                GoRoute(
-                  path: 'history/:id',
-                  builder: (context, state) {
-                    final id =
-                        int.tryParse(state.pathParameters['id'] ?? '0') ?? 0;
-                    return ExerciseHistoryScreen(exerciseId: id);
                   },
                 ),
               ],
@@ -188,6 +181,10 @@ final router = GoRouter(
                 GoRoute(
                   path: 'measurements',
                   builder: (context, state) => const BodyMeasurementsScreen(),
+                ),
+                GoRoute(
+                  path: 'photos',
+                  builder: (context, state) => const ProgressPhotosScreen(),
                 ),
               ],
             ),

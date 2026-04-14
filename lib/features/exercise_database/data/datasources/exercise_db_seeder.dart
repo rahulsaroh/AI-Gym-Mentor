@@ -10,7 +10,7 @@ class ExerciseDbSeeder {
   static final ExerciseDbSeeder instance = ExerciseDbSeeder._();
   ExerciseDbSeeder._();
 
-  static const String _seedKey = 'exercises_seed_v2'; // Bumped version for new schema
+  static const String _seedKey = 'exercises_seed_v4'; // Forced re-seed for layout/granularity fixes
 
   Future<void> seed([AppDatabase? providedDb]) async {
     final prefs = await SharedPreferences.getInstance();
@@ -156,15 +156,21 @@ class ExerciseDbSeeder {
     final parts = <String>{};
 
     for (var m in all) {
-      if (m.contains('pector') || m.contains('chest')) parts.add('chest');
-      else if (m.contains('lat') || m.contains('rhombo') || m.contains('trape') || m.contains('back')) parts.add('back');
-      else if (m.contains('deltoid') || m.contains('shoulder')) parts.add('shoulders');
-      else if (m.contains('bicep') || m.contains('tricep') || m.contains('forearm')) parts.add('arms');
-      else if (m.contains('abdom') || m.contains('core') || m.contains('oblique')) parts.add('core');
-      else if (m.contains('quad') || m.contains('hamstr') || m.contains('glute') || m.contains('calf') || m.contains('leg')) parts.add('legs');
+      if (m.contains('pector') || m.contains('chest')) parts.add('Chest');
+      else if (m.contains('lat') || m.contains('rhombo') || m.contains('trape') || m.contains('back')) parts.add('Back');
+      else if (m.contains('deltoid') || m.contains('shoulder')) parts.add('Shoulders');
+      else if (m.contains('bicep')) parts.add('Biceps');
+      else if (m.contains('tricep')) parts.add('Triceps');
+      else if (m.contains('forearm')) parts.add('Arms');
+      else if (m.contains('abdom') || m.contains('core') || m.contains('oblique')) parts.add('Abs');
+      else if (m.contains('quad')) parts.add('Quads');
+      else if (m.contains('hamstr')) parts.add('Hamstrings');
+      else if (m.contains('glute')) parts.add('Glutes');
+      else if (m.contains('calf')) parts.add('Calves');
+      else if (m.contains('leg')) parts.add('Legs');
     }
     
-    if (parts.isEmpty) parts.add('full body');
+    if (parts.isEmpty) parts.add('Other');
     return parts.toList();
   }
 

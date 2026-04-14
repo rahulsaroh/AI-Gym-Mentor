@@ -4,6 +4,8 @@ import 'package:ai_gym_mentor/features/exercise_database/data/datasources/exerci
 import 'package:ai_gym_mentor/features/exercise_database/data/datasources/exercise_remote_datasource.dart';
 import 'package:ai_gym_mentor/features/exercise_database/domain/entities/exercise_entity.dart';
 import 'package:ai_gym_mentor/features/exercise_database/domain/repositories/exercise_repository.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:drift/drift.dart';
 
 class ExerciseRepositoryImpl implements ExerciseRepository {
   final ExerciseLocalDatasource _localDatasource;
@@ -49,6 +51,8 @@ class ExerciseRepositoryImpl implements ExerciseRepository {
       progressionPath: [],
       isFavorite: row.isFavorite,
       isEnriched: row.isEnriched,
+      nameHi: row.nameHi,
+      nameMr: row.nameMr,
       setType: row.setType,
       restTime: row.restTime,
       source: row.source,
@@ -176,7 +180,31 @@ class ExerciseRepositoryImpl implements ExerciseRepository {
 
   @override
   Future<String?> fetchGifUrl(String exerciseName) async {
-    return await _remoteDatasource.fetchGifUrl(exerciseName);
+    // 1. Check if we already have it in local DB
+    final query = await searchExercises(exerciseName, limit: 1);
+    if (query.isNotEmpty && query.first.gifUrl != null) {
+      return query.first.gifUrl;
+    }
+
+    // 2. Check connectivity
+    final connectivity = await Connectivity().checkConnectivity();
+    final isOnline = connectivity.isNotEmpty && !connectivity.contains(ConnectivityResult.none);
+    
+    if (!isOnline) return null;
+
+    // 3. Fetch from remote
+    final url = await _remoteDatasource.fetchGifUrl(exerciseName);
+    
+    // 4. If fetched, persist it to DB for offline use
+    if (url != null && query.isNotEmpty) {
+      final exerciseId = query.first.id;
+      // We need a way to update the exercise record. 
+      // I'll add a specific update method or use the datasource's raw DB access if available.
+      // Since ExerciseRepository can update, let's use the local datasource.
+      await _localDatasource.updateExercise(exerciseId, ExercisesCompanion(gifUrl: Value(url)));
+    }
+
+    return url;
   }
 
   @override
@@ -185,6 +213,8 @@ class ExerciseRepositoryImpl implements ExerciseRepository {
     List<String>? commonMistakes,
     List<String>? variations,
     String? enrichedOverview,
+    String? nameHi,
+    String? nameMr,
     String enrichmentSource = 'llm',
   }) async {
     await _localDatasource.saveEnrichedContent(
@@ -194,6 +224,15 @@ class ExerciseRepositoryImpl implements ExerciseRepository {
       variations: variations,
       enrichedOverview: enrichedOverview,
       enrichmentSource: enrichmentSource,
+    );
+
+    // Update localized names in main exercises table
+    await _localDatasource.updateExercise(
+      exerciseId,
+      ExercisesCompanion(
+        nameHi: Value(nameHi),
+        nameMr: Value(nameMr),
+      ),
     );
   }
 

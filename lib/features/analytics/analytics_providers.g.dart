@@ -281,3 +281,92 @@ abstract class _$BodyMeasurementsList
     element.handleCreate(ref, build);
   }
 }
+
+@ProviderFor(BodyTargetsList)
+final bodyTargetsListProvider = BodyTargetsListProvider._();
+
+final class BodyTargetsListProvider
+    extends $AsyncNotifierProvider<BodyTargetsList, List<target.BodyTarget>> {
+  BodyTargetsListProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'bodyTargetsListProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$bodyTargetsListHash();
+
+  @$internal
+  @override
+  BodyTargetsList create() => BodyTargetsList();
+}
+
+String _$bodyTargetsListHash() => r'51c692e8e60f16383576dd395f7b906b71ed8de6';
+
+abstract class _$BodyTargetsList
+    extends $AsyncNotifier<List<target.BodyTarget>> {
+  FutureOr<List<target.BodyTarget>> build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref
+        as $Ref<AsyncValue<List<target.BodyTarget>>, List<target.BodyTarget>>;
+    final element = ref.element as $ClassProviderElement<
+        AnyNotifier<AsyncValue<List<target.BodyTarget>>,
+            List<target.BodyTarget>>,
+        AsyncValue<List<target.BodyTarget>>,
+        Object?,
+        Object?>;
+    element.handleCreate(ref, build);
+  }
+}
+
+@ProviderFor(ProgressPhotosList)
+final progressPhotosListProvider = ProgressPhotosListProvider._();
+
+final class ProgressPhotosListProvider extends $AsyncNotifierProvider<
+    ProgressPhotosList, List<photo.ProgressPhoto>> {
+  ProgressPhotosListProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'progressPhotosListProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$progressPhotosListHash();
+
+  @$internal
+  @override
+  ProgressPhotosList create() => ProgressPhotosList();
+}
+
+String _$progressPhotosListHash() =>
+    r'0e2fc2385b0d68681a896ec78a55549be71f4c8b';
+
+abstract class _$ProgressPhotosList
+    extends $AsyncNotifier<List<photo.ProgressPhoto>> {
+  FutureOr<List<photo.ProgressPhoto>> build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<AsyncValue<List<photo.ProgressPhoto>>,
+        List<photo.ProgressPhoto>>;
+    final element = ref.element as $ClassProviderElement<
+        AnyNotifier<AsyncValue<List<photo.ProgressPhoto>>,
+            List<photo.ProgressPhoto>>,
+        AsyncValue<List<photo.ProgressPhoto>>,
+        Object?,
+        Object?>;
+    element.handleCreate(ref, build);
+  }
+}

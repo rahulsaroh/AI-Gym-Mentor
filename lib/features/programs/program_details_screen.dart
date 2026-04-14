@@ -59,6 +59,12 @@ class ProgramDetailScreen extends ConsumerWidget {
       ),
       actions: [
         IconButton(
+          icon: const Icon(LucideIcons.edit, color: Colors.white),
+          onPressed: () => context.push('/programs/edit/${program.id}'),
+          style: IconButton.styleFrom(backgroundColor: Colors.black26),
+          tooltip: 'Edit program',
+        ),
+        IconButton(
           icon: const Icon(LucideIcons.sparkles, color: Colors.white),
           onPressed: () {},
           style: IconButton.styleFrom(backgroundColor: Colors.black26),
@@ -335,6 +341,7 @@ class ProgramDetailScreen extends ConsumerWidget {
           height: 56,
           child: ElevatedButton(
             onPressed: () async {
+              final router = GoRouter.of(context);
               final repo = ref.read(workoutRepositoryProvider);
               final days = await repo.getTemplateDays(templateId);
               if (days.isNotEmpty && context.mounted) {
@@ -344,7 +351,8 @@ class ProgramDetailScreen extends ConsumerWidget {
                   name: program.name,
                 );
                 if (context.mounted) {
-                  context.push('/app/workout/active?id=$id&dayId=${days.first.id}');
+                  context.pop(); // Close if we were on some sheet (unlikely here but safe)
+                  router.push('/app/workout/active?id=$id&dayId=${days.first.id}');
                 }
               }
             },
@@ -377,19 +385,33 @@ class ProgramDetailScreen extends ConsumerWidget {
         content: Text('Do you want to start this specific workout session now?'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () {
+              // Get router before any async operations
+              final router = GoRouter.of(context);
+              Navigator.pop(context);
+            },
             child: const Text('Cancel'),
           ),
           TextButton(
             onPressed: () async {
-              Navigator.pop(context);
+              // Get router reference before entering async context to ensure it's available
+              final router = GoRouter.of(context);
+              
+              // Close dialog immediately to preserve context state
+              if (context.mounted) {
+                Navigator.pop(context);
+              }
+              
+              // Now perform the async operation
               final id = await ref.read(workoutHomeProvider.notifier).startWorkout(
                 templateId: day.templateId,
                 dayId: day.id,
                 name: programName,
               );
+              
+              // Navigate only if context is still mounted
               if (context.mounted) {
-                context.push('/app/workout/active?id=$id&dayId=${day.id}');
+                router.push('/app/workout/active?id=$id&dayId=${day.id}');
               }
             },
             child: const Text('Start Now', style: TextStyle(fontWeight: FontWeight.bold)),

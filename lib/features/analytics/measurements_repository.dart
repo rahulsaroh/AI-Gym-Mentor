@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart';
 import 'package:ai_gym_mentor/core/database/database.dart';
-import 'package:ai_gym_mentor/core/domain/entities/body_measurement.dart' as ent;
+import 'package:ai_gym_mentor/core/domain/entities/body_measurement.dart' as ent_m;
+import 'package:ai_gym_mentor/core/domain/entities/body_target.dart' as ent_t;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'measurements_repository.g.dart';
@@ -9,8 +10,8 @@ class MeasurementsRepository {
   final AppDatabase db;
   MeasurementsRepository(this.db);
 
-  ent.BodyMeasurement _toEntity(BodyMeasurementTable row) {
-    return ent.BodyMeasurement(
+  ent_m.BodyMeasurement _toEntity(BodyMeasurementTable row) {
+    return ent_m.BodyMeasurement(
       id: row.id,
       date: row.date,
       weight: row.weight,
@@ -32,7 +33,17 @@ class MeasurementsRepository {
     );
   }
 
-  Future<List<ent.BodyMeasurement>> getAllMeasurements() async {
+  ent_t.BodyTarget _toTargetEntity(BodyTarget row) {
+    return ent_t.BodyTarget(
+      id: row.id,
+      metric: row.metric,
+      targetValue: row.targetValue,
+      deadline: row.deadline,
+      createdAt: row.createdAt,
+    );
+  }
+
+  Future<List<ent_m.BodyMeasurement>> getAllMeasurements() async {
     final rows = await (db.select(db.bodyMeasurements)
           ..orderBy([(t) => OrderingTerm(expression: t.date, mode: OrderingMode.desc)]))
         .get();
@@ -54,7 +65,7 @@ class MeasurementsRepository {
     });
   }
 
-  Future<int> addMeasurement(ent.BodyMeasurement measurement) async {
+  Future<int> addMeasurement(ent_m.BodyMeasurement measurement) async {
     return await db.transaction(() async {
       final id = await db.into(db.bodyMeasurements).insert(BodyMeasurementsCompanion.insert(
             date: measurement.date,
@@ -84,9 +95,9 @@ class MeasurementsRepository {
     });
   }
 
-  Future<void> updateMeasurement(ent.BodyMeasurement measurement) async {
+  Future<void> updateMeasurement(ent_m.BodyMeasurement measurement) async {
     await db.update(db.bodyMeasurements).replace(BodyMeasurementTable(
-      id: measurement.id,
+      id: measurement.id!,
       date: measurement.date,
       weight: measurement.weight,
       bodyFat: measurement.bodyFat,
@@ -111,13 +122,41 @@ class MeasurementsRepository {
     await (db.delete(db.bodyMeasurements)..where((t) => t.id.equals(id))).go();
   }
 
-  Future<List<ent.BodyMeasurement>> getTrendData(String metric) async {
-    // Return last 20 entries for a specific metric to avoid chart clutter
+  Future<List<ent_m.BodyMeasurement>> getTrendData(String metric) async {
     final rows = await (db.select(db.bodyMeasurements)
           ..orderBy([(t) => OrderingTerm(expression: t.date, mode: OrderingMode.asc)])
           ..limit(20))
         .get();
     return rows.map(_toEntity).toList();
+  }
+
+  Future<List<ent_t.BodyTarget>> getAllTargets() async {
+    final rows = await (db.select(db.bodyTargets)
+          ..orderBy([(t) => OrderingTerm(expression: t.createdAt, mode: OrderingMode.desc)]))
+        .get();
+    return rows.map(_toTargetEntity).toList();
+  }
+
+  Future<ent_t.BodyTarget?> getTargetForMetric(String metric) async {
+    final row = await (db.select(db.bodyTargets)
+          ..where((t) => t.metric.equals(metric))
+          ..orderBy([(t) => OrderingTerm(expression: t.createdAt, mode: OrderingMode.desc)])
+          ..limit(1))
+        .getSingleOrNull();
+    return row != null ? _toTargetEntity(row) : null;
+  }
+
+  Future<int> addTarget(ent_t.BodyTarget tb) async {
+    return await db.into(db.bodyTargets).insert(BodyTargetsCompanion.insert(
+          metric: tb.metric,
+          targetValue: tb.targetValue,
+          deadline: Value(tb.deadline),
+          createdAt: DateTime.now(),
+        ));
+  }
+
+  Future<void> deleteTarget(int id) async {
+    await (db.delete(db.bodyTargets)..where((t) => t.id.equals(id))).go();
   }
 }
 

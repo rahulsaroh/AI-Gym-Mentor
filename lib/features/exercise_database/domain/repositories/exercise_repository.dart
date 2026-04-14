@@ -47,6 +47,8 @@ abstract class ExerciseRepository {
     List<String>? commonMistakes,
     List<String>? variations,
     String? enrichedOverview,
+    String? nameHi,
+    String? nameMr,
     String enrichmentSource = 'llm',
   });
   

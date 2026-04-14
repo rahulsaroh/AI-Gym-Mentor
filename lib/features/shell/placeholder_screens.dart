@@ -43,7 +43,6 @@ class MainShell extends ConsumerWidget {
         items: const [
           BottomNavigationBarItem(
               icon: Icon(Icons.fitness_center), label: 'Active'),
-          BottomNavigationBarItem(icon: Icon(Icons.list), label: 'Exercise'),
           BottomNavigationBarItem(
               icon: Icon(Icons.history), label: 'History'),
           BottomNavigationBarItem(

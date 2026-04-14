@@ -8,9 +8,13 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:ai_gym_mentor/features/exercise_database/presentation/providers/exercise_providers.dart';
 import 'package:ai_gym_mentor/features/exercise_database/presentation/providers/repository_provider.dart';
 import 'package:ai_gym_mentor/features/exercise_database/domain/entities/exercise_entity.dart';
-import 'package:ai_gym_mentor/core/database/database.dart' as db;
+import 'package:ai_gym_mentor/features/exercise_database/presentation/widgets/muscle_diagram_widget.dart';
+import 'package:ai_gym_mentor/features/exercise_database/presentation/widgets/instruction_step_widget.dart';
+import 'package:ai_gym_mentor/features/exercise_database/presentation/widgets/safety_tips_widget.dart';
+import 'package:ai_gym_mentor/features/exercise_database/presentation/widgets/progression_path_widget.dart';
 import 'package:ai_gym_mentor/features/exercise_database/data/datasources/gemini_service.dart';
 import 'package:ai_gym_mentor/features/exercise_database/presentation/providers/exercise_history_provider.dart';
+import 'package:ai_gym_mentor/l10n/app_localizations.dart';
 
 class ExerciseDetailScreen extends ConsumerStatefulWidget {
   final int exerciseId;
@@ -28,6 +32,7 @@ class ExerciseDetailScreen extends ConsumerStatefulWidget {
 
 class _ExerciseDetailScreenState extends ConsumerState<ExerciseDetailScreen> with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  bool _isEnriching = false;
 
   @override
   void initState() {
@@ -78,14 +83,16 @@ class _ExerciseDetailScreenState extends ConsumerState<ExerciseDetailScreen> wit
                       color: Theme.of(context).colorScheme.surface,
                       child: TabBar(
                         controller: _tabController,
+                        isScrollable: true,
+                        tabAlignment: TabAlignment.start,
                         labelColor: Theme.of(context).colorScheme.primary,
                         unselectedLabelColor: Theme.of(context).colorScheme.outline,
                         indicatorColor: Theme.of(context).colorScheme.primary,
                         indicatorSize: TabBarIndicatorSize.label,
-                        tabs: const [
-                          Tab(text: 'Overview'),
-                          Tab(text: 'Guide'),
-                          Tab(text: 'Progress'),
+                        tabs: [
+                          Tab(text: AppLocalizations.of(context)!.library),
+                          Tab(text: AppLocalizations.of(context)!.how_to_perform),
+                          Tab(text: AppLocalizations.of(context)!.progression_path),
                         ],
                       ),
                     ),
@@ -131,21 +138,7 @@ class _ExerciseDetailScreenState extends ConsumerState<ExerciseDetailScreen> wit
         ),
       ),
       actions: [
-        Padding(
-          padding: const EdgeInsets.all(4.0),
-          child: CircleAvatar(
-            backgroundColor: Colors.black.withValues(alpha: 0.3),
-            child: IconButton(
-              icon: Icon(
-                exercise.isEnriched ? LucideIcons.sparkles : LucideIcons.sparkle,
-                color: exercise.isEnriched ? Colors.amber : Colors.white,
-                size: 18,
-              ),
-              onPressed: () => _showEnrichmentDialog(context, exercise),
-              tooltip: 'AI Enrichment',
-            ),
-          ),
-        ),
+        if (!exercise.isEnriched) _buildEnrichmentButton(exercise),
         Padding(
           padding: const EdgeInsets.all(4.0),
           child: CircleAvatar(
@@ -173,33 +166,35 @@ class _ExerciseDetailScreenState extends ConsumerState<ExerciseDetailScreen> wit
         background: Stack(
           fit: StackFit.expand,
           children: [
-            Hero(
-              tag: 'ex_${exercise.id}',
-              child: exercise.gifUrl != null && !isOffline
-                  ? CachedNetworkImage(
-                      imageUrl: exercise.gifUrl!,
-                      fit: BoxFit.cover,
-                      placeholder: (_, __) => Container(color: Colors.grey.shade900),
-                    )
-                  : exercise.imageUrls.isNotEmpty
-                      ? CachedNetworkImage(
-                          imageUrl: exercise.imageUrls.first,
-                          fit: BoxFit.cover,
-                        )
-                      : Container(
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [Theme.of(context).colorScheme.primary, Theme.of(context).colorScheme.secondary],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
+            GestureDetector(
+              onTap: () => _showFullScreenMedia(context, exercise, isOffline),
+              child: Hero(
+                tag: 'ex_${exercise.id}',
+                child: exercise.gifUrl != null && !isOffline
+                    ? CachedNetworkImage(
+                        imageUrl: exercise.gifUrl!,
+                        fit: BoxFit.cover,
+                        placeholder: (_, __) => Container(color: Colors.grey.shade900),
+                      )
+                    : exercise.imageUrls.isNotEmpty
+                        ? CachedNetworkImage(
+                            imageUrl: exercise.imageUrls.first,
+                            fit: BoxFit.cover,
+                          )
+                        : Container(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [Theme.of(context).colorScheme.primary, Theme.of(context).colorScheme.secondary],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                            ),
+                            child: Center(
+                              child: Icon(LucideIcons.dumbbell, size: 80, color: Colors.white.withValues(alpha: 0.2)),
                             ),
                           ),
-                          child: Center(
-                            child: Icon(LucideIcons.dumbbell, size: 80, color: Colors.white.withValues(alpha: 0.2)),
-                          ),
-                        ),
+              ),
             ),
-            // Gradient Overlay
             DecoratedBox(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
@@ -214,7 +209,6 @@ class _ExerciseDetailScreenState extends ConsumerState<ExerciseDetailScreen> wit
                 ),
               ),
             ),
-            // Header Info
             Positioned(
               left: 20,
               right: 20,
@@ -238,7 +232,7 @@ class _ExerciseDetailScreenState extends ConsumerState<ExerciseDetailScreen> wit
                   Row(
                     children: [
                       Text(
-                        exercise.name,
+                        _getLocalizedName(exercise),
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 28,
@@ -279,11 +273,17 @@ class _ExerciseDetailScreenState extends ConsumerState<ExerciseDetailScreen> wit
   }
 
   Widget _buildOverviewTab(ExerciseEntity exercise) {
+    final l10n = AppLocalizations.of(context)!;
     return ListView(
       padding: const EdgeInsets.all(20),
       children: [
-        _buildSectionHeader('Muscles Targeted', LucideIcons.target),
+        _buildSectionHeader(l10n.muscles_worked, LucideIcons.target),
         const SizedBox(height: 12),
+        MuscleDiagramWidget(
+          primaryMuscles: exercise.primaryMuscles,
+          secondaryMuscles: exercise.secondaryMuscles,
+        ),
+        const SizedBox(height: 20),
         Wrap(
           spacing: 10,
           runSpacing: 10,
@@ -315,7 +315,7 @@ class _ExerciseDetailScreenState extends ConsumerState<ExerciseDetailScreen> wit
           'Direction of energy output during movement',
         ),
         const SizedBox(height: 32),
-        _buildSectionHeader('Related Exercises', LucideIcons.gitBranch),
+        _buildSectionHeader(l10n.similar_exercises, LucideIcons.gitBranch),
         const SizedBox(height: 12),
         _buildSimilarExercisesGrid(exercise),
         const SizedBox(height: 40),
@@ -324,25 +324,29 @@ class _ExerciseDetailScreenState extends ConsumerState<ExerciseDetailScreen> wit
   }
 
   Widget _buildGuideTab(ExerciseEntity exercise) {
+    final l10n = AppLocalizations.of(context)!;
     return ListView(
       padding: const EdgeInsets.all(20),
       children: [
-        _buildSectionHeader('Step-by-Step Instructions', LucideIcons.listOrdered),
+        _buildSectionHeader(l10n.how_to_perform, LucideIcons.listOrdered),
         const SizedBox(height: 16),
-        ...exercise.instructions.asMap().entries.map((entry) => _PremiumInstructionStep(
-              stepNumber: entry.key + 1,
-              instruction: entry.value,
-              isLast: entry.key == exercise.instructions.length - 1,
-            )),
+        if (exercise.instructions.isEmpty)
+          _buildEmptyInstructions(exercise)
+        else
+          ...exercise.instructions.asMap().entries.map((entry) => InstructionStepWidget(
+                stepNumber: entry.key + 1,
+                instruction: entry.value,
+                isLast: entry.key == exercise.instructions.length - 1,
+              )),
         const SizedBox(height: 32),
         if (exercise.safetyTips.isNotEmpty) ...[
-          _buildSectionHeader('Safety Tips', LucideIcons.shieldAlert, color: Colors.amber),
+          _buildSectionHeader(l10n.keep_in_mind, LucideIcons.shieldAlert, color: Colors.amber),
           const SizedBox(height: 12),
-          ...exercise.safetyTips.map((tip) => _PremiumSafetyTip(tip: tip)),
+          SafetyTipsWidget(tips: exercise.safetyTips),
           const SizedBox(height: 32),
         ],
         if (exercise.commonMistakes.isNotEmpty) ...[
-          _buildSectionHeader('Common Mistakes', LucideIcons.circleX, color: Colors.red),
+          _buildSectionHeader(l10n.avoid_mistakes, LucideIcons.circleX, color: Colors.red),
           const SizedBox(height: 12),
           ...exercise.commonMistakes.map((mistake) => _PremiumMistakeCard(mistake: mistake)),
           const SizedBox(height: 40),
@@ -352,6 +356,7 @@ class _ExerciseDetailScreenState extends ConsumerState<ExerciseDetailScreen> wit
   }
 
   Widget _buildProgressTab(ExerciseEntity exercise) {
+    final l10n = AppLocalizations.of(context)!;
     return ListView(
       padding: const EdgeInsets.all(20),
       children: [
@@ -359,9 +364,12 @@ class _ExerciseDetailScreenState extends ConsumerState<ExerciseDetailScreen> wit
         const SizedBox(height: 16),
         _buildExerciseStats(exercise),
         const SizedBox(height: 32),
-        _buildSectionHeader('Progression Path', LucideIcons.trendingUp),
+        _buildSectionHeader(l10n.progression_path, LucideIcons.trendingUp),
         const SizedBox(height: 16),
-        _buildProgressionPathVisual(exercise),
+        ProgressionPathWidget(
+          chain: ref.watch(progressionChainProvider(exercise.id)).value ?? [],
+          currentExerciseId: exercise.id.toString(),
+        ),
         const SizedBox(height: 40),
       ],
     );
@@ -447,19 +455,18 @@ class _ExerciseDetailScreenState extends ConsumerState<ExerciseDetailScreen> wit
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               ),
-              child: const Text('Add to Plan', style: TextStyle(fontWeight: FontWeight.bold)),
+              child: Text(AppLocalizations.of(context)!.add_to_workout, style: const TextStyle(fontWeight: FontWeight.bold)),
             ),
           ),
           const SizedBox(width: 12),
-          Container(
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.4),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: IconButton(
+          Expanded(
+            child: OutlinedButton(
               onPressed: () => context.push('/exercises/history/${exercise.id}'),
-              icon: Icon(LucideIcons.history, color: Theme.of(context).colorScheme.primary),
-              padding: const EdgeInsets.all(16),
+              style: OutlinedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              ),
+              child: Text(AppLocalizations.of(context)!.log_exercise, style: const TextStyle(fontWeight: FontWeight.bold)),
             ),
           ),
         ],
@@ -569,38 +576,97 @@ class _ExerciseDetailScreenState extends ConsumerState<ExerciseDetailScreen> wit
     );
   }
 
-  void _showEnrichmentDialog(BuildContext context, ExerciseEntity exercise) {
+  void _showFullScreenMedia(BuildContext context, ExerciseEntity exercise, bool isOffline) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Row(
-          children: [
-            Icon(LucideIcons.sparkles, color: Colors.amber),
-            SizedBox(width: 12),
-            Text('AI Enrichment'),
-          ],
-        ),
-        content: Text(exercise.isEnriched 
-          ? 'This exercise has already been enriched. Would you like to re-sync with AI for potentially newer insights?' 
-          : 'Sync with Gemini AI to generate professional safety tips, common mistakes, and localized names (Hindi/Marathi).'),
-        actions: [
-          TextButton(
+      useSafeArea: false,
+      builder: (context) => Scaffold(
+        backgroundColor: Colors.black,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(Icons.close, color: Colors.white),
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
           ),
-          FilledButton(
-            onPressed: () {
-              Navigator.pop(context);
-              _enrichExercise(exercise);
-            },
-            child: const Text('Enrich Now'),
+        ),
+        body: Center(
+          child: InteractiveViewer(
+            clipBehavior: Clip.none,
+            child: exercise.gifUrl != null && !isOffline
+                ? CachedNetworkImage(imageUrl: exercise.gifUrl!)
+                : exercise.imageUrls.isNotEmpty
+                    ? CachedNetworkImage(imageUrl: exercise.imageUrls.first)
+                    : const Icon(LucideIcons.dumbbell, size: 100, color: Colors.white54),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEmptyInstructions(ExerciseEntity exercise) {
+    return Container(
+      padding: const EdgeInsets.all(32),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Column(
+        children: [
+          Icon(LucideIcons.helpCircle, size: 48, color: Theme.of(context).colorScheme.outline),
+          const SizedBox(height: 16),
+          const Text(
+            'Demonstration Instructions Missing',
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'We don\'t have step-by-step instructions for this exercise yet. Let our AI Expert find them for you!',
+            style: TextStyle(color: Theme.of(context).colorScheme.outline, fontSize: 14),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 24),
+          FilledButton.icon(
+            onPressed: () => _handleEnrichment(exercise),
+            icon: const Icon(LucideIcons.sparkles, size: 18),
+            label: const Text('Consult AI Expert'),
           ),
         ],
       ),
     );
   }
 
-  Future<void> _enrichExercise(ExerciseEntity exercise) async {
+  String _getLocalizedName(ExerciseEntity exercise) {
+    final locale = Localizations.localeOf(context).languageCode;
+    if (locale == 'hi' && exercise.nameHi != null) return exercise.nameHi!;
+    if (locale == 'mr' && exercise.nameMr != null) return exercise.nameMr!;
+    return exercise.name;
+  }
+
+  Widget _buildEnrichmentButton(ExerciseEntity exercise) {
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 300),
+      child: _isEnriching
+          ? Container(
+              padding: const EdgeInsets.all(8),
+              decoration: const BoxDecoration(color: Colors.black45, shape: BoxShape.circle),
+              child: const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)),
+            )
+          : Tooltip(
+              message: 'Enrich with AI Expert (Safety, Tips, Translations)',
+              child: FloatingActionButton.small(
+                heroTag: 'enrich_btn',
+                onPressed: () => _handleEnrichment(exercise),
+                backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+                child: const Icon(LucideIcons.sparkles, size: 18),
+              ),
+            ),
+    );
+  }
+
+  Future<void> _handleEnrichment(ExerciseEntity exercise) async {
+    setState(() => _isEnriching = true);
     // Show loading overlay
     showDialog(
       context: context,
@@ -618,14 +684,17 @@ class _ExerciseDetailScreenState extends ConsumerState<ExerciseDetailScreen> wit
     );
 
     try {
-      final data = await ref.read(geminiServiceProvider.notifier).enrichExercise(exercise);
+      final gemini = ref.read(geminiServiceProvider.notifier);
+      final data = await gemini.enrichExercise(exercise);
       
       await ref.read(exerciseRepositoryProvider).saveEnrichedContent(
         exercise.id,
-        safetyTips: List<String>.from(data['safety_tips']),
-        commonMistakes: List<String>.from(data['common_mistakes']),
-        variations: List<String>.from(data['variations']),
-        enrichedOverview: data['overview'],
+        safetyTips: List<String>.from(data['safety_tips'] ?? []),
+        commonMistakes: List<String>.from(data['common_mistakes'] ?? []),
+        variations: List<String>.from(data['variations'] ?? []),
+        enrichedOverview: data['overview'] as String?,
+        nameHi: data['name_hindi'] as String?,
+        nameMr: data['name_marathi'] as String?,
         enrichmentSource: 'gemini-1.5-flash',
       );
 
@@ -634,6 +703,7 @@ class _ExerciseDetailScreenState extends ConsumerState<ExerciseDetailScreen> wit
       
       if (mounted) {
         Navigator.pop(context); // Close loading
+        setState(() => _isEnriching = false);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Exercise enriched successfully! ✨'),
@@ -644,6 +714,7 @@ class _ExerciseDetailScreenState extends ConsumerState<ExerciseDetailScreen> wit
     } catch (e) {
       if (mounted) {
         Navigator.pop(context); // Close loading
+        setState(() => _isEnriching = false);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Failed to enrich: $e')),
         );
@@ -652,7 +723,6 @@ class _ExerciseDetailScreenState extends ConsumerState<ExerciseDetailScreen> wit
   }
 
   Widget _buildFormScreen(ExerciseEntity exercise) {
-    // Basic implementation for now, will polish if needed in Phase 7
     return Scaffold(
       appBar: AppBar(title: const Text('Edit Exercise')),
       body: const Center(child: Text('Editor Mode - To be enhanced')),
@@ -683,95 +753,6 @@ class _PremiumMuscleChip extends StatelessWidget {
           fontWeight: isPrimary ? FontWeight.bold : FontWeight.w500,
           color: isPrimary ? color : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
         ),
-      ),
-    );
-  }
-}
-
-class _PremiumInstructionStep extends StatelessWidget {
-  final int stepNumber;
-  final String instruction;
-  final bool isLast;
-
-  const _PremiumInstructionStep({
-    required this.stepNumber,
-    required this.instruction,
-    required this.isLast,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return IntrinsicHeight(
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Column(
-            children: [
-              Container(
-                width: 28,
-                height: 28,
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primaryContainer,
-                  shape: BoxShape.circle,
-                ),
-                child: Center(
-                  child: Text(
-                    '$stepNumber',
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.primary,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 12,
-                    ),
-                  ),
-                ),
-              ),
-              if (!isLast)
-                Expanded(
-                  child: Container(
-                    width: 2,
-                    margin: const EdgeInsets.symmetric(vertical: 4),
-                    color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.5),
-                  ),
-                ),
-            ],
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.only(bottom: 24),
-              child: Text(
-                instruction,
-                style: const TextStyle(fontSize: 15, height: 1.5),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _PremiumSafetyTip extends StatelessWidget {
-  final String tip;
-  const _PremiumSafetyTip({required this.tip});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.amber.withValues(alpha: 0.05),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.amber.withValues(alpha: 0.2)),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Icon(LucideIcons.shieldAlert, size: 18, color: Colors.amber),
-          const SizedBox(width: 12),
-          Expanded(child: Text(tip, style: const TextStyle(fontSize: 14))),
-        ],
       ),
     );
   }
