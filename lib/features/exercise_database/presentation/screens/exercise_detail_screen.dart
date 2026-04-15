@@ -15,6 +15,7 @@ import 'package:ai_gym_mentor/features/exercise_database/presentation/widgets/pr
 import 'package:ai_gym_mentor/features/exercise_database/data/datasources/gemini_service.dart';
 import 'package:ai_gym_mentor/features/exercise_database/presentation/providers/exercise_history_provider.dart';
 import 'package:ai_gym_mentor/l10n/app_localizations.dart';
+import 'package:ai_gym_mentor/features/exercise_database/presentation/widgets/exercise_media_widget.dart';
 
 class ExerciseDetailScreen extends ConsumerStatefulWidget {
   final int exerciseId;
@@ -191,14 +192,12 @@ class _ExerciseDetailScreenState extends ConsumerState<ExerciseDetailScreen> wit
             children: [
               Hero(
                 tag: 'ex_${exercise.id}',
-                child: exercise.gifUrl != null && !isOffline
-                    ? CachedNetworkImage(
-                        imageUrl: exercise.gifUrl!,
-                        fit: BoxFit.cover,
-                        placeholder: (_, __) => _buildImagePlaceholder(context),
-                        errorWidget: (context, url, error) => _buildMediaFallback(context, exercise, isOffline),
-                      )
-                    : _buildMediaFallback(context, exercise, isOffline),
+                child: ExerciseMediaWidget(
+                  animatedUrl: isOffline ? null : exercise.gifUrl,
+                  staticUrl: isOffline ? null : (exercise.imageUrls.isNotEmpty ? exercise.imageUrls.first : null),
+                  fit: BoxFit.cover,
+                  showDecoration: false, // Handle decoration in SliverAppBar
+                ),
               ),
               DecoratedBox(
               decoration: BoxDecoration(
@@ -663,11 +662,12 @@ class _ExerciseDetailScreenState extends ConsumerState<ExerciseDetailScreen> wit
         body: Center(
           child: InteractiveViewer(
             clipBehavior: Clip.none,
-            child: exercise.gifUrl != null && !isOffline
-                ? CachedNetworkImage(imageUrl: exercise.gifUrl!)
-                : exercise.imageUrls.isNotEmpty
-                    ? CachedNetworkImage(imageUrl: exercise.imageUrls.first)
-                    : const Icon(LucideIcons.dumbbell, size: 100, color: Colors.white54),
+            child: ExerciseMediaWidget(
+              animatedUrl: isOffline ? null : exercise.gifUrl,
+              staticUrl: isOffline ? null : (exercise.imageUrls.isNotEmpty ? exercise.imageUrls.first : null),
+              fit: BoxFit.contain,
+              showDecoration: false,
+            ),
           ),
         ),
       ),

@@ -9,8 +9,10 @@ class ExerciseMediaWidget extends StatefulWidget {
   final String? animatedUrl; // e.g., GIF URL
   final String? staticUrl; // e.g., Thumbnail/Poster
   final String? videoUrl; // e.g., YouTube Link
-  final double height;
+  final double? height;
   final BoxFit fit;
+  final bool showDecoration;
+  final double borderRadius;
 
   const ExerciseMediaWidget({
     super.key,
@@ -19,6 +21,8 @@ class ExerciseMediaWidget extends StatefulWidget {
     this.videoUrl,
     this.height = 250,
     this.fit = BoxFit.cover,
+    this.showDecoration = true,
+    this.borderRadius = 16,
   });
 
   @override
@@ -28,30 +32,38 @@ class ExerciseMediaWidget extends StatefulWidget {
 class _ExerciseMediaWidgetState extends State<ExerciseMediaWidget> {
   @override
   Widget build(BuildContext context) {
+    if (!widget.showDecoration) {
+      return _buildStack();
+    }
+
     return Container(
       height: widget.height,
       width: double.infinity,
       decoration: BoxDecoration(
         color: Colors.grey[900],
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(widget.borderRadius),
       ),
       clipBehavior: Clip.antiAlias,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          _buildMedia(),
-          if (widget.videoUrl != null)
-            Positioned(
-              right: 8,
-              bottom: 8,
-              child: FloatingActionButton.small(
-                onPressed: () => _launchVideo(widget.videoUrl!),
-                backgroundColor: Colors.red.withValues(alpha: 0.8),
-                child: const Icon(Icons.play_arrow, color: Colors.white),
-              ),
+      child: _buildStack(),
+    );
+  }
+
+  Widget _buildStack() {
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        _buildMedia(),
+        if (widget.videoUrl != null)
+          Positioned(
+            right: 8,
+            bottom: 8,
+            child: FloatingActionButton.small(
+              onPressed: () => _launchVideo(widget.videoUrl!),
+              backgroundColor: Colors.red.withValues(alpha: 0.8),
+              child: const Icon(Icons.play_arrow, color: Colors.white),
             ),
-        ],
-      ),
+          ),
+      ],
     );
   }
 
