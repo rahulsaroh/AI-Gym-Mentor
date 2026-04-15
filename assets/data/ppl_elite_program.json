@@ -8,6 +8,7 @@
     {
       "name": "Day 1 — Push A (Chest, Shoulders, Triceps)",
       "order": 0,
+      "weekday": 1,
       "exercises": [
         {
           "exerciseName": "Dumbbell Arnold Press",
@@ -85,6 +86,7 @@
     {
       "name": "Day 2 — Pull A (Back, Biceps, Rear Delts)",
       "order": 1,
+      "weekday": 2,
       "exercises": [
         {
           "exerciseName": "Pull-Up (Wide Grip)",
@@ -171,6 +173,7 @@
     {
       "name": "Day 3 — Legs + Abs A (Quads, Glutes, Core, Kicks)",
       "order": 2,
+      "weekday": 3,
       "exercises": [
         {
           "exerciseName": "Dumbbell Goblet Squat",
@@ -264,6 +267,7 @@
     {
       "name": "Day 4 — Push B (Shoulder Focus, Chest, Triceps)",
       "order": 3,
+      "weekday": 4,
       "exercises": [
         {
           "exerciseName": "Dumbbell Shoulder Press",
@@ -340,6 +344,7 @@
     {
       "name": "Day 5 — Pull B (Back Width, Thickness, Rear Chain)",
       "order": 4,
+      "weekday": 5,
       "exercises": [
         {
           "exerciseName": "Pull-Up (Close Grip)",
@@ -417,6 +422,7 @@
     {
       "name": "Day 6 — Legs + Abs B (Posterior Chain, Calves, Combat Core)",
       "order": 5,
+      "weekday": 6,
       "exercises": [
         {
           "exerciseName": "Dumbbell Stiff-Leg Deadlift",

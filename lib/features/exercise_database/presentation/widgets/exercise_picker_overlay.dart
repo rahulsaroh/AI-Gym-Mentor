@@ -76,8 +76,11 @@ class _ExercisePickerOverlayState extends ConsumerState<ExercisePickerOverlay> {
   }
 
   void _onSearchChanged(String query) {
-    _applyFilters();
-    setState(() {});
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
+    _debounce = Timer(const Duration(milliseconds: 200), () {
+      _applyFilters();
+      if (mounted) setState(() {});
+    });
   }
 
   @override
@@ -236,7 +239,6 @@ class _ExercisePickerOverlayState extends ConsumerState<ExercisePickerOverlay> {
                                       .ensureGithubExercise(ex);
                                   if (exerciseId != null) {
                                     widget.onSelect(exerciseId);
-                                    if (context.mounted) Navigator.pop(context);
                                   }
                                 },
                               );

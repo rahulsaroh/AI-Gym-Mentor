@@ -346,6 +346,11 @@ class _CreateEditProgramScreenState
                 ..where((t) => t.templateId.equals(widget.templateId!)))
               .map((d) => d.id)
               .get();
+
+          // Nullify workout references to these days to avoid FK constraint failure
+          await (db.update(db.workouts)..where((t) => t.dayId.isIn(dayIds)))
+              .write(const WorkoutsCompanion(dayId: Value(null)));
+
           await (db.delete(db.templateExercises)
                 ..where((t) => t.dayId.isIn(dayIds)))
               .go();

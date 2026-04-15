@@ -608,17 +608,30 @@ class WorkoutRepository {
 
   Future<void> deleteTemplate(int id) async {
     await _db.transaction(() async {
-      final days = await (_db.select(_db.templateDays)
+      // 1. Get all day IDs for this template
+      final dayIds = await (_db.select(_db.templateDays)
             ..where((t) => t.templateId.equals(id)))
+          .map((d) => d.id)
           .get();
-      for (final day in days) {
+
+      // 2. Nullify workout references to this template and its days
+      // to avoid FOREIGN KEY constraint failure
+      await (_db.update(_db.workouts)..where((t) => t.templateId.equals(id)))
+          .write(const WorkoutsCompanion(templateId: Value(null), dayId: Value(null)));
+
+      // 3. Delete template exercises
+      for (final dayId in dayIds) {
         await (_db.delete(_db.templateExercises)
-              ..where((t) => t.dayId.equals(day.id)))
+              ..where((t) => t.dayId.equals(dayId)))
             .go();
       }
+
+      // 4. Delete template days
       await (_db.delete(_db.templateDays)
             ..where((t) => t.templateId.equals(id)))
           .go();
+
+      // 5. Delete the template itself
       await (_db.delete(_db.workoutTemplates)..where((t) => t.id.equals(id)))
           .go();
     });

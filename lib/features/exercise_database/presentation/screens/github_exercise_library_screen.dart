@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -18,26 +19,37 @@ class _GithubExerciseLibraryScreenState
     extends ConsumerState<GithubExerciseLibraryScreen> {
   late TextEditingController _searchController;
   bool _showFilters = false;
+  Timer? _debounce;
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
     _searchController = TextEditingController();
+    // Pre-fill if there is existing state
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _searchController.text = ref.read(githubFilterProvider).searchQuery;
+    });
   }
 
   @override
   void dispose() {
     _searchController.dispose();
+    _debounce?.cancel();
+    _scrollController.dispose();
     super.dispose();
   }
 
   void _handleSearch(String query) {
-    updateSearchQuery(query);
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
+    _debounce = Timer(const Duration(milliseconds: 300), () {
+      ref.read(githubFilterProvider.notifier).updateSearchQuery(query);
+    });
   }
 
   void _clearFilters() {
     _searchController.clear();
-    clearAllFilters();
+    ref.read(githubFilterProvider.notifier).clearAll();
   }
 
   @override
@@ -90,7 +102,7 @@ class _GithubExerciseLibraryScreenState
               bodyParts,
               selectedBodyPart,
               (bodyPart) {
-                updateBodyPartFilter(bodyPart);
+                ref.read(githubFilterProvider.notifier).updateBodyPart(bodyPart);
               },
             ),
             // Equipment filter chips
@@ -100,7 +112,7 @@ class _GithubExerciseLibraryScreenState
                 equipment,
                 selectedEquipment,
                 (equip) {
-                  updateEquipmentFilter(equip);
+                  ref.read(githubFilterProvider.notifier).updateEquipment(equip);
                 },
               ),
             // Show/Hide Filters toggle
@@ -174,6 +186,7 @@ class _GithubExerciseLibraryScreenState
                   }
 
                   return GridView.builder(
+                    controller: _scrollController,
                     padding: const EdgeInsets.all(12.0),
                     gridDelegate:
                         const SliverGridDelegateWithFixedCrossAxisCount(

@@ -11,7 +11,6 @@ import 'package:uuid/uuid.dart';
 import 'package:drift/drift.dart' hide Column;
 import 'package:ai_gym_mentor/features/exercise_database/presentation/providers/exercise_providers.dart';
 import 'package:ai_gym_mentor/features/exercise_database/presentation/providers/repository_provider.dart';
-import 'package:ai_gym_mentor/features/exercise_database/domain/entities/exercise_entity.dart';
 import 'package:ai_gym_mentor/features/exercise_database/domain/entities/exercise_entity.dart'
     as entity;
 import 'package:ai_gym_mentor/features/exercise_database/presentation/widgets/exercise_picker_overlay.dart';
@@ -32,7 +31,7 @@ import 'package:ai_gym_mentor/features/settings/models/settings_state.dart';
 import 'package:ai_gym_mentor/features/workout/providers/workout_duration_provider.dart';
 import 'package:ai_gym_mentor/features/workout/components/plate_calculator_dialog.dart';
 
-typedef Exercise = ExerciseEntity;
+typedef Exercise = entity.ExerciseEntity;
 
 class ActiveWorkoutScreen extends ConsumerStatefulWidget {
   final int workoutId;
@@ -80,10 +79,12 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
   bool _isEditingTitle = false;
   final Map<int, TextEditingController> _weightControllers = {};
   final Map<int, TextEditingController> _repsControllers = {};
+  final Map<int, TextEditingController> _secsControllers = {};
   final Map<int, TextEditingController> _rpeControllers = {};
   final Map<int, TextEditingController> _noteControllers = {};
   final Map<int, FocusNode> _weightNodes = {};
   final Map<int, FocusNode> _repsNodes = {};
+  final Map<int, FocusNode> _secsNodes = {};
   final Map<int, FocusNode> _rpeNodes = {};
 
   @override
@@ -117,10 +118,12 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
     _titleController.dispose();
     for (var c in _weightControllers.values) c.dispose();
     for (var c in _repsControllers.values) c.dispose();
+    for (var c in _secsControllers.values) c.dispose();
     for (var c in _rpeControllers.values) c.dispose();
     for (var c in _noteControllers.values) c.dispose();
     for (var n in _weightNodes.values) n.dispose();
     for (var n in _repsNodes.values) n.dispose();
+    for (var n in _secsNodes.values) n.dispose();
     for (var n in _rpeNodes.values) n.dispose();
     _scrollController.dispose();
     super.dispose();
@@ -136,6 +139,9 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
       case 'reps':
         map = _repsControllers;
         break;
+      case 'secs':
+        map = _secsControllers;
+        break;
       case 'rpe':
         map = _rpeControllers;
         break;
@@ -143,7 +149,7 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
         map = _noteControllers;
         break;
       default:
-        throw UnimplementedError();
+        throw UnimplementedError('Type $type is not implemented in _getController');
     }
     if (!map.containsKey(setId)) {
       map[setId] = TextEditingController(text: initialValue);
@@ -160,11 +166,14 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
       case 'reps':
         map = _repsNodes;
         break;
+      case 'secs':
+        map = _secsNodes;
+        break;
       case 'rpe':
         map = _rpeNodes;
         break;
       default:
-        throw UnimplementedError();
+        throw UnimplementedError('Type $type is not implemented in _getNode');
     }
     if (!map.containsKey(setId)) {
       map[setId] = FocusNode();
@@ -1904,6 +1913,7 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
                       block.sets.firstOrNull?.setType ?? db.SetType.straight),
                   supersetGroupId: Value(groupId),
                 ));
+            if (context.mounted) Navigator.pop(context);
           });
         },
       ),
@@ -1938,6 +1948,7 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
                 weight: 0,
                 setType: Value(db.SetType.straight),
               ));
+          if (context.mounted) Navigator.pop(context);
         },
       ),
     );
@@ -2198,6 +2209,7 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
               .write(db.WorkoutSetsCompanion(
             exerciseId: Value(newExerciseId),
           ));
+          if (context.mounted) Navigator.pop(context);
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text('Exercise replaced')),
@@ -2358,7 +2370,7 @@ class ExerciseBlock {
 
 /// Collapsible exercise media widget — shows GIF or image at top of exercise card.
 class _ExerciseMediaWidget extends StatefulWidget {
-  final ExerciseEntity exercise;
+  final Exercise exercise;
   const _ExerciseMediaWidget({required this.exercise});
 
   @override

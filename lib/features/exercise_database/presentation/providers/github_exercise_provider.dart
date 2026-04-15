@@ -13,47 +13,82 @@ final allGithubExercisesProvider =
   return service.getAllExercises();
 });
 
-// Simple state for filters
-class _FilterState {
+// State for filters
+class GithubFilterState {
   final String? bodyPart;
   final String? equipment;
   final String searchQuery;
 
-  const _FilterState({
+  const GithubFilterState({
     this.bodyPart,
     this.equipment,
     this.searchQuery = '',
   });
+
+  GithubFilterState copyWith({
+    String? bodyPart,
+    bool clearBodyPart = false,
+    String? equipment,
+    bool clearEquipment = false,
+    String? searchQuery,
+  }) {
+    return GithubFilterState(
+      bodyPart: clearBodyPart ? null : (bodyPart ?? this.bodyPart),
+      equipment: clearEquipment ? null : (equipment ?? this.equipment),
+      searchQuery: searchQuery ?? this.searchQuery,
+    );
+  }
 }
 
-// Mutable state for filters
-final _currentFilterState = ValueNotifier<_FilterState>(const _FilterState());
+// StateProvider-like Notifier for the filter state
+class GithubFilterNotifier extends Notifier<GithubFilterState> {
+  @override
+  GithubFilterState build() => const GithubFilterState();
 
-// Providers that read from the current state
+  void updateBodyPart(String? bodyPart) {
+    state = state.copyWith(bodyPart: bodyPart, clearBodyPart: bodyPart == null);
+  }
+
+  void updateEquipment(String? equipment) {
+    state = state.copyWith(equipment: equipment, clearEquipment: equipment == null);
+  }
+
+  void updateSearchQuery(String query) {
+    state = state.copyWith(searchQuery: query);
+  }
+
+  void clearAll() {
+    state = const GithubFilterState();
+  }
+}
+
+final githubFilterProvider = NotifierProvider<GithubFilterNotifier, GithubFilterState>(GithubFilterNotifier.new);
+
+// Providers that watch the filter state
 final selectedBodyPartProvider = Provider<String?>((ref) {
-  // Trigger watchers through a simple hack - just read  the notifier constantly
-  return _currentFilterState.value.bodyPart;
+  return ref.watch(githubFilterProvider).bodyPart;
 });
 
 final selectedEquipmentProvider = Provider<String?>((ref) {
-  return _currentFilterState.value.equipment;
+  return ref.watch(githubFilterProvider).equipment;
 });
 
 final exerciseSearchQueryProvider = Provider<String>((ref) {
-  return _currentFilterState.value.searchQuery;
+  return ref.watch(githubFilterProvider).searchQuery;
 });
 
 // Filtered exercises based on search and filters
 final filteredGithubExercisesProvider =
     FutureProvider<List<GithubExercise>>((ref) async {
   final service = ref.watch(githubExerciseServiceProvider);
-  final query = ref.watch(exerciseSearchQueryProvider);
-  final bodyPart = ref.watch(selectedBodyPartProvider);
-  final equipment = ref.watch(selectedEquipmentProvider);
+  final filterState = ref.watch(githubFilterProvider);
+  final query = filterState.searchQuery;
+  final bodyPart = filterState.bodyPart;
+  final equipment = filterState.equipment;
 
   List<GithubExercise> exercises;
 
-  // Start with search results if query is not empty
+  // Search if query is not empty
   if (query.isNotEmpty) {
     exercises = await service.searchExercises(query);
   } else {
@@ -97,41 +132,10 @@ final muscleTargetsProvider = FutureProvider<List<String>>((ref) async {
 
 // Provider to check if any filters are active
 final hasActiveFiltersProvider = Provider<bool>((ref) {
-  final bodyPart = ref.watch(selectedBodyPartProvider);
-  final equipment = ref.watch(selectedEquipmentProvider);
-  final query = ref.watch(exerciseSearchQueryProvider);
-
-  return bodyPart != null || equipment != null || query.isNotEmpty;
+  final filterState = ref.watch(githubFilterProvider);
+  return filterState.bodyPart != null ||
+      filterState.equipment != null ||
+      filterState.searchQuery.isNotEmpty;
 });
 
-// Filter update functions
-void updateBodyPartFilter(String? bodyPart) {
-  final current = _currentFilterState.value;
-  _currentFilterState.value = _FilterState(
-    bodyPart: bodyPart,
-    equipment: current.equipment,
-    searchQuery: current.searchQuery,
-  );
-}
 
-void updateEquipmentFilter(String? equipment) {
-  final current = _currentFilterState.value;
-  _currentFilterState.value = _FilterState(
-    bodyPart: current.bodyPart,
-    equipment: equipment,
-    searchQuery: current.searchQuery,
-  );
-}
-
-void updateSearchQuery(String query) {
-  final current = _currentFilterState.value;
-  _currentFilterState.value = _FilterState(
-    bodyPart: current.bodyPart,
-    equipment: current.equipment,
-    searchQuery: query,
-  );
-}
-
-void clearAllFilters() {
-  _currentFilterState.value = const _FilterState();
-}
