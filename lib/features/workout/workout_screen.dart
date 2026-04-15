@@ -742,11 +742,6 @@ class _ConsistencySection extends ConsumerWidget {
         padding: const EdgeInsets.symmetric(vertical: 20),
         child: activityAsync.when(
           data: (activity) {
-            // Convert list to map for Heatmap
-            final activityMap = {
-              for (var item in activity) 
-                item['date'] as DateTime : item['count'] as int
-            };
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -761,7 +756,7 @@ class _ConsistencySection extends ConsumerWidget {
                   ),
                 ),
                 const SizedBox(height: 16),
-                WorkoutHeatmap(activity: activityMap),
+                WorkoutHeatmap(activity: activity),
               ],
             );
           },

@@ -32,7 +32,7 @@ Future<List<Map<String, dynamic>>> frequencyTrend(Ref ref) async {
 }
 
 @riverpod
-Future<List<Map<String, dynamic>>> dailyActivity(Ref ref) async {
+Future<Map<DateTime, int>> dailyActivity(Ref ref) async {
   final repo = ref.watch(statsRepositoryProvider);
   return await repo.getDailyWorkoutActivity();
 }
@@ -41,10 +41,10 @@ Future<List<Map<String, dynamic>>> dailyActivity(Ref ref) async {
 Future<List<Map<String, dynamic>>> weightTrend(Ref ref) async {
   final measurements = await ref.watch(bodyMeasurementsListProvider.future);
   final weightData = measurements
-      .where((m) => m.type.toLowerCase() == 'weight')
+      .where((m) => m.weight != null)
       .map((m) => {
             'date': m.date,
-            'weight': m.weight,
+            'weight': m.weight!,
           })
       .toList();
   weightData.sort((a, b) => (a['date'] as DateTime).compareTo(b['date'] as DateTime));

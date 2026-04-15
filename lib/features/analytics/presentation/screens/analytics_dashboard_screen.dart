@@ -114,14 +114,7 @@ class AnalyticsDashboardScreen extends ConsumerWidget {
               child: Padding(
                 padding: const EdgeInsets.symmetric(vertical: 40),
                 child: activityAsync.when(
-                  data: (activity) {
-                    // Convert list of maps to Map<DateTime, int> for the Heatmap widget
-                    final activityMap = {
-                      for (var item in activity) 
-                        item['date'] as DateTime : item['count'] as int
-                    };
-                    return WorkoutHeatmap(activity: activityMap);
-                  },
+                  data: (activity) => WorkoutHeatmap(activity: activity),
                   loading: () => const SizedBox(height: 150),
                   error: (e, _) => const SizedBox.shrink(),
                 ),

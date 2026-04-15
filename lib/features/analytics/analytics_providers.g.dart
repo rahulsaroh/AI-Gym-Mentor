@@ -165,12 +165,12 @@ String _$frequencyTrendHash() => r'5377d5c0eacc71e4b75e313016bc72f21fa933ed';
 final dailyActivityProvider = DailyActivityProvider._();
 
 final class DailyActivityProvider extends $FunctionalProvider<
-        AsyncValue<List<Map<String, dynamic>>>,
-        List<Map<String, dynamic>>,
-        FutureOr<List<Map<String, dynamic>>>>
+        AsyncValue<Map<DateTime, int>>,
+        Map<DateTime, int>,
+        FutureOr<Map<DateTime, int>>>
     with
-        $FutureModifier<List<Map<String, dynamic>>>,
-        $FutureProvider<List<Map<String, dynamic>>> {
+        $FutureModifier<Map<DateTime, int>>,
+        $FutureProvider<Map<DateTime, int>> {
   DailyActivityProvider._()
       : super(
           from: null,
@@ -187,17 +187,17 @@ final class DailyActivityProvider extends $FunctionalProvider<
 
   @$internal
   @override
-  $FutureProviderElement<List<Map<String, dynamic>>> $createElement(
+  $FutureProviderElement<Map<DateTime, int>> $createElement(
           $ProviderPointer pointer) =>
       $FutureProviderElement(pointer);
 
   @override
-  FutureOr<List<Map<String, dynamic>>> create(Ref ref) {
+  FutureOr<Map<DateTime, int>> create(Ref ref) {
     return dailyActivity(ref);
   }
 }
 
-String _$dailyActivityHash() => r'29d2e1a88e8a479601c35627d682d0642a11765e';
+String _$dailyActivityHash() => r'19fde8f629f016c2e66f114bd10e0b2d2883cebd';
 
 @ProviderFor(weightTrend)
 final weightTrendProvider = WeightTrendProvider._();
@@ -235,7 +235,7 @@ final class WeightTrendProvider extends $FunctionalProvider<
   }
 }
 
-String _$weightTrendHash() => r'b2af1505e8543c2bb30261c4243455785a343e35';
+String _$weightTrendHash() => r'0460708393741bba4d707f4fe15a67cb07bacb0f';
 
 @ProviderFor(muscleBalance)
 final muscleBalanceProvider = MuscleBalanceProvider._();
@@ -440,7 +440,7 @@ final class WorkoutPRsProvider extends $FunctionalProvider<
   }
 }
 
-String _$workoutPRsHash() => r'8e8372453abb3b0d4b8d9b8da4474b297847236c';
+String _$workoutPRsHash() => r'9e3de2bff240a1f01e9999f99113ee69c33feaf1';
 
 final class WorkoutPRsFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<List<int>>, int> {
