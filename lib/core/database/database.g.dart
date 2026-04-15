@@ -1508,8 +1508,14 @@ class $TemplateDaysTable extends TemplateDays
   late final GeneratedColumn<int> order = GeneratedColumn<int>(
       'order', aliasedName, false,
       type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _weekdayMeta =
+      const VerificationMeta('weekday');
   @override
-  List<GeneratedColumn> get $columns => [id, templateId, name, order];
+  late final GeneratedColumn<int> weekday = GeneratedColumn<int>(
+      'weekday', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
+  @override
+  List<GeneratedColumn> get $columns => [id, templateId, name, order, weekday];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -1543,6 +1549,10 @@ class $TemplateDaysTable extends TemplateDays
     } else if (isInserting) {
       context.missing(_orderMeta);
     }
+    if (data.containsKey('weekday')) {
+      context.handle(_weekdayMeta,
+          weekday.isAcceptableOrUnknown(data['weekday']!, _weekdayMeta));
+    }
     return context;
   }
 
@@ -1560,6 +1570,8 @@ class $TemplateDaysTable extends TemplateDays
           .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
       order: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}order'])!,
+      weekday: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}weekday']),
     );
   }
 
@@ -1574,11 +1586,13 @@ class TemplateDay extends DataClass implements Insertable<TemplateDay> {
   final int templateId;
   final String name;
   final int order;
+  final int? weekday;
   const TemplateDay(
       {required this.id,
       required this.templateId,
       required this.name,
-      required this.order});
+      required this.order,
+      this.weekday});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -1586,6 +1600,9 @@ class TemplateDay extends DataClass implements Insertable<TemplateDay> {
     map['template_id'] = Variable<int>(templateId);
     map['name'] = Variable<String>(name);
     map['order'] = Variable<int>(order);
+    if (!nullToAbsent || weekday != null) {
+      map['weekday'] = Variable<int>(weekday);
+    }
     return map;
   }
 
@@ -1595,6 +1612,9 @@ class TemplateDay extends DataClass implements Insertable<TemplateDay> {
       templateId: Value(templateId),
       name: Value(name),
       order: Value(order),
+      weekday: weekday == null && nullToAbsent
+          ? const Value.absent()
+          : Value(weekday),
     );
   }
 
@@ -1606,6 +1626,7 @@ class TemplateDay extends DataClass implements Insertable<TemplateDay> {
       templateId: serializer.fromJson<int>(json['templateId']),
       name: serializer.fromJson<String>(json['name']),
       order: serializer.fromJson<int>(json['order']),
+      weekday: serializer.fromJson<int?>(json['weekday']),
     );
   }
   @override
@@ -1616,15 +1637,22 @@ class TemplateDay extends DataClass implements Insertable<TemplateDay> {
       'templateId': serializer.toJson<int>(templateId),
       'name': serializer.toJson<String>(name),
       'order': serializer.toJson<int>(order),
+      'weekday': serializer.toJson<int?>(weekday),
     };
   }
 
-  TemplateDay copyWith({int? id, int? templateId, String? name, int? order}) =>
+  TemplateDay copyWith(
+          {int? id,
+          int? templateId,
+          String? name,
+          int? order,
+          Value<int?> weekday = const Value.absent()}) =>
       TemplateDay(
         id: id ?? this.id,
         templateId: templateId ?? this.templateId,
         name: name ?? this.name,
         order: order ?? this.order,
+        weekday: weekday.present ? weekday.value : this.weekday,
       );
   TemplateDay copyWithCompanion(TemplateDaysCompanion data) {
     return TemplateDay(
@@ -1633,6 +1661,7 @@ class TemplateDay extends DataClass implements Insertable<TemplateDay> {
           data.templateId.present ? data.templateId.value : this.templateId,
       name: data.name.present ? data.name.value : this.name,
       order: data.order.present ? data.order.value : this.order,
+      weekday: data.weekday.present ? data.weekday.value : this.weekday,
     );
   }
 
@@ -1642,13 +1671,14 @@ class TemplateDay extends DataClass implements Insertable<TemplateDay> {
           ..write('id: $id, ')
           ..write('templateId: $templateId, ')
           ..write('name: $name, ')
-          ..write('order: $order')
+          ..write('order: $order, ')
+          ..write('weekday: $weekday')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, templateId, name, order);
+  int get hashCode => Object.hash(id, templateId, name, order, weekday);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -1656,7 +1686,8 @@ class TemplateDay extends DataClass implements Insertable<TemplateDay> {
           other.id == this.id &&
           other.templateId == this.templateId &&
           other.name == this.name &&
-          other.order == this.order);
+          other.order == this.order &&
+          other.weekday == this.weekday);
 }
 
 class TemplateDaysCompanion extends UpdateCompanion<TemplateDay> {
@@ -1664,17 +1695,20 @@ class TemplateDaysCompanion extends UpdateCompanion<TemplateDay> {
   final Value<int> templateId;
   final Value<String> name;
   final Value<int> order;
+  final Value<int?> weekday;
   const TemplateDaysCompanion({
     this.id = const Value.absent(),
     this.templateId = const Value.absent(),
     this.name = const Value.absent(),
     this.order = const Value.absent(),
+    this.weekday = const Value.absent(),
   });
   TemplateDaysCompanion.insert({
     this.id = const Value.absent(),
     required int templateId,
     required String name,
     required int order,
+    this.weekday = const Value.absent(),
   })  : templateId = Value(templateId),
         name = Value(name),
         order = Value(order);
@@ -1683,12 +1717,14 @@ class TemplateDaysCompanion extends UpdateCompanion<TemplateDay> {
     Expression<int>? templateId,
     Expression<String>? name,
     Expression<int>? order,
+    Expression<int>? weekday,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (templateId != null) 'template_id': templateId,
       if (name != null) 'name': name,
       if (order != null) 'order': order,
+      if (weekday != null) 'weekday': weekday,
     });
   }
 
@@ -1696,12 +1732,14 @@ class TemplateDaysCompanion extends UpdateCompanion<TemplateDay> {
       {Value<int>? id,
       Value<int>? templateId,
       Value<String>? name,
-      Value<int>? order}) {
+      Value<int>? order,
+      Value<int?>? weekday}) {
     return TemplateDaysCompanion(
       id: id ?? this.id,
       templateId: templateId ?? this.templateId,
       name: name ?? this.name,
       order: order ?? this.order,
+      weekday: weekday ?? this.weekday,
     );
   }
 
@@ -1720,6 +1758,9 @@ class TemplateDaysCompanion extends UpdateCompanion<TemplateDay> {
     if (order.present) {
       map['order'] = Variable<int>(order.value);
     }
+    if (weekday.present) {
+      map['weekday'] = Variable<int>(weekday.value);
+    }
     return map;
   }
 
@@ -1729,7 +1770,8 @@ class TemplateDaysCompanion extends UpdateCompanion<TemplateDay> {
           ..write('id: $id, ')
           ..write('templateId: $templateId, ')
           ..write('name: $name, ')
-          ..write('order: $order')
+          ..write('order: $order, ')
+          ..write('weekday: $weekday')
           ..write(')'))
         .toString();
   }
@@ -8903,6 +8945,7 @@ typedef $$TemplateDaysTableCreateCompanionBuilder = TemplateDaysCompanion
   required int templateId,
   required String name,
   required int order,
+  Value<int?> weekday,
 });
 typedef $$TemplateDaysTableUpdateCompanionBuilder = TemplateDaysCompanion
     Function({
@@ -8910,6 +8953,7 @@ typedef $$TemplateDaysTableUpdateCompanionBuilder = TemplateDaysCompanion
   Value<int> templateId,
   Value<String> name,
   Value<int> order,
+  Value<int?> weekday,
 });
 
 final class $$TemplateDaysTableReferences
@@ -8982,6 +9026,9 @@ class $$TemplateDaysTableFilterComposer
 
   ColumnFilters<int> get order => $composableBuilder(
       column: $table.order, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get weekday => $composableBuilder(
+      column: $table.weekday, builder: (column) => ColumnFilters(column));
 
   $$WorkoutTemplatesTableFilterComposer get templateId {
     final $$WorkoutTemplatesTableFilterComposer composer = $composerBuilder(
@@ -9064,6 +9111,9 @@ class $$TemplateDaysTableOrderingComposer
   ColumnOrderings<int> get order => $composableBuilder(
       column: $table.order, builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<int> get weekday => $composableBuilder(
+      column: $table.weekday, builder: (column) => ColumnOrderings(column));
+
   $$WorkoutTemplatesTableOrderingComposer get templateId {
     final $$WorkoutTemplatesTableOrderingComposer composer = $composerBuilder(
         composer: this,
@@ -9102,6 +9152,9 @@ class $$TemplateDaysTableAnnotationComposer
 
   GeneratedColumn<int> get order =>
       $composableBuilder(column: $table.order, builder: (column) => column);
+
+  GeneratedColumn<int> get weekday =>
+      $composableBuilder(column: $table.weekday, builder: (column) => column);
 
   $$WorkoutTemplatesTableAnnotationComposer get templateId {
     final $$WorkoutTemplatesTableAnnotationComposer composer = $composerBuilder(
@@ -9195,24 +9248,28 @@ class $$TemplateDaysTableTableManager extends RootTableManager<
             Value<int> templateId = const Value.absent(),
             Value<String> name = const Value.absent(),
             Value<int> order = const Value.absent(),
+            Value<int?> weekday = const Value.absent(),
           }) =>
               TemplateDaysCompanion(
             id: id,
             templateId: templateId,
             name: name,
             order: order,
+            weekday: weekday,
           ),
           createCompanionCallback: ({
             Value<int> id = const Value.absent(),
             required int templateId,
             required String name,
             required int order,
+            Value<int?> weekday = const Value.absent(),
           }) =>
               TemplateDaysCompanion.insert(
             id: id,
             templateId: templateId,
             name: name,
             order: order,
+            weekday: weekday,
           ),
           withReferenceMapper: (p0) => p0
               .map((e) => (

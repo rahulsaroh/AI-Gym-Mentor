@@ -203,7 +203,7 @@ class _ProgramsScreenState extends ConsumerState<ProgramsScreen> {
               ListTile(
                 leading: const Icon(LucideIcons.file),
                 title: const Text('Choose JSON File'),
-                subtitle: const Text('Import from a .json file'),
+                subtitle: const Text('Import from a .json plan or exercise list'),
                 onTap: () {
                   Navigator.pop(context);
                   ref.read(programsProvider.notifier).importTemplate();
@@ -216,6 +216,16 @@ class _ProgramsScreenState extends ConsumerState<ProgramsScreen> {
                 onTap: () {
                   Navigator.pop(context);
                   _showPasteJsonDialog(context, ref);
+                },
+              ),
+              const Divider(),
+              ListTile(
+                leading: Icon(LucideIcons.trophy, color: Colors.orange[700]),
+                title: const Text('6 Day PPL Elite'),
+                subtitle: const Text('Push/Pull/Legs split with GitHub exercises'),
+                onTap: () {
+                  Navigator.pop(context);
+                  ref.read(programsProvider.notifier).importPplEliteProgram();
                 },
               ),
             ],
@@ -456,6 +466,29 @@ class _ProgramCard extends ConsumerWidget {
                     label: const Text('Details'),
                     style: TextButton.styleFrom(
                       foregroundColor: Colors.teal[700],
+                      padding: const EdgeInsets.symmetric(horizontal: 0),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  TextButton.icon(
+                    onPressed: () async {
+                      final repo = ref.read(workoutRepositoryProvider);
+                      final days = await repo.getTemplateDays(template.id);
+                      if (days.isNotEmpty && context.mounted) {
+                        final id = await ref.read(workoutHomeProvider.notifier).startWorkout(
+                              templateId: template.id,
+                              dayId: days.first.id,
+                              name: template.name,
+                            );
+                        if (context.mounted) {
+                          context.push('/app/workout/active?id=$id&dayId=${days.first.id}');
+                        }
+                      }
+                    },
+                    icon: const Icon(LucideIcons.play, size: 18),
+                    label: const Text('Start'),
+                    style: TextButton.styleFrom(
+                      foregroundColor: Colors.orange[700],
                       padding: const EdgeInsets.symmetric(horizontal: 0),
                     ),
                   ),

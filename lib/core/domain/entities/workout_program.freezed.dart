@@ -417,6 +417,7 @@ mixin _$ProgramDay {
   int get templateId;
   String get name;
   int get order;
+  int? get weekday;
   List<ProgramExercise> get exercises;
 
   /// Create a copy of ProgramDay
@@ -439,17 +440,18 @@ mixin _$ProgramDay {
                 other.templateId == templateId) &&
             (identical(other.name, name) || other.name == name) &&
             (identical(other.order, order) || other.order == order) &&
+            (identical(other.weekday, weekday) || other.weekday == weekday) &&
             const DeepCollectionEquality().equals(other.exercises, exercises));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(runtimeType, id, templateId, name, order,
-      const DeepCollectionEquality().hash(exercises));
+      weekday, const DeepCollectionEquality().hash(exercises));
 
   @override
   String toString() {
-    return 'ProgramDay(id: $id, templateId: $templateId, name: $name, order: $order, exercises: $exercises)';
+    return 'ProgramDay(id: $id, templateId: $templateId, name: $name, order: $order, weekday: $weekday, exercises: $exercises)';
   }
 }
 
@@ -464,6 +466,7 @@ abstract mixin class $ProgramDayCopyWith<$Res> {
       int templateId,
       String name,
       int order,
+      int? weekday,
       List<ProgramExercise> exercises});
 }
 
@@ -483,6 +486,7 @@ class _$ProgramDayCopyWithImpl<$Res> implements $ProgramDayCopyWith<$Res> {
     Object? templateId = null,
     Object? name = null,
     Object? order = null,
+    Object? weekday = freezed,
     Object? exercises = null,
   }) {
     return _then(_self.copyWith(
@@ -502,6 +506,10 @@ class _$ProgramDayCopyWithImpl<$Res> implements $ProgramDayCopyWith<$Res> {
           ? _self.order
           : order // ignore: cast_nullable_to_non_nullable
               as int,
+      weekday: freezed == weekday
+          ? _self.weekday
+          : weekday // ignore: cast_nullable_to_non_nullable
+              as int?,
       exercises: null == exercises
           ? _self.exercises
           : exercises // ignore: cast_nullable_to_non_nullable
@@ -604,7 +612,7 @@ extension ProgramDayPatterns on ProgramDay {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
     TResult Function(int id, int templateId, String name, int order,
-            List<ProgramExercise> exercises)?
+            int? weekday, List<ProgramExercise> exercises)?
         $default, {
     required TResult orElse(),
   }) {
@@ -612,7 +620,7 @@ extension ProgramDayPatterns on ProgramDay {
     switch (_that) {
       case _ProgramDay() when $default != null:
         return $default(_that.id, _that.templateId, _that.name, _that.order,
-            _that.exercises);
+            _that.weekday, _that.exercises);
       case _:
         return orElse();
     }
@@ -634,14 +642,14 @@ extension ProgramDayPatterns on ProgramDay {
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
     TResult Function(int id, int templateId, String name, int order,
-            List<ProgramExercise> exercises)
+            int? weekday, List<ProgramExercise> exercises)
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _ProgramDay():
         return $default(_that.id, _that.templateId, _that.name, _that.order,
-            _that.exercises);
+            _that.weekday, _that.exercises);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -662,14 +670,14 @@ extension ProgramDayPatterns on ProgramDay {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
     TResult? Function(int id, int templateId, String name, int order,
-            List<ProgramExercise> exercises)?
+            int? weekday, List<ProgramExercise> exercises)?
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _ProgramDay() when $default != null:
         return $default(_that.id, _that.templateId, _that.name, _that.order,
-            _that.exercises);
+            _that.weekday, _that.exercises);
       case _:
         return null;
     }
@@ -684,6 +692,7 @@ class _ProgramDay extends ProgramDay {
       required this.templateId,
       required this.name,
       required this.order,
+      this.weekday,
       final List<ProgramExercise> exercises = const []})
       : _exercises = exercises,
         super._();
@@ -698,6 +707,8 @@ class _ProgramDay extends ProgramDay {
   final String name;
   @override
   final int order;
+  @override
+  final int? weekday;
   final List<ProgramExercise> _exercises;
   @override
   @JsonKey()
@@ -732,6 +743,7 @@ class _ProgramDay extends ProgramDay {
                 other.templateId == templateId) &&
             (identical(other.name, name) || other.name == name) &&
             (identical(other.order, order) || other.order == order) &&
+            (identical(other.weekday, weekday) || other.weekday == weekday) &&
             const DeepCollectionEquality()
                 .equals(other._exercises, _exercises));
   }
@@ -739,11 +751,11 @@ class _ProgramDay extends ProgramDay {
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(runtimeType, id, templateId, name, order,
-      const DeepCollectionEquality().hash(_exercises));
+      weekday, const DeepCollectionEquality().hash(_exercises));
 
   @override
   String toString() {
-    return 'ProgramDay(id: $id, templateId: $templateId, name: $name, order: $order, exercises: $exercises)';
+    return 'ProgramDay(id: $id, templateId: $templateId, name: $name, order: $order, weekday: $weekday, exercises: $exercises)';
   }
 }
 
@@ -760,6 +772,7 @@ abstract mixin class _$ProgramDayCopyWith<$Res>
       int templateId,
       String name,
       int order,
+      int? weekday,
       List<ProgramExercise> exercises});
 }
 
@@ -779,6 +792,7 @@ class __$ProgramDayCopyWithImpl<$Res> implements _$ProgramDayCopyWith<$Res> {
     Object? templateId = null,
     Object? name = null,
     Object? order = null,
+    Object? weekday = freezed,
     Object? exercises = null,
   }) {
     return _then(_ProgramDay(
@@ -798,6 +812,10 @@ class __$ProgramDayCopyWithImpl<$Res> implements _$ProgramDayCopyWith<$Res> {
           ? _self.order
           : order // ignore: cast_nullable_to_non_nullable
               as int,
+      weekday: freezed == weekday
+          ? _self.weekday
+          : weekday // ignore: cast_nullable_to_non_nullable
+              as int?,
       exercises: null == exercises
           ? _self._exercises
           : exercises // ignore: cast_nullable_to_non_nullable

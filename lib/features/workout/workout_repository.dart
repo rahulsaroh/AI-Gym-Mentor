@@ -9,8 +9,11 @@ import 'package:ai_gym_mentor/core/domain/entities/workout_program.dart' as ent;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ai_gym_mentor/core/database/initial_data.dart';
+import 'package:ai_gym_mentor/services/github_exercise_service.dart';
 
 part 'workout_repository.g.dart';
+
+final _githubService = GithubExerciseService();
 
 class WorkoutRepository {
   final AppDatabase _db;
@@ -70,6 +73,7 @@ class WorkoutRepository {
       templateId: row.templateId,
       name: row.name,
       order: row.order,
+      weekday: row.weekday,
       exercises: exercises,
     );
   }
@@ -620,6 +624,11 @@ class WorkoutRepository {
     });
   }
 
+  Future<void> updateDayWeekday(int dayId, int? weekday) async {
+    await (_db.update(_db.templateDays)..where((t) => t.id.equals(dayId)))
+        .write(TemplateDaysCompanion(weekday: Value(weekday)));
+  }
+
   Future<String> exportTemplateToJson(int id) async {
     final template = await (_db.select(_db.workoutTemplates)
           ..where((t) => t.id.equals(id)))
@@ -651,10 +660,101 @@ class WorkoutRepository {
     });
   }
 
+  Future<ExerciseTable?> _findExerciseMatch(String name, {String? githubId}) async {
+    // 1. Exact match (ignore case and whitespace)
+    final normalized = name.trim().toLowerCase();
+
+    final exactMatches = await (_db.select(_db.exercises)
+          ..where((t) => t.name.lower().equals(normalized)))
+        .get();
+
+    if (exactMatches.isNotEmpty) return exactMatches.first;
+
+    // 2. Try to match by GitHub ID if provided
+    if (githubId != null && githubId.isNotEmpty) {
+      final githubMatches = await (_db.select(_db.exercises)
+            ..where((t) => t.exerciseId.equals(githubId)))
+          .get();
+      if (githubMatches.isNotEmpty) return githubMatches.first;
+    }
+
+    // 3. FTS match fallback
+    try {
+      final ftsMatches = await _db.searchExercises(name);
+      if (ftsMatches.isNotEmpty) {
+        // Take the first FTS result as it's ranked by relevance
+        return ftsMatches.first;
+      }
+    } catch (e) {
+      print('FTS search failed for "$name": $e');
+    }
+
+    // 4. Try GitHub exercise matching as last resort
+    try {
+      final githubExercises = await _githubService.getAllExercises();
+      final lowerName = name.toLowerCase();
+      
+      // Try exact match on GitHub
+      var matched = githubExercises.where((g) => 
+        g.name.toLowerCase() == lowerName ||
+        g.name.toLowerCase().replaceAll(' ', '') == lowerName.replaceAll(' ', '')
+      ).toList();
+      
+      if (matched.isEmpty) {
+        // Try partial match
+        matched = githubExercises.where((g) => 
+          g.name.toLowerCase().contains(lowerName) || 
+          lowerName.contains(g.name.toLowerCase())
+        ).toList();
+      }
+      
+      if (matched.isNotEmpty) {
+        final ghEx = matched.first;
+        // Check if we already have this exercise in local DB
+        final existingByGithubId = await (_db.select(_db.exercises)
+              ..where((t) => t.exerciseId.equals(ghEx.id)))
+            .getSingleOrNull();
+        
+        if (existingByGithubId != null) return existingByGithubId;
+        
+        // Create new exercise from GitHub data
+        final newId = await _db.into(_db.exercises).insert(
+          ExercisesCompanion.insert(
+            name: ghEx.name,
+            exerciseId: Value(ghEx.id),
+            primaryMuscle: ghEx.target,
+            secondaryMuscle: Value(ghEx.secondaryMuscles.isNotEmpty ? ghEx.secondaryMuscles.first : null),
+            equipment: ghEx.equipment,
+            setType: 'Straight',
+            description: Value(ghEx.instructions.isNotEmpty ? ghEx.instructions.first : null),
+            instructions: Value(ghEx.instructions.isNotEmpty ? ghEx.instructions.join('|') : null),
+            gifUrl: Value(ghEx.gifUrl),
+            source: const Value('github'),
+          ),
+        );
+        
+        return await (_db.select(_db.exercises)
+              ..where((t) => t.id.equals(newId)))
+            .getSingle();
+      }
+    } catch (e) {
+      print('GitHub exercise matching failed for "$name": $e');
+    }
+
+    return null;
+  }
+
   Future<void> importTemplateFromJson(String jsonStr) async {
     try {
       final data = jsonDecode(jsonStr);
-      final name = data['name'] as String;
+
+      // Handle both formats: Full Program (Map) or Exercise List (List)
+      if (data is List) {
+        await _importExercisesAsPlan(data);
+        return;
+      }
+
+      final name = data['name'] as String? ?? 'Imported Plan';
       final description = data['description'] as String?;
       final goal = data['goal'] as String?;
       final duration = data['duration'] as String?;
@@ -677,17 +777,16 @@ class WorkoutRepository {
                 templateId: templateId,
                 name: dayData['name'],
                 order: dayData['order'],
+                weekday: Value(dayData['weekday'] as int?),
               ));
 
           final exercisesList = dayData['exercises'] as List;
           for (final exData in exercisesList) {
             final exerciseName = exData['exerciseName'] as String;
+            final githubId = exData['githubId'] as String?;
 
-            // Find or create exercise
-            final existingExs = await (_db.select(_db.exercises)
-                  ..where((t) => t.name.equals(exerciseName)))
-              .get();
-            var ex = existingExs.isNotEmpty ? existingExs.first : null;
+            // Find or create exercise with robust matching
+            var ex = await _findExerciseMatch(exerciseName, githubId: githubId);
 
             if (ex == null) {
               final newId = await _db
@@ -734,7 +833,74 @@ class WorkoutRepository {
     } catch (e, stack) {
       print('Import failed: $e');
       print(stack);
+      rethrow;
     }
+  }
+
+  Future<void> _importExercisesAsPlan(List exercises) async {
+    final now = DateTime.now();
+    final name = 'Imported List - ${DateFormat.yMd().format(now)}';
+
+    await _db.transaction(() async {
+      final templateId = await _db.into(_db.workoutTemplates).insert(
+            WorkoutTemplatesCompanion.insert(
+              name: name,
+              description: Value('Imported from exercise list on ${DateFormat.yMMMd().format(now)}'),
+            ),
+          );
+
+      final dayId = await _db.into(_db.templateDays).insert(
+            TemplateDaysCompanion.insert(
+              templateId: templateId,
+              name: 'Exercises',
+              order: 0,
+            ),
+          );
+
+      for (int i = 0; i < exercises.length; i++) {
+        final item = exercises[i];
+        String exerciseName;
+        String? setsJson;
+
+        if (item is String) {
+          exerciseName = item;
+        } else if (item is Map) {
+          exerciseName = item['name'] ?? item['exerciseName'] ?? 'Unknown Exercise';
+          if (item['setsJson'] != null) {
+            setsJson = item['setsJson'] is String ? item['setsJson'] : jsonEncode(item['setsJson']);
+          }
+        } else {
+          continue;
+        }
+
+        var ex = await _findExerciseMatch(exerciseName, githubId: item is Map ? item['githubId'] as String? : null);
+
+        if (ex == null) {
+          final newId = await _db.into(_db.exercises).insert(
+                ExercisesCompanion.insert(
+                  name: exerciseName,
+                  primaryMuscle: 'Full Body',
+                  equipment: 'None',
+                  setType: 'Straight',
+                  source: const Value('imported'),
+                ),
+              );
+          ex = await (_db.select(_db.exercises)..where((t) => t.id.equals(newId))).getSingle();
+        }
+
+        await _db.into(_db.templateExercises).insert(
+              TemplateExercisesCompanion.insert(
+                dayId: dayId,
+                exerciseId: ex.id,
+                order: i,
+                setType: const Value(SetType.straight),
+                setsJson: setsJson ?? '[{"reps":10, "weight": 0.0}, {"reps":10, "weight": 0.0}, {"reps":10, "weight": 0.0}]',
+                restTime: const Value(90),
+              ),
+            );
+      }
+    });
+    print('Import successful: $name');
   }
 
   Future<void> clearAllTemplatesAndInsertSample() async {

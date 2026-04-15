@@ -2273,20 +2273,6 @@
       ]
     },
     {
-      "name": "sync_http",
-      "version": "0.3.1",
-      "dependencies": []
-    },
-    {
-      "name": "process",
-      "version": "5.0.5",
-      "dependencies": [
-        "file",
-        "path",
-        "platform"
-      ]
-    },
-    {
       "name": "test",
       "version": "1.29.0",
       "dependencies": [
@@ -2318,6 +2304,27 @@
       ]
     },
     {
+      "name": "sync_http",
+      "version": "0.3.1",
+      "dependencies": []
+    },
+    {
+      "name": "process",
+      "version": "5.0.5",
+      "dependencies": [
+        "file",
+        "path",
+        "platform"
+      ]
+    },
+    {
+      "name": "webkit_inspection_protocol",
+      "version": "1.2.1",
+      "dependencies": [
+        "logging"
+      ]
+    },
+    {
       "name": "test_core",
       "version": "0.6.15",
       "dependencies": [
@@ -2342,13 +2349,6 @@
         "test_api",
         "vm_service",
         "yaml"
-      ]
-    },
-    {
-      "name": "webkit_inspection_protocol",
-      "version": "1.2.1",
-      "dependencies": [
-        "logging"
       ]
     },
     {

@@ -34,6 +34,7 @@ _ProgramDay _$ProgramDayFromJson(Map<String, dynamic> json) => _ProgramDay(
       templateId: (json['templateId'] as num).toInt(),
       name: json['name'] as String,
       order: (json['order'] as num).toInt(),
+      weekday: (json['weekday'] as num?)?.toInt(),
       exercises: (json['exercises'] as List<dynamic>?)
               ?.map((e) => ProgramExercise.fromJson(e as Map<String, dynamic>))
               .toList() ??
@@ -46,6 +47,7 @@ Map<String, dynamic> _$ProgramDayToJson(_ProgramDay instance) =>
       'templateId': instance.templateId,
       'name': instance.name,
       'order': instance.order,
+      'weekday': instance.weekday,
       'exercises': instance.exercises,
     };
 

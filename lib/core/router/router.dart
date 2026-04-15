@@ -12,7 +12,6 @@ import 'package:ai_gym_mentor/features/shell/placeholder_screens.dart'
 import 'package:ai_gym_mentor/features/splash/splash_screen.dart';
 import 'package:ai_gym_mentor/features/onboarding/onboarding_screen.dart';
 import 'package:ai_gym_mentor/features/setup/setup_screen.dart';
-import 'package:ai_gym_mentor/features/exercise_database/presentation/screens/exercise_list_screen.dart';
 import 'package:ai_gym_mentor/features/exercise_database/presentation/screens/muscle_group_screen.dart';
 import 'package:ai_gym_mentor/features/exercise_database/presentation/screens/exercise_history_screen.dart';
 import 'package:ai_gym_mentor/features/exercise_database/presentation/screens/exercise_detail_screen.dart';
@@ -31,8 +30,6 @@ import 'package:ai_gym_mentor/features/programs/create_edit_program_screen.dart'
 import 'package:ai_gym_mentor/features/programs/program_details_screen.dart';
 import 'package:ai_gym_mentor/features/workout/start_workout_screen.dart';
 import 'package:ai_gym_mentor/features/exercise_database/presentation/screens/github_exercise_library_screen.dart';
-import 'package:ai_gym_mentor/features/exercise_database/presentation/screens/github_exercise_detail_screen.dart';
-import 'package:ai_gym_mentor/services/github_exercise_service.dart';
 
 final router = GoRouter(
   initialLocation: '/',
@@ -75,7 +72,7 @@ final router = GoRouter(
     // Exercise library — accessible via push from Settings or anywhere, not a bottom tab
     GoRoute(
       path: '/exercises',
-      builder: (context, state) => const ExerciseListScreen(),
+      builder: (context, state) => const GithubExerciseLibraryScreen(),
       routes: [
         GoRoute(
           path: 'muscle-groups',
@@ -117,22 +114,6 @@ final router = GoRouter(
     GoRoute(
       path: '/exercise-library',
       builder: (context, state) => const GithubExerciseLibraryScreen(),
-      routes: [
-        GoRoute(
-          path: 'details',
-          builder: (context, state) {
-            final exercise = state.extra as GithubExercise?;
-            if (exercise == null) {
-              return const Scaffold(
-                body: Center(
-                  child: Text('Exercise not found'),
-                ),
-              );
-            }
-            return GithubExerciseDetailScreen(exercise: exercise);
-          },
-        ),
-      ],
     ),
     StatefulShellRoute.indexedStack(
       builder: (context, state, navigationShell) {

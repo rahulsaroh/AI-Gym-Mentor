@@ -28,6 +28,7 @@ abstract class ProgramDay with _$ProgramDay {
     required int templateId,
     required String name,
     required int order,
+    int? weekday,
     @Default([]) List<ProgramExercise> exercises,
   }) = _ProgramDay;
 

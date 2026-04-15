@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:gif_view/gif_view.dart';
 
 class ExerciseMediaWidget extends StatefulWidget {
   final String? animatedUrl; // e.g., GIF URL
@@ -70,15 +69,26 @@ class _ExerciseMediaWidgetState extends State<ExerciseMediaWidget> {
   Widget _buildMedia() {
     // Priority: animatedUrl -> staticUrl -> Placeholder
     if (widget.animatedUrl != null && widget.animatedUrl!.isNotEmpty) {
-      return GifView.network(
-        widget.animatedUrl!,
-        fit: widget.fit,
-      );
+      return _buildGifWithErrorHandling();
     } else if (widget.staticUrl != null && widget.staticUrl!.isNotEmpty) {
       return _buildStaticImage();
     } else {
       return _buildErrorPlaceholder();
     }
+  }
+
+  Widget _buildGifWithErrorHandling() {
+    return Image.network(
+      widget.animatedUrl!,
+      fit: widget.fit,
+      loadingBuilder: (context, child, loadingProgress) {
+        if (loadingProgress == null) return child;
+        return _buildPlaceholder();
+      },
+      errorBuilder: (context, error, stackTrace) {
+        return _buildErrorPlaceholder();
+      },
+    );
   }
 
   Widget _buildStaticImage() {

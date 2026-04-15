@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:ai_gym_mentor/services/github_exercise_service.dart';
 import 'package:ai_gym_mentor/core/database/database.dart';
 import 'package:ai_gym_mentor/features/exercise_database/data/datasources/exercise_local_datasource.dart';
 import 'package:ai_gym_mentor/features/exercise_database/data/datasources/exercise_db_seeder.dart';
@@ -305,6 +306,56 @@ class ExerciseRepositoryImpl implements ExerciseRepository {
 
     // Save body parts (auto-mapped during insert usually, but let's be explicit if needed)
     // For now, let's assume the datasource/seeder logic or we can add it here.
+
+    return id;
+  }
+
+  @override
+  Future<int> ensureGithubExercise(GithubExercise githubEx) async {
+    // Check if exercise already exists by name
+    final existing = await _localDatasource.getExercises(searchQuery: githubEx.name);
+    final match = existing
+        .where((e) => e.name.toLowerCase() == githubEx.name.toLowerCase())
+        .firstOrNull;
+
+    if (match != null) {
+      return match.id;
+    }
+
+    // Insert new exercise from GitHub
+    final companion = ExercisesCompanion.insert(
+      name: githubEx.name,
+      equipment: githubEx.equipment,
+      primaryMuscle: githubEx.target,
+      category: const Value('Strength'),
+      setType: 'Straight',
+      difficulty: const Value('Beginner'),
+      gifUrl: Value(githubEx.gifUrl),
+      source: const Value('github'),
+      instructions: Value(githubEx.instructions.join('|')),
+    );
+
+    final id = await _localDatasource.insertExercise(companion);
+
+    // Add muscles
+    if (githubEx.target.isNotEmpty) {
+      await _localDatasource.insertExerciseMuscle(id, githubEx.target, true);
+    }
+    for (final muscle in githubEx.secondaryMuscles) {
+      await _localDatasource.insertExerciseMuscle(id, muscle, false);
+    }
+
+    // Add body part
+    if (githubEx.bodyPart.isNotEmpty) {
+      await _localDatasource.database
+          .into(_localDatasource.database.exerciseBodyParts)
+          .insert(
+            ExerciseBodyPartsCompanion.insert(
+              exerciseId: id,
+              bodyPart: githubEx.bodyPart,
+            ),
+          );
+    }
 
     return id;
   }

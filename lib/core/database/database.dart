@@ -68,6 +68,7 @@ class TemplateDays extends Table {
   IntColumn get templateId => integer().references(WorkoutTemplates, #id)();
   TextColumn get name => text()();
   IntColumn get order => integer()();
+  IntColumn get weekday => integer().nullable()(); // 1 = Monday, 7 = Sunday
 }
 
 class TemplateExercises extends Table {
@@ -269,7 +270,7 @@ class AppDatabase extends _$AppDatabase {
   }
 
   @override
-  int get schemaVersion => 21;
+  int get schemaVersion => 22;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -443,6 +444,11 @@ class AppDatabase extends _$AppDatabase {
             if (!await hasColumn('exercises', 'usage_count')) {
               await m.addColumn(
                   exercises, exercises.usageCount as GeneratedColumn<Object>);
+            }
+          }
+          if (from < 22) {
+            if (!await hasColumn('template_days', 'weekday')) {
+              await m.addColumn(templateDays, templateDays.weekday);
             }
           }
         },

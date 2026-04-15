@@ -318,6 +318,325 @@ class __$MotivationTipCopyWithImpl<$Res>
 }
 
 /// @nodoc
+mixin _$TodayExercise {
+  int get id;
+  String get name;
+  String? get imageUrl;
+
+  /// Create a copy of TodayExercise
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $TodayExerciseCopyWith<TodayExercise> get copyWith =>
+      _$TodayExerciseCopyWithImpl<TodayExercise>(
+          this as TodayExercise, _$identity);
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is TodayExercise &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.name, name) || other.name == name) &&
+            (identical(other.imageUrl, imageUrl) ||
+                other.imageUrl == imageUrl));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, id, name, imageUrl);
+
+  @override
+  String toString() {
+    return 'TodayExercise(id: $id, name: $name, imageUrl: $imageUrl)';
+  }
+}
+
+/// @nodoc
+abstract mixin class $TodayExerciseCopyWith<$Res> {
+  factory $TodayExerciseCopyWith(
+          TodayExercise value, $Res Function(TodayExercise) _then) =
+      _$TodayExerciseCopyWithImpl;
+  @useResult
+  $Res call({int id, String name, String? imageUrl});
+}
+
+/// @nodoc
+class _$TodayExerciseCopyWithImpl<$Res>
+    implements $TodayExerciseCopyWith<$Res> {
+  _$TodayExerciseCopyWithImpl(this._self, this._then);
+
+  final TodayExercise _self;
+  final $Res Function(TodayExercise) _then;
+
+  /// Create a copy of TodayExercise
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? name = null,
+    Object? imageUrl = freezed,
+  }) {
+    return _then(_self.copyWith(
+      id: null == id
+          ? _self.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as int,
+      name: null == name
+          ? _self.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      imageUrl: freezed == imageUrl
+          ? _self.imageUrl
+          : imageUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ));
+  }
+}
+
+/// Adds pattern-matching-related methods to [TodayExercise].
+extension TodayExercisePatterns on TodayExercise {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_TodayExercise value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _TodayExercise() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_TodayExercise value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _TodayExercise():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_TodayExercise value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _TodayExercise() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(int id, String name, String? imageUrl)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _TodayExercise() when $default != null:
+        return $default(_that.id, _that.name, _that.imageUrl);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(int id, String name, String? imageUrl) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _TodayExercise():
+        return $default(_that.id, _that.name, _that.imageUrl);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(int id, String name, String? imageUrl)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _TodayExercise() when $default != null:
+        return $default(_that.id, _that.name, _that.imageUrl);
+      case _:
+        return null;
+    }
+  }
+}
+
+/// @nodoc
+
+class _TodayExercise implements TodayExercise {
+  const _TodayExercise({required this.id, required this.name, this.imageUrl});
+
+  @override
+  final int id;
+  @override
+  final String name;
+  @override
+  final String? imageUrl;
+
+  /// Create a copy of TodayExercise
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$TodayExerciseCopyWith<_TodayExercise> get copyWith =>
+      __$TodayExerciseCopyWithImpl<_TodayExercise>(this, _$identity);
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _TodayExercise &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.name, name) || other.name == name) &&
+            (identical(other.imageUrl, imageUrl) ||
+                other.imageUrl == imageUrl));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, id, name, imageUrl);
+
+  @override
+  String toString() {
+    return 'TodayExercise(id: $id, name: $name, imageUrl: $imageUrl)';
+  }
+}
+
+/// @nodoc
+abstract mixin class _$TodayExerciseCopyWith<$Res>
+    implements $TodayExerciseCopyWith<$Res> {
+  factory _$TodayExerciseCopyWith(
+          _TodayExercise value, $Res Function(_TodayExercise) _then) =
+      __$TodayExerciseCopyWithImpl;
+  @override
+  @useResult
+  $Res call({int id, String name, String? imageUrl});
+}
+
+/// @nodoc
+class __$TodayExerciseCopyWithImpl<$Res>
+    implements _$TodayExerciseCopyWith<$Res> {
+  __$TodayExerciseCopyWithImpl(this._self, this._then);
+
+  final _TodayExercise _self;
+  final $Res Function(_TodayExercise) _then;
+
+  /// Create a copy of TodayExercise
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? id = null,
+    Object? name = null,
+    Object? imageUrl = freezed,
+  }) {
+    return _then(_TodayExercise(
+      id: null == id
+          ? _self.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as int,
+      name: null == name
+          ? _self.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      imageUrl: freezed == imageUrl
+          ? _self.imageUrl
+          : imageUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ));
+  }
+}
+
+/// @nodoc
 mixin _$WorkoutHomeState {
   String get greeting;
   String get userName;
@@ -331,7 +650,7 @@ mixin _$WorkoutHomeState {
   String? get lastWorkoutSummary;
   bool get isRestDay;
   String? get todayDayName;
-  List<String> get todayExercises;
+  List<TodayExercise> get todayExercises;
   int get estimatedDuration;
   int? get nextDayId;
   int? get templateId;
@@ -432,7 +751,7 @@ abstract mixin class $WorkoutHomeStateCopyWith<$Res> {
       String? lastWorkoutSummary,
       bool isRestDay,
       String? todayDayName,
-      List<String> todayExercises,
+      List<TodayExercise> todayExercises,
       int estimatedDuration,
       int? nextDayId,
       int? templateId,
@@ -527,7 +846,7 @@ class _$WorkoutHomeStateCopyWithImpl<$Res>
       todayExercises: null == todayExercises
           ? _self.todayExercises
           : todayExercises // ignore: cast_nullable_to_non_nullable
-              as List<String>,
+              as List<TodayExercise>,
       estimatedDuration: null == estimatedDuration
           ? _self.estimatedDuration
           : estimatedDuration // ignore: cast_nullable_to_non_nullable
@@ -706,7 +1025,7 @@ extension WorkoutHomeStatePatterns on WorkoutHomeState {
             String? lastWorkoutSummary,
             bool isRestDay,
             String? todayDayName,
-            List<String> todayExercises,
+            List<TodayExercise> todayExercises,
             int estimatedDuration,
             int? nextDayId,
             int? templateId,
@@ -768,7 +1087,7 @@ extension WorkoutHomeStatePatterns on WorkoutHomeState {
             String? lastWorkoutSummary,
             bool isRestDay,
             String? todayDayName,
-            List<String> todayExercises,
+            List<TodayExercise> todayExercises,
             int estimatedDuration,
             int? nextDayId,
             int? templateId,
@@ -828,7 +1147,7 @@ extension WorkoutHomeStatePatterns on WorkoutHomeState {
             String? lastWorkoutSummary,
             bool isRestDay,
             String? todayDayName,
-            List<String> todayExercises,
+            List<TodayExercise> todayExercises,
             int estimatedDuration,
             int? nextDayId,
             int? templateId,
@@ -878,7 +1197,7 @@ class _WorkoutHomeState extends WorkoutHomeState {
       this.lastWorkoutSummary,
       this.isRestDay = false,
       this.todayDayName,
-      final List<String> todayExercises = const [],
+      final List<TodayExercise> todayExercises = const [],
       this.estimatedDuration = 0,
       this.nextDayId,
       this.templateId,
@@ -922,10 +1241,10 @@ class _WorkoutHomeState extends WorkoutHomeState {
   final bool isRestDay;
   @override
   final String? todayDayName;
-  final List<String> _todayExercises;
+  final List<TodayExercise> _todayExercises;
   @override
   @JsonKey()
-  List<String> get todayExercises {
+  List<TodayExercise> get todayExercises {
     if (_todayExercises is EqualUnmodifiableListView) return _todayExercises;
     // ignore: implicit_dynamic_type
     return EqualUnmodifiableListView(_todayExercises);
@@ -1038,7 +1357,7 @@ abstract mixin class _$WorkoutHomeStateCopyWith<$Res>
       String? lastWorkoutSummary,
       bool isRestDay,
       String? todayDayName,
-      List<String> todayExercises,
+      List<TodayExercise> todayExercises,
       int estimatedDuration,
       int? nextDayId,
       int? templateId,
@@ -1137,7 +1456,7 @@ class __$WorkoutHomeStateCopyWithImpl<$Res>
       todayExercises: null == todayExercises
           ? _self._todayExercises
           : todayExercises // ignore: cast_nullable_to_non_nullable
-              as List<String>,
+              as List<TodayExercise>,
       estimatedDuration: null == estimatedDuration
           ? _self.estimatedDuration
           : estimatedDuration // ignore: cast_nullable_to_non_nullable

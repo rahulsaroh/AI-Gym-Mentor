@@ -6,6 +6,8 @@ import 'package:go_router/go_router.dart';
 import 'package:ai_gym_mentor/features/workout/workout_repository.dart';
 import 'package:ai_gym_mentor/core/domain/entities/workout_program.dart' as ent;
 import 'package:ai_gym_mentor/features/workout/providers/workout_home_notifier.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'dart:convert';
 
 class ProgramDetailScreen extends ConsumerWidget {
   final int templateId;
@@ -28,19 +30,44 @@ class ProgramDetailScreen extends ConsumerWidget {
           if (program == null)
             return const Center(child: Text('Program not found'));
 
-          return Stack(
-            children: [
-              CustomScrollView(
-                slivers: [
+          return DefaultTabController(
+            length: program.days.length,
+            child: Scaffold(
+              backgroundColor: Colors.white,
+              body: NestedScrollView(
+                headerSliverBuilder: (context, innerBoxIsScrolled) => [
                   _buildAppBar(context, program),
                   _buildHeader(context, program),
                   _buildOverview(context, program),
-                  _buildSchedule(context, ref, program),
-                  const SliverPadding(padding: EdgeInsets.only(bottom: 120)),
+                  SliverPersistentHeader(
+                    pinned: true,
+                    delegate: _TabBarDelegate(
+                      TabBar(
+                        isScrollable: true,
+                        labelColor: Colors.teal[900],
+                        unselectedLabelColor: Colors.grey,
+                        indicatorColor: Colors.teal[900],
+                        indicatorWeight: 3,
+                        labelStyle: GoogleFonts.outfit(fontWeight: FontWeight.bold),
+                        tabs: program.days.map((day) {
+                          final weekdayName = day.weekday != null 
+                              ? _getWeekdayName(day.weekday!).substring(0, 3) 
+                              : 'Day ${day.order + 1}';
+                          return Tab(text: day.weekday != null ? '$weekdayName (D${day.order + 1})' : 'Day ${day.order + 1}');
+                        }).toList(),
+                      ),
+                    ),
+                  ),
                 ],
+                body: TabBarView(
+                  children: program.days
+                      .map((day) => _buildDaySingleView(context, ref, day, program.name))
+                      .toList(),
+                ),
               ),
-              _buildBottomButton(context, ref, program),
-            ],
+              floatingActionButton: _buildBottomButton(context, ref, program),
+              floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+            ),
           );
         },
       ),
@@ -199,130 +226,89 @@ class ProgramDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildSchedule(
-      BuildContext context, WidgetRef ref, ent.WorkoutProgram program) {
-    return SliverToBoxAdapter(
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(20, 32, 20, 0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Plan Schedule',
-              style: GoogleFonts.outfit(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-              ),
-            ),
-            const SizedBox(height: 16),
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.grey[50],
-                borderRadius: BorderRadius.circular(24),
-                border: Border.all(color: Colors.grey[100]!),
-              ),
-              child: ExpansionTile(
-                initiallyExpanded: true,
-                title: Text(
-                  'Week 1',
-                  style: GoogleFonts.outfit(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.orange[800],
-                  ),
-                ),
-                trailing: Icon(LucideIcons.chevronUp, color: Colors.teal[900]),
-                children: program.days
-                    .map(
-                        (day) => _buildDayItem(context, ref, day, program.name))
-                    .toList(),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDayItem(BuildContext context, WidgetRef ref, ent.ProgramDay day,
+  Widget _buildDaySingleView(BuildContext context, WidgetRef ref, ent.ProgramDay day,
       String programName) {
     final muscleGroups = _deriveMuscleGroups(day);
 
-    return Container(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Day ${day.order + 1}',
-                style: GoogleFonts.outfit(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
-              ),
-              Row(
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 100),
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: Colors.orange[50],
-                      borderRadius: BorderRadius.circular(4),
+                  Text(
+                    day.name,
+                    style: GoogleFonts.outfit(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
                     ),
-                    child: Text(
-                      muscleGroups,
-                      style: GoogleFonts.outfit(
-                        fontSize: 11,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.orange[700],
-                      ),
-                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(width: 8),
-                  IconButton(
-                    icon: const Icon(LucideIcons.play,
-                        size: 20, color: Colors.green),
-                    onPressed: () =>
-                        _showStartDayConfirm(context, ref, day, programName),
-                    style: IconButton.styleFrom(
-                      backgroundColor: Colors.green.withOpacity(0.1),
-                      padding: const EdgeInsets.all(4),
+                  Text(
+                    muscleGroups,
+                    style: GoogleFonts.outfit(
+                      fontSize: 14,
+                      color: Colors.teal[700],
+                      fontWeight: FontWeight.w500,
                     ),
-                    constraints: const BoxConstraints(),
-                    visualDensity: VisualDensity.compact,
-                    tooltip: 'Start this day',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ],
               ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          ...day.exercises.map((ex) => Padding(
-                padding: const EdgeInsets.only(bottom: 8),
-                child: Row(
-                  children: [
-                    Icon(LucideIcons.circleCheckBig,
-                        size: 18, color: Colors.orange[300]),
-                    const SizedBox(width: 12),
-                    Text(
-                      ex.exercise.name,
-                      style: GoogleFonts.outfit(
-                        fontSize: 15,
-                        color: Colors.black87,
-                      ),
+            ),
+            const SizedBox(width: 12),
+            Row(
+              children: [
+                ElevatedButton.icon(
+                  onPressed: () => _showStartDayConfirm(context, ref, day, programName),
+                  icon: const Icon(LucideIcons.play, size: 14, color: Colors.white),
+                  label: Text(
+                    'START',
+                    style: GoogleFonts.outfit(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
                     ),
-                  ],
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green[600],
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
                 ),
-              )),
-        ],
-      ),
+                const SizedBox(width: 8),
+                IconButton(
+                  icon: Icon(
+                    LucideIcons.calendar, 
+                    size: 20, 
+                    color: day.weekday != null ? Colors.teal : Colors.blue
+                  ),
+                  onPressed: () => _showWeekdayPicker(context, ref, day),
+                  style: IconButton.styleFrom(
+                    backgroundColor: (day.weekday != null ? Colors.teal : Colors.blue).withOpacity(0.1),
+                    padding: const EdgeInsets.all(8),
+                  ),
+                  tooltip: 'Set weekday',
+                ),
+              ],
+            ),
+          ],
+        ),
+        const SizedBox(height: 24),
+        ...day.exercises.map((ex) => _buildExerciseTile(context, ex)),
+      ],
     );
   }
+
 
   String _deriveMuscleGroups(ent.ProgramDay day) {
     if (day.exercises.isEmpty) return 'Rest Day';
@@ -336,59 +322,43 @@ class ProgramDetailScreen extends ConsumerWidget {
 
   Widget _buildBottomButton(
       BuildContext context, WidgetRef ref, ent.WorkoutProgram program) {
-    return Positioned(
-      bottom: 0,
-      left: 0,
-      right: 0,
-      child: Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 10,
-              offset: const Offset(0, -5),
-            ),
-          ],
-        ),
-        child: SizedBox(
-          width: double.infinity,
-          height: 56,
-          child: ElevatedButton(
-            onPressed: () async {
-              final router = GoRouter.of(context);
-              final repo = ref.read(workoutRepositoryProvider);
-              final days = await repo.getTemplateDays(templateId);
-              if (days.isNotEmpty && context.mounted) {
-                final id =
-                    await ref.read(workoutHomeProvider.notifier).startWorkout(
-                          templateId: templateId,
-                          dayId: days.first.id,
-                          name: program.name,
-                        );
-                if (context.mounted) {
-                  context
-                      .pop(); // Close if we were on some sheet (unlikely here but safe)
-                  router.push(
-                      '/app/workout/active?id=$id&dayId=${days.first.id}');
-                }
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 0),
+      child: SizedBox(
+        width: double.infinity,
+        height: 56,
+        child: ElevatedButton(
+          onPressed: () async {
+            final router = GoRouter.of(context);
+            final repo = ref.read(workoutRepositoryProvider);
+            final days = await repo.getTemplateDays(templateId);
+            if (days.isNotEmpty && context.mounted) {
+              final id =
+                  await ref.read(workoutHomeProvider.notifier).startWorkout(
+                        templateId: templateId,
+                        dayId: days.first.id,
+                        name: program.name,
+                      );
+              if (context.mounted) {
+                // Navigate only if context is still mounted
+                router.push(
+                    '/app/workout/active?id=$id&dayId=${days.first.id}');
               }
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.orange[700],
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-              elevation: 0,
+            }
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.orange[700],
+            foregroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
             ),
-            child: Text(
-              'Start Default Schedule',
-              style: GoogleFonts.outfit(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
+            elevation: 4,
+          ),
+          child: Text(
+            'Start Default Schedule',
+            style: GoogleFonts.outfit(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
             ),
           ),
         ),
@@ -442,5 +412,165 @@ class ProgramDetailScreen extends ConsumerWidget {
         ],
       ),
     );
+  }
+  Widget _buildExerciseTile(BuildContext context, ent.ProgramExercise ex) {
+    final setsInfo = _formatSets(ex.setsJson);
+    final imageUrl = ex.exercise.imageUrls.isNotEmpty 
+        ? ex.exercise.imageUrls.first 
+        : (ex.exercise.gifUrl ?? '');
+
+    return InkWell(
+      onTap: () => context.push('/exercises/${ex.exercise.id}'),
+      borderRadius: BorderRadius.circular(12),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 10),
+        child: Row(
+          children: [
+            // Exercise Thumbnail
+            Container(
+              width: 50,
+              height: 50,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.grey[200],
+                border: Border.all(color: Colors.grey[300]!, width: 1.5),
+              ),
+              clipBehavior: Clip.antiAlias,
+              child: imageUrl.isNotEmpty
+                  ? CachedNetworkImage(
+                      imageUrl: imageUrl,
+                      fit: BoxFit.cover,
+                      placeholder: (context, url) => const Icon(LucideIcons.image, size: 20, color: Colors.grey),
+                      errorWidget: (context, url, error) => const Icon(LucideIcons.dumbbell, size: 20, color: Colors.grey),
+                    )
+                  : const Icon(LucideIcons.dumbbell, size: 20, color: Colors.grey),
+            ),
+            const SizedBox(width: 16),
+            // Exercise Info
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    ex.exercise.name,
+                    style: GoogleFonts.outfit(
+                      fontSize: 17,
+                      fontWeight: FontWeight.bold,
+                      color: const Color(0xFF3B82F6), // Vibrant Blue
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    setsInfo,
+                    style: GoogleFonts.outfit(
+                      fontSize: 14,
+                      color: Colors.grey[500],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(LucideIcons.chevronRight, color: Colors.grey[300], size: 18),
+          ],
+        ),
+      ),
+    );
+  }
+
+  String _formatSets(String setsJson) {
+    try {
+      final List<dynamic> sets = jsonDecode(setsJson);
+      if (sets.isEmpty) return '1 set';
+      final int count = sets.length;
+      final firstSet = sets.first;
+      final reps = firstSet['reps'] ?? '10';
+      return '$count ${count == 1 ? "set" : "sets"} • $reps reps';
+    } catch (e) {
+      return '3 sets • 12 reps'; // Default fallback matching common exercises
+    }
+  }
+
+  void _showWeekdayPicker(BuildContext context, WidgetRef ref, ent.ProgramDay day) {
+    final weekdays = [
+      'None',
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday',
+      'Sunday'
+    ];
+
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => ListView.builder(
+        shrinkWrap: true,
+        itemCount: weekdays.length,
+        itemBuilder: (context, index) {
+          final isNone = index == 0;
+          final weekdayValue = isNone ? null : index;
+          return ListTile(
+            title: Text(weekdays[index]),
+            leading: Icon(
+              isNone ? LucideIcons.slash : LucideIcons.calendar,
+              color: day.weekday == weekdayValue ? Colors.green : null,
+            ),
+            trailing: day.weekday == weekdayValue ? const Icon(LucideIcons.check) : null,
+            onTap: () {
+              ref.read(workoutRepositoryProvider).updateDayWeekday(day.id, weekdayValue);
+              // Invalidate programs and home to refresh UI
+              ref.invalidate(workoutHomeProvider);
+              // We need to trigger a rebuild of the current screen
+              // Since it's a FutureBuilder, we might need a better way, but for now:
+              Navigator.pop(context);
+            },
+          );
+        },
+      ),
+    );
+  }
+
+  String _getWeekdayName(int weekday) {
+    const names = [
+      '',
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday',
+      'Sunday'
+    ];
+    if (weekday < 1 || weekday > 7) return 'Unknown';
+    return names[weekday];
+  }
+}
+
+class _TabBarDelegate extends SliverPersistentHeaderDelegate {
+  final TabBar tabBar;
+
+  _TabBarDelegate(this.tabBar);
+
+  @override
+  double get minExtent => tabBar.preferredSize.height;
+  @override
+  double get maxExtent => tabBar.preferredSize.height;
+
+  @override
+  Widget build(
+      BuildContext context, double shrinkOffset, bool overlapsContent) {
+    return Container(
+      color: Colors.white,
+      child: tabBar,
+    );
+  }
+
+  @override
+  bool shouldRebuild(_TabBarDelegate oldDelegate) {
+    return false;
   }
 }

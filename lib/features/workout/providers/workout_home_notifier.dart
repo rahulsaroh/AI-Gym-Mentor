@@ -23,6 +23,15 @@ abstract class MotivationTip with _$MotivationTip {
 }
 
 @freezed
+abstract class TodayExercise with _$TodayExercise {
+  const factory TodayExercise({
+    required int id,
+    required String name,
+    String? imageUrl,
+  }) = _TodayExercise;
+}
+
+@freezed
 abstract class WorkoutHomeState with _$WorkoutHomeState {
   const factory WorkoutHomeState({
     required String greeting,
@@ -38,7 +47,7 @@ abstract class WorkoutHomeState with _$WorkoutHomeState {
     String? lastWorkoutSummary,
     @Default(false) bool isRestDay,
     String? todayDayName,
-    @Default([]) List<String> todayExercises,
+    @Default([]) List<TodayExercise> todayExercises,
     @Default(0) int estimatedDuration,
     int? nextDayId,
     int? templateId,
@@ -137,7 +146,7 @@ class WorkoutHomeNotifier extends _$WorkoutHomeNotifier {
 
     // Program logic: Determine today's workout day from active template
     String? todayDayName;
-    List<String> todayExercises = [];
+    List<TodayExercise> todayExercises = [];
     int estimatedDuration = 0;
     int? nextDayId;
     int? activeTemplateId;
@@ -170,17 +179,27 @@ class WorkoutHomeNotifier extends _$WorkoutHomeNotifier {
           }
         }
 
+        // Weekday Priority Logic:
+        // Try to find a day that specifically matches today's weekday
+        final todayWeekday = now.weekday; // 1 = Mon, 7 = Sun
+        final weekdayMatchIndex = templateDays.indexWhere((d) => d.weekday == todayWeekday);
+        
         final nextDay = (forcedDayId != null) 
             ? templateDays.firstWhere((d) => d.id == forcedDayId, orElse: () => templateDays[nextDayIndex])
-            : templateDays[nextDayIndex];
+            : (weekdayMatchIndex != -1 ? templateDays[weekdayMatchIndex] : templateDays[nextDayIndex]);
             
         todayDayName = nextDay.name;
         nextDayId = nextDay.id;
 
         final templateExercises =
             await workoutRepo.getTemplateExercises(nextDay.id);
-        todayExercises =
-            templateExercises.map((te) => te.exercise.name).toList();
+        todayExercises = templateExercises.map((te) => TodayExercise(
+              id: te.exercise.id,
+              name: te.exercise.name,
+              imageUrl: te.exercise.imageUrls.isNotEmpty
+                  ? te.exercise.imageUrls.first
+                  : (te.exercise.gifUrl ?? ''),
+            )).toList();
         estimatedDuration =
             templateExercises.length * 12; // Estimate: 12 mins per exercise
 

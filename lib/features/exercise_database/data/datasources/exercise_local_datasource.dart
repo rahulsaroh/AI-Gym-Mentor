@@ -7,6 +7,8 @@ class ExerciseLocalDatasource {
 
   ExerciseLocalDatasource(this._db);
 
+  AppDatabase get database => _db;
+
   Future<List<ExerciseTable>> getExercises({
     int page = 0,
     int pageSize = 20,

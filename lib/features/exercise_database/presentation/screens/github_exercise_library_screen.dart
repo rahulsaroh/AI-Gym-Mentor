@@ -4,6 +4,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:ai_gym_mentor/features/exercise_database/presentation/providers/github_exercise_provider.dart';
 import 'package:ai_gym_mentor/features/exercise_database/presentation/widgets/github_exercise_card.dart';
 import 'package:go_router/go_router.dart';
+import 'package:ai_gym_mentor/features/exercise_database/presentation/providers/repository_provider.dart';
 
 class GithubExerciseLibraryScreen extends ConsumerStatefulWidget {
   const GithubExerciseLibraryScreen({Key? key}) : super(key: key);
@@ -186,11 +187,13 @@ class _GithubExerciseLibraryScreenState
                       final exercise = exercises[index];
                       return GithubExerciseCard(
                         exercise: exercise,
-                        onTap: () {
-                          context.push(
-                            '/exercise-library/details',
-                            extra: exercise,
-                          );
+                        onTap: () async {
+                          final localId = await ref
+                              .read(exerciseRepositoryProvider)
+                              .ensureGithubExercise(exercise);
+                          if (context.mounted) {
+                            context.push('/exercises/$localId');
+                          }
                         },
                       );
                     },

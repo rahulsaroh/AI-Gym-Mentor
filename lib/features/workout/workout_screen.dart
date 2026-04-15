@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:ai_gym_mentor/core/database/database.dart';
 import 'package:ai_gym_mentor/core/domain/entities/workout_session.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -362,20 +363,28 @@ class _TodayPlanSection extends ConsumerWidget {
                     ],
                   ),
                   const SizedBox(height: 20),
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: state.todayExercises
-                            .take(3)
-                            .map((e) => _ExerciseChip(label: e))
-                            .toList() +
-                        (state.todayExercises.length > 3
-                            ? [
-                                _ExerciseChip(
-                                    label:
-                                        '+${state.todayExercises.length - 3} more')
-                              ]
-                            : []),
+                  Column(
+                    children: [
+                      ...state.todayExercises.take(3).map((ex) => _TodayExerciseItem(ex: ex)),
+                      if (state.todayExercises.length > 3)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 12),
+                          child: Row(
+                            children: [
+                              Icon(LucideIcons.plus, size: 14, color: Colors.white.withValues(alpha: 0.7)),
+                              const SizedBox(width: 8),
+                              Text(
+                                '${state.todayExercises.length - 3} more exercises',
+                                style: GoogleFonts.outfit(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white.withValues(alpha: 0.7),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                    ],
                   ),
                 ] else
                   Text(
@@ -1180,6 +1189,71 @@ class _FloatingWorkoutBannerState extends State<_FloatingWorkoutBanner>
                   );
                 },
               ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _TodayExerciseItem extends StatelessWidget {
+  final TodayExercise ex;
+  const _TodayExerciseItem({required this.ex});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: InkWell(
+        onTap: () => context.push('/exercises/${ex.id}'),
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.all(4.0),
+          child: Row(
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.2),
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.3), width: 1),
+                ),
+                clipBehavior: Clip.antiAlias,
+                child: ex.imageUrl != null && ex.imageUrl!.isNotEmpty
+                    ? CachedNetworkImage(
+                        imageUrl: ex.imageUrl!,
+                        fit: BoxFit.cover,
+                        placeholder: (context, url) => const Center(
+                            child: SizedBox(
+                                width: 15,
+                                height: 15,
+                                child: CircularProgressIndicator(
+                                    strokeWidth: 2, color: Colors.white70))),
+                        errorWidget: (context, url, error) => const Icon(
+                            LucideIcons.dumbbell,
+                            size: 16,
+                            color: Colors.white70),
+                      )
+                    : const Icon(LucideIcons.dumbbell,
+                        size: 16, color: Colors.white70),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  ex.name,
+                  style: GoogleFonts.outfit(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 16,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              const Icon(LucideIcons.chevronRight, size: 14, color: Colors.white38),
             ],
           ),
         ),

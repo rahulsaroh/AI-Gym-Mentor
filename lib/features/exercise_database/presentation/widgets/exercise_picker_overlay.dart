@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:ai_gym_mentor/features/exercise_database/presentation/providers/exercise_providers.dart';
-import 'package:ai_gym_mentor/features/exercise_database/domain/entities/exercise_entity.dart';
-import 'package:ai_gym_mentor/features/exercise_database/data/models/exercise_filter_model.dart';
+import 'package:ai_gym_mentor/services/github_exercise_service.dart';
+import 'package:ai_gym_mentor/features/exercise_database/domain/repositories/exercise_repository.dart';
+import 'package:ai_gym_mentor/features/exercise_database/presentation/providers/repository_provider.dart';
 
 class ExercisePickerOverlay extends ConsumerStatefulWidget {
   final Function(int) onSelect;
@@ -33,23 +33,51 @@ class _ExercisePickerOverlayState extends ConsumerState<ExercisePickerOverlay> {
     'Abs'
   ];
   Timer? _debounce;
+  String? _selectedBodyPart;
+
+  final _githubService = GithubExerciseService();
+  List<GithubExercise> _exercises = [];
+  List<GithubExercise> _filteredExercises = [];
+  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    // Reset filters when opening picker
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(exerciseFilterStateProvider.notifier).updateFilter((_) => const ExerciseFilter());
-    });
+    _loadExercises();
+  }
+
+  Future<void> _loadExercises() async {
+    setState(() => _isLoading = true);
+    try {
+      _exercises = await _githubService.getAllExercises();
+      _applyFilters();
+    } catch (e) {
+      debugPrint('Error loading GitHub exercises: $e');
+    }
+    setState(() => _isLoading = false);
+  }
+
+  void _applyFilters() {
+    _filteredExercises = _exercises.where((ex) {
+      final query = _searchController.text.toLowerCase();
+      if (query.isNotEmpty) {
+        if (!ex.name.toLowerCase().contains(query) &&
+            !ex.bodyPart.toLowerCase().contains(query)) {
+          return false;
+        }
+      }
+      if (_selectedBodyPart != null && _selectedBodyPart != 'All') {
+        if (ex.bodyPart.toLowerCase() != _selectedBodyPart!.toLowerCase()) {
+          return false;
+        }
+      }
+      return true;
+    }).toList();
   }
 
   void _onSearchChanged(String query) {
-    if (_debounce?.isActive ?? false) _debounce!.cancel();
-    _debounce = Timer(const Duration(milliseconds: 300), () {
-        ref.read(exerciseFilterStateProvider.notifier).updateFilter(
-            (filter) => filter.copyWith(searchQuery: query),
-          );
-    });
+    _applyFilters();
+    setState(() {});
   }
 
   @override
@@ -61,9 +89,6 @@ class _ExercisePickerOverlayState extends ConsumerState<ExercisePickerOverlay> {
 
   @override
   Widget build(BuildContext context) {
-    final exercisesAsync = ref.watch(exerciseListProvider);
-    final filter = ref.watch(exerciseFilterStateProvider);
-
     return DraggableScrollableSheet(
       initialChildSize: 0.9,
       minChildSize: 0.5,
@@ -107,21 +132,6 @@ class _ExercisePickerOverlayState extends ConsumerState<ExercisePickerOverlay> {
                     Row(
                       children: [
                         IconButton(
-                          icon: Icon(
-                            LucideIcons.arrowUpDown,
-                            size: 18,
-                            color: ref.watch(exerciseFilterStateProvider).sortByUsage
-                                ? Theme.of(context).colorScheme.primary
-                                : null,
-                          ),
-                          onPressed: () {
-                            ref.read(exerciseFilterStateProvider.notifier).updateFilter(
-                                  (s) => s.copyWith(sortByUsage: !s.sortByUsage),
-                                );
-                          },
-                          tooltip: 'Sort by Usage',
-                        ),
-                        IconButton(
                           onPressed: () => Navigator.pop(context),
                           icon: Container(
                             padding: const EdgeInsets.all(4),
@@ -159,37 +169,6 @@ class _ExercisePickerOverlayState extends ConsumerState<ExercisePickerOverlay> {
                         ),
                       ),
                     ),
-                    // Live Suggestions
-                    if (_searchController.text.length >= 2)
-                      Consumer(
-                        builder: (context, ref, child) {
-                          final suggestionsAsync = ref.watch(searchSuggestionsProvider(_searchController.text));
-                          return suggestionsAsync.when(
-                            data: (suggestions) {
-                              if (suggestions.isEmpty) return const SizedBox.shrink();
-                              return Container(
-                                margin: const EdgeInsets.only(top: 8),
-                                decoration: BoxDecoration(
-                                  color: Theme.of(context).colorScheme.surfaceVariant.withValues(alpha: 0.2),
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Column(
-                                  children: suggestions.map((s) => ListTile(
-                                    dense: true,
-                                    title: Text(s.name, style: const TextStyle(fontSize: 13)),
-                                    onTap: () {
-                                      _searchController.text = s.name;
-                                      _onSearchChanged(s.name);
-                                    },
-                                  )).toList(),
-                                ),
-                              );
-                            },
-                            loading: () => const SizedBox.shrink(),
-                            error: (_, __) => const SizedBox.shrink(),
-                          );
-                        },
-                      ),
                   ],
                 ),
               ),
@@ -202,18 +181,17 @@ class _ExercisePickerOverlayState extends ConsumerState<ExercisePickerOverlay> {
                   itemCount: _muscles.length,
                   itemBuilder: (context, index) {
                     final muscle = _muscles[index];
-                    final isSelected = (filter.bodyPart == muscle) || (filter.bodyPart == null && muscle == 'All');
+                    final isSelected = (_selectedBodyPart == muscle) || (_selectedBodyPart == null && muscle == 'All');
                     return Padding(
                       padding: const EdgeInsets.only(right: 10),
                       child: FilterChip(
                         label: Text(muscle),
                         selected: isSelected,
                         onSelected: (val) {
-                          ref.read(exerciseFilterStateProvider.notifier).updateFilter(
-                            (state) => state.copyWith(
-                              bodyPart: muscle == 'All' ? null : muscle,
-                            ),
-                          );
+                          setState(() {
+                            _selectedBodyPart = muscle == 'All' ? null : muscle;
+                            _applyFilters();
+                          });
                         },
                         showCheckmark: false,
                         labelStyle: TextStyle(
@@ -230,41 +208,40 @@ class _ExercisePickerOverlayState extends ConsumerState<ExercisePickerOverlay> {
               ),
               const SizedBox(height: 20),
               Expanded(
-                child: exercisesAsync.when(
-                  data: (exercises) {
-                    if (exercises.isEmpty) {
-                      return Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(LucideIcons.searchX, size: 40, color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5)),
-                            const SizedBox(height: 16),
-                            const Text('No variations found', style: TextStyle(fontWeight: FontWeight.bold)),
-                          ],
-                        ),
-                      );
-                    }
-                    return ListView.separated(
-                      controller: scrollController,
-                      padding: const EdgeInsets.fromLTRB(24, 0, 24, 40),
-                      itemCount: exercises.length,
-                      separatorBuilder: (_, __) => const SizedBox(height: 12),
-                      itemBuilder: (context, index) {
-                        final ex = exercises[index];
-                        return _CompactPickerCard(
-                          exercise: ex,
-                          onTap: () {
-                            widget.onSelect(ex.id);
-                            Navigator.pop(context);
-                          },
-                        );
-                      },
-                    );
-                  },
-                  loading: () =>
-                      const Center(child: CircularProgressIndicator()),
-                  error: (e, s) => Center(child: Text('Error: $e')),
-                ),
+                child: _isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : _filteredExercises.isEmpty
+                        ? Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(LucideIcons.searchX, size: 40, color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5)),
+                                const SizedBox(height: 16),
+                                const Text('No exercises found', style: TextStyle(fontWeight: FontWeight.bold)),
+                              ],
+                            ),
+                          )
+                        : ListView.separated(
+                            controller: scrollController,
+                            padding: const EdgeInsets.fromLTRB(24, 0, 24, 40),
+                            itemCount: _filteredExercises.length,
+                            separatorBuilder: (_, __) => const SizedBox(height: 12),
+                            itemBuilder: (context, index) {
+                              final ex = _filteredExercises[index];
+                              return _CompactPickerCard(
+                                exercise: ex,
+                                onTap: () async {
+                                  final exerciseId = await ref
+                                      .read(exerciseRepositoryProvider)
+                                      .ensureGithubExercise(ex);
+                                  if (exerciseId != null) {
+                                    widget.onSelect(exerciseId);
+                                    if (context.mounted) Navigator.pop(context);
+                                  }
+                                },
+                              );
+                            },
+                          ),
               ),
             ],
           ),
@@ -275,7 +252,7 @@ class _ExercisePickerOverlayState extends ConsumerState<ExercisePickerOverlay> {
 }
 
 class _CompactPickerCard extends StatelessWidget {
-  final ExerciseEntity exercise;
+  final GithubExercise exercise;
   final VoidCallback onTap;
 
   const _CompactPickerCard({required this.exercise, required this.onTap});
@@ -300,12 +277,12 @@ class _CompactPickerCard extends StatelessWidget {
                 color: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: exercise.imageUrls.isNotEmpty
-                ? ClipRRect(
-                  borderRadius: BorderRadius.circular(10),
-                  child: CachedNetworkImage(imageUrl: exercise.imageUrls.first, fit: BoxFit.cover),
-                )
-                : Center(child: Icon(LucideIcons.dumbbell, size: 20, color: Theme.of(context).colorScheme.primary)),
+              child: CachedNetworkImage(
+                imageUrl: exercise.gifUrl,
+                fit: BoxFit.cover,
+                placeholder: (_, __) => Center(child: Icon(LucideIcons.dumbbell, size: 20, color: Theme.of(context).colorScheme.primary)),
+                errorWidget: (_, __, ___) => Center(child: Icon(LucideIcons.dumbbell, size: 20, color: Theme.of(context).colorScheme.primary)),
+              ),
             ),
             const SizedBox(width: 16),
             Expanded(
@@ -319,7 +296,7 @@ class _CompactPickerCard extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                   Text(
-                    '${exercise.primaryMuscles.join(", ")} • ${exercise.equipment}',
+                    '${exercise.target} • ${exercise.equipment}',
                     style: TextStyle(
                       fontSize: 11,
                       color: Theme.of(context).colorScheme.outline,

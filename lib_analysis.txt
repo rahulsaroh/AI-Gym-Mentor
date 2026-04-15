@@ -1,0 +1,208 @@
+﻿Analyzing lib...                                                
+
+warning - Unused import: 'dart:convert' - lib\core\database\database.dart:2:8 - unused_import
+warning - Unused import: 'package:flutter/services.dart' - lib\core\database\database.dart:6:8 - unused_import
+warning - Unused import: 'package:ai_gym_mentor/core/database/initial_data.dart' - lib\core\database\database.dart:9:8 - unused_import
+   info - Unnecessary use of 'toList' in a spread - lib\core\widgets\speed_dial_fab.dart:130:14 - unnecessary_to_list_in_spreads
+   info - Statements in an if should be enclosed in a block - lib\features\analytics\analytics_dashboard_screen.dart:302:7 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\features\analytics\analytics_dashboard_screen.dart:342:21 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\features\analytics\analytics_dashboard_screen.dart:366:7 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\features\analytics\analytics_dashboard_screen.dart:398:21 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\features\analytics\analytics_dashboard_screen.dart:425:7 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\features\analytics\analytics_dashboard_screen.dart:663:7 - curly_braces_in_flow_control_structures
+   info - Use interpolation to compose strings and values - lib\features\analytics\body_measurements_screen.dart:285:24 - prefer_interpolation_to_compose_strings
+warning - The '!' will have no effect because the receiver can't be null - lib\features\analytics\measurements_repository.dart:100:25 - unnecessary_non_null_assertion
+   info - Use a 'SizedBox' to add whitespace to a layout - lib\features\analytics\pr_hall_of_fame_screen.dart:100:12 - sized_box_for_whitespace
+   info - Statements in an if should be enclosed in a block - lib\features\analytics\presentation\widgets\stats_trend_chart.dart:99:48 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\features\analytics\presentation\widgets\stats_trend_chart.dart:100:55 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\features\analytics\presentation\widgets\stats_trend_chart.dart:101:49 - curly_braces_in_flow_control_structures
+warning - Unused import: 'package:intl/intl.dart' - lib\features\analytics\presentation\widgets\workout_heatmap.dart:2:8 - unused_import
+   info - Don't use 'BuildContext's across async gaps - lib\features\analytics\progress_photos_screen.dart:55:28 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps - lib\features\analytics\progress_photos_screen.dart:62:7 - use_build_context_synchronously
+   info - Statements in an if should be enclosed in a block - lib\features\analytics\stats_repository.dart:202:7 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\features\exercise_database\data\datasources\exercise_db_seeder.dart:238:9 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\features\exercise_database\data\datasources\exercise_db_seeder.dart:243:9 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\features\exercise_database\data\datasources\exercise_db_seeder.dart:245:9 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\features\exercise_database\data\datasources\exercise_db_seeder.dart:247:9 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\features\exercise_database\data\datasources\exercise_db_seeder.dart:249:9 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\features\exercise_database\data\datasources\exercise_db_seeder.dart:251:9 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\features\exercise_database\data\datasources\exercise_db_seeder.dart:255:9 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\features\exercise_database\data\datasources\exercise_db_seeder.dart:257:9 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\features\exercise_database\data\datasources\exercise_db_seeder.dart:259:9 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\features\exercise_database\data\datasources\exercise_db_seeder.dart:261:9 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\features\exercise_database\data\datasources\exercise_db_seeder.dart:263:9 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\features\exercise_database\data\datasources\exercise_db_seeder.dart:264:35 - curly_braces_in_flow_control_structures
+warning - Unused import: 'dart:convert' - lib\features\exercise_database\domain\entities\exercise_entity.dart:1:8 - unused_import
+warning - Unused import: 'dart:convert' - lib\features\exercise_database\presentation\screens\exercise_detail_screen.dart:1:8 - unused_import
+   info - The import of 'dart:ui' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart' - lib\features\exercise_database\presentation\screens\exercise_detail_screen.dart:2:8 - unnecessary_import
+warning - The declaration '_buildProgressionPathVisual' isn't referenced - lib\features\exercise_database\presentation\screens\exercise_detail_screen.dart:571:10 - unused_element
+warning - The declaration '_buildMediaFallback' isn't referenced - lib\features\exercise_database\presentation\screens\exercise_detail_screen.dart:621:10 - unused_element
+   info - 'value' is deprecated and shouldn't be used. Use initialValue instead. This will set the initial value for the form field. This feature was deprecated after v3.33.0-1.0.pre - lib\features\exercise_database\presentation\screens\exercise_detail_screen.dart:849:15 - deprecated_member_use
+   info - 'value' is deprecated and shouldn't be used. Use initialValue instead. This will set the initial value for the form field. This feature was deprecated after v3.33.0-1.0.pre - lib\features\exercise_database\presentation\screens\exercise_detail_screen.dart:872:15 - deprecated_member_use
+   info - 'value' is deprecated and shouldn't be used. Use initialValue instead. This will set the initial value for the form field. This feature was deprecated after v3.33.0-1.0.pre - lib\features\exercise_database\presentation\screens\exercise_detail_screen.dart:880:15 - deprecated_member_use
+   info - The import of 'dart:ui' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart' - lib\features\exercise_database\presentation\screens\exercise_list_screen.dart:2:8 - unnecessary_import
+warning - Unused import: 'package:flutter_slidable/flutter_slidable.dart' - lib\features\exercise_database\presentation\screens\exercise_list_screen.dart:6:8 - unused_import
+warning - Unused import: 'package:ai_gym_mentor/core/database/database.dart' - lib\features\exercise_database\presentation\screens\exercise_list_screen.dart:11:8 - unused_import
+warning - Unused import: 'package:ai_gym_mentor/core/widgets/skeleton_card.dart' - lib\features\exercise_database\presentation\screens\exercise_list_screen.dart:12:8 - unused_import
+warning - The value of the field 'bodyPartFilters' isn't used - lib\features\exercise_database\presentation\screens\exercise_list_screen.dart:39:29 - unused_field
+warning - The value of the field 'difficultyFilters' isn't used - lib\features\exercise_database\presentation\screens\exercise_list_screen.dart:50:29 - unused_field
+warning - The value of the field 'equipmentFilters' isn't used - lib\features\exercise_database\presentation\screens\exercise_list_screen.dart:57:29 - unused_field
+warning - Unnecessary cast - lib\features\exercise_database\presentation\screens\exercise_list_screen.dart:329:33 - unnecessary_cast
+warning - The declaration '_buildFilterChip' isn't referenced - lib\features\exercise_database\presentation\screens\exercise_list_screen.dart:472:10 - unused_element
+warning - The declaration '_showFilterSheet' isn't referenced - lib\features\exercise_database\presentation\screens\exercise_list_screen.dart:490:8 - unused_element
+   info - Parameter 'key' could be a super parameter - lib\features\exercise_database\presentation\screens\github_exercise_detail_screen.dart:10:9 - use_super_parameters
+warning - The value of the local variable 'isDark' isn't used - lib\features\exercise_database\presentation\screens\github_exercise_detail_screen.dart:17:11 - unused_local_variable
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\exercise_database\presentation\screens\github_exercise_detail_screen.dart:60:42 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\exercise_database\presentation\screens\github_exercise_detail_screen.dart:71:47 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\exercise_database\presentation\screens\github_exercise_detail_screen.dart:162:55 - deprecated_member_use
+   info - Unnecessary use of 'toList' in a spread - lib\features\exercise_database\presentation\screens\github_exercise_detail_screen.dart:225:27 - unnecessary_to_list_in_spreads
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\exercise_database\presentation\screens\github_exercise_detail_screen.dart:266:22 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\exercise_database\presentation\screens\github_exercise_detail_screen.dart:268:41 - deprecated_member_use
+   info - Parameter 'key' could be a super parameter - lib\features\exercise_database\presentation\screens\github_exercise_library_screen.dart:9:9 - use_super_parameters
+warning - The value of 'refresh' should be used - lib\features\exercise_database\presentation\screens\github_exercise_library_screen.dart:59:15 - unused_result
+warning - The value of 'refresh' should be used - lib\features\exercise_database\presentation\screens\github_exercise_library_screen.dart:225:31 - unused_result
+   info - 'surfaceVariant' is deprecated and shouldn't be used. Use surfaceContainerHighest instead. This feature was deprecated after v3.18.0-0.1.pre - lib\features\exercise_database\presentation\screens\muscle_group_screen.dart:58:54 - deprecated_member_use
+warning - The value of the field '_customCacheManager' isn't used - lib\features\exercise_database\presentation\widgets\exercise_media_widget.dart:139:16 - unused_field
+   info - 'surfaceVariant' is deprecated and shouldn't be used. Use surfaceContainerHighest instead. This feature was deprecated after v3.18.0-0.1.pre - lib\features\exercise_database\presentation\widgets\exercise_picker_overlay.dart:138:68 - deprecated_member_use
+   info - 'surfaceVariant' is deprecated and shouldn't be used. Use surfaceContainerHighest instead. This feature was deprecated after v3.18.0-0.1.pre - lib\features\exercise_database\presentation\widgets\exercise_picker_overlay.dart:162:30 - deprecated_member_use
+   info - Parameter 'key' could be a super parameter - lib\features\exercise_database\presentation\widgets\github_exercise_card.dart:10:9 - use_super_parameters
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\exercise_database\presentation\widgets\github_exercise_card.dart:95:22 - deprecated_member_use
+warning - Unused import: 'package:ai_gym_mentor/core/database/database.dart' - lib\features\history\history_providers.dart:1:8 - unused_import
+warning - Unused import: 'package:ai_gym_mentor/core/domain/entities/workout_session.dart' - lib\features\history\history_screen.dart:5:8 - unused_import
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\history\history_screen.dart:368:22 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\history\history_screen.dart:370:41 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\history\history_screen.dart:568:41 - deprecated_member_use
+   info - Don't use 'BuildContext's across async gaps - lib\features\history\history_screen.dart:697:40 - use_build_context_synchronously
+   info - The import of 'package:flutter/foundation.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart' - lib\features\history\workout_detail_screen.dart:1:8 - unnecessary_import
+   info - The import of 'package:flutter/services.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart' - lib\features\history\workout_detail_screen.dart:3:8 - unnecessary_import
+   info - Statements in an if should be enclosed in a block - lib\features\history\workout_detail_screen.dart:53:11 - curly_braces_in_flow_control_structures
+   info - Unnecessary use of string interpolation - lib\features\history\workout_detail_screen.dart:416:35 - unnecessary_string_interpolations
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\onboarding\onboarding_screen.dart:107:34 - deprecated_member_use
+   info - The private field _expandedIndices could be 'final' - lib\features\programs\create_edit_program_screen.dart:29:12 - prefer_final_fields
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\programs\create_edit_program_screen.dart:692:14 - deprecated_member_use
+   info - Statements in an if should be enclosed in a block - lib\features\programs\program_details_screen.dart:31:13 - curly_braces_in_flow_control_structures
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\programs\program_details_screen.dart:295:53 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\programs\program_details_screen.dart:335:35 - deprecated_member_use
+warning - The value of the local variable 'router' isn't used - lib\features\programs\program_details_screen.dart:397:21 - unused_local_variable
+warning - Unused import: 'dart:io' - lib\features\programs\programs_screen.dart:1:8 - unused_import
+warning - Unused import: 'package:ai_gym_mentor/features/workout/workout_repository.dart' - lib\features\programs\programs_screen.dart:10:8 - unused_import
+warning - Unused import: 'package:ai_gym_mentor/features/workout/providers/workout_home_notifier.dart' - lib\features\programs\programs_screen.dart:11:8 - unused_import
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\programs\programs_screen.dart:492:22 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\programs\programs_screen.dart:494:41 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\programs\programs_screen.dart:498:39 - deprecated_member_use
+warning - The declaration '_buildStat' isn't referenced - lib\features\programs\programs_screen.dart:503:10 - unused_element
+   info - 'Share' is deprecated and shouldn't be used. Use SharePlus instead - lib\features\programs\providers\programs_notifier.dart:53:11 - deprecated_member_use
+   info - 'share' is deprecated and shouldn't be used. Use SharePlus.instance.share() instead - lib\features\programs\providers\programs_notifier.dart:53:17 - deprecated_member_use
+   info - 'Share' is deprecated and shouldn't be used. Use SharePlus instead - lib\features\programs\providers\programs_notifier.dart:63:11 - deprecated_member_use
+   info - 'share' is deprecated and shouldn't be used. Use SharePlus.instance.share() instead - lib\features\programs\providers\programs_notifier.dart:63:17 - deprecated_member_use
+   info - Don't invoke 'print' in production code - lib\features\programs\providers\programs_notifier.dart:70:5 - avoid_print
+   info - Don't invoke 'print' in production code - lib\features\programs\providers\programs_notifier.dart:77:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\features\programs\providers\programs_notifier.dart:85:7 - avoid_print
+   info - Statements in an if should be enclosed in a block - lib\features\settings\csv_export_screen.dart:167:21 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\features\settings\csv_export_screen.dart:169:21 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\features\settings\csv_export_screen.dart:192:11 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\features\settings\csv_export_screen.dart:195:11 - curly_braces_in_flow_control_structures
+   info - 'Share' is deprecated and shouldn't be used. Use SharePlus instead - lib\features\settings\csv_export_screen.dart:300:13 - deprecated_member_use
+   info - 'shareXFiles' is deprecated and shouldn't be used. Use SharePlus.instance.share() instead - lib\features\settings\csv_export_screen.dart:300:19 - deprecated_member_use
+   info - Statements in an if should be enclosed in a block - lib\features\settings\csv_export_screen.dart:304:9 - curly_braces_in_flow_control_structures
+   info - 'groupValue' is deprecated and shouldn't be used. Use a RadioGroup ancestor to manage group value instead. This feature was deprecated after v3.32.0-0.0.pre - lib\features\settings\import_wizard_screen.dart:221:13 - deprecated_member_use
+   info - 'onChanged' is deprecated and shouldn't be used. Use RadioGroup to handle value change instead. This feature was deprecated after v3.32.0-0.0.pre - lib\features\settings\import_wizard_screen.dart:222:13 - deprecated_member_use
+   info - 'groupValue' is deprecated and shouldn't be used. Use a RadioGroup ancestor to manage group value instead. This feature was deprecated after v3.32.0-0.0.pre - lib\features\settings\import_wizard_screen.dart:228:13 - deprecated_member_use
+   info - 'onChanged' is deprecated and shouldn't be used. Use RadioGroup to handle value change instead. This feature was deprecated after v3.32.0-0.0.pre - lib\features\settings\import_wizard_screen.dart:229:13 - deprecated_member_use
+   info - 'groupValue' is deprecated and shouldn't be used. Use a RadioGroup ancestor to manage group value instead. This feature was deprecated after v3.32.0-0.0.pre - lib\features\settings\import_wizard_screen.dart:235:13 - deprecated_member_use
+   info - 'onChanged' is deprecated and shouldn't be used. Use RadioGroup to handle value change instead. This feature was deprecated after v3.32.0-0.0.pre - lib\features\settings\import_wizard_screen.dart:236:13 - deprecated_member_use
+   info - Statements in an if should be enclosed in a block - lib\features\settings\services\csv_service.dart:52:9 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\features\settings\services\csv_service.dart:54:9 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\features\settings\services\csv_service.dart:57:9 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\features\settings\services\csv_service.dart:61:9 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\features\settings\services\csv_service.dart:65:9 - curly_braces_in_flow_control_structures
+   info - 'value' is deprecated and shouldn't be used. Use component accessors like .r or .g, or toARGB32 for an explicit conversion - lib\features\settings\settings_repository.dart:58:36 - deprecated_member_use
+   info - 'value' is deprecated and shouldn't be used. Use component accessors like .r or .g, or toARGB32 for an explicit conversion - lib\features\settings\settings_repository.dart:87:60 - deprecated_member_use
+warning - Unused import: 'package:intl/intl.dart' - lib\features\settings\settings_screen.dart:4:8 - unused_import
+   info - 'value' is deprecated and shouldn't be used. Use component accessors like .r or .g, or toARGB32 for an explicit conversion - lib\features\settings\settings_screen.dart:290:57 - deprecated_member_use
+   info - 'value' is deprecated and shouldn't be used. Use component accessors like .r or .g, or toARGB32 for an explicit conversion - lib\features\settings\settings_screen.dart:290:68 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\settings\settings_screen.dart:309:46 - deprecated_member_use
+   info - 'groupValue' is deprecated and shouldn't be used. Use a RadioGroup ancestor to manage group value instead. This feature was deprecated after v3.32.0-0.0.pre - lib\features\settings\settings_screen.dart:459:21 - deprecated_member_use
+   info - 'onChanged' is deprecated and shouldn't be used. Use RadioGroup to handle value change instead. This feature was deprecated after v3.32.0-0.0.pre - lib\features\settings\settings_screen.dart:460:21 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\setup\setup_screen.dart:109:32 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\setup\setup_screen.dart:127:32 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\setup\setup_screen.dart:150:54 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\setup\setup_screen.dart:198:59 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\splash\splash_screen.dart:88:30 - deprecated_member_use
+   info - Statements in a for should be enclosed in a block - lib\features\workout\active_workout_screen.dart:114:46 - curly_braces_in_flow_control_structures
+   info - Statements in a for should be enclosed in a block - lib\features\workout\active_workout_screen.dart:115:44 - curly_braces_in_flow_control_structures
+   info - Statements in a for should be enclosed in a block - lib\features\workout\active_workout_screen.dart:116:43 - curly_braces_in_flow_control_structures
+   info - Statements in a for should be enclosed in a block - lib\features\workout\active_workout_screen.dart:117:44 - curly_braces_in_flow_control_structures
+   info - Statements in a for should be enclosed in a block - lib\features\workout\active_workout_screen.dart:118:40 - curly_braces_in_flow_control_structures
+   info - Statements in a for should be enclosed in a block - lib\features\workout\active_workout_screen.dart:119:38 - curly_braces_in_flow_control_structures
+   info - Statements in a for should be enclosed in a block - lib\features\workout\active_workout_screen.dart:120:37 - curly_braces_in_flow_control_structures
+warning - The declaration '_formatDuration' isn't referenced - lib\features\workout\active_workout_screen.dart:225:10 - unused_element
+warning - The operand can't be 'null', so the condition is always 'true' - lib\features\workout\active_workout_screen.dart:600:43 - unnecessary_null_comparison
+warning - The '!' will have no effect because the receiver can't be null - lib\features\workout\active_workout_screen.dart:601:42 - unnecessary_non_null_assertion
+warning - The '!' will have no effect because the receiver can't be null - lib\features\workout\active_workout_screen.dart:625:50 - unnecessary_non_null_assertion
+   info - Use interpolation to compose strings and values - lib\features\workout\active_workout_screen.dart:683:29 - prefer_interpolation_to_compose_strings
+   info - Statements in an if should be enclosed in a block - lib\features\workout\active_workout_screen.dart:1189:7 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\features\workout\active_workout_screen.dart:1543:9 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\features\workout\active_workout_screen.dart:1563:9 - curly_braces_in_flow_control_structures
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\workout\active_workout_screen.dart:1862:22 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\workout\active_workout_screen.dart:1976:26 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\workout\active_workout_screen.dart:1982:30 - deprecated_member_use
+   info - Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check - lib\features\workout\active_workout_screen.dart:2075:34 - use_build_context_synchronously
+warning - The declaration '_undoDelete' isn't referenced - lib\features\workout\active_workout_screen.dart:2084:16 - unused_element
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\workout\components\plate_calculator_dialog.dart:90:24 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\workout\components\plate_calculator_dialog.dart:103:30 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\workout\components\pr_banner.dart:81:52 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\workout\components\rest_timer_overlay.dart:40:33 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\workout\components\set_type_selector.dart:143:34 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\workout\components\set_type_selector.dart:155:63 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\workout\components\set_type_selector.dart:186:38 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\workout\components\superset_bracket_painter.dart:102:23 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\workout\components\workout_summary_overlay.dart:392:63 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\workout\components\workout_summary_overlay.dart:396:18 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\workout\components\workout_summary_overlay.dart:449:63 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\workout\components\workout_summary_overlay.dart:453:18 - deprecated_member_use
+   info - The import of 'package:flutter_riverpod/flutter_riverpod.dart' is unnecessary because all of the used elements are also provided by the import of 'package:riverpod_annotation/riverpod_annotation.dart' - lib\features\workout\providers\timer_notifier.dart:2:8 - unnecessary_import
+warning - Unused import: 'package:drift/drift.dart' - lib\features\workout\providers\workout_home_notifier.dart:1:8 - unused_import
+warning - Unused import: 'package:ai_gym_mentor/core/database/database.dart' - lib\features\workout\providers\workout_home_notifier.dart:3:8 - unused_import
+warning - Unused import: 'package:ai_gym_mentor/core/domain/entities/workout_program.dart' - lib\features\workout\providers\workout_home_notifier.dart:5:8 - unused_import
+warning - The value of the local variable 'lastWorkout' isn't used - lib\features\workout\providers\workout_home_notifier.dart:72:11 - unused_local_variable
+warning - The value of the local variable 'activeDraft' isn't used - lib\features\workout\providers\workout_home_notifier.dart:73:11 - unused_local_variable
+warning - The declaration '_currentManualDayId' isn't referenced - lib\features\workout\providers\workout_home_notifier.dart:234:12 - unused_element
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\workout\start_workout_screen.dart:114:41 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\workout\start_workout_screen.dart:126:34 - deprecated_member_use
+warning - The operand can't be 'null', so the condition is always 'true' - lib\features\workout\workout_repository.dart:104:41 - unnecessary_null_comparison
+   info - The 'if' statement could be replaced by a null-aware assignment - lib\features\workout\workout_repository.dart:478:5 - prefer_conditional_assignment
+   info - Don't invoke 'print' in production code - lib\features\workout\workout_repository.dart:733:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\features\workout\workout_repository.dart:735:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\features\workout\workout_repository.dart:736:7 - avoid_print
+warning - Unused import: 'package:fl_chart/fl_chart.dart' - lib\features\workout\workout_screen.dart:5:8 - unused_import
+warning - The declaration '_ExerciseChip' isn't referenced - lib\features\workout\workout_screen.dart:523:7 - unused_element
+   info - Statements in an if should be enclosed in a block - lib\features\workout\workout_screen.dart:642:7 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\features\workout\workout_screen.dart:905:7 - curly_braces_in_flow_control_structures
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\workout\workout_screen.dart:1120:18 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\workout\workout_screen.dart:1123:60 - deprecated_member_use
+warning - Unused import: 'package:flutter_riverpod/flutter_riverpod.dart' - lib\services\background_worker.dart:2:8 - unused_import
+   info - 'isInDebugMode' is deprecated and shouldn't be used. Use WorkmanagerDebug handlers instead. This parameter has no effect - lib\services\background_worker.dart:15:56 - deprecated_member_use
+   info - 'value' is deprecated and shouldn't be used. Use component accessors like .r or .g, or toARGB32 for an explicit conversion - lib\services\backup_service.dart:58:46 - deprecated_member_use
+   info - 'Share' is deprecated and shouldn't be used. Use SharePlus instead - lib\services\backup_service.dart:73:11 - deprecated_member_use
+   info - 'shareXFiles' is deprecated and shouldn't be used. Use SharePlus.instance.share() instead - lib\services\backup_service.dart:73:17 - deprecated_member_use
+warning - Unused import: 'dart:convert' - lib\services\exercise_enrichment_service.dart:1:8 - unused_import
+warning - The value of the field '_db' isn't used - lib\services\exercise_enrichment_service.dart:6:21 - unused_field
+warning - The value of the local variable 'ids' isn't used - lib\services\exercise_enrichment_service.dart:75:11 - unused_local_variable
+warning - The value of the local variable 'names' isn't used - lib\services\exercise_enrichment_service.dart:76:11 - unused_local_variable
+   info - Don't invoke 'print' in production code - lib\services\exercise_enrichment_service.dart:137:5 - avoid_print
+   info - Don't invoke 'print' in production code - lib\services\exercise_enrichment_service.dart:138:5 - avoid_print
+   info - Don't invoke 'print' in production code - lib\services\exercise_enrichment_service.dart:139:5 - avoid_print
+   info - Don't invoke 'print' in production code - lib\services\exercise_enrichment_service.dart:140:5 - avoid_print
+   info - Don't invoke 'print' in production code - lib\services\exercise_enrichment_service.dart:141:5 - avoid_print
+   info - Don't invoke 'print' in production code - lib\services\exercise_enrichment_service.dart:142:5 - avoid_print
+   info - Don't invoke 'print' in production code - lib\services\exercise_enrichment_service.dart:145:9 - avoid_print
+   info - 'Share' is deprecated and shouldn't be used. Use SharePlus instead - lib\services\export_service.dart:66:11 - deprecated_member_use
+   info - 'shareXFiles' is deprecated and shouldn't be used. Use SharePlus.instance.share() instead - lib\services\export_service.dart:66:17 - deprecated_member_use
+   info - 'Share' is deprecated and shouldn't be used. Use SharePlus instead - lib\services\export_service.dart:159:11 - deprecated_member_use
+   info - 'shareXFiles' is deprecated and shouldn't be used. Use SharePlus.instance.share() instead - lib\services\export_service.dart:159:17 - deprecated_member_use
+   info - 'Share' is deprecated and shouldn't be used. Use SharePlus instead - lib\services\export_service.dart:181:11 - deprecated_member_use
+   info - 'shareXFiles' is deprecated and shouldn't be used. Use SharePlus.instance.share() instead - lib\services\export_service.dart:181:17 - deprecated_member_use
+   info - Don't invoke 'print' in production code - lib\services\export_service.dart:228:7 - avoid_print
+   info - Statements in an if should be enclosed in a block - lib\services\progression_service.dart:130:7 - curly_braces_in_flow_control_structures
+

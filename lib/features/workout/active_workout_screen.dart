@@ -66,6 +66,10 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
   db.WorkoutSet? _lastDeletedSet;
   ExerciseBlock? _lastDeletedExercise;
 
+  // Focus Mode State
+  bool _isFocusMode = true; // Default to focus mode as requested
+  int _currentExerciseIndex = 0;
+
   // Ghost text history
   Map<int, List<db.WorkoutSet>> _previousSessionSets = {}; // exerciseId -> sets
 
@@ -292,6 +296,17 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
                       ),
                     ),
                     const SizedBox(width: 8),
+                    // Toggle View button
+                    IconButton(
+                      icon: Icon(_isFocusMode ? LucideIcons.list : LucideIcons.maximize2),
+                      tooltip: _isFocusMode ? 'Switch to List View' : 'Switch to Focus View',
+                      onPressed: () {
+                        setState(() {
+                          _isFocusMode = !_isFocusMode;
+                        });
+                      },
+                    ),
+                    const SizedBox(width: 8),
                     // Finish button
                     FilledButton(
                       onPressed: () => _showSummary(workout),
@@ -345,6 +360,113 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
                       HapticFeedback.mediumImpact();
                     }
                     final exerciseBlocks = _groupSetsByExercise(sets);
+
+                    if (_isFocusMode && exerciseBlocks.isNotEmpty) {
+                      // Adjust index if out of bounds (can happen if exercise is deleted)
+                      if (_currentExerciseIndex >= exerciseBlocks.length) {
+                        _currentExerciseIndex = exerciseBlocks.length - 1;
+                      }
+                      if (_currentExerciseIndex < 0) _currentExerciseIndex = 0;
+
+                      final block = exerciseBlocks[_currentExerciseIndex];
+                      
+                      return Column(
+                        children: [
+                          // Progress Bar
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            child: LinearProgressIndicator(
+                              value: (exerciseBlocks.length > 0) 
+                                  ? (_currentExerciseIndex + 1) / exerciseBlocks.length 
+                                  : 0,
+                              backgroundColor: Colors.grey[200],
+                              valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).primaryColor),
+                              borderRadius: BorderRadius.circular(10),
+                              minHeight: 8,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  'Exercise ${_currentExerciseIndex + 1} of ${exerciseBlocks.length}',
+                                  style: GoogleFonts.outfit(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.grey[600],
+                                  ),
+                                ),
+                                Text(
+                                  '${(((_currentExerciseIndex + 1) / exerciseBlocks.length) * 100).toInt()}% Complete',
+                                  style: GoogleFonts.outfit(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                    color: Theme.of(context).primaryColor,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Expanded(
+                            child: SingleChildScrollView(
+                              padding: const EdgeInsets.all(16),
+                              child: _buildExerciseBlock(block, exerciseBlocks),
+                            ),
+                          ),
+                          // Navigation Controls
+                          Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).cardColor,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.05),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, -5),
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: OutlinedButton.icon(
+                                    onPressed: _currentExerciseIndex > 0
+                                        ? () => setState(() => _currentExerciseIndex--)
+                                        : null,
+                                    icon: const Icon(LucideIcons.chevronLeft),
+                                    label: const Text('Previous'),
+                                    style: OutlinedButton.styleFrom(
+                                      padding: const EdgeInsets.symmetric(vertical: 16),
+                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 16),
+                                Expanded(
+                                  child: ElevatedButton.icon(
+                                    onPressed: _currentExerciseIndex < exerciseBlocks.length - 1
+                                        ? () => setState(() => _currentExerciseIndex++)
+                                        : null,
+                                    icon: const Text('Next'),
+                                    label: const Icon(LucideIcons.chevronRight),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Theme.of(context).primaryColor,
+                                      foregroundColor: Colors.white,
+                                      padding: const EdgeInsets.symmetric(vertical: 16),
+                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      );
+                    }
+
                     return ReorderableListView.builder(
                       scrollController: _scrollController,
                       padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
@@ -567,26 +689,31 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
                       ),
                     ),
                     Expanded(
+                      child: InkWell(
+                        onTap: () => context.push('/exercises/${exercise.id}'),
+                        borderRadius: BorderRadius.circular(8),
                         child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(exercise.name,
-                            style: const TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 18),
-                            overflow: TextOverflow.ellipsis),
-                        const SizedBox(height: 4),
-                        Wrap(
-                          spacing: 4,
-                          runSpacing: 4,
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            ...exercise.primaryMuscles
-                                .map((m) => _buildMuscleChip(m)),
-                            ...exercise.secondaryMuscles.map(
-                                (m) => _buildMuscleChip(m, isSecondary: true)),
+                            Text(exercise.name,
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 18),
+                                overflow: TextOverflow.ellipsis),
+                            const SizedBox(height: 4),
+                            Wrap(
+                              spacing: 4,
+                              runSpacing: 4,
+                              children: [
+                                ...exercise.primaryMuscles
+                                    .map((m) => _buildMuscleChip(m)),
+                                ...exercise.secondaryMuscles.map((m) =>
+                                    _buildMuscleChip(m, isSecondary: true)),
+                              ],
+                            ),
                           ],
                         ),
-                      ],
-                    )),
+                      ),
+                    ),
                     Semantics(
                       label: 'Exercise options for ${exercise.name}',
                       button: true,

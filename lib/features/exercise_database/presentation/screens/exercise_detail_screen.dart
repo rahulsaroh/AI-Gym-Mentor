@@ -304,10 +304,43 @@ class _ExerciseDetailScreenState extends ConsumerState<ExerciseDetailScreen> wit
           spacing: 10,
           runSpacing: 10,
           children: [
-            ...exercise.primaryMuscles.map((m) => _PremiumMuscleChip(m, isPrimary: true)),
-            ...exercise.secondaryMuscles.map((m) => _PremiumMuscleChip(m, isPrimary: false)),
+            ...exercise.primaryMuscles
+                .map((m) => _PremiumMuscleChip(m, isPrimary: true)),
+            ...exercise.secondaryMuscles
+                .map((m) => _PremiumMuscleChip(m, isPrimary: false)),
           ],
         ),
+        if (exercise.targetBodyParts.isNotEmpty || exercise.category.isNotEmpty) ...[
+          const SizedBox(height: 24),
+          _buildSectionHeader('Classification', LucideIcons.tags),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              if (exercise.targetBodyParts.isNotEmpty)
+                _buildInfoChip(
+                  'Target',
+                  exercise.targetBodyParts.join(', '),
+                  LucideIcons.target,
+                  Colors.blue,
+                ),
+              _buildInfoChip(
+                'Body Part',
+                exercise.category.toUpperCase(),
+                LucideIcons.user,
+                Colors.orange,
+              ),
+              if (exercise.equipment != null)
+                _buildInfoChip(
+                  'Equipment',
+                  exercise.equipment!,
+                  LucideIcons.wrench,
+                  Colors.green,
+                ),
+            ],
+          ),
+        ],
         const SizedBox(height: 32),
         if (exercise.overview?.isNotEmpty ?? false) ...[
           _buildSectionHeader('About', LucideIcons.info),
@@ -892,7 +925,42 @@ class _ExerciseDetailScreenState extends ConsumerState<ExerciseDetailScreen> wit
   Widget _buildFormSection(String title) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8.0),
-      child: Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+      child:
+          Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+    );
+  }
+  
+  Widget _buildInfoChip(String label, String value, IconData icon, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: color.withValues(alpha: 0.2)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 14, color: color),
+          const SizedBox(width: 8),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(label,
+                  style: TextStyle(
+                      fontSize: 10,
+                      color: color.withValues(alpha: 0.7),
+                      fontWeight: FontWeight.bold)),
+              Text(value,
+                  style: TextStyle(
+                      fontSize: 12,
+                      color: color,
+                      fontWeight: FontWeight.bold)),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }

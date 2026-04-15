@@ -285,7 +285,7 @@ class _MuscleDiagramWidgetState extends State<MuscleDiagramWidget> {
       children: legend.asMap().entries.map((entry) {
         final isLast = entry.key == legend.length - 1;
         final (label, colorHex) = entry.value;
-        final color = Color(int.parse('FF$colorHex', radix: 16));
+        final color = Color(int.parse('FF${colorHex.replaceAll('#', '')}', radix: 16));
 
         return Padding(
           padding: EdgeInsets.only(right: isLast ? 0 : 24),

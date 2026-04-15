@@ -5,6 +5,7 @@ import 'package:ai_gym_mentor/features/workout/providers/workout_home_notifier.d
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/services.dart';
 import 'dart:io';
 
 part 'programs_notifier.freezed.dart';
@@ -90,6 +91,19 @@ class ProgramsNotifier extends _$ProgramsNotifier {
     final repo = ref.read(workoutRepositoryProvider);
     await repo.importTemplateFromJson(jsonStr);
     await refresh();
+  }
+
+  Future<void> importPplEliteProgram() async {
+    try {
+      state = const AsyncValue.loading();
+      final jsonStr = await rootBundle.loadString('assets/data/ppl_elite_program.json');
+      final repo = ref.read(workoutRepositoryProvider);
+      await repo.importTemplateFromJson(jsonStr);
+      await refresh();
+    } catch (e, st) {
+      print('DEBUG: Failed to import PPL Elite program: $e');
+      state = AsyncValue.error(e, st);
+    }
   }
 
   Future<void> makeDefault(int id) async {

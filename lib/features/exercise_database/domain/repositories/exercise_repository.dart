@@ -1,4 +1,5 @@
 import 'package:ai_gym_mentor/features/exercise_database/domain/entities/exercise_entity.dart';
+import 'package:ai_gym_mentor/services/github_exercise_service.dart';
 
 abstract class ExerciseRepository {
   // List queries — return lightweight ExerciseEntity
@@ -69,4 +70,7 @@ abstract class ExerciseRepository {
 
   // Create/Update Custom Exercise
   Future<int> createExercise(ExerciseEntity exercise);
+
+  // Sync GitHub exercise to local DB
+  Future<int> ensureGithubExercise(GithubExercise exercise);
 }

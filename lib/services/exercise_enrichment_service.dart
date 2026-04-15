@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:ai_gym_mentor/core/database/database.dart';
-import 'package:ai_gym_mentor/features/exercises/exercise_repository.dart';
+import 'package:ai_gym_mentor/features/exercise_database/domain/repositories/exercise_repository.dart';
 
 class ExerciseEnrichmentService {
   final AppDatabase _db;
@@ -92,7 +92,7 @@ class ExerciseQaChecker {
       if (ex.imageUrl == null || ex.imageUrl!.isEmpty) {
         failingIds['no_image']!.add(ex.id.toString());
       }
-      if (ex.primaryMuscles.isEmpty) {
+      if (ex.primaryMuscle.isEmpty) {
         failingIds['no_primary_muscle']!.add(ex.id.toString());
       }
       if (ex.instructions == null || ex.instructions!.split('|').length < 3) {
