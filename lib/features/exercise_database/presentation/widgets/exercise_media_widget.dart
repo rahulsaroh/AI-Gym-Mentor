@@ -61,10 +61,6 @@ class _ExerciseMediaWidgetState extends State<ExerciseMediaWidget> {
       return GifView.network(
         widget.animatedUrl!,
         fit: widget.fit,
-        placeholder: _buildPlaceholder(),
-        errorBuilder: (context, error, stackTrace) => widget.staticUrl != null
-            ? _buildStaticImage()
-            : _buildErrorPlaceholder(),
       );
     } else if (widget.staticUrl != null && widget.staticUrl!.isNotEmpty) {
       return _buildStaticImage();

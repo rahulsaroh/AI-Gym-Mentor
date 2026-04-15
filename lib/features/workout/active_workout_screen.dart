@@ -903,11 +903,51 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
                     ),
                   ),
                 ),
+                IconButton(
+                  icon: Icon(
+                    LucideIcons.pencilLine,
+                    size: 16,
+                    color: set.notes?.isNotEmpty == true
+                        ? Theme.of(context).colorScheme.primary
+                        : Theme.of(context).colorScheme.outline.withValues(alpha: 0.5),
+                  ),
+                  onPressed: () => _showSetNoteDialog(set),
+                  constraints: const BoxConstraints(),
+                  padding: const EdgeInsets.only(left: 4),
+                ),
               ],
             ),
           ),
         ),
       ),
+    );
+  }
+
+  void _showSetNoteDialog(db.WorkoutSet set) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        final controller = _getController(set.id, 'note', set.notes ?? '');
+        return AlertDialog(
+          title: const Text('Set Note'),
+          content: TextField(
+            controller: controller,
+            autofocus: true,
+            decoration: const InputDecoration(hintText: 'Enter note for this set...'),
+          ),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+            TextButton(
+              onPressed: () {
+                _updateSet(set.id, notes: controller.text);
+                Navigator.pop(context);
+                setState(() {}); // Refresh UI for icon color
+              },
+              child: const Text('Save'),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -1293,7 +1333,7 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
       ExerciseBlock block,
       List<ExerciseBlock> allBlocks) async {
     final settings = ref.read(settingsProvider).value;
-    if (settings == null) return;
+    if (settings == null || !settings.autoStartRestTimer) return;
 
     // Determine rest time: Exercise specific > Set Type specific > Default 90s
     int restTime = exercise.restTime > 0 ? exercise.restTime : 90;
@@ -1805,11 +1845,15 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
         text = 'C';
         color = Colors.teal;
         break;
-      case db.SetType.straight:
-        break;
       case db.SetType.superset:
         text = 'S';
         color = Colors.indigo;
+        break;
+      case db.SetType.straight:
+        break;
+      case db.SetType.failure:
+        text = 'F';
+        color = Colors.red.shade700;
         break;
     }
 

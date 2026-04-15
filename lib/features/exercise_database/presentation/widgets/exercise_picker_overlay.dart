@@ -104,16 +104,35 @@ class _ExercisePickerOverlayState extends ConsumerState<ExercisePickerOverlay> {
                             letterSpacing: -0.5,
                           ),
                     ),
-                    IconButton(
-                      onPressed: () => Navigator.pop(context),
-                      icon: Container(
-                        padding: const EdgeInsets.all(4),
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.surfaceVariant.withValues(alpha: 0.5),
-                          shape: BoxShape.circle,
+                    Row(
+                      children: [
+                        IconButton(
+                          icon: Icon(
+                            LucideIcons.arrowUpDown,
+                            size: 18,
+                            color: ref.watch(exerciseFilterStateProvider).sortByUsage
+                                ? Theme.of(context).colorScheme.primary
+                                : null,
+                          ),
+                          onPressed: () {
+                            ref.read(exerciseFilterStateProvider.notifier).updateFilter(
+                                  (s) => s.copyWith(sortByUsage: !s.sortByUsage),
+                                );
+                          },
+                          tooltip: 'Sort by Usage',
                         ),
-                        child: const Icon(LucideIcons.x, size: 18),
-                      ),
+                        IconButton(
+                          onPressed: () => Navigator.pop(context),
+                          icon: Container(
+                            padding: const EdgeInsets.all(4),
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).colorScheme.surfaceVariant.withValues(alpha: 0.5),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(LucideIcons.x, size: 18),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),

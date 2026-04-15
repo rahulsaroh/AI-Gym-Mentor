@@ -36,6 +36,14 @@ class _ExerciseDetailScreenState extends ConsumerState<ExerciseDetailScreen> wit
   late TabController _tabController;
   bool _isEnriching = false;
 
+  final _formKey = GlobalKey<FormState>();
+  String _name = '';
+  String _category = 'Strength';
+  String _primaryMuscle = '';
+  String _equipment = 'None';
+  String _mechanic = 'Compound';
+  String _force = 'Push';
+
   @override
   void initState() {
     super.initState();
@@ -44,6 +52,17 @@ class _ExerciseDetailScreenState extends ConsumerState<ExerciseDetailScreen> wit
       WidgetsBinding.instance.addPostFrameCallback((_) {
         ref.read(exerciseRepositoryProvider).markRecentlyViewed(widget.exerciseId);
       });
+    }
+  }
+
+  void _setupForm(ExerciseEntity? template) {
+    if (template != null) {
+      _name = '${template.name} (Copy)';
+      _category = template.category;
+      _primaryMuscle = template.primaryMuscles.isNotEmpty ? template.primaryMuscles.first : '';
+      _equipment = template.equipment ?? 'None';
+      _mechanic = template.mechanic ?? 'Compound';
+      _force = template.force ?? 'Push';
     }
   }
 
@@ -774,46 +793,98 @@ class _ExerciseDetailScreenState extends ConsumerState<ExerciseDetailScreen> wit
   }
 
   Widget _buildFormScreen(ExerciseEntity exercise) {
-    // If copying, use templateExercise instead of the blank one
-    final displayEx = widget.templateExercise ?? exercise;
+    _setupForm(widget.templateExercise);
     
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.exerciseId == 0 ? 'Create Custom Exercise' : 'Edit Exercise'),
         actions: [
           TextButton(
-            onPressed: () {
-              // TODO: Implement save logic
-              context.pop();
+            onPressed: () async {
+              if (_formKey.currentState!.validate()) {
+                _formKey.currentState!.save();
+                
+                final newExercise = ExerciseEntity(
+                  id: 0,
+                  exerciseId: '',
+                  name: _name,
+                  category: _category,
+                  primaryMuscles: [_primaryMuscle],
+                  difficulty: 'beginner',
+                  mechanic: _mechanic,
+                  force: _force,
+                  equipment: _equipment,
+                );
+
+                await ref.read(exerciseRepositoryProvider).createExercise(newExercise);
+                ref.invalidate(exerciseListProvider);
+                
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Exercise created successfully!')),
+                  );
+                  context.pop();
+                }
+              }
             },
             child: const Text('Save', style: TextStyle(fontWeight: FontWeight.bold)),
           ),
         ],
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(20),
-        children: [
-          _buildFormSection('Exercise Name'),
-          TextFormField(
-            initialValue: displayEx.name,
-            decoration: const InputDecoration(hintText: 'e.g. Diamond Pushups'),
-          ),
-          const SizedBox(height: 20),
-          _buildFormSection('Category'),
-          DropdownButtonFormField<String>(
-            value: displayEx.category,
-            items: ['Strength', 'Cardio', 'Flexibility'].map((c) => 
-              DropdownMenuItem(value: c, child: Text(c))).toList(),
-            onChanged: (val) {},
-          ),
-          const SizedBox(height: 20),
-          _buildFormSection('Primary Muscle'),
-          TextFormField(
-            initialValue: displayEx.primaryMuscles.isNotEmpty ? displayEx.primaryMuscles.first : '',
-            decoration: const InputDecoration(hintText: 'e.g. Chest'),
-          ),
-          const SizedBox(height: 100), // Space for keyboard
-        ],
+      body: Form(
+        key: _formKey,
+        child: ListView(
+          padding: const EdgeInsets.all(20),
+          children: [
+            _buildFormSection('Exercise Name'),
+            TextFormField(
+              initialValue: _name,
+              decoration: const InputDecoration(hintText: 'e.g. Diamond Pushups'),
+              validator: (val) => val == null || val.isEmpty ? 'Please enter a name' : null,
+              onSaved: (val) => _name = val ?? '',
+            ),
+            const SizedBox(height: 20),
+            _buildFormSection('Category'),
+            DropdownButtonFormField<String>(
+              value: _category.substring(0, 1).toUpperCase() + _category.substring(1).toLowerCase(),
+              items: ['Strength', 'Cardio', 'Flexibility'].map((c) => 
+                DropdownMenuItem(value: c, child: Text(c))).toList(),
+              onChanged: (val) => setState(() => _category = val ?? 'Strength'),
+            ),
+            const SizedBox(height: 20),
+            _buildFormSection('Primary Muscle'),
+            TextFormField(
+              initialValue: _primaryMuscle,
+              decoration: const InputDecoration(hintText: 'e.g. Chest'),
+              validator: (val) => val == null || val.isEmpty ? 'Please enter a muscle' : null,
+              onSaved: (val) => _primaryMuscle = val ?? '',
+            ),
+            const SizedBox(height: 20),
+            _buildFormSection('Equipment'),
+            TextFormField(
+              initialValue: _equipment,
+              decoration: const InputDecoration(hintText: 'e.g. Dumbbell'),
+              onSaved: (val) => _equipment = val ?? 'None',
+            ),
+             const SizedBox(height: 20),
+            _buildFormSection('Mechanic Type'),
+            DropdownButtonFormField<String>(
+              value: _mechanic,
+              items: ['Compound', 'Isolation'].map((m) => 
+                DropdownMenuItem(value: m, child: Text(m))).toList(),
+              onChanged: (val) => setState(() => _mechanic = val ?? 'Compound'),
+            ),
+             const SizedBox(height: 20),
+            _buildFormSection('Force Type'),
+            DropdownButtonFormField<String>(
+              value: _force,
+              items: ['Push', 'Pull', 'Static'].map((f) => 
+                DropdownMenuItem(value: f, child: Text(f))).toList(),
+              onChanged: (val) => setState(() => _force = val ?? 'Push'),
+            ),
+            const SizedBox(height: 100), // Space for keyboard
+          ],
+        ),
       ),
     );
   }

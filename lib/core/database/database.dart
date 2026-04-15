@@ -19,7 +19,8 @@ enum SetType {
   amrap,
   timed,
   restPause,
-  cluster
+  cluster,
+  failure
 }
 
 @DataClassName('ExerciseTable')
@@ -268,7 +269,7 @@ class AppDatabase extends _$AppDatabase {
   }
 
   @override
-  int get schemaVersion => 20;
+  int get schemaVersion => 21;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(

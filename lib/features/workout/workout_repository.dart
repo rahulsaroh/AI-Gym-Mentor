@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:drift/drift.dart';
+import 'package:intl/intl.dart';
 import 'package:ai_gym_mentor/core/database/database.dart';
 import 'package:ai_gym_mentor/features/exercise_database/domain/entities/exercise_entity.dart';
 import 'package:ai_gym_mentor/core/domain/entities/logged_set.dart' as ent;
@@ -73,15 +74,48 @@ class WorkoutRepository {
     );
   }
 
-  Future<List<Map<String, dynamic>>> getHistoryWithVolume(
-      {int limit = 20, int offset = 0}) async {
-    final workouts = await (_db.select(_db.workouts)
-          ..where((t) => t.status.equals('completed'))
-          ..orderBy([
-            (t) => OrderingTerm(expression: t.date, mode: OrderingMode.desc)
-          ])
-          ..limit(limit, offset: offset))
-        .get();
+  Future<List<Map<String, dynamic>>> getHistoryWithVolume({
+    int limit = 20,
+    int offset = 0,
+    String? searchQuery,
+    List<String>? muscleGroups,
+    int? templateId,
+  }) async {
+    final query = _db.select(_db.workouts);
+
+    query.where((t) => t.status.equals('completed'));
+
+    if (templateId != null) {
+      query.where((t) => t.templateId.equals(templateId));
+    }
+
+    if (searchQuery != null && searchQuery.isNotEmpty) {
+      query.where((t) => t.name.contains(searchQuery));
+    }
+
+    if (muscleGroups != null && muscleGroups.isNotEmpty) {
+      // Filter workouts that have at least one exercise targeting these muscles
+      final workoutIdsWithMuscles = _db.selectOnly(_db.workoutSets).join([
+        innerJoin(_db.exercises, _db.exercises.id.equalsExp(_db.workoutSets.exerciseId)),
+      ]);
+      workoutIdsWithMuscles.addColumns([_db.workoutSets.workoutId]);
+      
+      Expression<bool> muscleFilter = _db.exercises.primaryMuscle.isIn(muscleGroups);
+      if (_db.exercises.secondaryMuscle != null) {
+        muscleFilter = muscleFilter | _db.exercises.secondaryMuscle.isIn(muscleGroups);
+      }
+      workoutIdsWithMuscles.where(muscleFilter);
+      
+      final ids = await workoutIdsWithMuscles.map((row) => row.read(_db.workoutSets.workoutId)).get();
+      query.where((t) => t.id.isIn(ids.whereType<int>().toList()));
+    }
+
+    query.orderBy([
+      (t) => OrderingTerm(expression: t.date, mode: OrderingMode.desc)
+    ]);
+    query.limit(limit, offset: offset);
+
+    final workouts = await query.get();
 
     final List<Map<String, dynamic>> result = [];
     for (final w in workouts) {
@@ -280,6 +314,66 @@ class WorkoutRepository {
             ));
       }
       return newWorkoutId;
+    });
+  }
+
+  Future<int> saveWorkoutAsTemplate(int workoutId, String templateName) async {
+    final workout = await (_db.select(_db.workouts)..where((t) => t.id.equals(workoutId))).getSingle();
+    final sets = await (_db.select(_db.workoutSets)..where((t) => t.workoutId.equals(workoutId))).get();
+    
+    return await _db.transaction(() async {
+      // 1. Create Template
+      final templateId = await _db.into(_db.workoutTemplates).insert(
+        WorkoutTemplatesCompanion.insert(
+          name: templateName,
+          description: Value('Created from workout on ${DateFormat.yMMMd().format(workout.date)}'),
+        )
+      );
+
+      // 2. Create Day
+      final dayId = await _db.into(_db.templateDays).insert(
+        TemplateDaysCompanion.insert(
+          templateId: templateId,
+          name: 'Day 1',
+          order: 0,
+        )
+      );
+
+      // 3. Create Template Exercises
+      final exerciseGroups = <int, List<WorkoutSet>>{};
+      for (var s in sets) {
+        exerciseGroups.putIfAbsent(s.exerciseId, () => []).add(s);
+      }
+
+      final sortedIds = exerciseGroups.keys.toList()..sort((a, b) {
+        final orderA = exerciseGroups[a]!.first.exerciseOrder;
+        final orderB = exerciseGroups[b]!.first.exerciseOrder;
+        return orderA.compareTo(orderB);
+      });
+
+      for (var i = 0; i < sortedIds.length; i++) {
+        final exId = sortedIds[i];
+        final exSets = exerciseGroups[exId]!;
+        final firstSet = exSets.first;
+        
+        final setsJson = jsonEncode(exSets.map((s) => {
+          'reps': s.reps,
+          'weight': s.weight,
+        }).toList());
+
+        await _db.into(_db.templateExercises).insert(
+          TemplateExercisesCompanion.insert(
+            dayId: dayId,
+            exerciseId: exId,
+            order: i,
+            setType: Value(firstSet.setType),
+            setsJson: setsJson,
+            restTime: const Value(90),
+            notes: Value(firstSet.notes),
+          )
+        );
+      }
+      return templateId;
     });
   }
 

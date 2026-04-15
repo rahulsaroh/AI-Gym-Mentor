@@ -24,6 +24,7 @@ class SettingsState {
   final bool timerVibration;
   final bool backgroundNotification;
   final bool autoBackup;
+  final bool autoStartRestTimer;
 
   final double barbellWeight;
   final Map<String, int>
@@ -53,6 +54,7 @@ class SettingsState {
     this.timerVibration = true,
     this.backgroundNotification = true,
     this.autoBackup = false,
+    this.autoStartRestTimer = true,
     this.barbellWeight = 20.0,
     this.availablePlates = const {
       '1.25': 4,
@@ -87,6 +89,7 @@ class SettingsState {
     bool? timerVibration,
     bool? backgroundNotification,
     bool? autoBackup,
+    bool? autoStartRestTimer,
     double? barbellWeight,
     Map<String, int>? availablePlates,
     double? autoIncrement,
@@ -113,6 +116,7 @@ class SettingsState {
       backgroundNotification:
           backgroundNotification ?? this.backgroundNotification,
       autoBackup: autoBackup ?? this.autoBackup,
+      autoStartRestTimer: autoStartRestTimer ?? this.autoStartRestTimer,
       barbellWeight: barbellWeight ?? this.barbellWeight,
       availablePlates: availablePlates ?? this.availablePlates,
       autoIncrement: autoIncrement ?? this.autoIncrement,

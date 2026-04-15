@@ -13,6 +13,7 @@ import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 import 'package:ai_gym_mentor/features/analytics/components/fitness_wrapped_card.dart';
+import 'package:ai_gym_mentor/features/analytics/presentation/widgets/stats_trend_chart.dart';
 
 class AnalyticsDashboardScreen extends ConsumerWidget {
   const AnalyticsDashboardScreen({super.key});
@@ -83,6 +84,28 @@ class AnalyticsDashboardScreen extends ConsumerWidget {
               _LazyChart(
                 builder: (ref) => ref.watch(frequencyTrendProvider).when(
                       data: (data) => _FrequencyChart(data: data, target: 4),
+                      loading: () => const _SkeletonChart(),
+                      error: (e, _) => Center(child: Text('Error: $e')),
+                    ),
+              ),
+
+              // 3.1 Body Weight Trend
+              _SectionHeader(
+                  title: 'Body Weight Trend', subtitle: 'Progress over time'),
+              _LazyChart(
+                builder: (ref) => ref.watch(weightTrendProvider).when(
+                      data: (data) => StatsTrendChart(data: data, type: StatType.weight),
+                      loading: () => const _SkeletonChart(),
+                      error: (e, _) => Center(child: Text('Error: $e')),
+                    ),
+              ),
+
+              // 3.2 Workout Duration Trend
+              _SectionHeader(
+                  title: 'Duration Trend', subtitle: 'Average workout length'),
+              _LazyChart(
+                builder: (ref) => ref.watch(durationTrendProvider).when(
+                      data: (data) => StatsTrendChart(data: data, type: StatType.duration),
                       loading: () => const _SkeletonChart(),
                       error: (e, _) => Center(child: Text('Error: $e')),
                     ),

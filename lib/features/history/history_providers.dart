@@ -15,6 +15,40 @@ class HistoryItem {
       {required this.workout, required this.volume, required this.setCount});
 }
 
+class HistoryFilter {
+  final String? searchQuery;
+  final List<String>? muscleGroups;
+  final int? templateId;
+
+  const HistoryFilter({
+    this.searchQuery,
+    this.muscleGroups,
+    this.templateId,
+  });
+
+  HistoryFilter copyWith({
+    String? searchQuery,
+    List<String>? muscleGroups,
+    int? templateId,
+  }) {
+    return HistoryFilter(
+      searchQuery: searchQuery ?? this.searchQuery,
+      muscleGroups: muscleGroups ?? this.muscleGroups,
+      templateId: templateId ?? this.templateId,
+    );
+  }
+}
+
+@riverpod
+class HistoryFilterState extends _$HistoryFilterState {
+  @override
+  HistoryFilter build() => const HistoryFilter();
+
+  void updateFilter(HistoryFilter Function(HistoryFilter) update) {
+    state = update(state);
+  }
+}
+
 @riverpod
 Future<Map<String, dynamic>> historyStats(Ref ref) async {
   final repo = ref.watch(workoutRepositoryProvider);
@@ -27,8 +61,15 @@ class HistoryList extends _$HistoryList {
 
   @override
   Future<List<HistoryItem>> build() async {
+    final filter = ref.watch(historyFilterStateProvider);
     final repo = ref.watch(workoutRepositoryProvider);
-    final data = await repo.getHistoryWithVolume(limit: _pageSize, offset: 0);
+    final data = await repo.getHistoryWithVolume(
+      limit: _pageSize,
+      offset: 0,
+      searchQuery: filter.searchQuery,
+      muscleGroups: filter.muscleGroups,
+      templateId: filter.templateId,
+    );
     return data
         .map((d) => HistoryItem(
               workout: d['workout'],
@@ -42,9 +83,15 @@ class HistoryList extends _$HistoryList {
     if (state.isLoading || !state.hasValue) return;
 
     final currentList = state.value!;
+    final filter = ref.read(historyFilterStateProvider);
     final repo = ref.read(workoutRepositoryProvider);
     final moreData = await repo.getHistoryWithVolume(
-        limit: _pageSize, offset: currentList.length);
+      limit: _pageSize,
+      offset: currentList.length,
+      searchQuery: filter.searchQuery,
+      muscleGroups: filter.muscleGroups,
+      templateId: filter.templateId,
+    );
     final more = moreData
         .map((d) => HistoryItem(
               workout: d['workout'],

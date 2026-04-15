@@ -9,6 +9,56 @@ part of 'history_providers.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 
+@ProviderFor(HistoryFilterState)
+final historyFilterStateProvider = HistoryFilterStateProvider._();
+
+final class HistoryFilterStateProvider
+    extends $NotifierProvider<HistoryFilterState, HistoryFilter> {
+  HistoryFilterStateProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'historyFilterStateProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$historyFilterStateHash();
+
+  @$internal
+  @override
+  HistoryFilterState create() => HistoryFilterState();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(HistoryFilter value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<HistoryFilter>(value),
+    );
+  }
+}
+
+String _$historyFilterStateHash() =>
+    r'fce4a774d67c41917891051cf05fb98c3d4ff29d';
+
+abstract class _$HistoryFilterState extends $Notifier<HistoryFilter> {
+  HistoryFilter build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<HistoryFilter, HistoryFilter>;
+    final element = ref.element as $ClassProviderElement<
+        AnyNotifier<HistoryFilter, HistoryFilter>,
+        HistoryFilter,
+        Object?,
+        Object?>;
+    element.handleCreate(ref, build);
+  }
+}
+
 @ProviderFor(historyStats)
 final historyStatsProvider = HistoryStatsProvider._();
 
@@ -71,7 +121,7 @@ final class HistoryListProvider
   HistoryList create() => HistoryList();
 }
 
-String _$historyListHash() => r'de10e7e0cfaf6ecf3fa33f3bea90cb971eec099d';
+String _$historyListHash() => r'7ebb6f44bb14eba3a0624b8bc88e7dfedeae67d8';
 
 abstract class _$HistoryList extends $AsyncNotifier<List<HistoryItem>> {
   FutureOr<List<HistoryItem>> build();

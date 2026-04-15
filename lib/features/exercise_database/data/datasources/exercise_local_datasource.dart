@@ -169,6 +169,21 @@ class ExerciseLocalDatasource {
         .write(companion);
   }
 
+  Future<int> insertExercise(ExercisesCompanion companion) async {
+    return await _db.into(_db.exercises).insert(companion);
+  }
+
+  Future<void> insertExerciseMuscle(int exerciseId, String muscle, bool isPrimary) async {
+    await _db.into(_db.exerciseMuscles).insert(
+      ExerciseMusclesCompanion.insert(
+        exerciseId: exerciseId,
+        muscleName: muscle.toLowerCase(),
+        isPrimary: Value(isPrimary),
+      ),
+      mode: InsertMode.insertOrIgnore,
+    );
+  }
+
   Future<List<String>> getAvailableBodyParts() async {
     final bodyParts = await _db.select(_db.exerciseBodyParts).get();
     return bodyParts.map((b) => b.bodyPart).toSet().toList()..sort();

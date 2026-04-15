@@ -67,6 +67,33 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
               ),
               const SizedBox(width: 8),
             ],
+            bottom: PreferredSize(
+              preferredSize: const Size.fromHeight(60),
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+                child: TextField(
+                  onChanged: (val) {
+                    ref.read(historyFilterStateProvider.notifier).updateFilter(
+                          (s) => s.copyWith(searchQuery: val),
+                        );
+                  },
+                  decoration: InputDecoration(
+                    hintText: 'Search workouts...',
+                    prefixIcon: const Icon(LucideIcons.search, size: 20),
+                    contentPadding: const EdgeInsets.symmetric(vertical: 0),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
+                    ),
+                    filled: true,
+                    fillColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          SliverToBoxAdapter(
+            child: _FilterSection(),
           ),
           SliverToBoxAdapter(
             child: statsAsync.when(
@@ -206,6 +233,71 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
   }
 }
 
+class _FilterSection extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final filter = ref.watch(historyFilterStateProvider);
+    final muscles = [
+      'Chest',
+      'Back',
+      'Shoulders',
+      'Biceps',
+      'Triceps',
+      'Legs',
+      'Abs',
+      'Full Body'
+    ];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Row(
+            children: [
+              FilterChip(
+                label: const Text('All'),
+                selected: (filter.muscleGroups?.isEmpty ?? true) &&
+                    filter.templateId == null,
+                onSelected: (_) {
+                  ref.read(historyFilterStateProvider.notifier).updateFilter(
+                        (s) => const HistoryFilter(),
+                      );
+                },
+              ),
+              const SizedBox(width: 8),
+              ...muscles.map((m) {
+                final isSelected = filter.muscleGroups?.contains(m) ?? false;
+                return Padding(
+                  padding: const EdgeInsets.only(right: 8),
+                  child: FilterChip(
+                    label: Text(m),
+                    selected: isSelected,
+                    onSelected: (selected) {
+                      final current =
+                          List<String>.from(filter.muscleGroups ?? []);
+                      if (selected) {
+                        current.add(m);
+                      } else {
+                        current.remove(m);
+                      }
+                      ref
+                          .read(historyFilterStateProvider.notifier)
+                          .updateFilter(
+                            (s) => s.copyWith(muscleGroups: current),
+                          );
+                    },
+                  ),
+                );
+              }),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
 class _HistoryHeaderStats extends StatelessWidget {
   final Map<String, dynamic> stats;
   const _HistoryHeaderStats({required this.stats});
@@ -581,20 +673,52 @@ class _WorkoutCard extends ConsumerWidget {
         ),
         startActionPane: ActionPane(
           motion: const DrawerMotion(),
-          extentRatio: 0.25,
+          extentRatio: 0.5,
           children: [
             SlidableAction(
-              onPressed: (_) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Session duplicated')),
+              onPressed: (_) async {
+                final nameController = TextEditingController(text: workout.name);
+                final name = await showDialog<String>(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: const Text('Save as Template'),
+                    content: TextField(
+                      controller: nameController,
+                      decoration: const InputDecoration(labelText: 'Template Name'),
+                    ),
+                    actions: [
+                      TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+                      TextButton(onPressed: () => Navigator.pop(context, nameController.text), child: const Text('Save')),
+                    ],
+                  ),
                 );
+                if (name != null && context.mounted) {
+                  await ref.read(workoutRepositoryProvider).saveWorkoutAsTemplate(workout.id, name);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Saved as reusable template')),
+                  );
+                }
+              },
+              backgroundColor: Colors.indigo,
+              foregroundColor: Colors.white,
+              icon: LucideIcons.layoutTemplate,
+              label: 'As Template',
+              borderRadius: const BorderRadius.horizontal(left: Radius.circular(16)),
+            ),
+            SlidableAction(
+              onPressed: (_) async {
+                await ref.read(workoutRepositoryProvider).repeatWorkout(workout.id);
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Session duplicated to draft')),
+                  );
+                  context.go('/'); // Go to home to see draft
+                }
               },
               backgroundColor: Colors.blue,
               foregroundColor: Colors.white,
               icon: LucideIcons.copy,
-              label: 'Duplicate',
-              borderRadius:
-                  const BorderRadius.horizontal(left: Radius.circular(16)),
+              label: 'Repeat',
             ),
           ],
         ),

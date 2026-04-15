@@ -276,4 +276,36 @@ class ExerciseRepositoryImpl implements ExerciseRepository {
     // 2. Reset seeding flags in SharedPreferences
     await ExerciseDbSeeder.instance.reset();
   }
+
+  @override
+  Future<int> createExercise(ExerciseEntity exercise) async {
+    final companion = ExercisesCompanion.insert(
+      name: exercise.name,
+      category: Value(exercise.category),
+      difficulty: Value(exercise.difficulty),
+      primaryMuscle: exercise.primaryMuscles.isNotEmpty ? exercise.primaryMuscles.first : 'Other',
+      equipment: exercise.equipment ?? 'None',
+      setType: exercise.setType,
+      restTime: Value(exercise.restTime),
+      mechanic: Value(exercise.mechanic),
+      force: Value(exercise.force),
+      source: const Value('custom'),
+      isCustom: const Value(true),
+    );
+
+    final id = await _localDatasource.insertExercise(companion);
+
+    // Save muscles
+    for (final m in exercise.primaryMuscles) {
+      await _localDatasource.insertExerciseMuscle(id, m, true);
+    }
+    for (final m in exercise.secondaryMuscles) {
+      await _localDatasource.insertExerciseMuscle(id, m, false);
+    }
+
+    // Save body parts (auto-mapped during insert usually, but let's be explicit if needed)
+    // For now, let's assume the datasource/seeder logic or we can add it here.
+
+    return id;
+  }
 }

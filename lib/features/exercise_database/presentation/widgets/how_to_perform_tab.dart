@@ -71,7 +71,7 @@ class HowToPerformTab extends StatelessWidget {
       children: [
         const SizedBox(height: 40),
         Icon(
-          LucideIcons.infoIcon,
+          LucideIcons.info,
           size: 48,
           color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.4),
         ),

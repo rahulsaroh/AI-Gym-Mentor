@@ -66,4 +66,7 @@ abstract class ExerciseRepository {
 
   // Administrative
   Future<void> wipeAllData();
+
+  // Create/Update Custom Exercise
+  Future<int> createExercise(ExerciseEntity exercise);
 }
