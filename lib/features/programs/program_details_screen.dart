@@ -22,10 +22,11 @@ class ProgramDetailScreen extends ConsumerWidget {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
-          final program = snapshot.data?.firstWhere((t) => t.id == templateId, 
-            orElse: () => throw Exception('Program not found'));
-          
-          if (program == null) return const Center(child: Text('Program not found'));
+          final program = snapshot.data?.firstWhere((t) => t.id == templateId,
+              orElse: () => throw Exception('Program not found'));
+
+          if (program == null)
+            return const Center(child: Text('Program not found'));
 
           return Stack(
             children: [
@@ -59,7 +60,7 @@ class ProgramDetailScreen extends ConsumerWidget {
       ),
       actions: [
         IconButton(
-          icon: const Icon(LucideIcons.edit, color: Colors.white),
+          icon: const Icon(LucideIcons.pencil, color: Colors.white),
           onPressed: () => context.push('/programs/edit/${program.id}'),
           style: IconButton.styleFrom(backgroundColor: Colors.black26),
           tooltip: 'Edit program',
@@ -116,7 +117,8 @@ class ProgramDetailScreen extends ConsumerWidget {
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   decoration: BoxDecoration(
                     color: Colors.orange[50],
                     borderRadius: BorderRadius.circular(20),
@@ -183,7 +185,8 @@ class ProgramDetailScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              program.description ?? 'A comprehensive strength building program designed for peak performance.',
+              program.description ??
+                  'A comprehensive strength building program designed for peak performance.',
               style: GoogleFonts.outfit(
                 fontSize: 16,
                 color: Colors.grey[600],
@@ -196,7 +199,8 @@ class ProgramDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildSchedule(BuildContext context, WidgetRef ref, ent.WorkoutProgram program) {
+  Widget _buildSchedule(
+      BuildContext context, WidgetRef ref, ent.WorkoutProgram program) {
     return SliverToBoxAdapter(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(20, 32, 20, 0),
@@ -229,7 +233,10 @@ class ProgramDetailScreen extends ConsumerWidget {
                   ),
                 ),
                 trailing: Icon(LucideIcons.chevronUp, color: Colors.teal[900]),
-                children: program.days.map((day) => _buildDayItem(context, ref, day, program.name)).toList(),
+                children: program.days
+                    .map(
+                        (day) => _buildDayItem(context, ref, day, program.name))
+                    .toList(),
               ),
             ),
           ],
@@ -238,7 +245,8 @@ class ProgramDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildDayItem(BuildContext context, WidgetRef ref, ent.ProgramDay day, String programName) {
+  Widget _buildDayItem(BuildContext context, WidgetRef ref, ent.ProgramDay day,
+      String programName) {
     final muscleGroups = _deriveMuscleGroups(day);
 
     return Container(
@@ -260,7 +268,8 @@ class ProgramDetailScreen extends ConsumerWidget {
               Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
                       color: Colors.orange[50],
                       borderRadius: BorderRadius.circular(4),
@@ -276,8 +285,10 @@ class ProgramDetailScreen extends ConsumerWidget {
                   ),
                   const SizedBox(width: 8),
                   IconButton(
-                    icon: const Icon(LucideIcons.play, size: 20, color: Colors.green),
-                    onPressed: () => _showStartDayConfirm(context, ref, day, programName),
+                    icon: const Icon(LucideIcons.play,
+                        size: 20, color: Colors.green),
+                    onPressed: () =>
+                        _showStartDayConfirm(context, ref, day, programName),
                     style: IconButton.styleFrom(
                       backgroundColor: Colors.green.withOpacity(0.1),
                       padding: const EdgeInsets.all(4),
@@ -292,21 +303,22 @@ class ProgramDetailScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 12),
           ...day.exercises.map((ex) => Padding(
-            padding: const EdgeInsets.only(bottom: 8),
-            child: Row(
-              children: [
-                Icon(LucideIcons.circleCheckBig, size: 18, color: Colors.orange[300]),
-                const SizedBox(width: 12),
-                Text(
-                  ex.exercise.name,
-                  style: GoogleFonts.outfit(
-                    fontSize: 15,
-                    color: Colors.black87,
-                  ),
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Row(
+                  children: [
+                    Icon(LucideIcons.circleCheckBig,
+                        size: 18, color: Colors.orange[300]),
+                    const SizedBox(width: 12),
+                    Text(
+                      ex.exercise.name,
+                      style: GoogleFonts.outfit(
+                        fontSize: 15,
+                        color: Colors.black87,
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          )),
+              )),
         ],
       ),
     );
@@ -314,12 +326,16 @@ class ProgramDetailScreen extends ConsumerWidget {
 
   String _deriveMuscleGroups(ent.ProgramDay day) {
     if (day.exercises.isEmpty) return 'Rest Day';
-    final muscles = day.exercises.map((e) => e.exercise.primaryMuscles.firstOrNull ?? "Other").toSet().toList();
+    final muscles = day.exercises
+        .map((e) => e.exercise.primaryMuscles.firstOrNull ?? "Other")
+        .toSet()
+        .toList();
     if (muscles.length > 2) return '${muscles[0]} & More';
     return muscles.join(' & ');
   }
 
-  Widget _buildBottomButton(BuildContext context, WidgetRef ref, ent.WorkoutProgram program) {
+  Widget _buildBottomButton(
+      BuildContext context, WidgetRef ref, ent.WorkoutProgram program) {
     return Positioned(
       bottom: 0,
       left: 0,
@@ -345,14 +361,17 @@ class ProgramDetailScreen extends ConsumerWidget {
               final repo = ref.read(workoutRepositoryProvider);
               final days = await repo.getTemplateDays(templateId);
               if (days.isNotEmpty && context.mounted) {
-                final id = await ref.read(workoutHomeProvider.notifier).startWorkout(
-                  templateId: templateId,
-                  dayId: days.first.id,
-                  name: program.name,
-                );
+                final id =
+                    await ref.read(workoutHomeProvider.notifier).startWorkout(
+                          templateId: templateId,
+                          dayId: days.first.id,
+                          name: program.name,
+                        );
                 if (context.mounted) {
-                  context.pop(); // Close if we were on some sheet (unlikely here but safe)
-                  router.push('/app/workout/active?id=$id&dayId=${days.first.id}');
+                  context
+                      .pop(); // Close if we were on some sheet (unlikely here but safe)
+                  router.push(
+                      '/app/workout/active?id=$id&dayId=${days.first.id}');
                 }
               }
             },
@@ -377,12 +396,14 @@ class ProgramDetailScreen extends ConsumerWidget {
     );
   }
 
-  void _showStartDayConfirm(BuildContext context, WidgetRef ref, ent.ProgramDay day, String programName) {
+  void _showStartDayConfirm(BuildContext context, WidgetRef ref,
+      ent.ProgramDay day, String programName) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: Text('Start ${day.name}?'),
-        content: Text('Do you want to start this specific workout session now?'),
+        content:
+            Text('Do you want to start this specific workout session now?'),
         actions: [
           TextButton(
             onPressed: () {
@@ -396,25 +417,27 @@ class ProgramDetailScreen extends ConsumerWidget {
             onPressed: () async {
               // Get router reference before entering async context to ensure it's available
               final router = GoRouter.of(context);
-              
+
               // Close dialog immediately to preserve context state
               if (context.mounted) {
                 Navigator.pop(context);
               }
-              
+
               // Now perform the async operation
-              final id = await ref.read(workoutHomeProvider.notifier).startWorkout(
-                templateId: day.templateId,
-                dayId: day.id,
-                name: programName,
-              );
-              
+              final id =
+                  await ref.read(workoutHomeProvider.notifier).startWorkout(
+                        templateId: day.templateId,
+                        dayId: day.id,
+                        name: programName,
+                      );
+
               // Navigate only if context is still mounted
               if (context.mounted) {
                 router.push('/app/workout/active?id=$id&dayId=${day.id}');
               }
             },
-            child: const Text('Start Now', style: TextStyle(fontWeight: FontWeight.bold)),
+            child: const Text('Start Now',
+                style: TextStyle(fontWeight: FontWeight.bold)),
           ),
         ],
       ),

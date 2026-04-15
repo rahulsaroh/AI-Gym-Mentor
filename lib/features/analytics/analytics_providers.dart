@@ -20,9 +20,35 @@ Future<List<Map<String, dynamic>>> volumeTrend(Ref ref) async {
 }
 
 @riverpod
+Future<List<Map<String, dynamic>>> durationTrend(Ref ref) async {
+  final repo = ref.watch(statsRepositoryProvider);
+  return await repo.getDurationTrend();
+}
+
+@riverpod
 Future<List<Map<String, dynamic>>> frequencyTrend(Ref ref) async {
   final repo = ref.watch(statsRepositoryProvider);
   return await repo.getWorkoutFrequency();
+}
+
+@riverpod
+Future<List<Map<String, dynamic>>> dailyActivity(Ref ref) async {
+  final repo = ref.watch(statsRepositoryProvider);
+  return await repo.getDailyWorkoutActivity();
+}
+
+@riverpod
+Future<List<Map<String, dynamic>>> weightTrend(Ref ref) async {
+  final measurements = await ref.watch(bodyMeasurementsListProvider.future);
+  final weightData = measurements
+      .where((m) => m.type.toLowerCase() == 'weight')
+      .map((m) => {
+            'date': m.date,
+            'weight': m.weight,
+          })
+      .toList();
+  weightData.sort((a, b) => (a['date'] as DateTime).compareTo(b['date'] as DateTime));
+  return weightData;
 }
 
 @riverpod
@@ -41,6 +67,28 @@ Future<List<Map<String, dynamic>>> plateauAlerts(Ref ref) async {
 Future<List<Map<String, dynamic>>> recentPRs(Ref ref) async {
   final repo = ref.watch(statsRepositoryProvider);
   return await repo.getRecentPRs();
+}
+
+@riverpod
+Future<List<Map<String, dynamic>>> fullPRHistory(Ref ref) async {
+  final repo = ref.watch(statsRepositoryProvider);
+  return await repo.getFullPRHistory();
+}
+
+@riverpod
+Future<List<int>> workoutPRs(Ref ref, int workoutId) async {
+  final repo = ref.watch(statsRepositoryProvider);
+  final fullHistory = await ref.watch(fullPRHistoryProvider.future);
+  
+  // A PR was achieved in this workout if the date of its all-time best matches the workout date
+  final workout = await (repo.db.select(repo.db.workouts)..where((t) => t.id.equals(workoutId))).getSingle();
+  
+  return fullHistory
+    .where((pr) => (pr['date'] as DateTime).day == workout.date.day && 
+                  (pr['date'] as DateTime).month == workout.date.month &&
+                  (pr['date'] as DateTime).year == workout.date.year)
+    .map((pr) => pr['exerciseId'] as int)
+    .toList();
 }
 
 @riverpod

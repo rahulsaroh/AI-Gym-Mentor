@@ -25,7 +25,9 @@ enum SetType {
 @DataClassName('ExerciseTable')
 class Exercises extends Table {
   IntColumn get id => integer().autoIncrement()();
-  TextColumn get exerciseId => text().nullable()(); // String ID from source (e.g., yuhonas_3_4_Sit-Up)
+  TextColumn get exerciseId => text()
+      .nullable()
+      .unique()(); // String ID from source (e.g., yuhonas_3_4_Sit-Up)
   TextColumn get name => text().withLength(min: 1, max: 255)();
   TextColumn get description => text().nullable()();
   TextColumn get category => text().withDefault(const Constant('Strength'))();
@@ -48,6 +50,7 @@ class Exercises extends Table {
   TextColumn get nameHi => text().nullable()();
   TextColumn get nameMr => text().nullable()();
   DateTimeColumn get lastUsed => dateTime().nullable()();
+  IntColumn get usageCount => integer().withDefault(const Constant(0))();
 }
 
 class WorkoutTemplates extends Table {
@@ -111,6 +114,7 @@ class WorkoutSets extends Table {
   BoolColumn get isPr => boolean().withDefault(const Constant(false))();
   TextColumn get supersetGroupId => text().nullable()();
   TextColumn get subSetsJson => text().nullable()(); // For DropSets/Rest-Pause
+  BoolColumn get isFavorite => boolean().withDefault(const Constant(false))();
 }
 
 @DataClassName('BodyMeasurementTable')
@@ -147,10 +151,10 @@ class ProgressPhotos extends Table {
   IntColumn get id => integer().autoIncrement()();
   DateTimeColumn get date => dateTime()();
   TextColumn get imagePath => text()();
-  TextColumn get category => text().withDefault(const Constant('front'))(); // front, side, back
+  TextColumn get category =>
+      text().withDefault(const Constant('front'))(); // front, side, back
   TextColumn get notes => text().nullable()();
 }
-
 
 class SyncQueue extends Table {
   IntColumn get id => integer().autoIncrement()();
@@ -190,13 +194,18 @@ class ExerciseBodyParts extends Table {
 }
 
 class ExerciseEnrichedContent extends Table {
-  IntColumn get exerciseId => integer().references(Exercises, #id)();
+  IntColumn get exerciseId => integer().unique().references(Exercises, #id)();
   TextColumn get safetyTips => text().nullable()(); // JSON-encoded List<String>
-  TextColumn get commonMistakes => text().nullable()(); // JSON-encoded List<String>
+  TextColumn get commonMistakes =>
+      text().nullable()(); // JSON-encoded List<String>
   TextColumn get variations => text().nullable()(); // JSON-encoded List<String>
   TextColumn get enrichedOverview => text().nullable()();
   DateTimeColumn get enrichedAt => dateTime().nullable()();
-  TextColumn get enrichmentSource => text().nullable()(); // 'manual', 'llm-gemini', 'llm-gpt4', 'auto-extracted'
+  TextColumn get enrichmentSource => text()
+      .nullable()(); // 'manual', 'llm-gemini', 'llm-gpt4', 'auto-extracted'
+
+  @override
+  Set<Column> get primaryKey => {exerciseId};
 }
 
 class RecentExercises extends Table {
@@ -211,7 +220,8 @@ class ExerciseProgressions extends Table {
   IntColumn get id => integer().autoIncrement()();
   IntColumn get exerciseId => integer().references(Exercises, #id)();
   IntColumn get progressionExerciseId => integer().references(Exercises, #id)();
-  IntColumn get position => integer()(); // 0 = current, negative = easier, positive = harder
+  IntColumn get position =>
+      integer()(); // 0 = current, negative = easier, positive = harder
 }
 
 class ExerciseInstructions extends Table {
@@ -250,15 +260,15 @@ class AppDatabase extends _$AppDatabase {
       'SELECT rowid FROM exercises_fts WHERE exercises_fts MATCH ?',
       variables: [Variable.withString(query)],
     ).get();
-    
+
     final ids = results.map((row) => row.read<int>('rowid')).toList();
     if (ids.isEmpty) return [];
-    
+
     return (select(exercises)..where((t) => t.id.isIn(ids))).get();
   }
 
   @override
-  int get schemaVersion => 18;
+  int get schemaVersion => 20;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -325,31 +335,40 @@ class AppDatabase extends _$AppDatabase {
           if (from < 10) {
             // Bulk update for Unified Exercise Library
             if (!await hasColumn('exercises', 'description')) {
-              await customStatement('ALTER TABLE exercises ADD COLUMN description TEXT');
+              await customStatement(
+                  'ALTER TABLE exercises ADD COLUMN description TEXT');
             }
             if (!await hasColumn('exercises', 'category')) {
-              await customStatement("ALTER TABLE exercises ADD COLUMN category TEXT DEFAULT 'Strength'");
+              await customStatement(
+                  "ALTER TABLE exercises ADD COLUMN category TEXT DEFAULT 'Strength'");
             }
             if (!await hasColumn('exercises', 'difficulty')) {
-              await customStatement("ALTER TABLE exercises ADD COLUMN difficulty TEXT DEFAULT 'Beginner'");
+              await customStatement(
+                  "ALTER TABLE exercises ADD COLUMN difficulty TEXT DEFAULT 'Beginner'");
             }
             if (!await hasColumn('exercises', 'gif_url')) {
-              await customStatement('ALTER TABLE exercises ADD COLUMN gif_url TEXT');
+              await customStatement(
+                  'ALTER TABLE exercises ADD COLUMN gif_url TEXT');
             }
             if (!await hasColumn('exercises', 'image_url')) {
-              await customStatement('ALTER TABLE exercises ADD COLUMN image_url TEXT');
+              await customStatement(
+                  'ALTER TABLE exercises ADD COLUMN image_url TEXT');
             }
             if (!await hasColumn('exercises', 'video_url')) {
-              await customStatement('ALTER TABLE exercises ADD COLUMN video_url TEXT');
+              await customStatement(
+                  'ALTER TABLE exercises ADD COLUMN video_url TEXT');
             }
             if (!await hasColumn('exercises', 'mechanic')) {
-              await customStatement('ALTER TABLE exercises ADD COLUMN mechanic TEXT');
+              await customStatement(
+                  'ALTER TABLE exercises ADD COLUMN mechanic TEXT');
             }
             if (!await hasColumn('exercises', 'force')) {
-              await customStatement('ALTER TABLE exercises ADD COLUMN force TEXT');
+              await customStatement(
+                  'ALTER TABLE exercises ADD COLUMN force TEXT');
             }
             if (!await hasColumn('exercises', 'source')) {
-              await customStatement("ALTER TABLE exercises ADD COLUMN source TEXT DEFAULT 'local'");
+              await customStatement(
+                  "ALTER TABLE exercises ADD COLUMN source TEXT DEFAULT 'local'");
             }
           }
           if (from < 12) {
@@ -405,13 +424,33 @@ class AppDatabase extends _$AppDatabase {
             await m.deleteTable('recent_exercises');
             await m.createTable(recentExercises);
           }
+          if (from < 19) {
+            // Fix duplicates in exercise_enriched_content before adding unique constraint/PK
+            await customStatement('''
+              DELETE FROM exercise_enriched_content 
+              WHERE rowid NOT IN (
+                SELECT MIN(rowid) 
+                FROM exercise_enriched_content 
+                GROUP BY exercise_id
+              )
+            ''');
+            // Re-create the table with the new constraints
+            await m.deleteTable('exercise_enriched_content');
+            await m.createTable(exerciseEnrichedContent);
+          }
+          if (from < 20) {
+            if (!await hasColumn('exercises', 'usage_count')) {
+              await m.addColumn(
+                  exercises, exercises.usageCount as GeneratedColumn<Object>);
+            }
+          }
         },
         beforeOpen: (details) async {
           await customStatement('PRAGMA foreign_keys = ON');
 
           if (details.wasCreated || details.hadUpgrade) {
             // Use the external seeder
-            // import is needed but we are inside the file. 
+            // import is needed but we are inside the file.
             // I'll add the import at the top later or use a callback.
             // For now, I'll trigger it from a provider or main.dart.
           }

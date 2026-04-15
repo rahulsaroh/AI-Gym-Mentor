@@ -13,9 +13,10 @@ abstract class ExerciseFilter with _$ExerciseFilter {
     @Default(null) String? difficulty,
     @Default(null) String? searchQuery,
     @Default(false) bool favoritesOnly,
+    @Default(false) bool sortByUsage,
   }) = _ExerciseFilter;
 
   bool get isActive =>
     bodyPart != null || category != null || equipment != null ||
-    difficulty != null || (searchQuery?.isNotEmpty ?? false) || favoritesOnly;
+    difficulty != null || (searchQuery?.isNotEmpty ?? false) || favoritesOnly || sortByUsage;
 }

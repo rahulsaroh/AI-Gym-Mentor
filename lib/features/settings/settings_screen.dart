@@ -51,6 +51,13 @@ class SettingsScreen extends ConsumerWidget {
             ),
             _buildTile(
               context,
+              title: 'GitHub Exercise Library',
+              subtitle: '1300+ exercises with GIFs (1.2K+)',
+              icon: LucideIcons.lightbulb,
+              onTap: () => context.push('/exercise-library'),
+            ),
+            _buildTile(
+              context,
               title: 'Body Measurements',
               subtitle: 'Track physique measurements & targets',
               icon: LucideIcons.ruler,

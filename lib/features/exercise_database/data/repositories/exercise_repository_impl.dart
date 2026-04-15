@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:ai_gym_mentor/core/database/database.dart';
 import 'package:ai_gym_mentor/features/exercise_database/data/datasources/exercise_local_datasource.dart';
+import 'package:ai_gym_mentor/features/exercise_database/data/datasources/exercise_db_seeder.dart';
 import 'package:ai_gym_mentor/features/exercise_database/data/datasources/exercise_remote_datasource.dart';
 import 'package:ai_gym_mentor/features/exercise_database/domain/entities/exercise_entity.dart';
 import 'package:ai_gym_mentor/features/exercise_database/domain/repositories/exercise_repository.dart';
@@ -58,6 +59,7 @@ class ExerciseRepositoryImpl implements ExerciseRepository {
       source: row.source,
       isCustom: row.isCustom,
       lastUsed: row.lastUsed,
+      usageCount: row.usageCount,
     );
   }
 
@@ -70,7 +72,9 @@ class ExerciseRepositoryImpl implements ExerciseRepository {
     String? category,
     String? equipment,
     String? difficulty,
+    String? searchQuery,
     bool favoritesOnly = false,
+    bool sortByUsage = false,
   }) async {
     final rows = await _localDatasource.getExercises(
       page: page,
@@ -79,7 +83,9 @@ class ExerciseRepositoryImpl implements ExerciseRepository {
       category: category,
       equipment: equipment,
       level: difficulty,
+      searchQuery: searchQuery,
       favoritesOnly: favoritesOnly,
+      sortByUsage: sortByUsage,
     );
     return rows.map((row) => _toEntity(row)).toList();
   }
@@ -156,6 +162,11 @@ class ExerciseRepositoryImpl implements ExerciseRepository {
   @override
   Future<void> toggleFavorite(int exerciseId, bool isFavorite) async {
     await _localDatasource.toggleFavorite(exerciseId, isFavorite);
+  }
+
+  @override
+  Future<void> incrementUsageCount(int exerciseId) async {
+    await _localDatasource.incrementUsageCount(exerciseId);
   }
 
   @override
@@ -255,5 +266,14 @@ class ExerciseRepositoryImpl implements ExerciseRepository {
   @override
   Future<List<Map<String, dynamic>>> getChartData(int exerciseId, Duration range) async {
     return await _localDatasource.getChartData(exerciseId, range);
+  }
+
+  @override
+  Future<void> wipeAllData() async {
+    // 1. Clear database tables
+    await _localDatasource.clearAllExercises();
+    
+    // 2. Reset seeding flags in SharedPreferences
+    await ExerciseDbSeeder.instance.reset();
   }
 }

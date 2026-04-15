@@ -23,7 +23,9 @@ class $ExercisesTable extends Exercises
   @override
   late final GeneratedColumn<String> exerciseId = GeneratedColumn<String>(
       'exercise_id', aliasedName, true,
-      type: DriftSqlType.string, requiredDuringInsert: false);
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'));
   static const VerificationMeta _nameMeta = const VerificationMeta('name');
   @override
   late final GeneratedColumn<String> name = GeneratedColumn<String>(
@@ -173,6 +175,14 @@ class $ExercisesTable extends Exercises
   late final GeneratedColumn<DateTime> lastUsed = GeneratedColumn<DateTime>(
       'last_used', aliasedName, true,
       type: DriftSqlType.dateTime, requiredDuringInsert: false);
+  static const VerificationMeta _usageCountMeta =
+      const VerificationMeta('usageCount');
+  @override
+  late final GeneratedColumn<int> usageCount = GeneratedColumn<int>(
+      'usage_count', aliasedName, false,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(0));
   @override
   List<GeneratedColumn> get $columns => [
         id,
@@ -198,7 +208,8 @@ class $ExercisesTable extends Exercises
         isEnriched,
         nameHi,
         nameMr,
-        lastUsed
+        lastUsed,
+        usageCount
       ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -329,6 +340,12 @@ class $ExercisesTable extends Exercises
       context.handle(_lastUsedMeta,
           lastUsed.isAcceptableOrUnknown(data['last_used']!, _lastUsedMeta));
     }
+    if (data.containsKey('usage_count')) {
+      context.handle(
+          _usageCountMeta,
+          usageCount.isAcceptableOrUnknown(
+              data['usage_count']!, _usageCountMeta));
+    }
     return context;
   }
 
@@ -386,6 +403,8 @@ class $ExercisesTable extends Exercises
           .read(DriftSqlType.string, data['${effectivePrefix}name_mr']),
       lastUsed: attachedDatabase.typeMapping
           .read(DriftSqlType.dateTime, data['${effectivePrefix}last_used']),
+      usageCount: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}usage_count'])!,
     );
   }
 
@@ -420,6 +439,7 @@ class ExerciseTable extends DataClass implements Insertable<ExerciseTable> {
   final String? nameHi;
   final String? nameMr;
   final DateTime? lastUsed;
+  final int usageCount;
   const ExerciseTable(
       {required this.id,
       this.exerciseId,
@@ -444,7 +464,8 @@ class ExerciseTable extends DataClass implements Insertable<ExerciseTable> {
       required this.isEnriched,
       this.nameHi,
       this.nameMr,
-      this.lastUsed});
+      this.lastUsed,
+      required this.usageCount});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -496,6 +517,7 @@ class ExerciseTable extends DataClass implements Insertable<ExerciseTable> {
     if (!nullToAbsent || lastUsed != null) {
       map['last_used'] = Variable<DateTime>(lastUsed);
     }
+    map['usage_count'] = Variable<int>(usageCount);
     return map;
   }
 
@@ -545,6 +567,7 @@ class ExerciseTable extends DataClass implements Insertable<ExerciseTable> {
       lastUsed: lastUsed == null && nullToAbsent
           ? const Value.absent()
           : Value(lastUsed),
+      usageCount: Value(usageCount),
     );
   }
 
@@ -576,6 +599,7 @@ class ExerciseTable extends DataClass implements Insertable<ExerciseTable> {
       nameHi: serializer.fromJson<String?>(json['nameHi']),
       nameMr: serializer.fromJson<String?>(json['nameMr']),
       lastUsed: serializer.fromJson<DateTime?>(json['lastUsed']),
+      usageCount: serializer.fromJson<int>(json['usageCount']),
     );
   }
   @override
@@ -606,6 +630,7 @@ class ExerciseTable extends DataClass implements Insertable<ExerciseTable> {
       'nameHi': serializer.toJson<String?>(nameHi),
       'nameMr': serializer.toJson<String?>(nameMr),
       'lastUsed': serializer.toJson<DateTime?>(lastUsed),
+      'usageCount': serializer.toJson<int>(usageCount),
     };
   }
 
@@ -633,7 +658,8 @@ class ExerciseTable extends DataClass implements Insertable<ExerciseTable> {
           bool? isEnriched,
           Value<String?> nameHi = const Value.absent(),
           Value<String?> nameMr = const Value.absent(),
-          Value<DateTime?> lastUsed = const Value.absent()}) =>
+          Value<DateTime?> lastUsed = const Value.absent(),
+          int? usageCount}) =>
       ExerciseTable(
         id: id ?? this.id,
         exerciseId: exerciseId.present ? exerciseId.value : this.exerciseId,
@@ -662,6 +688,7 @@ class ExerciseTable extends DataClass implements Insertable<ExerciseTable> {
         nameHi: nameHi.present ? nameHi.value : this.nameHi,
         nameMr: nameMr.present ? nameMr.value : this.nameMr,
         lastUsed: lastUsed.present ? lastUsed.value : this.lastUsed,
+        usageCount: usageCount ?? this.usageCount,
       );
   ExerciseTable copyWithCompanion(ExercisesCompanion data) {
     return ExerciseTable(
@@ -700,6 +727,8 @@ class ExerciseTable extends DataClass implements Insertable<ExerciseTable> {
       nameHi: data.nameHi.present ? data.nameHi.value : this.nameHi,
       nameMr: data.nameMr.present ? data.nameMr.value : this.nameMr,
       lastUsed: data.lastUsed.present ? data.lastUsed.value : this.lastUsed,
+      usageCount:
+          data.usageCount.present ? data.usageCount.value : this.usageCount,
     );
   }
 
@@ -729,7 +758,8 @@ class ExerciseTable extends DataClass implements Insertable<ExerciseTable> {
           ..write('isEnriched: $isEnriched, ')
           ..write('nameHi: $nameHi, ')
           ..write('nameMr: $nameMr, ')
-          ..write('lastUsed: $lastUsed')
+          ..write('lastUsed: $lastUsed, ')
+          ..write('usageCount: $usageCount')
           ..write(')'))
         .toString();
   }
@@ -759,7 +789,8 @@ class ExerciseTable extends DataClass implements Insertable<ExerciseTable> {
         isEnriched,
         nameHi,
         nameMr,
-        lastUsed
+        lastUsed,
+        usageCount
       ]);
   @override
   bool operator ==(Object other) =>
@@ -788,7 +819,8 @@ class ExerciseTable extends DataClass implements Insertable<ExerciseTable> {
           other.isEnriched == this.isEnriched &&
           other.nameHi == this.nameHi &&
           other.nameMr == this.nameMr &&
-          other.lastUsed == this.lastUsed);
+          other.lastUsed == this.lastUsed &&
+          other.usageCount == this.usageCount);
 }
 
 class ExercisesCompanion extends UpdateCompanion<ExerciseTable> {
@@ -816,6 +848,7 @@ class ExercisesCompanion extends UpdateCompanion<ExerciseTable> {
   final Value<String?> nameHi;
   final Value<String?> nameMr;
   final Value<DateTime?> lastUsed;
+  final Value<int> usageCount;
   const ExercisesCompanion({
     this.id = const Value.absent(),
     this.exerciseId = const Value.absent(),
@@ -841,6 +874,7 @@ class ExercisesCompanion extends UpdateCompanion<ExerciseTable> {
     this.nameHi = const Value.absent(),
     this.nameMr = const Value.absent(),
     this.lastUsed = const Value.absent(),
+    this.usageCount = const Value.absent(),
   });
   ExercisesCompanion.insert({
     this.id = const Value.absent(),
@@ -867,6 +901,7 @@ class ExercisesCompanion extends UpdateCompanion<ExerciseTable> {
     this.nameHi = const Value.absent(),
     this.nameMr = const Value.absent(),
     this.lastUsed = const Value.absent(),
+    this.usageCount = const Value.absent(),
   })  : name = Value(name),
         primaryMuscle = Value(primaryMuscle),
         equipment = Value(equipment),
@@ -896,6 +931,7 @@ class ExercisesCompanion extends UpdateCompanion<ExerciseTable> {
     Expression<String>? nameHi,
     Expression<String>? nameMr,
     Expression<DateTime>? lastUsed,
+    Expression<int>? usageCount,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -922,6 +958,7 @@ class ExercisesCompanion extends UpdateCompanion<ExerciseTable> {
       if (nameHi != null) 'name_hi': nameHi,
       if (nameMr != null) 'name_mr': nameMr,
       if (lastUsed != null) 'last_used': lastUsed,
+      if (usageCount != null) 'usage_count': usageCount,
     });
   }
 
@@ -949,7 +986,8 @@ class ExercisesCompanion extends UpdateCompanion<ExerciseTable> {
       Value<bool>? isEnriched,
       Value<String?>? nameHi,
       Value<String?>? nameMr,
-      Value<DateTime?>? lastUsed}) {
+      Value<DateTime?>? lastUsed,
+      Value<int>? usageCount}) {
     return ExercisesCompanion(
       id: id ?? this.id,
       exerciseId: exerciseId ?? this.exerciseId,
@@ -975,6 +1013,7 @@ class ExercisesCompanion extends UpdateCompanion<ExerciseTable> {
       nameHi: nameHi ?? this.nameHi,
       nameMr: nameMr ?? this.nameMr,
       lastUsed: lastUsed ?? this.lastUsed,
+      usageCount: usageCount ?? this.usageCount,
     );
   }
 
@@ -1053,6 +1092,9 @@ class ExercisesCompanion extends UpdateCompanion<ExerciseTable> {
     if (lastUsed.present) {
       map['last_used'] = Variable<DateTime>(lastUsed.value);
     }
+    if (usageCount.present) {
+      map['usage_count'] = Variable<int>(usageCount.value);
+    }
     return map;
   }
 
@@ -1082,7 +1124,8 @@ class ExercisesCompanion extends UpdateCompanion<ExerciseTable> {
           ..write('isEnriched: $isEnriched, ')
           ..write('nameHi: $nameHi, ')
           ..write('nameMr: $nameMr, ')
-          ..write('lastUsed: $lastUsed')
+          ..write('lastUsed: $lastUsed, ')
+          ..write('usageCount: $usageCount')
           ..write(')'))
         .toString();
   }
@@ -2781,6 +2824,16 @@ class $WorkoutSetsTable extends WorkoutSets
   late final GeneratedColumn<String> subSetsJson = GeneratedColumn<String>(
       'sub_sets_json', aliasedName, true,
       type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _isFavoriteMeta =
+      const VerificationMeta('isFavorite');
+  @override
+  late final GeneratedColumn<bool> isFavorite = GeneratedColumn<bool>(
+      'is_favorite', aliasedName, false,
+      type: DriftSqlType.bool,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('CHECK ("is_favorite" IN (0, 1))'),
+      defaultValue: const Constant(false));
   @override
   List<GeneratedColumn> get $columns => [
         id,
@@ -2798,7 +2851,8 @@ class $WorkoutSetsTable extends WorkoutSets
         completedAt,
         isPr,
         supersetGroupId,
-        subSetsJson
+        subSetsJson,
+        isFavorite
       ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -2891,6 +2945,12 @@ class $WorkoutSetsTable extends WorkoutSets
           subSetsJson.isAcceptableOrUnknown(
               data['sub_sets_json']!, _subSetsJsonMeta));
     }
+    if (data.containsKey('is_favorite')) {
+      context.handle(
+          _isFavoriteMeta,
+          isFavorite.isAcceptableOrUnknown(
+              data['is_favorite']!, _isFavoriteMeta));
+    }
     return context;
   }
 
@@ -2933,6 +2993,8 @@ class $WorkoutSetsTable extends WorkoutSets
           DriftSqlType.string, data['${effectivePrefix}superset_group_id']),
       subSetsJson: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}sub_sets_json']),
+      isFavorite: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}is_favorite'])!,
     );
   }
 
@@ -2962,6 +3024,7 @@ class WorkoutSet extends DataClass implements Insertable<WorkoutSet> {
   final bool isPr;
   final String? supersetGroupId;
   final String? subSetsJson;
+  final bool isFavorite;
   const WorkoutSet(
       {required this.id,
       required this.workoutId,
@@ -2978,7 +3041,8 @@ class WorkoutSet extends DataClass implements Insertable<WorkoutSet> {
       this.completedAt,
       required this.isPr,
       this.supersetGroupId,
-      this.subSetsJson});
+      this.subSetsJson,
+      required this.isFavorite});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -3013,6 +3077,7 @@ class WorkoutSet extends DataClass implements Insertable<WorkoutSet> {
     if (!nullToAbsent || subSetsJson != null) {
       map['sub_sets_json'] = Variable<String>(subSetsJson);
     }
+    map['is_favorite'] = Variable<bool>(isFavorite);
     return map;
   }
 
@@ -3041,6 +3106,7 @@ class WorkoutSet extends DataClass implements Insertable<WorkoutSet> {
       subSetsJson: subSetsJson == null && nullToAbsent
           ? const Value.absent()
           : Value(subSetsJson),
+      isFavorite: Value(isFavorite),
     );
   }
 
@@ -3065,6 +3131,7 @@ class WorkoutSet extends DataClass implements Insertable<WorkoutSet> {
       isPr: serializer.fromJson<bool>(json['isPr']),
       supersetGroupId: serializer.fromJson<String?>(json['supersetGroupId']),
       subSetsJson: serializer.fromJson<String?>(json['subSetsJson']),
+      isFavorite: serializer.fromJson<bool>(json['isFavorite']),
     );
   }
   @override
@@ -3088,6 +3155,7 @@ class WorkoutSet extends DataClass implements Insertable<WorkoutSet> {
       'isPr': serializer.toJson<bool>(isPr),
       'supersetGroupId': serializer.toJson<String?>(supersetGroupId),
       'subSetsJson': serializer.toJson<String?>(subSetsJson),
+      'isFavorite': serializer.toJson<bool>(isFavorite),
     };
   }
 
@@ -3107,7 +3175,8 @@ class WorkoutSet extends DataClass implements Insertable<WorkoutSet> {
           Value<DateTime?> completedAt = const Value.absent(),
           bool? isPr,
           Value<String?> supersetGroupId = const Value.absent(),
-          Value<String?> subSetsJson = const Value.absent()}) =>
+          Value<String?> subSetsJson = const Value.absent(),
+          bool? isFavorite}) =>
       WorkoutSet(
         id: id ?? this.id,
         workoutId: workoutId ?? this.workoutId,
@@ -3127,6 +3196,7 @@ class WorkoutSet extends DataClass implements Insertable<WorkoutSet> {
             ? supersetGroupId.value
             : this.supersetGroupId,
         subSetsJson: subSetsJson.present ? subSetsJson.value : this.subSetsJson,
+        isFavorite: isFavorite ?? this.isFavorite,
       );
   WorkoutSet copyWithCompanion(WorkoutSetsCompanion data) {
     return WorkoutSet(
@@ -3153,6 +3223,8 @@ class WorkoutSet extends DataClass implements Insertable<WorkoutSet> {
           : this.supersetGroupId,
       subSetsJson:
           data.subSetsJson.present ? data.subSetsJson.value : this.subSetsJson,
+      isFavorite:
+          data.isFavorite.present ? data.isFavorite.value : this.isFavorite,
     );
   }
 
@@ -3174,7 +3246,8 @@ class WorkoutSet extends DataClass implements Insertable<WorkoutSet> {
           ..write('completedAt: $completedAt, ')
           ..write('isPr: $isPr, ')
           ..write('supersetGroupId: $supersetGroupId, ')
-          ..write('subSetsJson: $subSetsJson')
+          ..write('subSetsJson: $subSetsJson, ')
+          ..write('isFavorite: $isFavorite')
           ..write(')'))
         .toString();
   }
@@ -3196,7 +3269,8 @@ class WorkoutSet extends DataClass implements Insertable<WorkoutSet> {
       completedAt,
       isPr,
       supersetGroupId,
-      subSetsJson);
+      subSetsJson,
+      isFavorite);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -3216,7 +3290,8 @@ class WorkoutSet extends DataClass implements Insertable<WorkoutSet> {
           other.completedAt == this.completedAt &&
           other.isPr == this.isPr &&
           other.supersetGroupId == this.supersetGroupId &&
-          other.subSetsJson == this.subSetsJson);
+          other.subSetsJson == this.subSetsJson &&
+          other.isFavorite == this.isFavorite);
 }
 
 class WorkoutSetsCompanion extends UpdateCompanion<WorkoutSet> {
@@ -3236,6 +3311,7 @@ class WorkoutSetsCompanion extends UpdateCompanion<WorkoutSet> {
   final Value<bool> isPr;
   final Value<String?> supersetGroupId;
   final Value<String?> subSetsJson;
+  final Value<bool> isFavorite;
   const WorkoutSetsCompanion({
     this.id = const Value.absent(),
     this.workoutId = const Value.absent(),
@@ -3253,6 +3329,7 @@ class WorkoutSetsCompanion extends UpdateCompanion<WorkoutSet> {
     this.isPr = const Value.absent(),
     this.supersetGroupId = const Value.absent(),
     this.subSetsJson = const Value.absent(),
+    this.isFavorite = const Value.absent(),
   });
   WorkoutSetsCompanion.insert({
     this.id = const Value.absent(),
@@ -3271,6 +3348,7 @@ class WorkoutSetsCompanion extends UpdateCompanion<WorkoutSet> {
     this.isPr = const Value.absent(),
     this.supersetGroupId = const Value.absent(),
     this.subSetsJson = const Value.absent(),
+    this.isFavorite = const Value.absent(),
   })  : workoutId = Value(workoutId),
         exerciseId = Value(exerciseId),
         exerciseOrder = Value(exerciseOrder),
@@ -3294,6 +3372,7 @@ class WorkoutSetsCompanion extends UpdateCompanion<WorkoutSet> {
     Expression<bool>? isPr,
     Expression<String>? supersetGroupId,
     Expression<String>? subSetsJson,
+    Expression<bool>? isFavorite,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -3312,6 +3391,7 @@ class WorkoutSetsCompanion extends UpdateCompanion<WorkoutSet> {
       if (isPr != null) 'is_pr': isPr,
       if (supersetGroupId != null) 'superset_group_id': supersetGroupId,
       if (subSetsJson != null) 'sub_sets_json': subSetsJson,
+      if (isFavorite != null) 'is_favorite': isFavorite,
     });
   }
 
@@ -3331,7 +3411,8 @@ class WorkoutSetsCompanion extends UpdateCompanion<WorkoutSet> {
       Value<DateTime?>? completedAt,
       Value<bool>? isPr,
       Value<String?>? supersetGroupId,
-      Value<String?>? subSetsJson}) {
+      Value<String?>? subSetsJson,
+      Value<bool>? isFavorite}) {
     return WorkoutSetsCompanion(
       id: id ?? this.id,
       workoutId: workoutId ?? this.workoutId,
@@ -3349,6 +3430,7 @@ class WorkoutSetsCompanion extends UpdateCompanion<WorkoutSet> {
       isPr: isPr ?? this.isPr,
       supersetGroupId: supersetGroupId ?? this.supersetGroupId,
       subSetsJson: subSetsJson ?? this.subSetsJson,
+      isFavorite: isFavorite ?? this.isFavorite,
     );
   }
 
@@ -3404,6 +3486,9 @@ class WorkoutSetsCompanion extends UpdateCompanion<WorkoutSet> {
     if (subSetsJson.present) {
       map['sub_sets_json'] = Variable<String>(subSetsJson.value);
     }
+    if (isFavorite.present) {
+      map['is_favorite'] = Variable<bool>(isFavorite.value);
+    }
     return map;
   }
 
@@ -3425,7 +3510,8 @@ class WorkoutSetsCompanion extends UpdateCompanion<WorkoutSet> {
           ..write('completedAt: $completedAt, ')
           ..write('isPr: $isPr, ')
           ..write('supersetGroupId: $supersetGroupId, ')
-          ..write('subSetsJson: $subSetsJson')
+          ..write('subSetsJson: $subSetsJson, ')
+          ..write('isFavorite: $isFavorite')
           ..write(')'))
         .toString();
   }
@@ -6147,9 +6233,9 @@ class $ExerciseEnrichedContentTable extends ExerciseEnrichedContent
   late final GeneratedColumn<int> exerciseId = GeneratedColumn<int>(
       'exercise_id', aliasedName, false,
       type: DriftSqlType.int,
-      requiredDuringInsert: true,
-      defaultConstraints:
-          GeneratedColumn.constraintIsAlways('REFERENCES exercises (id)'));
+      requiredDuringInsert: false,
+      defaultConstraints: GeneratedColumn.constraintIsAlways(
+          'UNIQUE REFERENCES exercises (id)'));
   static const VerificationMeta _safetyTipsMeta =
       const VerificationMeta('safetyTips');
   @override
@@ -6212,8 +6298,6 @@ class $ExerciseEnrichedContentTable extends ExerciseEnrichedContent
           _exerciseIdMeta,
           exerciseId.isAcceptableOrUnknown(
               data['exercise_id']!, _exerciseIdMeta));
-    } else if (isInserting) {
-      context.missing(_exerciseIdMeta);
     }
     if (data.containsKey('safety_tips')) {
       context.handle(
@@ -6255,7 +6339,7 @@ class $ExerciseEnrichedContentTable extends ExerciseEnrichedContent
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => const {};
+  Set<GeneratedColumn> get $primaryKey => {exerciseId};
   @override
   ExerciseEnrichedContentData map(Map<String, dynamic> data,
       {String? tablePrefix}) {
@@ -6461,7 +6545,6 @@ class ExerciseEnrichedContentCompanion
   final Value<String?> enrichedOverview;
   final Value<DateTime?> enrichedAt;
   final Value<String?> enrichmentSource;
-  final Value<int> rowid;
   const ExerciseEnrichedContentCompanion({
     this.exerciseId = const Value.absent(),
     this.safetyTips = const Value.absent(),
@@ -6470,18 +6553,16 @@ class ExerciseEnrichedContentCompanion
     this.enrichedOverview = const Value.absent(),
     this.enrichedAt = const Value.absent(),
     this.enrichmentSource = const Value.absent(),
-    this.rowid = const Value.absent(),
   });
   ExerciseEnrichedContentCompanion.insert({
-    required int exerciseId,
+    this.exerciseId = const Value.absent(),
     this.safetyTips = const Value.absent(),
     this.commonMistakes = const Value.absent(),
     this.variations = const Value.absent(),
     this.enrichedOverview = const Value.absent(),
     this.enrichedAt = const Value.absent(),
     this.enrichmentSource = const Value.absent(),
-    this.rowid = const Value.absent(),
-  }) : exerciseId = Value(exerciseId);
+  });
   static Insertable<ExerciseEnrichedContentData> custom({
     Expression<int>? exerciseId,
     Expression<String>? safetyTips,
@@ -6490,7 +6571,6 @@ class ExerciseEnrichedContentCompanion
     Expression<String>? enrichedOverview,
     Expression<DateTime>? enrichedAt,
     Expression<String>? enrichmentSource,
-    Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (exerciseId != null) 'exercise_id': exerciseId,
@@ -6500,7 +6580,6 @@ class ExerciseEnrichedContentCompanion
       if (enrichedOverview != null) 'enriched_overview': enrichedOverview,
       if (enrichedAt != null) 'enriched_at': enrichedAt,
       if (enrichmentSource != null) 'enrichment_source': enrichmentSource,
-      if (rowid != null) 'rowid': rowid,
     });
   }
 
@@ -6511,8 +6590,7 @@ class ExerciseEnrichedContentCompanion
       Value<String?>? variations,
       Value<String?>? enrichedOverview,
       Value<DateTime?>? enrichedAt,
-      Value<String?>? enrichmentSource,
-      Value<int>? rowid}) {
+      Value<String?>? enrichmentSource}) {
     return ExerciseEnrichedContentCompanion(
       exerciseId: exerciseId ?? this.exerciseId,
       safetyTips: safetyTips ?? this.safetyTips,
@@ -6521,7 +6599,6 @@ class ExerciseEnrichedContentCompanion
       enrichedOverview: enrichedOverview ?? this.enrichedOverview,
       enrichedAt: enrichedAt ?? this.enrichedAt,
       enrichmentSource: enrichmentSource ?? this.enrichmentSource,
-      rowid: rowid ?? this.rowid,
     );
   }
 
@@ -6549,9 +6626,6 @@ class ExerciseEnrichedContentCompanion
     if (enrichmentSource.present) {
       map['enrichment_source'] = Variable<String>(enrichmentSource.value);
     }
-    if (rowid.present) {
-      map['rowid'] = Variable<int>(rowid.value);
-    }
     return map;
   }
 
@@ -6564,8 +6638,7 @@ class ExerciseEnrichedContentCompanion
           ..write('variations: $variations, ')
           ..write('enrichedOverview: $enrichedOverview, ')
           ..write('enrichedAt: $enrichedAt, ')
-          ..write('enrichmentSource: $enrichmentSource, ')
-          ..write('rowid: $rowid')
+          ..write('enrichmentSource: $enrichmentSource')
           ..write(')'))
         .toString();
   }
@@ -7399,6 +7472,7 @@ typedef $$ExercisesTableCreateCompanionBuilder = ExercisesCompanion Function({
   Value<String?> nameHi,
   Value<String?> nameMr,
   Value<DateTime?> lastUsed,
+  Value<int> usageCount,
 });
 typedef $$ExercisesTableUpdateCompanionBuilder = ExercisesCompanion Function({
   Value<int> id,
@@ -7425,6 +7499,7 @@ typedef $$ExercisesTableUpdateCompanionBuilder = ExercisesCompanion Function({
   Value<String?> nameHi,
   Value<String?> nameMr,
   Value<DateTime?> lastUsed,
+  Value<int> usageCount,
 });
 
 final class $$ExercisesTableReferences
@@ -7653,6 +7728,9 @@ class $$ExercisesTableFilterComposer
 
   ColumnFilters<DateTime> get lastUsed => $composableBuilder(
       column: $table.lastUsed, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get usageCount => $composableBuilder(
+      column: $table.usageCount, builder: (column) => ColumnFilters(column));
 
   Expression<bool> templateExercisesRefs(
       Expression<bool> Function($$TemplateExercisesTableFilterComposer f) f) {
@@ -7912,6 +7990,9 @@ class $$ExercisesTableOrderingComposer
 
   ColumnOrderings<DateTime> get lastUsed => $composableBuilder(
       column: $table.lastUsed, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get usageCount => $composableBuilder(
+      column: $table.usageCount, builder: (column) => ColumnOrderings(column));
 }
 
 class $$ExercisesTableAnnotationComposer
@@ -7994,6 +8075,9 @@ class $$ExercisesTableAnnotationComposer
 
   GeneratedColumn<DateTime> get lastUsed =>
       $composableBuilder(column: $table.lastUsed, builder: (column) => column);
+
+  GeneratedColumn<int> get usageCount => $composableBuilder(
+      column: $table.usageCount, builder: (column) => column);
 
   Expression<T> templateExercisesRefs<T extends Object>(
       Expression<T> Function($$TemplateExercisesTableAnnotationComposer a) f) {
@@ -8228,6 +8312,7 @@ class $$ExercisesTableTableManager extends RootTableManager<
             Value<String?> nameHi = const Value.absent(),
             Value<String?> nameMr = const Value.absent(),
             Value<DateTime?> lastUsed = const Value.absent(),
+            Value<int> usageCount = const Value.absent(),
           }) =>
               ExercisesCompanion(
             id: id,
@@ -8254,6 +8339,7 @@ class $$ExercisesTableTableManager extends RootTableManager<
             nameHi: nameHi,
             nameMr: nameMr,
             lastUsed: lastUsed,
+            usageCount: usageCount,
           ),
           createCompanionCallback: ({
             Value<int> id = const Value.absent(),
@@ -8280,6 +8366,7 @@ class $$ExercisesTableTableManager extends RootTableManager<
             Value<String?> nameHi = const Value.absent(),
             Value<String?> nameMr = const Value.absent(),
             Value<DateTime?> lastUsed = const Value.absent(),
+            Value<int> usageCount = const Value.absent(),
           }) =>
               ExercisesCompanion.insert(
             id: id,
@@ -8306,6 +8393,7 @@ class $$ExercisesTableTableManager extends RootTableManager<
             nameHi: nameHi,
             nameMr: nameMr,
             lastUsed: lastUsed,
+            usageCount: usageCount,
           ),
           withReferenceMapper: (p0) => p0
               .map((e) => (
@@ -10217,6 +10305,7 @@ typedef $$WorkoutSetsTableCreateCompanionBuilder = WorkoutSetsCompanion
   Value<bool> isPr,
   Value<String?> supersetGroupId,
   Value<String?> subSetsJson,
+  Value<bool> isFavorite,
 });
 typedef $$WorkoutSetsTableUpdateCompanionBuilder = WorkoutSetsCompanion
     Function({
@@ -10236,6 +10325,7 @@ typedef $$WorkoutSetsTableUpdateCompanionBuilder = WorkoutSetsCompanion
   Value<bool> isPr,
   Value<String?> supersetGroupId,
   Value<String?> subSetsJson,
+  Value<bool> isFavorite,
 });
 
 final class $$WorkoutSetsTableReferences
@@ -10326,6 +10416,9 @@ class $$WorkoutSetsTableFilterComposer
 
   ColumnFilters<String> get subSetsJson => $composableBuilder(
       column: $table.subSetsJson, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<bool> get isFavorite => $composableBuilder(
+      column: $table.isFavorite, builder: (column) => ColumnFilters(column));
 
   $$WorkoutsTableFilterComposer get workoutId {
     final $$WorkoutsTableFilterComposer composer = $composerBuilder(
@@ -10421,6 +10514,9 @@ class $$WorkoutSetsTableOrderingComposer
   ColumnOrderings<String> get subSetsJson => $composableBuilder(
       column: $table.subSetsJson, builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<bool> get isFavorite => $composableBuilder(
+      column: $table.isFavorite, builder: (column) => ColumnOrderings(column));
+
   $$WorkoutsTableOrderingComposer get workoutId {
     final $$WorkoutsTableOrderingComposer composer = $composerBuilder(
         composer: this,
@@ -10513,6 +10609,9 @@ class $$WorkoutSetsTableAnnotationComposer
   GeneratedColumn<String> get subSetsJson => $composableBuilder(
       column: $table.subSetsJson, builder: (column) => column);
 
+  GeneratedColumn<bool> get isFavorite => $composableBuilder(
+      column: $table.isFavorite, builder: (column) => column);
+
   $$WorkoutsTableAnnotationComposer get workoutId {
     final $$WorkoutsTableAnnotationComposer composer = $composerBuilder(
         composer: this,
@@ -10593,6 +10692,7 @@ class $$WorkoutSetsTableTableManager extends RootTableManager<
             Value<bool> isPr = const Value.absent(),
             Value<String?> supersetGroupId = const Value.absent(),
             Value<String?> subSetsJson = const Value.absent(),
+            Value<bool> isFavorite = const Value.absent(),
           }) =>
               WorkoutSetsCompanion(
             id: id,
@@ -10611,6 +10711,7 @@ class $$WorkoutSetsTableTableManager extends RootTableManager<
             isPr: isPr,
             supersetGroupId: supersetGroupId,
             subSetsJson: subSetsJson,
+            isFavorite: isFavorite,
           ),
           createCompanionCallback: ({
             Value<int> id = const Value.absent(),
@@ -10629,6 +10730,7 @@ class $$WorkoutSetsTableTableManager extends RootTableManager<
             Value<bool> isPr = const Value.absent(),
             Value<String?> supersetGroupId = const Value.absent(),
             Value<String?> subSetsJson = const Value.absent(),
+            Value<bool> isFavorite = const Value.absent(),
           }) =>
               WorkoutSetsCompanion.insert(
             id: id,
@@ -10647,6 +10749,7 @@ class $$WorkoutSetsTableTableManager extends RootTableManager<
             isPr: isPr,
             supersetGroupId: supersetGroupId,
             subSetsJson: subSetsJson,
+            isFavorite: isFavorite,
           ),
           withReferenceMapper: (p0) => p0
               .map((e) => (
@@ -12681,14 +12784,13 @@ typedef $$ExerciseBodyPartsTableProcessedTableManager = ProcessedTableManager<
     PrefetchHooks Function({bool exerciseId})>;
 typedef $$ExerciseEnrichedContentTableCreateCompanionBuilder
     = ExerciseEnrichedContentCompanion Function({
-  required int exerciseId,
+  Value<int> exerciseId,
   Value<String?> safetyTips,
   Value<String?> commonMistakes,
   Value<String?> variations,
   Value<String?> enrichedOverview,
   Value<DateTime?> enrichedAt,
   Value<String?> enrichmentSource,
-  Value<int> rowid,
 });
 typedef $$ExerciseEnrichedContentTableUpdateCompanionBuilder
     = ExerciseEnrichedContentCompanion Function({
@@ -12699,7 +12801,6 @@ typedef $$ExerciseEnrichedContentTableUpdateCompanionBuilder
   Value<String?> enrichedOverview,
   Value<DateTime?> enrichedAt,
   Value<String?> enrichmentSource,
-  Value<int> rowid,
 });
 
 final class $$ExerciseEnrichedContentTableReferences extends BaseReferences<
@@ -12907,7 +13008,6 @@ class $$ExerciseEnrichedContentTableTableManager extends RootTableManager<
             Value<String?> enrichedOverview = const Value.absent(),
             Value<DateTime?> enrichedAt = const Value.absent(),
             Value<String?> enrichmentSource = const Value.absent(),
-            Value<int> rowid = const Value.absent(),
           }) =>
               ExerciseEnrichedContentCompanion(
             exerciseId: exerciseId,
@@ -12917,17 +13017,15 @@ class $$ExerciseEnrichedContentTableTableManager extends RootTableManager<
             enrichedOverview: enrichedOverview,
             enrichedAt: enrichedAt,
             enrichmentSource: enrichmentSource,
-            rowid: rowid,
           ),
           createCompanionCallback: ({
-            required int exerciseId,
+            Value<int> exerciseId = const Value.absent(),
             Value<String?> safetyTips = const Value.absent(),
             Value<String?> commonMistakes = const Value.absent(),
             Value<String?> variations = const Value.absent(),
             Value<String?> enrichedOverview = const Value.absent(),
             Value<DateTime?> enrichedAt = const Value.absent(),
             Value<String?> enrichmentSource = const Value.absent(),
-            Value<int> rowid = const Value.absent(),
           }) =>
               ExerciseEnrichedContentCompanion.insert(
             exerciseId: exerciseId,
@@ -12937,7 +13035,6 @@ class $$ExerciseEnrichedContentTableTableManager extends RootTableManager<
             enrichedOverview: enrichedOverview,
             enrichedAt: enrichedAt,
             enrichmentSource: enrichmentSource,
-            rowid: rowid,
           ),
           withReferenceMapper: (p0) => p0
               .map((e) => (

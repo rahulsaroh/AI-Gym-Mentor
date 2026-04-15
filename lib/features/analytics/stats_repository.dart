@@ -129,6 +129,60 @@ class StatsRepository {
         .toList();
   }
 
+  /// Daily Workout Activity (Last 365 Days) for Heatmap
+  Future<Map<DateTime, int>> getDailyWorkoutActivity() async {
+    final now = DateTime.now();
+    final yearAgo = now.subtract(const Duration(days: 365));
+
+    final query = db.select(db.workouts)
+      ..where((t) =>
+          t.date.isBiggerOrEqualValue(yearAgo) &
+          t.status.equals('completed'));
+
+    final workouts = await query.get();
+    final Map<DateTime, int> dailyActivity = {};
+
+    for (final w in workouts) {
+      final day = DateTime(w.date.year, w.date.month, w.date.day);
+      dailyActivity[day] = (dailyActivity[day] ?? 0) + 1;
+    }
+
+    return dailyActivity;
+  }
+
+  /// Weekly Duration Trend (Last 12 Weeks)
+  Future<List<Map<String, dynamic>>> getDurationTrend() async {
+    final now = DateTime.now();
+    final twelveWeeksAgo = now.subtract(const Duration(days: 84));
+
+    final query = db.select(db.workouts)
+      ..where((t) =>
+          t.date.isBiggerOrEqualValue(twelveWeeksAgo) &
+          t.status.equals('completed'));
+
+    final workouts = await query.get();
+    final Map<int, List<int>> weeklyDurations = {};
+
+    for (final w in workouts) {
+      final weekStart = w.date.subtract(Duration(days: w.date.weekday - 1));
+      final key = DateTime(weekStart.year, weekStart.month, weekStart.day)
+          .millisecondsSinceEpoch;
+      
+      weeklyDurations.putIfAbsent(key, () => []).add(w.duration ?? 0);
+    }
+
+    // Average duration in minutes
+    final sortedKeys = weeklyDurations.keys.toList()..sort();
+    return sortedKeys.map((k) {
+      final list = weeklyDurations[k]!;
+      final avg = list.fold(0, (a, b) => a + b) / list.length / 60;
+      return {
+        'date': DateTime.fromMillisecondsSinceEpoch(k),
+        'duration': avg,
+      };
+    }).toList();
+  }
+
   /// Muscle Group Balance (This month vs Last month)
   Future<Map<String, dynamic>> getMuscleBalance() async {
     final now = DateTime.now();
@@ -324,6 +378,45 @@ class StatsRepository {
       if (prs.length >= 10) break;
     }
     return prs;
+  }
+
+  Future<List<Map<String, dynamic>>> getFullPRHistory() async {
+    // PR = a set that was the best at its time of creation
+    // This is computationally expensive to calculate for all time, 
+    // so we'll fetch all sets and simulate the timeline or use a simpler heuristic:
+    // "Current best set for each exercise ever"
+    
+    final query = db.select(db.workoutSets).join([
+      innerJoin(db.workouts, db.workouts.id.equalsExp(db.workoutSets.workoutId)),
+      innerJoin(db.exercises, db.exercises.id.equalsExp(db.workoutSets.exerciseId)),
+    ])
+      ..where(db.workouts.status.equals('completed'))
+      ..orderBy([OrderingTerm.desc(db.workouts.date)]);
+
+    final rows = await query.get();
+    Map<int, Map<String, dynamic>> bests = {};
+
+    for (final row in rows) {
+      final s = row.readTable(db.workoutSets);
+      final ex = row.readTable(db.exercises);
+      final date = row.readTable(db.workouts).date;
+      final rm = s.weight * (1 + s.reps / 30);
+
+      if (!bests.containsKey(ex.id) || rm > bests[ex.id]!['rm']) {
+        bests[ex.id] = {
+          'exerciseId': ex.id,
+          'name': ex.name,
+          'value': '${s.weight}kg x ${s.reps.toInt()}',
+          'rm': rm,
+          'date': date,
+          'primaryMuscle': ex.primaryMuscle,
+        };
+      }
+    }
+
+    final prList = bests.values.toList();
+    prList.sort((a, b) => (b['date'] as DateTime).compareTo(a['date'] as DateTime));
+    return prList;
   }
 }
 

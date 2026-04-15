@@ -10,12 +10,13 @@ class ExerciseDbSeeder {
   static final ExerciseDbSeeder instance = ExerciseDbSeeder._();
   ExerciseDbSeeder._();
 
-  static const String _seedKey = 'exercises_seed_v4'; // Forced re-seed for layout/granularity fixes
+  static const String _seedKey =
+      'exercises_seed_v7'; // Stable seed with Uniqueness Constraints and Cleanup
 
   Future<void> seed([AppDatabase? providedDb]) async {
     final prefs = await SharedPreferences.getInstance();
     if (prefs.getBool(_seedKey) == true) {
-      debugPrint('ExerciseDbSeeder: Already seeded v2, skipping...');
+      debugPrint('ExerciseDbSeeder: Already seeded v5, skipping...');
       return;
     }
 
@@ -24,43 +25,69 @@ class ExerciseDbSeeder {
 
     try {
       // 1. Load Main Exercise Data
-      final jsonString = await rootBundle.loadString('assets/data/exercises.json');
+      final jsonString =
+          await rootBundle.loadString('assets/data/exercises.json');
       final List<dynamic> jsonList = json.decode(jsonString);
       debugPrint('ExerciseDbSeeder: Loaded ${jsonList.length} exercises');
 
       // Refining the approach to allow table linking:
       // We'll insert exercises first in one batch, then muscles/parts/instructions in another.
-      
-      final Map<String, int> sourceIdToDbId = {};
-      
-      // Pass 1: Exercises
-      await database.batch((batch) {
-        for (final item in jsonList) {
-          final primaryMuscles = item['primaryMuscles'] as List<dynamic>? ?? [];
-          final primaryMuscle = primaryMuscles.isNotEmpty ? primaryMuscles.first.toString() : 'Other';
 
-          batch.insert(database.exercises, schema.ExercisesCompanion.insert(
-            exerciseId: Value(item['id']),
-            name: item['name'] ?? 'Unknown',
-            category: Value(item['category'] ?? 'strength'),
-            difficulty: Value(item['difficulty'] ?? 'beginner'),
-            primaryMuscle: primaryMuscle,
-            equipment: item['equipment'] ?? 'None',
-            setType: 'Straight',
-            force: Value(item['force']),
-            mechanic: Value(item['mechanic']),
-            imageUrl: Value(item['imageUrl']),
-            source: Value(item['source'] ?? 'local'),
-          ), mode: InsertMode.insertOrIgnore);
-        }
-      });
-
-      // Retrieve mapping
-      final allRows = await database.select(database.exercises).get();
-      for (var row in allRows) {
+      // Pass 0: Pre-fetch existing exercise_id to ID mapping to maintain stability
+      final Map<String, int> existingIdMap = {};
+      final existingRows = await database.select(database.exercises).get();
+      for (var row in existingRows) {
         if (row.exerciseId != null) {
-          sourceIdToDbId[row.exerciseId!] = row.id;
+          existingIdMap[row.exerciseId!] = row.id;
+        } else {
+          // Fallback for older data without exerciseId
+          existingIdMap[row.name] = row.id;
         }
+      }
+
+      final Map<String, int> sourceIdToDbId = {};
+
+      // Pass 1: Exercises (Upsert Logic)
+      for (final item in jsonList) {
+        final extId = item['id'].toString();
+        final primaryMuscles = item['primaryMuscles'] as List<dynamic>? ?? [];
+        final primaryMuscle = primaryMuscles.isNotEmpty
+            ? primaryMuscles.first.toString()
+            : 'Other';
+
+        final companion = schema.ExercisesCompanion(
+          exerciseId: Value(extId),
+          name: Value(item['name'] ?? 'Unknown'),
+          category: Value(item['category'] ?? 'strength'),
+          difficulty: Value(item['difficulty'] ?? 'beginner'),
+          primaryMuscle: Value(primaryMuscle),
+          equipment: Value(item['equipment'] ?? 'None'),
+          setType: const Value('Straight'),
+          force: Value(item['force']),
+          mechanic: Value(item['mechanic']),
+          imageUrl: Value(item['imageUrl']),
+          gifUrl: Value(item['gifUrl']),
+          source: Value(item['source'] ?? 'local'),
+          nameHi: Value(item['nameHindi']),
+          nameMr: Value(item['nameMarathi']),
+          isEnriched: Value(item['safetyTips'] != null),
+        );
+
+        int dbId;
+        if (existingIdMap.containsKey(extId)) {
+          dbId = existingIdMap[extId]!;
+          await (database.update(database.exercises)
+                ..where((t) => t.id.equals(dbId)))
+              .write(companion);
+        } else if (existingIdMap.containsKey(item['name'])) {
+          dbId = existingIdMap[item['name']]!;
+          await (database.update(database.exercises)
+                ..where((t) => t.id.equals(dbId)))
+              .write(companion);
+        } else {
+          dbId = await database.into(database.exercises).insert(companion);
+        }
+        sourceIdToDbId[extId] = dbId;
       }
 
       // Pass 2: Related Data
@@ -69,47 +96,80 @@ class ExerciseDbSeeder {
           final dbId = sourceIdToDbId[item['id']];
           if (dbId == null) continue;
 
+          // Cleanup existing relations before re-seeding to avoid duplicates in non-unique tables
+          batch.deleteWhere(
+              database.exerciseInstructions, (t) => t.exerciseId.equals(dbId));
+          batch.deleteWhere(
+              database.exerciseMuscles, (t) => t.exerciseId.equals(dbId));
+          batch.deleteWhere(
+              database.exerciseBodyParts, (t) => t.exerciseId.equals(dbId));
+
           // Instructions (New Table)
           final instructions = item['instructions'] as List<dynamic>? ?? [];
           for (int i = 0; i < instructions.length; i++) {
-            batch.insert(database.exerciseInstructions, schema.ExerciseInstructionsCompanion.insert(
-              exerciseId: dbId,
-              stepNumber: i + 1,
-              instructionText: instructions[i].toString(),
-            ));
+            batch.insert(
+                database.exerciseInstructions,
+                schema.ExerciseInstructionsCompanion.insert(
+                  exerciseId: dbId,
+                  stepNumber: i + 1,
+                  instructionText: instructions[i].toString(),
+                ));
           }
 
           // Muscles (Primary)
           final primary = item['primaryMuscles'] as List<dynamic>? ?? [];
           for (var muscle in primary) {
-            batch.insert(database.exerciseMuscles, schema.ExerciseMusclesCompanion.insert(
-              exerciseId: dbId,
-              muscleName: muscle.toString().toLowerCase(),
-              isPrimary: const Value(true),
-            ), mode: InsertMode.insertOrIgnore);
+            batch.insert(
+                database.exerciseMuscles,
+                schema.ExerciseMusclesCompanion.insert(
+                  exerciseId: dbId,
+                  muscleName: muscle.toString().toLowerCase(),
+                  isPrimary: const Value(true),
+                ),
+                mode: InsertMode.insertOrIgnore);
           }
 
           // Muscles (Secondary)
           final secondary = item['secondaryMuscles'] as List<dynamic>? ?? [];
           for (var muscle in secondary) {
-            batch.insert(database.exerciseMuscles, schema.ExerciseMusclesCompanion.insert(
-              exerciseId: dbId,
-              muscleName: muscle.toString().toLowerCase(),
-              isPrimary: const Value(false),
-            ), mode: InsertMode.insertOrIgnore);
+            batch.insert(
+                database.exerciseMuscles,
+                schema.ExerciseMusclesCompanion.insert(
+                  exerciseId: dbId,
+                  muscleName: muscle.toString().toLowerCase(),
+                  isPrimary: const Value(false),
+                ),
+                mode: InsertMode.insertOrIgnore);
           }
 
           // Body Parts (Mapping Logic)
           final bodyParts = _mapMusclesToBodyParts(primary, secondary);
           for (var part in bodyParts) {
-            batch.insert(database.exerciseBodyParts, schema.ExerciseBodyPartsCompanion.insert(
-              exerciseId: dbId,
-              bodyPart: part,
-            ), mode: InsertMode.insertOrIgnore);
+            batch.insert(
+                database.exerciseBodyParts,
+                schema.ExerciseBodyPartsCompanion.insert(
+                  exerciseId: dbId,
+                  bodyPart: part,
+                ),
+                mode: InsertMode.insertOrIgnore);
           }
 
-          // Safety Tips Auto-Extraction (Phase 3.5)
-          _extractAndInsertSafetyTips(database, batch, dbId, item['instructions'] ?? []);
+          // Safety Tips & Enriched Content (Phase 3.5 - High Quality)
+          if (item['safetyTips'] != null) {
+            batch.insert(
+                database.exerciseEnrichedContent,
+                schema.ExerciseEnrichedContentCompanion.insert(
+                  exerciseId: Value(dbId),
+                  safetyTips: Value(jsonEncode(item['safetyTips'])),
+                  commonMistakes: Value(jsonEncode(item['commonMistakes'])),
+                  enrichedAt: Value(DateTime.now()),
+                  enrichmentSource: const Value('llm-gemini-enriched'),
+                ),
+                mode: InsertMode.insertOrReplace);
+          } else {
+            _extractAndInsertSafetyTips(
+                database, batch, dbId, item['instructions'] ?? []);
+          }
         }
       });
 
@@ -123,60 +183,96 @@ class ExerciseDbSeeder {
     }
   }
 
-  void _extractAndInsertSafetyTips(AppDatabase database, Batch batch, int dbId, List instructions) {
+  void _extractAndInsertSafetyTips(
+      AppDatabase database, Batch batch, int dbId, List instructions) {
     const safetyKeywords = [
-      'keep', 'avoid', 'maintain', 'ensure', 'careful', 
-      'slowly', 'controlled', 'breathe', 'neutral', 'straight',
-      'do not', "don't", 'prevent', 'injury'
+      'keep',
+      'avoid',
+      'maintain',
+      'ensure',
+      'careful',
+      'slowly',
+      'controlled',
+      'breathe',
+      'neutral',
+      'straight',
+      'do not',
+      "don't",
+      'prevent',
+      'injury'
     ];
-    
+
     final extractedTips = <String>[];
     for (var instr in instructions) {
       final text = instr.toString();
       final lowerText = text.toLowerCase();
       if (safetyKeywords.any((kw) => lowerText.contains(kw))) {
-        if (text.length < 200) { // Avoid overly long descriptions
+        if (text.length < 200) {
+          // Avoid overly long descriptions
           extractedTips.add(text);
         }
       }
     }
 
     if (extractedTips.isNotEmpty) {
-      batch.insert(database.exerciseEnrichedContent, schema.ExerciseEnrichedContentCompanion.insert(
-        exerciseId: dbId,
-        safetyTips: Value(jsonEncode(extractedTips)),
-        enrichedAt: Value(DateTime.now()),
-        enrichmentSource: const Value('auto_extracted'),
-      ), mode: InsertMode.insertOrReplace);
+      batch.insert(
+          database.exerciseEnrichedContent,
+          schema.ExerciseEnrichedContentCompanion.insert(
+            exerciseId: Value(dbId),
+            safetyTips: Value(jsonEncode(extractedTips)),
+            enrichedAt: Value(DateTime.now()),
+            enrichmentSource: const Value('auto_extracted'),
+          ),
+          mode: InsertMode.insertOrReplace);
     }
   }
 
   List<String> _mapMusclesToBodyParts(List primary, List secondary) {
-    final all = [...primary, ...secondary].map((e) => e.toString().toLowerCase()).toList();
+    final all = [...primary, ...secondary]
+        .map((e) => e.toString().toLowerCase())
+        .toList();
     final parts = <String>{};
 
     for (var m in all) {
-      if (m.contains('pector') || m.contains('chest')) parts.add('Chest');
-      else if (m.contains('lat') || m.contains('rhombo') || m.contains('trape') || m.contains('back')) parts.add('Back');
-      else if (m.contains('deltoid') || m.contains('shoulder')) parts.add('Shoulders');
-      else if (m.contains('bicep')) parts.add('Biceps');
-      else if (m.contains('tricep')) parts.add('Triceps');
-      else if (m.contains('forearm')) parts.add('Arms');
-      else if (m.contains('abdom') || m.contains('core') || m.contains('oblique')) parts.add('Abs');
-      else if (m.contains('quad')) parts.add('Quads');
-      else if (m.contains('hamstr')) parts.add('Hamstrings');
-      else if (m.contains('glute')) parts.add('Glutes');
-      else if (m.contains('calf')) parts.add('Calves');
+      if (m.contains('pector') || m.contains('chest'))
+        parts.add('Chest');
+      else if (m.contains('lat') ||
+          m.contains('rhombo') ||
+          m.contains('trape') ||
+          m.contains('back'))
+        parts.add('Back');
+      else if (m.contains('deltoid') || m.contains('shoulder'))
+        parts.add('Shoulders');
+      else if (m.contains('bicep'))
+        parts.add('Biceps');
+      else if (m.contains('tricep'))
+        parts.add('Triceps');
+      else if (m.contains('forearm'))
+        parts.add('Arms');
+      else if (m.contains('abdom') ||
+          m.contains('core') ||
+          m.contains('oblique'))
+        parts.add('Abs');
+      else if (m.contains('quad'))
+        parts.add('Quads');
+      else if (m.contains('hamstr'))
+        parts.add('Hamstrings');
+      else if (m.contains('glute'))
+        parts.add('Glutes');
+      else if (m.contains('calf'))
+        parts.add('Calves');
       else if (m.contains('leg')) parts.add('Legs');
     }
-    
+
     if (parts.isEmpty) parts.add('Other');
     return parts.toList();
   }
 
-  Future<void> _seedProgressions(AppDatabase database, Map<String, int> sourceIdToDbId) async {
+  Future<void> _seedProgressions(
+      AppDatabase database, Map<String, int> sourceIdToDbId) async {
     try {
-      final jsonString = await rootBundle.loadString('assets/exercise_data/progressions_seed.json');
+      final jsonString = await rootBundle
+          .loadString('assets/exercise_data/progressions_seed.json');
       final List<dynamic> progressions = json.decode(jsonString);
 
       await database.batch((batch) {
@@ -192,16 +288,28 @@ class ExerciseDbSeeder {
               final progDbId = sourceIdToDbId[progSourceId];
 
               if (progDbId != null && position != 0) {
-                batch.insert(database.exerciseProgressions, schema.ExerciseProgressionsCompanion.insert(
-                  exerciseId: baseDbId,
-                  progressionExerciseId: progDbId,
-                  position: position,
-                ), mode: InsertMode.insertOrIgnore);
+                batch.insert(
+                    database.exerciseProgressions,
+                    schema.ExerciseProgressionsCompanion.insert(
+                      exerciseId: baseDbId,
+                      progressionExerciseId: progDbId,
+                      position: position,
+                    ),
+                    mode: InsertMode.insertOrIgnore);
               }
             }
           }
         }
       });
     } catch (_) {}
+  }
+
+  Future<void> reset() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_seedKey);
+    // Also remove any older versions just in case
+    for (int i = 1; i <= 10; i++) {
+      await prefs.remove('exercises_seed_v$i');
+    }
   }
 }

@@ -85,6 +85,44 @@ final class VolumeTrendProvider extends $FunctionalProvider<
 
 String _$volumeTrendHash() => r'a64c01d9c700354b43e62c6464ee636bc52c28b2';
 
+@ProviderFor(durationTrend)
+final durationTrendProvider = DurationTrendProvider._();
+
+final class DurationTrendProvider extends $FunctionalProvider<
+        AsyncValue<List<Map<String, dynamic>>>,
+        List<Map<String, dynamic>>,
+        FutureOr<List<Map<String, dynamic>>>>
+    with
+        $FutureModifier<List<Map<String, dynamic>>>,
+        $FutureProvider<List<Map<String, dynamic>>> {
+  DurationTrendProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'durationTrendProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$durationTrendHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<List<Map<String, dynamic>>> $createElement(
+          $ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<List<Map<String, dynamic>>> create(Ref ref) {
+    return durationTrend(ref);
+  }
+}
+
+String _$durationTrendHash() => r'7a68f9e8f7c586305099cb022e292120333c4b49';
+
 @ProviderFor(frequencyTrend)
 final frequencyTrendProvider = FrequencyTrendProvider._();
 
@@ -122,6 +160,82 @@ final class FrequencyTrendProvider extends $FunctionalProvider<
 }
 
 String _$frequencyTrendHash() => r'5377d5c0eacc71e4b75e313016bc72f21fa933ed';
+
+@ProviderFor(dailyActivity)
+final dailyActivityProvider = DailyActivityProvider._();
+
+final class DailyActivityProvider extends $FunctionalProvider<
+        AsyncValue<List<Map<String, dynamic>>>,
+        List<Map<String, dynamic>>,
+        FutureOr<List<Map<String, dynamic>>>>
+    with
+        $FutureModifier<List<Map<String, dynamic>>>,
+        $FutureProvider<List<Map<String, dynamic>>> {
+  DailyActivityProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'dailyActivityProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$dailyActivityHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<List<Map<String, dynamic>>> $createElement(
+          $ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<List<Map<String, dynamic>>> create(Ref ref) {
+    return dailyActivity(ref);
+  }
+}
+
+String _$dailyActivityHash() => r'29d2e1a88e8a479601c35627d682d0642a11765e';
+
+@ProviderFor(weightTrend)
+final weightTrendProvider = WeightTrendProvider._();
+
+final class WeightTrendProvider extends $FunctionalProvider<
+        AsyncValue<List<Map<String, dynamic>>>,
+        List<Map<String, dynamic>>,
+        FutureOr<List<Map<String, dynamic>>>>
+    with
+        $FutureModifier<List<Map<String, dynamic>>>,
+        $FutureProvider<List<Map<String, dynamic>>> {
+  WeightTrendProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'weightTrendProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$weightTrendHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<List<Map<String, dynamic>>> $createElement(
+          $ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<List<Map<String, dynamic>>> create(Ref ref) {
+    return weightTrend(ref);
+  }
+}
+
+String _$weightTrendHash() => r'b2af1505e8543c2bb30261c4243455785a343e35';
 
 @ProviderFor(muscleBalance)
 final muscleBalanceProvider = MuscleBalanceProvider._();
@@ -236,6 +350,117 @@ final class RecentPRsProvider extends $FunctionalProvider<
 }
 
 String _$recentPRsHash() => r'd130b371b2a845a632292098586dd4184211b1c5';
+
+@ProviderFor(fullPRHistory)
+final fullPRHistoryProvider = FullPRHistoryProvider._();
+
+final class FullPRHistoryProvider extends $FunctionalProvider<
+        AsyncValue<List<Map<String, dynamic>>>,
+        List<Map<String, dynamic>>,
+        FutureOr<List<Map<String, dynamic>>>>
+    with
+        $FutureModifier<List<Map<String, dynamic>>>,
+        $FutureProvider<List<Map<String, dynamic>>> {
+  FullPRHistoryProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'fullPRHistoryProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$fullPRHistoryHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<List<Map<String, dynamic>>> $createElement(
+          $ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<List<Map<String, dynamic>>> create(Ref ref) {
+    return fullPRHistory(ref);
+  }
+}
+
+String _$fullPRHistoryHash() => r'dc8e2c6288fd7d2669d56dcbfe14fbc8470430f7';
+
+@ProviderFor(workoutPRs)
+final workoutPRsProvider = WorkoutPRsFamily._();
+
+final class WorkoutPRsProvider extends $FunctionalProvider<
+        AsyncValue<List<int>>, List<int>, FutureOr<List<int>>>
+    with $FutureModifier<List<int>>, $FutureProvider<List<int>> {
+  WorkoutPRsProvider._(
+      {required WorkoutPRsFamily super.from, required int super.argument})
+      : super(
+          retry: null,
+          name: r'workoutPRsProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$workoutPRsHash();
+
+  @override
+  String toString() {
+    return r'workoutPRsProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $FutureProviderElement<List<int>> $createElement($ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<List<int>> create(Ref ref) {
+    final argument = this.argument as int;
+    return workoutPRs(
+      ref,
+      argument,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is WorkoutPRsProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$workoutPRsHash() => r'8e8372453abb3b0d4b8d9b8da4474b297847236c';
+
+final class WorkoutPRsFamily extends $Family
+    with $FunctionalFamilyOverride<FutureOr<List<int>>, int> {
+  WorkoutPRsFamily._()
+      : super(
+          retry: null,
+          name: r'workoutPRsProvider',
+          dependencies: null,
+          $allTransitiveDependencies: null,
+          isAutoDispose: true,
+        );
+
+  WorkoutPRsProvider call(
+    int workoutId,
+  ) =>
+      WorkoutPRsProvider._(argument: workoutId, from: this);
+
+  @override
+  String toString() => r'workoutPRsProvider';
+}
 
 @ProviderFor(BodyMeasurementsList)
 final bodyMeasurementsListProvider = BodyMeasurementsListProvider._();

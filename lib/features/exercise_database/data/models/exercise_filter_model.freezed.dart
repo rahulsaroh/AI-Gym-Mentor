@@ -20,6 +20,7 @@ mixin _$ExerciseFilter {
   String? get difficulty;
   String? get searchQuery;
   bool get favoritesOnly;
+  bool get sortByUsage;
 
   /// Create a copy of ExerciseFilter
   /// with the given fields replaced by the non-null parameter values.
@@ -45,16 +46,18 @@ mixin _$ExerciseFilter {
             (identical(other.searchQuery, searchQuery) ||
                 other.searchQuery == searchQuery) &&
             (identical(other.favoritesOnly, favoritesOnly) ||
-                other.favoritesOnly == favoritesOnly));
+                other.favoritesOnly == favoritesOnly) &&
+            (identical(other.sortByUsage, sortByUsage) ||
+                other.sortByUsage == sortByUsage));
   }
 
   @override
   int get hashCode => Object.hash(runtimeType, bodyPart, category, equipment,
-      difficulty, searchQuery, favoritesOnly);
+      difficulty, searchQuery, favoritesOnly, sortByUsage);
 
   @override
   String toString() {
-    return 'ExerciseFilter(bodyPart: $bodyPart, category: $category, equipment: $equipment, difficulty: $difficulty, searchQuery: $searchQuery, favoritesOnly: $favoritesOnly)';
+    return 'ExerciseFilter(bodyPart: $bodyPart, category: $category, equipment: $equipment, difficulty: $difficulty, searchQuery: $searchQuery, favoritesOnly: $favoritesOnly, sortByUsage: $sortByUsage)';
   }
 }
 
@@ -70,7 +73,8 @@ abstract mixin class $ExerciseFilterCopyWith<$Res> {
       String? equipment,
       String? difficulty,
       String? searchQuery,
-      bool favoritesOnly});
+      bool favoritesOnly,
+      bool sortByUsage});
 }
 
 /// @nodoc
@@ -92,6 +96,7 @@ class _$ExerciseFilterCopyWithImpl<$Res>
     Object? difficulty = freezed,
     Object? searchQuery = freezed,
     Object? favoritesOnly = null,
+    Object? sortByUsage = null,
   }) {
     return _then(_self.copyWith(
       bodyPart: freezed == bodyPart
@@ -117,6 +122,10 @@ class _$ExerciseFilterCopyWithImpl<$Res>
       favoritesOnly: null == favoritesOnly
           ? _self.favoritesOnly
           : favoritesOnly // ignore: cast_nullable_to_non_nullable
+              as bool,
+      sortByUsage: null == sortByUsage
+          ? _self.sortByUsage
+          : sortByUsage // ignore: cast_nullable_to_non_nullable
               as bool,
     ));
   }
@@ -215,16 +224,28 @@ extension ExerciseFilterPatterns on ExerciseFilter {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
-    TResult Function(String? bodyPart, String? category, String? equipment,
-            String? difficulty, String? searchQuery, bool favoritesOnly)?
+    TResult Function(
+            String? bodyPart,
+            String? category,
+            String? equipment,
+            String? difficulty,
+            String? searchQuery,
+            bool favoritesOnly,
+            bool sortByUsage)?
         $default, {
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
       case _ExerciseFilter() when $default != null:
-        return $default(_that.bodyPart, _that.category, _that.equipment,
-            _that.difficulty, _that.searchQuery, _that.favoritesOnly);
+        return $default(
+            _that.bodyPart,
+            _that.category,
+            _that.equipment,
+            _that.difficulty,
+            _that.searchQuery,
+            _that.favoritesOnly,
+            _that.sortByUsage);
       case _:
         return orElse();
     }
@@ -245,15 +266,27 @@ extension ExerciseFilterPatterns on ExerciseFilter {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
-    TResult Function(String? bodyPart, String? category, String? equipment,
-            String? difficulty, String? searchQuery, bool favoritesOnly)
+    TResult Function(
+            String? bodyPart,
+            String? category,
+            String? equipment,
+            String? difficulty,
+            String? searchQuery,
+            bool favoritesOnly,
+            bool sortByUsage)
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _ExerciseFilter():
-        return $default(_that.bodyPart, _that.category, _that.equipment,
-            _that.difficulty, _that.searchQuery, _that.favoritesOnly);
+        return $default(
+            _that.bodyPart,
+            _that.category,
+            _that.equipment,
+            _that.difficulty,
+            _that.searchQuery,
+            _that.favoritesOnly,
+            _that.sortByUsage);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -273,15 +306,27 @@ extension ExerciseFilterPatterns on ExerciseFilter {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
-    TResult? Function(String? bodyPart, String? category, String? equipment,
-            String? difficulty, String? searchQuery, bool favoritesOnly)?
+    TResult? Function(
+            String? bodyPart,
+            String? category,
+            String? equipment,
+            String? difficulty,
+            String? searchQuery,
+            bool favoritesOnly,
+            bool sortByUsage)?
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _ExerciseFilter() when $default != null:
-        return $default(_that.bodyPart, _that.category, _that.equipment,
-            _that.difficulty, _that.searchQuery, _that.favoritesOnly);
+        return $default(
+            _that.bodyPart,
+            _that.category,
+            _that.equipment,
+            _that.difficulty,
+            _that.searchQuery,
+            _that.favoritesOnly,
+            _that.sortByUsage);
       case _:
         return null;
     }
@@ -297,7 +342,8 @@ class _ExerciseFilter extends ExerciseFilter {
       this.equipment = null,
       this.difficulty = null,
       this.searchQuery = null,
-      this.favoritesOnly = false})
+      this.favoritesOnly = false,
+      this.sortByUsage = false})
       : super._();
 
   @override
@@ -318,6 +364,9 @@ class _ExerciseFilter extends ExerciseFilter {
   @override
   @JsonKey()
   final bool favoritesOnly;
+  @override
+  @JsonKey()
+  final bool sortByUsage;
 
   /// Create a copy of ExerciseFilter
   /// with the given fields replaced by the non-null parameter values.
@@ -343,16 +392,18 @@ class _ExerciseFilter extends ExerciseFilter {
             (identical(other.searchQuery, searchQuery) ||
                 other.searchQuery == searchQuery) &&
             (identical(other.favoritesOnly, favoritesOnly) ||
-                other.favoritesOnly == favoritesOnly));
+                other.favoritesOnly == favoritesOnly) &&
+            (identical(other.sortByUsage, sortByUsage) ||
+                other.sortByUsage == sortByUsage));
   }
 
   @override
   int get hashCode => Object.hash(runtimeType, bodyPart, category, equipment,
-      difficulty, searchQuery, favoritesOnly);
+      difficulty, searchQuery, favoritesOnly, sortByUsage);
 
   @override
   String toString() {
-    return 'ExerciseFilter(bodyPart: $bodyPart, category: $category, equipment: $equipment, difficulty: $difficulty, searchQuery: $searchQuery, favoritesOnly: $favoritesOnly)';
+    return 'ExerciseFilter(bodyPart: $bodyPart, category: $category, equipment: $equipment, difficulty: $difficulty, searchQuery: $searchQuery, favoritesOnly: $favoritesOnly, sortByUsage: $sortByUsage)';
   }
 }
 
@@ -370,7 +421,8 @@ abstract mixin class _$ExerciseFilterCopyWith<$Res>
       String? equipment,
       String? difficulty,
       String? searchQuery,
-      bool favoritesOnly});
+      bool favoritesOnly,
+      bool sortByUsage});
 }
 
 /// @nodoc
@@ -392,6 +444,7 @@ class __$ExerciseFilterCopyWithImpl<$Res>
     Object? difficulty = freezed,
     Object? searchQuery = freezed,
     Object? favoritesOnly = null,
+    Object? sortByUsage = null,
   }) {
     return _then(_ExerciseFilter(
       bodyPart: freezed == bodyPart
@@ -417,6 +470,10 @@ class __$ExerciseFilterCopyWithImpl<$Res>
       favoritesOnly: null == favoritesOnly
           ? _self.favoritesOnly
           : favoritesOnly // ignore: cast_nullable_to_non_nullable
+              as bool,
+      sortByUsage: null == sortByUsage
+          ? _self.sortByUsage
+          : sortByUsage // ignore: cast_nullable_to_non_nullable
               as bool,
     ));
   }

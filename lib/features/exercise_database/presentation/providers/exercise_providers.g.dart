@@ -83,7 +83,7 @@ final class ExerciseListProvider
   ExerciseList create() => ExerciseList();
 }
 
-String _$exerciseListHash() => r'88ce6e8de9525a8061f57f51c6a4fd28e208e13d';
+String _$exerciseListHash() => r'cb0dfea486035165ec3b73d5ba4ad394d00420d3';
 
 abstract class _$ExerciseList extends $AsyncNotifier<List<ExerciseEntity>> {
   FutureOr<List<ExerciseEntity>> build();
@@ -382,3 +382,82 @@ final class AllExercisesProvider extends $FunctionalProvider<
 }
 
 String _$allExercisesHash() => r'8a0630411988eb9ada499861829028912caa9ca5';
+
+@ProviderFor(searchSuggestions)
+final searchSuggestionsProvider = SearchSuggestionsFamily._();
+
+final class SearchSuggestionsProvider extends $FunctionalProvider<
+        AsyncValue<List<ExerciseEntity>>,
+        List<ExerciseEntity>,
+        FutureOr<List<ExerciseEntity>>>
+    with
+        $FutureModifier<List<ExerciseEntity>>,
+        $FutureProvider<List<ExerciseEntity>> {
+  SearchSuggestionsProvider._(
+      {required SearchSuggestionsFamily super.from,
+      required String super.argument})
+      : super(
+          retry: null,
+          name: r'searchSuggestionsProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$searchSuggestionsHash();
+
+  @override
+  String toString() {
+    return r'searchSuggestionsProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $FutureProviderElement<List<ExerciseEntity>> $createElement(
+          $ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<List<ExerciseEntity>> create(Ref ref) {
+    final argument = this.argument as String;
+    return searchSuggestions(
+      ref,
+      argument,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is SearchSuggestionsProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$searchSuggestionsHash() => r'0172dc89113bb0d075511300572663a3e59350a8';
+
+final class SearchSuggestionsFamily extends $Family
+    with $FunctionalFamilyOverride<FutureOr<List<ExerciseEntity>>, String> {
+  SearchSuggestionsFamily._()
+      : super(
+          retry: null,
+          name: r'searchSuggestionsProvider',
+          dependencies: null,
+          $allTransitiveDependencies: null,
+          isAutoDispose: true,
+        );
+
+  SearchSuggestionsProvider call(
+    String query,
+  ) =>
+      SearchSuggestionsProvider._(argument: query, from: this);
+
+  @override
+  String toString() => r'searchSuggestionsProvider';
+}

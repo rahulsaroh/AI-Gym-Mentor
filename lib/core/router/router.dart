@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ai_gym_mentor/features/workout/workout_screen.dart';
+import 'package:ai_gym_mentor/features/exercise_database/domain/entities/exercise_entity.dart';
 import 'package:ai_gym_mentor/features/shell/placeholder_screens.dart'
     hide
         SplashScreen,
@@ -29,6 +30,9 @@ import 'package:ai_gym_mentor/features/programs/programs_screen.dart';
 import 'package:ai_gym_mentor/features/programs/create_edit_program_screen.dart';
 import 'package:ai_gym_mentor/features/programs/program_details_screen.dart';
 import 'package:ai_gym_mentor/features/workout/start_workout_screen.dart';
+import 'package:ai_gym_mentor/features/exercise_database/presentation/screens/github_exercise_library_screen.dart';
+import 'package:ai_gym_mentor/features/exercise_database/presentation/screens/github_exercise_detail_screen.dart';
+import 'package:ai_gym_mentor/services/github_exercise_service.dart';
 
 final router = GoRouter(
   initialLocation: '/',
@@ -79,8 +83,8 @@ final router = GoRouter(
         ),
         GoRoute(
           path: 'create',
-          builder: (context, state) =>
-              const ExerciseDetailScreen(exerciseId: 0),
+          builder: (context, state) => ExerciseDetailScreen(
+              exerciseId: 0, templateExercise: state.extra as ExerciseEntity?),
         ),
         GoRoute(
           path: ':id',
@@ -96,18 +100,36 @@ final router = GoRouter(
         GoRoute(
           path: ':id/edit',
           builder: (context, state) {
-            final id =
-                int.tryParse(state.pathParameters['id'] ?? '0') ?? 0;
-            return ExerciseDetailScreen(
-                exerciseId: id, isEditing: true);
+            final id = int.tryParse(state.pathParameters['id'] ?? '0') ?? 0;
+            return ExerciseDetailScreen(exerciseId: id, isEditing: true);
           },
         ),
         GoRoute(
           path: 'history/:id',
           builder: (context, state) {
-            final id =
-                int.tryParse(state.pathParameters['id'] ?? '0') ?? 0;
+            final id = int.tryParse(state.pathParameters['id'] ?? '0') ?? 0;
             return ExerciseHistoryScreen(exerciseId: id);
+          },
+        ),
+      ],
+    ),
+    // GitHub Exercise Library
+    GoRoute(
+      path: '/exercise-library',
+      builder: (context, state) => const GithubExerciseLibraryScreen(),
+      routes: [
+        GoRoute(
+          path: 'details',
+          builder: (context, state) {
+            final exercise = state.extra as GithubExercise?;
+            if (exercise == null) {
+              return const Scaffold(
+                body: Center(
+                  child: Text('Exercise not found'),
+                ),
+              );
+            }
+            return GithubExerciseDetailScreen(exercise: exercise);
           },
         ),
       ],
@@ -212,4 +234,3 @@ final router = GoRouter(
     ),
   ],
 );
-

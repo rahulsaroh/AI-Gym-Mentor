@@ -13,6 +13,9 @@ import 'package:ai_gym_mentor/features/workout/components/begin_session_sheet.da
 import 'package:ai_gym_mentor/services/plateau_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ai_gym_mentor/features/workout/workout_repository.dart';
+import 'package:ai_gym_mentor/features/analytics/presentation/widgets/stats_trend_chart.dart';
+import 'package:ai_gym_mentor/features/analytics/presentation/widgets/workout_heatmap.dart';
+import 'package:ai_gym_mentor/features/analytics/analytics_providers.dart';
 
 import 'package:ai_gym_mentor/core/widgets/skeleton_card.dart';
 
@@ -37,6 +40,7 @@ class WorkoutHomeScreen extends ConsumerWidget {
                   _TodayPlanSection(state: state),
                   _QuickActionSection(),
                   _LastWorkoutSection(state: state),
+                  _ConsistencySection(),
                   _WeeklyVolumeSection(state: state),
                   _BodyweightSection(state: state),
                   _MotivationSection(state: state),
@@ -699,85 +703,70 @@ class _WeeklyVolumeSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SliverToBoxAdapter(
-      child: RepaintBoundary(
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'This Week\'s Volume',
-                style: GoogleFonts.outfit(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 20),
-              SizedBox(
-                height: 120,
-                child: BarChart(
-                  BarChartData(
-                    alignment: BarChartAlignment.spaceAround,
-                    maxY: 5000, // Adjust based on data
-                    barTouchData: BarTouchData(enabled: false),
-                    titlesData: FlTitlesData(
-                      show: true,
-                      bottomTitles: AxisTitles(
-                        sideTitles: SideTitles(
-                          showTitles: true,
-                          getTitlesWidget: (value, meta) {
-                            const days = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
-                            return Padding(
-                              padding: const EdgeInsets.only(top: 8.0),
-                              child: Text(days[value.toInt()]),
-                            );
-                          },
-                        ),
-                      ),
-                      leftTitles: const AxisTitles(
-                          sideTitles: SideTitles(showTitles: false)),
-                      rightTitles: const AxisTitles(
-                          sideTitles: SideTitles(showTitles: false)),
-                      topTitles: const AxisTitles(
-                          sideTitles: SideTitles(showTitles: false)),
-                    ),
-                    gridData: const FlGridData(show: false),
-                    borderData: FlBorderData(show: false),
-                    barGroups: List.generate(7, (i) {
-                      final day = DateTime.now().subtract(
-                          Duration(days: DateTime.now().weekday - 1 - i));
-                      final dayKey = DateTime(day.year, day.month, day.day)
-                          .millisecondsSinceEpoch;
-                      final volume = state.weeklyVolume[dayKey] ?? 0;
+    // Convert weeklyVolume map to the format expected by StatsTrendChart
+    final sortedKeys = state.weeklyVolume.keys.toList()..sort();
+    final chartData = sortedKeys.map((k) => {
+      'date': DateTime.fromMillisecondsSinceEpoch(k),
+      'volume': state.weeklyVolume[k],
+    }).toList();
 
-                      return BarChartGroupData(
-                        x: i,
-                        barRods: [
-                          BarChartRodData(
-                            toY: volume,
-                            color: (i == DateTime.now().weekday - 1
-                                ? Theme.of(context).colorScheme.primary
-                                : Theme.of(context)
-                                    .colorScheme
-                                    .surfaceContainerHighest)
-                        .withValues(alpha: 0.8),
-                            width: 16,
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                        ],
-                      );
-                    }),
+    return SliverToBoxAdapter(
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Volume Progression',
+              style: GoogleFonts.outfit(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 16),
+            StatsTrendChart(data: chartData, type: StatType.volume),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ConsistencySection extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final activityAsync = ref.watch(dailyActivityProvider);
+
+    return SliverToBoxAdapter(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 20),
+        child: activityAsync.when(
+          data: (activity) {
+            // Convert list to map for Heatmap
+            final activityMap = {
+              for (var item in activity) 
+                item['date'] as DateTime : item['count'] as int
+            };
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Text(
+                    'Consistency',
+                    style: GoogleFonts.outfit(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Total this week: ${state.weeklyVolume.values.fold(0.0, (a, b) => a + b).toStringAsFixed(0)} kg',
-                style: const TextStyle(color: Colors.grey, fontSize: 12),
-              ),
-            ],
-          ),
+                const SizedBox(height: 16),
+                WorkoutHeatmap(activity: activityMap),
+              ],
+            );
+          },
+          loading: () => const SizedBox(height: 150),
+          error: (_, __) => const SizedBox.shrink(),
         ),
       ),
     );

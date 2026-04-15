@@ -99,7 +99,7 @@ void main() {
         await db.into(db.workoutSets).insert(WorkoutSetsCompanion.insert(
               workoutId: workoutId,
               exerciseId: te.exercise.id,
-              exerciseOrder: te.templateExercise.order,
+              exerciseOrder: te.order,
               setNumber: s,
               reps: 10,
               weight: 60.0,

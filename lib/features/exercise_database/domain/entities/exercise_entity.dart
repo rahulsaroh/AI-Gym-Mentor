@@ -34,6 +34,7 @@ class ExerciseEntity {
   final String source;
   final bool isCustom;
   final DateTime? lastUsed;
+  final int usageCount;
 
   const ExerciseEntity({
     required this.id,
@@ -67,6 +68,7 @@ class ExerciseEntity {
     this.source = 'local',
     this.isCustom = false,
     this.lastUsed,
+    this.usageCount = 0,
   });
 
   factory ExerciseEntity.fromJson(Map<String, dynamic> json) {
@@ -79,6 +81,7 @@ class ExerciseEntity {
       primaryMuscles: List<String>.from(json['primaryMuscles'] ?? []),
       instructions: List<String>.from(json['instructions'] ?? []),
       imageUrls: List<String>.from(json['imageUrls'] ?? []),
+      usageCount: json['usageCount'] as int? ?? 0,
     );
   }
 
@@ -92,6 +95,7 @@ class ExerciseEntity {
       'primaryMuscles': primaryMuscles,
       'instructions': instructions,
       'imageUrls': imageUrls,
+      'usageCount': usageCount,
     };
   }
 
@@ -143,6 +147,7 @@ class ExerciseEntity {
     String? source,
     bool? isCustom,
     DateTime? lastUsed,
+    int? usageCount,
   }) {
     return ExerciseEntity(
       id: id ?? this.id,
@@ -176,6 +181,7 @@ class ExerciseEntity {
       source: source ?? this.source,
       isCustom: isCustom ?? this.isCustom,
       lastUsed: lastUsed ?? this.lastUsed,
+      usageCount: usageCount ?? this.usageCount,
     );
   }
 }

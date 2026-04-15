@@ -14,9 +14,15 @@ class ExerciseLocalDatasource {
     String? category,
     String? equipment,
     String? level,
+    String? searchQuery,
     bool favoritesOnly = false,
+    bool sortByUsage = false,
   }) async {
     final query = _db.select(_db.exercises);
+
+    if (searchQuery != null && searchQuery.isNotEmpty) {
+      query.where((t) => t.name.contains(searchQuery));
+    }
 
     if (category != null) {
       query.where((t) => t.category.lower().equals(category.toLowerCase()));
@@ -43,7 +49,11 @@ class ExerciseLocalDatasource {
     }
 
     query.limit(pageSize, offset: page * pageSize);
-    query.orderBy([(t) => OrderingTerm(expression: t.name)]);
+    if (sortByUsage) {
+      query.orderBy([(t) => OrderingTerm(expression: t.usageCount, mode: OrderingMode.desc)]);
+    } else {
+      query.orderBy([(t) => OrderingTerm(expression: t.name)]);
+    }
 
     return await query.get();
   }
@@ -71,8 +81,9 @@ class ExerciseLocalDatasource {
 
   Future<ExerciseEnrichedContentData?> getEnrichedContent(int exerciseId) async {
     return await (_db.select(_db.exerciseEnrichedContent)
-      ..where((t) => t.exerciseId.equals(exerciseId)))
-      .getSingleOrNull();
+          ..where((t) => t.exerciseId.equals(exerciseId)))
+        .get()
+        .then((rows) => rows.isNotEmpty ? rows.first : null);
   }
 
   Future<List<ExerciseTable>> getRelatedExercises(int exerciseId, {int limit = 8}) async {
@@ -144,6 +155,13 @@ class ExerciseLocalDatasource {
 
   Future<void> toggleFavorite(int exerciseId, bool isFavorite) async {
     await updateExercise(exerciseId, ExercisesCompanion(isFavorite: Value(isFavorite)));
+  }
+
+  Future<void> incrementUsageCount(int exerciseId) async {
+    final row = await getExerciseById(exerciseId);
+    if (row != null) {
+      await updateExercise(exerciseId, ExercisesCompanion(usageCount: Value(row.usageCount + 1)));
+    }
   }
 
   Future<void> updateExercise(int id, ExercisesCompanion companion) async {
@@ -303,5 +321,17 @@ class ExerciseLocalDatasource {
     }
 
     return result;
+  }
+
+  Future<void> clearAllExercises() async {
+    await _db.transaction(() async {
+      await _db.delete(_db.exerciseEnrichedContent).go();
+      await _db.delete(_db.exerciseMuscles).go();
+      await _db.delete(_db.exerciseBodyParts).go();
+      await _db.delete(_db.exerciseInstructions).go();
+      await _db.delete(_db.exerciseProgressions).go();
+      await _db.delete(_db.recentExercises).go();
+      await _db.delete(_db.exercises).go();
+    });
   }
 }

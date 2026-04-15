@@ -40,7 +40,9 @@ class ExerciseList extends _$ExerciseList {
       category: filter.category,
       equipment: filter.equipment,
       difficulty: filter.difficulty,
+      searchQuery: filter.searchQuery,
       favoritesOnly: filter.favoritesOnly,
+      sortByUsage: filter.sortByUsage,
     );
   }
 
@@ -120,4 +122,9 @@ class FavoriteToggle extends _$FavoriteToggle {
 @riverpod
 Future<List<ExerciseEntity>> allExercises(Ref ref) {
   return ref.read(exerciseRepositoryProvider).getAllExercises();
+}
+@riverpod
+Future<List<ExerciseEntity>> searchSuggestions(Ref ref, String query) async {
+  if (query.length < 2) return [];
+  return ref.read(exerciseRepositoryProvider).searchExercises(query, limit: 5);
 }

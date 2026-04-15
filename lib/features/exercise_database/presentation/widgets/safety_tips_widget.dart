@@ -26,23 +26,44 @@ class SafetyTipsWidget extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.amber.withValues(alpha: 0.05),
-        borderRadius: BorderRadius.circular(12),
-        border: const Border(
-          left: BorderSide(color: Colors.amber, width: 4),
+        gradient: LinearGradient(
+          colors: [
+            Colors.amber.withValues(alpha: 0.1),
+            Colors.amber.withValues(alpha: 0.02),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
         ),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.amber.withValues(alpha: 0.2)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.amber.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(LucideIcons.shieldAlert, size: 18, color: Colors.amber),
-          const SizedBox(width: 12),
+          Container(
+            padding: const EdgeInsets.all(6),
+            decoration: BoxDecoration(
+              color: Colors.amber.withValues(alpha: 0.1),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(LucideIcons.shieldAlert, size: 16, color: Colors.amber),
+          ),
+          const SizedBox(width: 14),
           Expanded(
             child: Text(
               tip,
               style: const TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
-                height: 1.4,
+                height: 1.5,
+                letterSpacing: 0.1,
               ),
             ),
           ),

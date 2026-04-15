@@ -120,23 +120,58 @@ class _ExercisePickerOverlayState extends ConsumerState<ExercisePickerOverlay> {
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                child: TextField(
-                  controller: _searchController,
-                  onChanged: _onSearchChanged,
-                  decoration: InputDecoration(
-                    hintText: 'Search movements...',
-                    prefixIcon: Icon(LucideIcons.search, size: 18, color: Theme.of(context).colorScheme.primary),
-                    filled: true,
-                    fillColor: Theme.of(context)
-                        .colorScheme
-                        .surfaceVariant
-                        .withValues(alpha: 0.3),
-                    contentPadding: const EdgeInsets.symmetric(vertical: 12),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      borderSide: BorderSide.none,
+                child: Column(
+                  children: [
+                    TextField(
+                      controller: _searchController,
+                      onChanged: _onSearchChanged,
+                      decoration: InputDecoration(
+                        hintText: 'Search movements...',
+                        prefixIcon: Icon(LucideIcons.search, size: 18, color: Theme.of(context).colorScheme.primary),
+                        filled: true,
+                        fillColor: Theme.of(context)
+                            .colorScheme
+                            .surfaceVariant
+                            .withValues(alpha: 0.3),
+                        contentPadding: const EdgeInsets.symmetric(vertical: 12),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
                     ),
-                  ),
+                    // Live Suggestions
+                    if (_searchController.text.length >= 2)
+                      Consumer(
+                        builder: (context, ref, child) {
+                          final suggestionsAsync = ref.watch(searchSuggestionsProvider(_searchController.text));
+                          return suggestionsAsync.when(
+                            data: (suggestions) {
+                              if (suggestions.isEmpty) return const SizedBox.shrink();
+                              return Container(
+                                margin: const EdgeInsets.only(top: 8),
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context).colorScheme.surfaceVariant.withValues(alpha: 0.2),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Column(
+                                  children: suggestions.map((s) => ListTile(
+                                    dense: true,
+                                    title: Text(s.name, style: const TextStyle(fontSize: 13)),
+                                    onTap: () {
+                                      _searchController.text = s.name;
+                                      _onSearchChanged(s.name);
+                                    },
+                                  )).toList(),
+                                ),
+                              );
+                            },
+                            loading: () => const SizedBox.shrink(),
+                            error: (_, __) => const SizedBox.shrink(),
+                          );
+                        },
+                      ),
+                  ],
                 ),
               ),
               const SizedBox(height: 16),

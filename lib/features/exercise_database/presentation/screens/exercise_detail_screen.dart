@@ -19,11 +19,13 @@ import 'package:ai_gym_mentor/l10n/app_localizations.dart';
 class ExerciseDetailScreen extends ConsumerStatefulWidget {
   final int exerciseId;
   final bool isEditing;
+  final ExerciseEntity? templateExercise;
 
   const ExerciseDetailScreen({
     super.key,
     required this.exerciseId,
     this.isEditing = false,
+    this.templateExercise,
   });
 
   @override
@@ -163,39 +165,23 @@ class _ExerciseDetailScreenState extends ConsumerState<ExerciseDetailScreen> wit
       ],
       flexibleSpace: FlexibleSpaceBar(
         stretchModes: const [StretchMode.zoomBackground, StretchMode.blurBackground],
-        background: Stack(
-          fit: StackFit.expand,
-          children: [
-            GestureDetector(
-              onTap: () => _showFullScreenMedia(context, exercise, isOffline),
-              child: Hero(
+        background: GestureDetector(
+          onTap: () => _showFullScreenMedia(context, exercise, isOffline),
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              Hero(
                 tag: 'ex_${exercise.id}',
                 child: exercise.gifUrl != null && !isOffline
                     ? CachedNetworkImage(
                         imageUrl: exercise.gifUrl!,
                         fit: BoxFit.cover,
-                        placeholder: (_, __) => Container(color: Colors.grey.shade900),
+                        placeholder: (_, __) => _buildImagePlaceholder(context),
+                        errorWidget: (context, url, error) => _buildMediaFallback(context, exercise, isOffline),
                       )
-                    : exercise.imageUrls.isNotEmpty
-                        ? CachedNetworkImage(
-                            imageUrl: exercise.imageUrls.first,
-                            fit: BoxFit.cover,
-                          )
-                        : Container(
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: [Theme.of(context).colorScheme.primary, Theme.of(context).colorScheme.secondary],
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                              ),
-                            ),
-                            child: Center(
-                              child: Icon(LucideIcons.dumbbell, size: 80, color: Colors.white.withValues(alpha: 0.2)),
-                            ),
-                          ),
+                    : _buildMediaFallback(context, exercise, isOffline),
               ),
-            ),
-            DecoratedBox(
+              DecoratedBox(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
@@ -256,12 +242,23 @@ class _ExerciseDetailScreenState extends ConsumerState<ExerciseDetailScreen> wit
                       ),
                     ),
                   const SizedBox(height: 4),
-                  Text(
-                    '${exercise.equipment} • ${exercise.mechanic ?? "Compound"}',
-                    style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.7),
-                      fontSize: 14,
-                    ),
+                  Row(
+                    children: [
+                      Text(
+                        '${exercise.equipment} • ',
+                        style: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.7),
+                          fontSize: 14,
+                        ),
+                      ),
+                      if (exercise.mechanic != null)
+                        _PremiumDetailTypeTag(type: exercise.mechanic!),
+                      if (exercise.category.toLowerCase().contains('cardio'))
+                        Padding(
+                          padding: const EdgeInsets.only(left: 8.0),
+                          child: _PremiumDetailTypeTag(type: 'Cardio', color: Colors.blue),
+                        ),
+                    ],
                   ),
                 ],
               ),
@@ -269,8 +266,9 @@ class _ExerciseDetailScreenState extends ConsumerState<ExerciseDetailScreen> wit
           ],
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildOverviewTab(ExerciseEntity exercise) {
     final l10n = AppLocalizations.of(context)!;
@@ -460,13 +458,27 @@ class _ExerciseDetailScreenState extends ConsumerState<ExerciseDetailScreen> wit
           ),
           const SizedBox(width: 12),
           Expanded(
-            child: OutlinedButton(
+            child: OutlinedButton.icon(
               onPressed: () => context.push('/exercises/history/${exercise.id}'),
+              icon: const Icon(LucideIcons.history, size: 16),
+              label: Text(AppLocalizations.of(context)!.log_exercise, style: const TextStyle(fontWeight: FontWeight.bold)),
               style: OutlinedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               ),
-              child: Text(AppLocalizations.of(context)!.log_exercise, style: const TextStyle(fontWeight: FontWeight.bold)),
+            ),
+          ),
+          const SizedBox(width: 12),
+          IconButton.filledTonal(
+            onPressed: () {
+              // Copy to new workout/custom exercise
+              context.push('/exercises/create', extra: exercise);
+            },
+            icon: const Icon(LucideIcons.copy),
+            tooltip: 'Copy to Custom',
+            style: IconButton.styleFrom(
+              padding: const EdgeInsets.all(16),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             ),
           ),
         ],
@@ -550,7 +562,7 @@ class _ExerciseDetailScreenState extends ConsumerState<ExerciseDetailScreen> wit
               children: [
                 ListTile(
                   leading: CircleAvatar(
-                    backgroundColor: isCurrent ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.surfaceVariant,
+                    backgroundColor: isCurrent ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.surfaceContainerHighest,
                     child: Icon(
                       isCurrent ? Icons.check : LucideIcons.chevronRight,
                       size: 16,
@@ -573,6 +585,45 @@ class _ExerciseDetailScreenState extends ConsumerState<ExerciseDetailScreen> wit
       },
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (_, __) => const SizedBox.shrink(),
+    );
+  }
+
+  Widget _buildImagePlaceholder(BuildContext context) {
+    return Container(
+      color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+      child: Center(
+        child: CircularProgressIndicator(
+          strokeWidth: 2,
+          color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.5),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMediaFallback(BuildContext context, ExerciseEntity exercise, bool isOffline) {
+    if (exercise.imageUrls.isNotEmpty && !isOffline) {
+      return CachedNetworkImage(
+        imageUrl: exercise.imageUrls.first,
+        fit: BoxFit.cover,
+        placeholder: (_, __) => _buildImagePlaceholder(context),
+        errorWidget: (context, url, error) => _buildMuscleIconPlaceholder(context),
+      );
+    }
+    return _buildMuscleIconPlaceholder(context);
+  }
+
+  Widget _buildMuscleIconPlaceholder(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Theme.of(context).colorScheme.primary, Theme.of(context).colorScheme.secondary],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+      ),
+      child: Center(
+        child: Icon(LucideIcons.dumbbell, size: 80, color: Colors.white.withValues(alpha: 0.2)),
+      ),
     );
   }
 
@@ -613,7 +664,7 @@ class _ExerciseDetailScreenState extends ConsumerState<ExerciseDetailScreen> wit
       ),
       child: Column(
         children: [
-          Icon(LucideIcons.helpCircle, size: 48, color: Theme.of(context).colorScheme.outline),
+          Icon(LucideIcons.info, size: 48, color: Theme.of(context).colorScheme.outline),
           const SizedBox(height: 16),
           const Text(
             'Demonstration Instructions Missing',
@@ -723,9 +774,54 @@ class _ExerciseDetailScreenState extends ConsumerState<ExerciseDetailScreen> wit
   }
 
   Widget _buildFormScreen(ExerciseEntity exercise) {
+    // If copying, use templateExercise instead of the blank one
+    final displayEx = widget.templateExercise ?? exercise;
+    
     return Scaffold(
-      appBar: AppBar(title: const Text('Edit Exercise')),
-      body: const Center(child: Text('Editor Mode - To be enhanced')),
+      appBar: AppBar(
+        title: Text(widget.exerciseId == 0 ? 'Create Custom Exercise' : 'Edit Exercise'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              // TODO: Implement save logic
+              context.pop();
+            },
+            child: const Text('Save', style: TextStyle(fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
+      body: ListView(
+        padding: const EdgeInsets.all(20),
+        children: [
+          _buildFormSection('Exercise Name'),
+          TextFormField(
+            initialValue: displayEx.name,
+            decoration: const InputDecoration(hintText: 'e.g. Diamond Pushups'),
+          ),
+          const SizedBox(height: 20),
+          _buildFormSection('Category'),
+          DropdownButtonFormField<String>(
+            value: displayEx.category,
+            items: ['Strength', 'Cardio', 'Flexibility'].map((c) => 
+              DropdownMenuItem(value: c, child: Text(c))).toList(),
+            onChanged: (val) {},
+          ),
+          const SizedBox(height: 20),
+          _buildFormSection('Primary Muscle'),
+          TextFormField(
+            initialValue: displayEx.primaryMuscles.isNotEmpty ? displayEx.primaryMuscles.first : '',
+            decoration: const InputDecoration(hintText: 'e.g. Chest'),
+          ),
+          const SizedBox(height: 100), // Space for keyboard
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFormSection(String title) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8.0),
+      child: Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
     );
   }
 }
@@ -824,7 +920,7 @@ class _EmptyStatsPlaceholder extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceVariant.withValues(alpha: 0.3),
+        color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.5), style: BorderStyle.none),
       ),
@@ -858,5 +954,35 @@ class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
   @override
   bool shouldRebuild(_SliverAppBarDelegate oldDelegate) {
     return false;
+  }
+}
+
+class _PremiumDetailTypeTag extends StatelessWidget {
+  final String type;
+  final Color? color;
+
+  const _PremiumDetailTypeTag({required this.type, this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    final displayColor = color ?? (type.toLowerCase() == 'compound' ? Colors.purpleAccent : Colors.tealAccent);
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      decoration: BoxDecoration(
+        color: displayColor.withValues(alpha: 0.2),
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: displayColor.withValues(alpha: 0.3)),
+      ),
+      child: Text(
+        type.toUpperCase(),
+        style: TextStyle(
+          fontSize: 10,
+          fontWeight: FontWeight.bold,
+          color: displayColor,
+          letterSpacing: 0.5,
+        ),
+      ),
+    );
   }
 }

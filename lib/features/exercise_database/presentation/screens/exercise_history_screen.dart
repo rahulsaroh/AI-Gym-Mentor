@@ -6,6 +6,7 @@ import 'package:ai_gym_mentor/features/exercise_database/presentation/providers/
 import 'package:ai_gym_mentor/features/exercise_database/presentation/providers/exercise_history_provider.dart';
 import 'package:intl/intl.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:ai_gym_mentor/features/analytics/analytics_providers.dart';
 
 class ExerciseHistoryScreen extends ConsumerStatefulWidget {
   final int exerciseId;
@@ -148,11 +149,27 @@ class _ExerciseHistoryScreenState extends ConsumerState<ExerciseHistoryScreen> {
           historyAsync.when(
             data: (sessions) => SliverList(
               delegate: SliverChildBuilderDelegate(
-                (context, index) => _SessionCard(
-                  session: sessions[index],
-                  previousSession:
-                      index + 1 < sessions.length ? sessions[index + 1] : null,
-                ),
+                (context, index) {
+                  final session = sessions[index];
+                  final prsAsync = ref.watch(fullPRHistoryProvider);
+                  final isPR = prsAsync.when(
+                    data: (prs) => prs.any((p) => 
+                      p['exerciseId'] == widget.exerciseId && 
+                      (p['date'] as DateTime).day == (session['date'] as DateTime).day &&
+                      (p['date'] as DateTime).month == (session['date'] as DateTime).month &&
+                      (p['date'] as DateTime).year == (session['date'] as DateTime).year
+                    ),
+                    loading: () => false,
+                    error: (_, __) => false,
+                  );
+
+                  return _SessionCard(
+                    session: session,
+                    isPR: isPR,
+                    previousSession:
+                        index + 1 < sessions.length ? sessions[index + 1] : null,
+                  );
+                },
                 childCount: sessions.length,
               ),
             ),
@@ -346,8 +363,9 @@ class _ProgressLineChart extends StatelessWidget {
 
 class _SessionCard extends StatelessWidget {
   final Map<String, dynamic> session;
+  final bool isPR;
   final Map<String, dynamic>? previousSession;
-  const _SessionCard({required this.session, this.previousSession});
+  const _SessionCard({required this.session, this.isPR = false, this.previousSession});
 
   @override
   Widget build(BuildContext context) {
@@ -406,6 +424,12 @@ class _SessionCard extends StatelessWidget {
                     style: const TextStyle(
                         fontSize: 13, fontWeight: FontWeight.w500),
                   ),
+                  if (isPR) ...[
+                    const SizedBox(width: 8),
+                    const Icon(LucideIcons.trophy, size: 14, color: Colors.amber),
+                    const SizedBox(width: 4),
+                    const Text('PR', style: TextStyle(color: Colors.amber, fontWeight: FontWeight.bold, fontSize: 10)),
+                  ],
                   const Spacer(),
                   _buildTrendIndicator(topSet),
                   const SizedBox(width: 8),

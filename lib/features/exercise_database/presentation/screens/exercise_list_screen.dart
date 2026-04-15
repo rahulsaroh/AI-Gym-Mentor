@@ -32,7 +32,7 @@ class ExerciseListScreen extends ConsumerStatefulWidget {
 }
 
 class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
-  final TextEditingController _searchController = TextEditingController();
+  final SearchController _searchController = SearchController();
   Timer? _debounce;
   final ScrollController _scrollController = ScrollController();
 
@@ -113,7 +113,7 @@ class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
         physics: const BouncingScrollPhysics(
             parent: AlwaysScrollableScrollPhysics()),
         slivers: [
-          _buildPremiumAppBar(context, isOffline),
+          _buildPremiumAppBar(context, filter, isOffline),
           _buildSearchAndFilters(context, filter, bodyPartAsync, equipmentAsync),
           if (!filter.isActive)
             recentlyViewedAsync.when(
@@ -242,13 +242,34 @@ class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
     );
   }
 
-  Widget _buildPremiumAppBar(BuildContext context, bool isOffline) {
+  Widget _buildPremiumAppBar(BuildContext context, ExerciseFilter filter, bool isOffline) {
     return SliverAppBar(
       expandedHeight: 140,
       pinned: true,
       stretch: true,
       backgroundColor: Theme.of(context).colorScheme.surface,
       elevation: 0,
+      actions: [
+          IconButton(
+            icon: Icon(
+              LucideIcons.arrowUpDown, 
+              size: 20, 
+              color: filter.sortByUsage ? Theme.of(context).colorScheme.primary : null
+            ),
+            onPressed: () {
+              ref.read(exerciseFilterStateProvider.notifier).updateFilter(
+                (s) => s.copyWith(sortByUsage: !s.sortByUsage)
+              );
+            },
+            tooltip: 'Sort by Usage',
+          ),
+          IconButton(
+            icon: const Icon(LucideIcons.trash2, size: 20),
+          onPressed: () => _showWipeConfirmation(context),
+          tooltip: 'Wipe Database',
+        ),
+        const SizedBox(width: 8),
+      ],
       flexibleSpace: FlexibleSpaceBar(
         stretchModes: const [StretchMode.blurBackground, StretchMode.zoomBackground],
         centerTitle: false,
@@ -309,30 +330,46 @@ class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
-            child: TextField(
-              controller: _searchController,
-              onChanged: _onSearchChanged,
-              style: const TextStyle(fontSize: 15),
-              decoration: InputDecoration(
-                hintText: AppLocalizations.of(context)!.search_hint,
-                prefixIcon: Icon(LucideIcons.search, size: 20, color: Theme.of(context).colorScheme.primary),
-                suffixIcon: _searchController.text.isNotEmpty 
-                  ? IconButton(
-                      icon: const Icon(LucideIcons.x, size: 16),
-                      onPressed: () {
-                        _searchController.clear();
-                        _onSearchChanged('');
-                      },
-                    )
-                  : null,
-                filled: true,
-                fillColor: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
-                ),
-              ),
+            child: SearchAnchor(
+              searchController: _searchController as SearchController,
+              builder: (context, controller) {
+                return SearchBar(
+                  controller: controller,
+                  hintText: AppLocalizations.of(context)!.search_hint,
+                  padding: const WidgetStatePropertyAll(EdgeInsets.symmetric(horizontal: 16)),
+                  onTap: () => controller.openView(),
+                  onChanged: _onSearchChanged,
+                  leading: Icon(LucideIcons.search, size: 20, color: Theme.of(context).colorScheme.primary),
+                  trailing: [
+                    if (controller.text.isNotEmpty)
+                      IconButton(
+                        icon: const Icon(LucideIcons.x, size: 16),
+                        onPressed: () {
+                          controller.clear();
+                          _onSearchChanged('');
+                        },
+                      ),
+                  ],
+                  elevation: const WidgetStatePropertyAll(0),
+                  backgroundColor: WidgetStatePropertyAll(Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3)),
+                  shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+                );
+              },
+              suggestionsBuilder: (context, controller) async {
+                final suggestions = await ref.read(searchSuggestionsProvider(controller.text).future);
+                return suggestions.map((ex) => ListTile(
+                  leading: ex.imageUrls.isNotEmpty 
+                    ? SizedBox(width: 40, child: CachedNetworkImage(imageUrl: ex.imageUrls.first, fit: BoxFit.cover))
+                    : const Icon(LucideIcons.dumbbell),
+                  title: Text(ex.name),
+                  subtitle: Text(ex.primaryMuscles.join(', ')),
+                  onTap: () {
+                    controller.closeView(ex.name);
+                    _onSearchChanged(ex.name);
+                    context.push('/exercises/${ex.id}');
+                  },
+                ));
+              },
             ),
           ),
           
@@ -535,6 +572,55 @@ class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
       ),
     );
   }
+  void _showWipeConfirmation(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Wipe Exercise Database?'),
+        content: const Text(
+          'This will permanently delete all exercises, safety tips, and enriched content. '
+          'Your workout plans and history may be affected. This cannot be undone.'
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(context);
+              
+              showDialog(
+                context: context,
+                barrierDismissible: false,
+                builder: (context) => const Center(child: CircularProgressIndicator()),
+              );
+
+              try {
+                await ref.read(exerciseRepositoryProvider).wipeAllData();
+                ref.invalidate(exerciseListProvider);
+                
+                if (context.mounted) {
+                  Navigator.pop(context); // Remove progress
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Database wiped successfully.')),
+                  );
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Error: $e')),
+                  );
+                }
+              }
+            },
+            child: const Text('WIPE EVERYTHING', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 class _RecentlyViewedPremiumCard extends StatelessWidget {
@@ -689,7 +775,19 @@ class _ExercisePremiumCard extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(height: 8),
-                      _PremiumDifficultyBadge(difficulty: exercise.difficulty),
+                      Row(
+                        children: [
+                          _PremiumDifficultyBadge(difficulty: exercise.difficulty),
+                          const SizedBox(width: 8),
+                          if (exercise.mechanic != null)
+                            _PremiumTypeBadge(type: exercise.mechanic!),
+                          if (exercise.category.toLowerCase().contains('cardio'))
+                            const Padding(
+                              padding: EdgeInsets.only(left: 8.0),
+                              child: _PremiumTypeBadge(type: 'Cardio', color: Colors.blue),
+                            ),
+                        ],
+                      ),
                     ],
                   ),
                 ),
@@ -774,6 +872,35 @@ class _PremiumDifficultyBadge extends StatelessWidget {
           fontSize: 9,
           fontWeight: FontWeight.bold,
           color: color,
+          letterSpacing: 0.5,
+        ),
+      ),
+    );
+  }
+}
+
+class _PremiumTypeBadge extends StatelessWidget {
+  final String type;
+  final Color? color;
+
+  const _PremiumTypeBadge({required this.type, this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    final displayColor = color ?? (type.toLowerCase() == 'compound' ? Colors.purple : Colors.teal);
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      decoration: BoxDecoration(
+        color: displayColor.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Text(
+        type.toUpperCase(),
+        style: TextStyle(
+          fontSize: 9,
+          fontWeight: FontWeight.bold,
+          color: displayColor,
           letterSpacing: 0.5,
         ),
       ),

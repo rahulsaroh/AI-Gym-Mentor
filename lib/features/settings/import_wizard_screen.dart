@@ -293,6 +293,7 @@ class _ImportWizardScreenState extends ConsumerState<ImportWizardScreen> {
           restTime: ex['restTime'] as int? ?? 90,
           instructions: ex['instructions'] as String?,
           gifUrl: ex['gifUrl'] as String?,
+          usageCount: 0,
           imageUrl: ex['imageUrl'] as String?,
           videoUrl: ex['videoUrl'] as String?,
           mechanic: ex['mechanic'] as String?,
@@ -301,7 +302,9 @@ class _ImportWizardScreenState extends ConsumerState<ImportWizardScreen> {
           isCustom: ex['isCustom'] as bool? ?? false,
           isFavorite: ex['isFavorite'] as bool? ?? false,
           isEnriched: ex['isEnriched'] as bool? ?? false,
-          lastUsed: ex['lastUsed'] != null ? DateTime.parse(ex['lastUsed'] as String) : null,
+          lastUsed: ex['lastUsed'] != null
+              ? DateTime.parse(ex['lastUsed'] as String)
+              : null,
         );
         await db.into(db.exercises).insertOnConflictUpdate(exercise);
       }

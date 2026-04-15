@@ -10,6 +10,7 @@ import 'package:go_router/go_router.dart';
 import 'package:drift/drift.dart' hide Column, Table;
 import 'package:ai_gym_mentor/features/history/history_providers.dart';
 import 'package:ai_gym_mentor/features/workout/workout_repository.dart';
+import 'package:ai_gym_mentor/features/analytics/analytics_providers.dart';
 
 class WorkoutDetailScreen extends ConsumerStatefulWidget {
   final int workoutId;
@@ -51,6 +52,8 @@ class _WorkoutDetailScreenState extends ConsumerState<WorkoutDetailScreen> {
         if (workout == null)
           return const Scaffold(
               body: Center(child: CircularProgressIndicator()));
+
+        final prsAsync = ref.watch(workoutPRsProvider(widget.workoutId));
 
         return Scaffold(
           appBar: AppBar(
@@ -106,7 +109,10 @@ class _WorkoutDetailScreenState extends ConsumerState<WorkoutDetailScreen> {
                 slivers: [
                   SliverToBoxAdapter(
                     child: _WorkoutSummaryHeader(
-                        workout: workout, muscleVolume: muscleVolume),
+                        workout: workout, 
+                        muscleVolume: muscleVolume,
+                        prsAchieved: prsAsync.when(data: (ids) => ids.length, loading: () => 0, error: (_,__) => 0),
+                    ),
                   ),
                   SliverPadding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -125,6 +131,7 @@ class _WorkoutDetailScreenState extends ConsumerState<WorkoutDetailScreen> {
                             exercise: exercise,
                             rows: exerciseSets,
                             isEditing: _isEditing,
+                            isPR: prsAsync.when(data: (ids) => ids.contains(exercise.id), loading: () => false, error: (_,__) => false),
                             onUpdate: (setId, weight, reps) =>
                                 _updateSet(setId, weight, reps),
                           );
@@ -213,9 +220,10 @@ class _WorkoutDetailScreenState extends ConsumerState<WorkoutDetailScreen> {
 class _WorkoutSummaryHeader extends StatelessWidget {
   final Workout workout;
   final Map<String, double> muscleVolume;
+  final int prsAchieved;
 
   const _WorkoutSummaryHeader(
-      {required this.workout, required this.muscleVolume});
+      {required this.workout, required this.muscleVolume, required this.prsAchieved});
 
   @override
   Widget build(BuildContext context) {
@@ -236,8 +244,10 @@ class _WorkoutSummaryHeader extends StatelessWidget {
                   label: 'Volume',
                   value: '${totalVolume.toStringAsFixed(0)}kg'),
               const SizedBox(width: 24),
-              const _SummaryStat(
-                  label: 'PRs', value: '🏆 2'), // Placeholder for logic
+              _SummaryStat(
+                  label: 'PRs', 
+                  value: '🏆 $prsAchieved', 
+                  isHighlight: prsAchieved > 0),
             ],
           ),
           if (workout.notes != null && workout.notes!.isNotEmpty) ...[
@@ -287,18 +297,21 @@ class _WorkoutSummaryHeader extends StatelessWidget {
 class _SummaryStat extends StatelessWidget {
   final String label;
   final String value;
-  const _SummaryStat({required this.label, required this.value});
+  final bool isHighlight;
+
+  const _SummaryStat({required this.label, required this.value, this.isHighlight = false});
 
   @override
   Widget build(BuildContext context) {
+    final color = isHighlight ? Colors.amber : Theme.of(context).colorScheme.outline;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label,
             style: TextStyle(
-                color: Theme.of(context).colorScheme.outline, fontSize: 10)),
+                color: color, fontSize: 10, fontWeight: isHighlight ? FontWeight.bold : FontWeight.normal)),
         Text(value,
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: isHighlight ? Colors.amber : null)),
       ],
     );
   }
@@ -308,6 +321,7 @@ class _ExerciseDetailBlock extends ConsumerWidget {
   final ExerciseTable exercise;
   final List<TypedResult> rows;
   final bool isEditing;
+  final bool isPR;
   final Function(int, double, double) onUpdate;
 
   const _ExerciseDetailBlock({
@@ -315,6 +329,7 @@ class _ExerciseDetailBlock extends ConsumerWidget {
     required this.exercise,
     required this.rows,
     required this.isEditing,
+    this.isPR = false,
     required this.onUpdate,
   });
 
@@ -342,6 +357,12 @@ class _ExerciseDetailBlock extends ConsumerWidget {
               const SizedBox(width: 4),
               const Icon(LucideIcons.externalLink,
                   size: 14, color: Colors.blue),
+              if (isPR) ...[
+                const SizedBox(width: 8),
+                const Icon(LucideIcons.trophy, size: 14, color: Colors.amber),
+                const SizedBox(width: 4),
+                const Text('NEW PR!', style: TextStyle(color: Colors.amber, fontWeight: FontWeight.bold, fontSize: 10)),
+              ],
             ],
           ),
         ),

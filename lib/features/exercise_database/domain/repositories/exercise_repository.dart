@@ -10,8 +10,12 @@ abstract class ExerciseRepository {
     String? category,
     String? equipment,
     String? difficulty,
+    String? searchQuery,
     bool favoritesOnly = false,
+    bool sortByUsage = false,
   });
+
+  Future<void> incrementUsageCount(int exerciseId);
 
   // Full-text search using FTS5
   Future<List<ExerciseEntity>> searchExercises(String query, {int limit = 30});
@@ -59,4 +63,7 @@ abstract class ExerciseRepository {
 
   // Helper for internal use
   Future<List<ExerciseEntity>> getAllExercises();
+
+  // Administrative
+  Future<void> wipeAllData();
 }
