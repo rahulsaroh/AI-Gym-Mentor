@@ -354,7 +354,19 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
             scrolledUnderElevation: 0,
             leading: IconButton(
                 icon: const Icon(LucideIcons.chevronLeft, size: 22),
-                onPressed: () => context.pop()),
+                onPressed: () async {
+                  if (widget.dayId != null) {
+                    final database = ref.read(db.appDatabaseProvider);
+                    final day = await (database.select(database.templateDays)
+                          ..where((t) => t.id.equals(widget.dayId!)))
+                        .getSingleOrNull();
+                    if (day != null && context.mounted) {
+                      context.go('/programs/details/${day.templateId}');
+                      return;
+                    }
+                  }
+                  if (context.mounted) context.pop();
+                }),
             title: StreamBuilder<List<db.WorkoutSet>>(
               stream: _watchSets(),
               builder: (context, snapshot) {
@@ -364,7 +376,7 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      workout.name,
+                      workout?.name ?? 'Workout',
                       style: GoogleFonts.inter(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -463,7 +475,19 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
             canPop: false,
             onPopInvokedWithResult: (didPop, result) async {
               if (didPop) return;
-              // Call _discardWorkout which handles the confirmation dialog
+              
+              if (widget.dayId != null) {
+                final database = ref.read(db.appDatabaseProvider);
+                final day = await (database.select(database.templateDays)
+                      ..where((t) => t.id.equals(widget.dayId!)))
+                    .getSingleOrNull();
+                if (day != null && context.mounted) {
+                  context.go('/programs/details/${day.templateId}');
+                  return;
+                }
+              }
+              
+              // Fallback to discard confirmation if no specific program to return to
               _discardWorkout(showConfirm: true);
             },
             child: Stack(
@@ -728,19 +752,12 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
     );
   }
 
-  Widget _buildExerciseHeaderCard(Exercise exercise, ExerciseBlock block) {
+  Widget _buildExerciseHeaderCard(entity.ExerciseEntity exercise, ExerciseBlock block) {
     return Container(
       margin: const EdgeInsets.only(bottom: 24),
       decoration: BoxDecoration(
-        color: const Color(0xFF1E293B),
+        color: Colors.transparent,
         borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.2),
-            blurRadius: 15,
-            offset: const Offset(0, 5),
-          ),
-        ],
       ),
       clipBehavior: Clip.antiAlias,
       child: Stack(
@@ -750,16 +767,16 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
             children: [
                // Exercise Media
               SizedBox(
-                height: 180,
+                height: 220, // Increased height for larger GIF
                 width: double.infinity,
                 child: ExerciseMediaWidget(
                   animatedUrl: exercise.gifUrl,
                   staticUrl: exercise.imageUrls.isNotEmpty ? exercise.imageUrls.first : null,
-                  fit: BoxFit.cover,
+                  fit: BoxFit.contain, // Changed to contain to see full GIF clearly
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 12), // Reduced padding
                 child: Row(
                   children: [
                     Expanded(
@@ -769,9 +786,9 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
                           Text(
                             exercise.name,
                             style: GoogleFonts.inter(
-                              fontSize: 20,
+                              fontSize: 24, // Slightly bigger text
                               fontWeight: FontWeight.bold,
-                              color: Colors.white,
+                              color: Theme.of(context).colorScheme.onSurface,
                             ),
                           ),
                           const SizedBox(height: 8),
@@ -799,14 +816,14 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
                               width: 48,
                               height: 48,
                               alignment: Alignment.center,
-                              child: const Icon(LucideIcons.info, color: Colors.white70, size: 24),
+                              child: Icon(LucideIcons.info, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7), size: 24),
                             ),
                           ),
                         ),
                         const SizedBox(height: 4),
                         Text(
                           'Info',
-                          style: GoogleFonts.inter(fontSize: 10, color: Colors.white70),
+                          style: GoogleFonts.inter(fontSize: 10, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7)),
                         ),
                       ],
                     ),
@@ -819,7 +836,7 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
             top: 12,
             right: 8,
             child: IconButton(
-              icon: const Icon(Icons.more_vert, color: Colors.white, size: 24),
+              icon: Icon(Icons.more_vert, color: Theme.of(context).colorScheme.onSurface, size: 24),
               onPressed: () => _showExerciseMenu(block, exercise),
             ),
           ),
@@ -946,7 +963,7 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
               Expanded(child: _buildTableHeaderLabel('WEIGHT (${unit == WeightUnit.kg ? 'KG' : 'LBS'})', 0)),
               Expanded(child: _buildTableHeaderLabel(exercise.setType == 'Timed' ? 'SECS' : 'REPS', 0)),
               _buildTableHeaderLabel('RPE', 50),
-              _buildTableHeaderLabel('RIR', 50),
+              // RIR removed as requested
               const SizedBox(width: 44), // Action column
             ],
           ),
@@ -1140,91 +1157,123 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
               ),
           ],
         ),
-        child: Row(
+        child: Column(
           children: [
-            // Set Number Badge
-            Container(
-              width: 28,
-              height: 28,
-              decoration: BoxDecoration(
-                color: isCompleted 
-                    ? Colors.green 
-                    : (isActive ? Theme.of(context).primaryColor : Colors.grey[200]),
-                shape: BoxShape.circle,
-              ),
-              alignment: Alignment.center,
-              child: Text(
-                index.toString(),
-                style: GoogleFonts.inter(
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
-                  color: (isCompleted || isActive) ? Colors.white : Colors.grey[600],
-                ),
-              ),
-            ),
-            const SizedBox(width: 12),
-            // Weight Input
-            Expanded(
-              child: _buildRedesignedCellInput(
-                setId: set.id,
-                type: 'weight',
-                value: WeightConverter.toDisplay(set.weight, unit).toStringAsFixed(1),
-                onChanged: (val) => _updateSet(set.id, weight: WeightConverter.toStorage(double.tryParse(val) ?? 0, unit)),
-                isCompleted: isCompleted,
-              ),
-            ),
-            const SizedBox(width: 8),
-            // Reps Input
-            Expanded(
-              child: _buildRedesignedCellInput(
-                setId: set.id,
-                type: exercise.setType == 'Timed' ? 'secs' : 'reps',
-                value: set.reps.toInt().toString(),
-                onChanged: (val) => _updateSet(set.id, reps: double.tryParse(val) ?? 0),
-                isCompleted: isCompleted,
-              ),
-            ),
-            const SizedBox(width: 8),
-            // RPE
-            _buildCompactIntensityInput(set, true, isCompleted),
-            const SizedBox(width: 8),
-            // RIR
-            _buildCompactIntensityInput(set, false, isCompleted),
-            const SizedBox(width: 12),
-            GestureDetector(
-              onTap: () => _toggleSet(set, exercise, block, allBlocks),
-              child: TweenAnimationBuilder<double>(
-                duration: const Duration(milliseconds: 300),
-                tween: Tween(begin: 0.0, end: isCompleted ? 1.0 : 0.0),
-                builder: (context, value, child) {
-                  return Container(
-                    width: 32,
-                    height: 32,
-                    decoration: BoxDecoration(
-                      color: Color.lerp(Colors.transparent, Colors.green, value),
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: Color.lerp(Colors.grey[300]!, Colors.green, value)!,
-                        width: 2,
-                      ),
-                      boxShadow: [
-                        if (value > 0.5)
-                          BoxShadow(
-                            color: Colors.green.withOpacity(0.3 * value),
-                            blurRadius: 8,
-                            spreadRadius: 2,
-                          ),
-                      ],
+            Row(
+              children: [
+                // Set Number Badge
+                Container(
+                  width: 28,
+                  height: 28,
+                  decoration: BoxDecoration(
+                    color: isCompleted 
+                        ? Colors.green 
+                        : (isActive ? Theme.of(context).primaryColor : Colors.grey[200]),
+                    shape: BoxShape.circle,
+                  ),
+                  alignment: Alignment.center,
+                  child: Text(
+                    index.toString(),
+                    style: GoogleFonts.inter(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: (isCompleted || isActive) ? Colors.white : Colors.grey[600],
                     ),
-                    child: value > 0.5 
-                        ? const Icon(LucideIcons.check, size: 18, color: Colors.white) 
-                        : null,
-                  );
-                },
-              ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                // Weight Input
+                Expanded(
+                  child: _buildRedesignedCellInput(
+                    setId: set.id,
+                    type: 'weight',
+                    value: WeightConverter.toDisplay(set.weight, unit).toStringAsFixed(1),
+                    onChanged: (val) => _updateSet(set.id, weight: WeightConverter.toStorage(double.tryParse(val) ?? 0, unit)),
+                    isCompleted: isCompleted,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                // Reps Input
+                Expanded(
+                  child: _buildRedesignedCellInput(
+                    setId: set.id,
+                    type: exercise.setType == 'Timed' ? 'secs' : 'reps',
+                    value: set.reps.toInt().toString(),
+                    onChanged: (val) => _updateSet(set.id, reps: double.tryParse(val) ?? 0),
+                    isCompleted: isCompleted,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                _buildCompactIntensityInput(set, true, isCompleted),
+                // RIR removed as requested
+                const SizedBox(width: 12),
+                GestureDetector(
+                  onTap: () => _toggleSet(set, exercise, block, allBlocks),
+                  child: TweenAnimationBuilder<double>(
+                    duration: const Duration(milliseconds: 300),
+                    tween: Tween(begin: 0.0, end: isCompleted ? 1.0 : 0.0),
+                    builder: (context, value, child) {
+                      return Container(
+                        width: 32,
+                        height: 32,
+                        decoration: BoxDecoration(
+                          color: Color.lerp(Colors.transparent, Colors.green, value),
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: Color.lerp(Colors.grey[300]!, Colors.green, value)!,
+                            width: 2,
+                          ),
+                          boxShadow: [
+                            if (value > 0.5)
+                              BoxShadow(
+                                color: Colors.green.withOpacity(0.3 * value),
+                                blurRadius: 8,
+                                spreadRadius: 2,
+                              ),
+                          ],
+                        ),
+                        child: value > 0.5 
+                            ? const Icon(LucideIcons.check, size: 18, color: Colors.white) 
+                            : null,
+                      );
+                    },
+                  ),
+                ),
+              ],
             ),
+            _buildPreviousStatsRow(set, unit),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildPreviousStatsRow(db.WorkoutSet set, WeightUnit unit) {
+    if (!_previousSessionSets.containsKey(set.exerciseId)) return const SizedBox.shrink();
+    
+    final prevSets = _previousSessionSets[set.exerciseId]!;
+    final match = prevSets.where((s) => s.setNumber == set.setNumber).firstOrNull ?? prevSets.lastOrNull;
+    
+    if (match == null) return const SizedBox.shrink();
+    
+    final weightStr = WeightConverter.toDisplay(match.weight, unit).toStringAsFixed(1);
+    final repsStr = match.reps.toInt().toString();
+
+    return Padding(
+      padding: const EdgeInsets.only(left: 40, top: 2), // Aligned with the badges
+      child: Row(
+        children: [
+          Icon(LucideIcons.history, size: 10, color: Theme.of(context).colorScheme.outline.withOpacity(0.5)),
+          const SizedBox(width: 4),
+          Text(
+            'Last: ${weightStr}${unit == WeightUnit.kg ? 'kg' : 'lbs'} x $repsStr',
+            style: GoogleFonts.inter(
+              fontSize: 10,
+              color: Theme.of(context).colorScheme.outline.withOpacity(0.7),
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -1266,8 +1315,12 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
             ),
             onChanged: onChanged,
             onTap: () {
-               // Focus is handled by TextField itself, adding onTap for clarity
                focusNode.requestFocus();
+               // Direct enter data: Select all so user can overwrite immediately
+               controller.selection = TextSelection(
+                 baseOffset: 0,
+                 extentOffset: controller.text.length,
+               );
             },
           ),
         ),
