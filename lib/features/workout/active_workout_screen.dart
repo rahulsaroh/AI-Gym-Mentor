@@ -190,15 +190,19 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
       final database = ref.read(db.appDatabaseProvider);
       int? dayId = widget.dayId;
 
+      debugPrint('ActiveWorkoutScreen: Starting init for workout ${widget.workoutId}, dayId=$dayId');
+
       // If dayId is null, try to fetch it from the workout record in DB
       if (dayId == null) {
         final workoutRow = await (database.select(database.workouts)
               ..where((t) => t.id.equals(widget.workoutId)))
             .getSingleOrNull();
         dayId = workoutRow?.dayId;
+        debugPrint('ActiveWorkoutScreen: Fetched dayId from workout: $dayId');
       }
 
       if (dayId == null) {
+        debugPrint('ActiveWorkoutScreen: dayId is null, skipping template init');
         if (mounted) setState(() => _isInitializing = false);
         return;
       }
@@ -206,6 +210,8 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
       final existingSets = await (database.select(database.workoutSets)
             ..where((t) => t.workoutId.equals(widget.workoutId)))
           .get();
+
+      debugPrint('ActiveWorkoutScreen: Found ${existingSets.length} existing sets');
 
       if (existingSets.isEmpty) {
         final templateExercises =
@@ -217,8 +223,13 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
         debugPrint(
             'ActiveWorkoutScreen: Initializing with ${templateExercises.length} exercises for day $dayId');
 
+        if (templateExercises.isEmpty) {
+          debugPrint('ActiveWorkoutScreen: WARNING - No template exercises found for day $dayId!');
+        }
+
         for (var i = 0; i < templateExercises.length; i++) {
           final te = templateExercises[i];
+          debugPrint('ActiveWorkoutScreen: Adding exercise ${te.exerciseId} at order $i');
           await database
               .into(database.workoutSets)
               .insert(db.WorkoutSetsCompanion.insert(
@@ -498,7 +509,11 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
                         final block = exerciseBlocks[index];
 
                         final firstSet = block.sets.firstOrNull;
-                        final currentGroupId = firstSet?.supersetGroupId;
+                        if (firstSet == null) {
+                          return const SizedBox(
+                              height: 100, key: ValueKey('empty_block'));
+                        }
+                        final currentGroupId = firstSet.supersetGroupId;
                         bool isFirst = false;
                         bool isLast = false;
                         bool isMiddle = false;
@@ -519,7 +534,7 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
                         }
 
                         return RepaintBoundary(
-                          key: ValueKey('ex_block_${block.sets.first.id}'),
+                          key: ValueKey('ex_block_${firstSet.id}'),
                           child: SupersetConnector(
                             isFirst: isFirst,
                             isLast: isLast,

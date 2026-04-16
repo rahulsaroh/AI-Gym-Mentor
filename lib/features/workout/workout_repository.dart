@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:drift/drift.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter/foundation.dart';
 import 'package:ai_gym_mentor/core/database/database.dart';
 import 'package:ai_gym_mentor/features/exercise_database/domain/entities/exercise_entity.dart';
 import 'package:ai_gym_mentor/core/domain/entities/logged_set.dart' as ent;
@@ -502,6 +503,11 @@ class WorkoutRepository {
           ]))
         .get();
 
+    debugPrint('WorkoutRepository.getTemplateDays: found ${rows.length} days for template $templateId');
+    for (final r in rows) {
+      debugPrint('WorkoutRepository.getTemplateDays: day id=${r.id}, name=${r.name}');
+    }
+
     final List<ent.ProgramDay> days = [];
     for (final r in rows) {
       final exercises = await getTemplateExercises(r.id);
@@ -522,9 +528,12 @@ class WorkoutRepository {
       ]);
 
     final rows = await query.get();
+    debugPrint('WorkoutRepository.getTemplateExercises: found ${rows.length} exercises for day $dayId');
     return rows.map((row) {
       final te = row.readTable(_db.templateExercises);
       final ex = row.readTable(_db.exercises);
+      
+      debugPrint('WorkoutRepository.getTemplateExercises: exercise id=${ex.id}, name=${ex.name}, exerciseId=${ex.exerciseId}');
       
       // Map back to Exercise Library Repository instance or use toEntity
       final exerciseEntity = ExerciseEntity(
@@ -582,7 +591,8 @@ class WorkoutRepository {
 
   Future<int> createWorkout(
       {String name = 'New Workout', int? templateId, int? dayId}) async {
-    return await _db.into(_db.workouts).insert(WorkoutsCompanion.insert(
+    debugPrint('WorkoutRepository.createWorkout: name=$name, templateId=$templateId, dayId=$dayId');
+    final id = await _db.into(_db.workouts).insert(WorkoutsCompanion.insert(
           name: name,
           date: DateTime.now(),
           startTime: Value(DateTime.now()),
@@ -590,6 +600,8 @@ class WorkoutRepository {
           templateId: Value(templateId),
           dayId: Value(dayId),
         ));
+    debugPrint('WorkoutRepository.createWorkout: inserted workout with id=$id');
+    return id;
   }
 
   Future<List<ent.WorkoutProgram>> getAllTemplates() async {

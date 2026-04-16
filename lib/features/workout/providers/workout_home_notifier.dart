@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:drift/drift.dart' hide JsonKey;
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:ai_gym_mentor/core/database/database.dart';
@@ -267,11 +268,13 @@ class WorkoutHomeNotifier extends _$WorkoutHomeNotifier {
 
   Future<int> startWorkout({int? templateId, int? dayId, String? name}) async {
     final repo = ref.read(workoutRepositoryProvider);
+    debugPrint('WorkoutHomeNotifier.startWorkout: templateId=$templateId, dayId=$dayId, name=$name');
     final id = await repo.createWorkout(
       name: name ?? 'New Workout',
       templateId: templateId,
       dayId: dayId,
     );
+    debugPrint('WorkoutHomeNotifier.startWorkout: created workout id=$id');
     ref.invalidateSelf();
     return id;
   }

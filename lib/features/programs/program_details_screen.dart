@@ -332,13 +332,16 @@ class ProgramDetailScreen extends ConsumerWidget {
             final router = GoRouter.of(context);
             final repo = ref.read(workoutRepositoryProvider);
             final days = await repo.getTemplateDays(templateId);
+            debugPrint('ProgramDetailScreen _buildBottomButton: days count=${days.length}');
             if (days.isNotEmpty && context.mounted) {
+              debugPrint('ProgramDetailScreen _buildBottomButton: starting workout templateId=$templateId, dayId=${days.first.id}');
               final id =
                   await ref.read(workoutHomeProvider.notifier).startWorkout(
                         templateId: templateId,
                         dayId: days.first.id,
                         name: program.name,
                       );
+              debugPrint('ProgramDetailScreen _buildBottomButton: created workout id=$id');
               if (context.mounted) {
                 // Navigate only if context is still mounted
                 router.push(
@@ -393,6 +396,8 @@ class ProgramDetailScreen extends ConsumerWidget {
                 Navigator.pop(context);
               }
 
+              debugPrint('ProgramDetailScreen: Starting workout with templateId=${day.templateId}, dayId=${day.id}');
+
               // Now perform the async operation
               final id =
                   await ref.read(workoutHomeProvider.notifier).startWorkout(
@@ -400,6 +405,8 @@ class ProgramDetailScreen extends ConsumerWidget {
                         dayId: day.id,
                         name: programName,
                       );
+
+              debugPrint('ProgramDetailScreen: Created workout with id=$id');
 
               // Navigate only if context is still mounted
               if (context.mounted) {
