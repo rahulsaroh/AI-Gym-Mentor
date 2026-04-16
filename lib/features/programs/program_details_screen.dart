@@ -371,34 +371,29 @@ class ProgramDetailScreen extends ConsumerWidget {
 
   void _showStartDayConfirm(BuildContext context, WidgetRef ref,
       ent.ProgramDay day, String programName) {
+    // Capture router from the OUTER context BEFORE showing dialog
+    final router = GoRouter.of(context);
+
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         title: Text('Start ${day.name}?'),
         content:
-            Text('Do you want to start this specific workout session now?'),
+            const Text('Do you want to start this specific workout session now?'),
         actions: [
           TextButton(
-            onPressed: () {
-              // Get router before any async operations
-              final router = GoRouter.of(context);
-              Navigator.pop(context);
-            },
+            onPressed: () => Navigator.pop(dialogContext),
             child: const Text('Cancel'),
           ),
           TextButton(
             onPressed: () async {
-              // Get router reference before entering async context to ensure it's available
-              final router = GoRouter.of(context);
+              // Close dialog using dialogContext
+              Navigator.pop(dialogContext);
 
-              // Close dialog immediately to preserve context state
-              if (context.mounted) {
-                Navigator.pop(context);
-              }
+              debugPrint(
+                  'ProgramDetailScreen: Starting workout with templateId=${day.templateId}, dayId=${day.id}');
 
-              debugPrint('ProgramDetailScreen: Starting workout with templateId=${day.templateId}, dayId=${day.id}');
-
-              // Now perform the async operation
+              // Async operation after dialog is closed
               final id =
                   await ref.read(workoutHomeProvider.notifier).startWorkout(
                         templateId: day.templateId,
@@ -408,7 +403,7 @@ class ProgramDetailScreen extends ConsumerWidget {
 
               debugPrint('ProgramDetailScreen: Created workout with id=$id');
 
-              // Navigate only if context is still mounted
+              // Use the outer `context` for mounted check and the pre-captured router
               if (context.mounted) {
                 router.push('/app/workout/active?id=$id&dayId=${day.id}');
               }

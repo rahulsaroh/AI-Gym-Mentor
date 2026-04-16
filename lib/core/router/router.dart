@@ -51,22 +51,18 @@ final router = GoRouter(
       builder: (context, state) => const StartWorkoutScreen(),
     ),
     GoRoute(
-      path: '/programs/create',
-      builder: (context, state) => const CreateEditProgramScreen(),
-    ),
-    GoRoute(
-      path: '/programs/edit/:id',
+      path: '/app/workout/active',
       builder: (context, state) {
-        final id = int.tryParse(state.pathParameters['id'] ?? '0') ?? 0;
-        return CreateEditProgramScreen(templateId: id);
-      },
-    ),
-    GoRoute(
-      path: '/programs/details/:id',
-      builder: (context, state) {
-        final idStr = state.pathParameters['id'];
-        final id = int.tryParse(idStr ?? '0') ?? 0;
-        return ProgramDetailScreen(templateId: id);
+        final idStr = state.uri.queryParameters['id'];
+        if (idStr == null) {
+          return const Scaffold(
+              body: Center(child: Text('Invalid workout ID')));
+        }
+        final id = int.tryParse(idStr) ?? 0;
+        final dayId = state.uri.queryParameters['dayId'] != null
+            ? int.tryParse(state.uri.queryParameters['dayId']!)
+            : null;
+        return ActiveWorkoutScreen(workoutId: id, dayId: dayId);
       },
     ),
     // Exercise library — accessible via push from Settings or anywhere, not a bottom tab
@@ -168,6 +164,28 @@ final router = GoRouter(
             GoRoute(
               path: '/programs',
               builder: (context, state) => const ProgramsScreen(),
+              routes: [
+                GoRoute(
+                  path: 'details/:id',
+                  builder: (context, state) {
+                    final idStr = state.pathParameters['id'];
+                    final id = int.tryParse(idStr ?? '0') ?? 0;
+                    return ProgramDetailScreen(templateId: id);
+                  },
+                ),
+                GoRoute(
+                  path: 'create',
+                  builder: (context, state) => const CreateEditProgramScreen(),
+                ),
+                GoRoute(
+                  path: 'edit/:id',
+                  builder: (context, state) {
+                    final id =
+                        int.tryParse(state.pathParameters['id'] ?? '0') ?? 0;
+                    return CreateEditProgramScreen(templateId: id);
+                  },
+                ),
+              ],
             ),
           ],
         ),

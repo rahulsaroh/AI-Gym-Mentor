@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -72,6 +73,8 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
   // Ghost text history
   Map<int, List<db.WorkoutSet>> _previousSessionSets = {}; // exerciseId -> sets
 
+  late PageController _pageController;
+
   late ScrollController _scrollController;
 
   // Input management
@@ -108,6 +111,7 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
 
     // Removed _shakeDetector as per scope control plan
     _scrollController = ScrollController();
+    _pageController = PageController(initialPage: _currentExerciseIndex);
   }
 
   @override
@@ -126,6 +130,7 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
     for (var n in _secsNodes.values) n.dispose();
     for (var n in _rpeNodes.values) n.dispose();
     _scrollController.dispose();
+    _pageController.dispose();
     super.dispose();
   }
 
@@ -188,61 +193,28 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
   Future<void> _initializeFromTemplate() async {
     try {
       final database = ref.read(db.appDatabaseProvider);
-      int? dayId = widget.dayId;
+      final int? dayId = widget.dayId;
 
-      debugPrint('ActiveWorkoutScreen: Starting init for workout ${widget.workoutId}, dayId=$dayId');
+      debugPrint(
+          'ActiveWorkoutScreen: Starting init for workout ${widget.workoutId}, dayId=$dayId');
 
-      // If dayId is null, try to fetch it from the workout record in DB
       if (dayId == null) {
+        // Try to fetch it from the workout record in DB if not provided via constructor
         final workoutRow = await (database.select(database.workouts)
               ..where((t) => t.id.equals(widget.workoutId)))
             .getSingleOrNull();
-        dayId = workoutRow?.dayId;
-        debugPrint('ActiveWorkoutScreen: Fetched dayId from workout: $dayId');
-      }
 
-      if (dayId == null) {
-        debugPrint('ActiveWorkoutScreen: dayId is null, skipping template init');
-        if (mounted) setState(() => _isInitializing = false);
-        return;
-      }
-
-      final existingSets = await (database.select(database.workoutSets)
-            ..where((t) => t.workoutId.equals(widget.workoutId)))
-          .get();
-
-      debugPrint('ActiveWorkoutScreen: Found ${existingSets.length} existing sets');
-
-      if (existingSets.isEmpty) {
-        final templateExercises =
-            await (database.select(database.templateExercises)
-                  ..where((t) => t.dayId.equals(dayId!))
-                  ..orderBy([(t) => OrderingTerm(expression: t.order)]))
-                .get();
-
-        debugPrint(
-            'ActiveWorkoutScreen: Initializing with ${templateExercises.length} exercises for day $dayId');
-
-        if (templateExercises.isEmpty) {
-          debugPrint('ActiveWorkoutScreen: WARNING - No template exercises found for day $dayId!');
+        if (workoutRow?.dayId == null) {
+          debugPrint(
+              'ActiveWorkoutScreen: dayId is null in widget and database, skipping template init');
+          if (mounted) setState(() => _isInitializing = false);
+          return;
         }
 
-        for (var i = 0; i < templateExercises.length; i++) {
-          final te = templateExercises[i];
-          debugPrint('ActiveWorkoutScreen: Adding exercise ${te.exerciseId} at order $i');
-          await database
-              .into(database.workoutSets)
-              .insert(db.WorkoutSetsCompanion.insert(
-                workoutId: widget.workoutId,
-                exerciseId: te.exerciseId,
-                exerciseOrder: i,
-                setNumber: 1,
-                reps: 10,
-                weight: 0,
-                setType: Value(te.setType),
-                supersetGroupId: Value(te.supersetGroupId),
-              ));
-        }
+        // Proceed with the fetched dayId
+        await _processTemplate(database, workoutRow!.dayId!);
+      } else {
+        await _processTemplate(database, dayId);
       }
     } catch (e, stack) {
       debugPrint('ActiveWorkoutScreen ERROR during initialization: $e');
@@ -250,6 +222,88 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
     } finally {
       if (mounted) setState(() => _isInitializing = false);
     }
+  }
+
+  Future<void> _processTemplate(db.AppDatabase database, int dayId) async {
+    // Check if we already have sets for this workout to avoid duplicates
+    final existingSets = await (database.select(database.workoutSets)
+          ..where((t) => t.workoutId.equals(widget.workoutId)))
+        .get();
+
+    debugPrint(
+        'ActiveWorkoutScreen: Found ${existingSets.length} existing sets for workout ${widget.workoutId}');
+
+    if (existingSets.isNotEmpty) {
+      debugPrint('ActiveWorkoutScreen: Workout already has sets, skipping initialization');
+      return;
+    }
+
+    final templateExercises = await (database.select(database.templateExercises)
+          ..where((t) => t.dayId.equals(dayId))
+          ..orderBy([(t) => OrderingTerm(expression: t.order)]))
+        .get();
+
+    debugPrint(
+        'ActiveWorkoutScreen: Initializing with ${templateExercises.length} exercises for day $dayId');
+
+    if (templateExercises.isEmpty) {
+      debugPrint('ActiveWorkoutScreen: WARNING - No template exercises found for day $dayId!');
+      return;
+    }
+
+    await database.transaction(() async {
+      for (var i = 0; i < templateExercises.length; i++) {
+        final te = templateExercises[i];
+        
+        // Parse sets from JSON if available, otherwise default to a single set
+        List<dynamic> setsData = [];
+        try {
+          if (te.setsJson.isNotEmpty) {
+            setsData = jsonDecode(te.setsJson);
+          }
+        } catch (e) {
+          debugPrint('Error parsing setsJson for exercise ${te.exerciseId}: $e');
+        }
+
+        if (setsData.isEmpty) {
+          // Fallback: Add at least one default set if no sets defined
+          await database.into(database.workoutSets).insert(
+                db.WorkoutSetsCompanion.insert(
+                  workoutId: widget.workoutId,
+                  exerciseId: te.exerciseId,
+                  exerciseOrder: i,
+                  setNumber: 1,
+                  reps: 10,
+                  weight: 0,
+                  setType: Value(te.setType),
+                  supersetGroupId: Value(te.supersetGroupId),
+                ),
+              );
+        } else {
+          // Insert each set defined in the template
+          for (var j = 0; j < setsData.length; j++) {
+            final setData = setsData[j];
+            final double reps = (setData['reps'] as num?)?.toDouble() ?? 10.0;
+            final double weight = (setData['weight'] as num?)?.toDouble() ?? 0.0;
+            
+            await database.into(database.workoutSets).insert(
+                  db.WorkoutSetsCompanion.insert(
+                    workoutId: widget.workoutId,
+                    exerciseId: te.exerciseId,
+                    exerciseOrder: i,
+                    setNumber: j + 1,
+                    reps: reps,
+                    weight: weight,
+                    setType: Value(te.setType),
+                    supersetGroupId: Value(te.supersetGroupId),
+                  ),
+                );
+          }
+        }
+      }
+    });
+
+    debugPrint('ActiveWorkoutScreen: Successully initialized workout from template');
   }
 
   String _formatDuration(int seconds) {
@@ -267,6 +321,9 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
     if (_isInitializing) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
+    
+    final settings = ref.watch(settingsProvider).value ?? const SettingsState();
+    final exercisesAsync = ref.watch(allExercisesProvider);
     final database = ref.read(db.appDatabaseProvider);
     final workoutStream = database.select(database.workouts)
       ..where((t) => t.id.equals(widget.workoutId));
@@ -382,9 +439,6 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
                   stream: _watchSets(),
                   builder: (context, setsSnapshot) {
                     final sets = setsSnapshot.data ?? [];
-                    if (mounted) {
-                      HapticFeedback.mediumImpact();
-                    }
                     final exerciseBlocks = _groupSetsByExercise(sets);
 
                     if (_isFocusMode && exerciseBlocks.isNotEmpty) {
@@ -421,12 +475,14 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
                                   'Exercise ${_currentExerciseIndex + 1} of ${exerciseBlocks.length}',
                                   style: GoogleFonts.outfit(
                                     fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.grey[600],
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.grey[500],
                                   ),
                                 ),
-                                Text(
-                                  '${(((_currentExerciseIndex + 1) / exerciseBlocks.length) * 100).toInt()}% Complete',
+                                 Text(
+                                  (exerciseBlocks.isNotEmpty)
+                                      ? '${(((_currentExerciseIndex + 1) / exerciseBlocks.length) * 100).toInt()}% Complete'
+                                      : '0% Complete',
                                   style: GoogleFonts.outfit(
                                     fontSize: 14,
                                     fontWeight: FontWeight.bold,
@@ -437,9 +493,22 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
                             ),
                           ),
                           Expanded(
-                            child: SingleChildScrollView(
-                              padding: const EdgeInsets.all(16),
-                              child: _buildExerciseBlock(block, exerciseBlocks),
+                            child: PageView.builder(
+                              controller: _pageController,
+                              onPageChanged: (index) {
+                                setState(() {
+                                  _currentExerciseIndex = index;
+                                });
+                              },
+                              itemCount: exerciseBlocks.length,
+                              itemBuilder: (context, index) {
+                                final block = exerciseBlocks[index];
+                                return SingleChildScrollView(
+                                  padding: const EdgeInsets.all(16),
+                                  child: _buildExerciseBlock(
+                                      block, exerciseBlocks, settings, exercisesAsync),
+                                );
+                              },
                             ),
                           ),
                           // Navigation Controls
@@ -460,7 +529,12 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
                                 Expanded(
                                   child: OutlinedButton.icon(
                                     onPressed: _currentExerciseIndex > 0
-                                        ? () => setState(() => _currentExerciseIndex--)
+                                        ? () {
+                                            _pageController.previousPage(
+                                              duration: const Duration(milliseconds: 300),
+                                              curve: Curves.easeInOut,
+                                            );
+                                          }
                                         : null,
                                     icon: const Icon(LucideIcons.chevronLeft),
                                     label: const Text('Previous'),
@@ -474,7 +548,12 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
                                 Expanded(
                                   child: ElevatedButton.icon(
                                     onPressed: _currentExerciseIndex < exerciseBlocks.length - 1
-                                        ? () => setState(() => _currentExerciseIndex++)
+                                        ? () {
+                                            _pageController.nextPage(
+                                              duration: const Duration(milliseconds: 300),
+                                              curve: Curves.easeInOut,
+                                            );
+                                          }
                                         : null,
                                     icon: const Text('Next'),
                                     label: const Icon(LucideIcons.chevronRight),
@@ -540,7 +619,8 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
                             isLast: isLast,
                             isMiddle: isMiddle,
                             color: Theme.of(context).primaryColor,
-                            child: _buildExerciseBlock(block, exerciseBlocks),
+                            child: _buildExerciseBlock(
+                                block, exerciseBlocks, settings, exercisesAsync),
                           ),
                         );
                       },
@@ -653,9 +733,10 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
   }
 
   Widget _buildExerciseBlock(
-      ExerciseBlock block, List<ExerciseBlock> allBlocks) {
-    final exercisesAsync = ref.watch(allExercisesProvider);
-    final settings = ref.watch(settingsProvider).value ?? const SettingsState();
+      ExerciseBlock block,
+      List<ExerciseBlock> allBlocks,
+      SettingsState settings,
+      AsyncValue<List<entity.ExerciseEntity>> exercisesAsync) {
     final unit = settings.weightUnit;
     return exercisesAsync.when(
       data: (exercises) {
@@ -859,31 +940,45 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
                   ),
                 Row(children: [
                   const SizedBox(
-                      width: 38,
+                      width: 32,
                       child: Text('Set',
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                              fontSize: 11, fontWeight: FontWeight.bold))),
+                              fontSize: 10, fontWeight: FontWeight.bold, color: Colors.grey))),
                   Expanded(
+                      flex: 3,
                       child: Text(unit == WeightUnit.kg ? 'kg' : 'lbs',
                           textAlign: TextAlign.center,
-                          style: TextStyle(
-                              fontSize: 11, fontWeight: FontWeight.bold))),
+                          style: const TextStyle(
+                              fontSize: 10, fontWeight: FontWeight.bold, color: Colors.grey))),
                   Expanded(
+                      flex: 2,
                       child: Text(exercise.setType == 'Timed' ? 'Secs' : 'Reps',
                           textAlign: TextAlign.center,
-                          style: TextStyle(
-                              fontSize: 11, fontWeight: FontWeight.bold))),
+                          style: const TextStyle(
+                              fontSize: 10, fontWeight: FontWeight.bold, color: Colors.grey))),
                   const Expanded(
+                      flex: 2,
                       child: Text('RPE',
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                              fontSize: 11, fontWeight: FontWeight.bold))),
-                  const SizedBox(width: 48),
+                              fontSize: 10, fontWeight: FontWeight.bold, color: Colors.grey))),
+                  const Expanded(
+                      flex: 2,
+                      child: Text('RIR',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                              fontSize: 10, fontWeight: FontWeight.bold, color: Colors.grey))),
+                  const SizedBox(width: 60), // Space for check button
                 ]),
                 const Divider(),
                 ...block.sets.asMap().entries.map((entry) => _buildSetRow(
-                    entry.value, entry.key + 1, exercise, block, allBlocks)),
+                    entry.value,
+                    entry.key + 1,
+                    exercise,
+                    block,
+                    allBlocks,
+                    settings)),
                 const SizedBox(height: 8),
                 Semantics(
                   label: 'Add new set to ${exercise.name}',
@@ -938,9 +1033,9 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
       int index,
       entity.ExerciseEntity exercise,
       ExerciseBlock block,
-      List<ExerciseBlock> allBlocks) {
+      List<ExerciseBlock> allBlocks,
+      SettingsState settings) {
     final isCompleted = set.completed;
-    final settings = ref.watch(settingsProvider).value ?? const SettingsState();
     final unit = settings.weightUnit;
     final Color rowColor = isCompleted
         ? Colors.green.withValues(alpha: 0.1)
@@ -985,10 +1080,12 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
             child: Row(
               children: [
                 SizedBox(
-                  width: 38,
+                  width: 32,
                   child: _buildSetTypeBadge(set, index),
                 ),
+                const SizedBox(width: 4),
                 Expanded(
+                  flex: 3,
                   child: _buildCellInput(
                     setId: set.id,
                     type: 'weight',
@@ -1006,12 +1103,9 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
                         WeightConverter.toDisplay(set.weight, unit)),
                   ),
                 ),
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 4),
-                  child: Text('×',
-                      style: TextStyle(color: Colors.grey, fontSize: 12)),
-                ),
+                const SizedBox(width: 4),
                 Expanded(
+                  flex: 2,
                   child: _buildCellInput(
                     setId: set.id,
                     type: exercise.setType == 'Timed' ? 'secs' : 'reps',
@@ -1023,19 +1117,22 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
                     isCompleted: isCompleted,
                   ),
                 ),
+                const SizedBox(width: 4),
                 Expanded(
+                  flex: 2,
                   child: _buildRpePicker(set, isCompleted),
                 ),
                 const SizedBox(width: 4),
                 Expanded(
+                  flex: 2,
                   child: _buildRirPicker(set, isCompleted),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: 6),
                 GestureDetector(
                   onTap: () => _toggleSet(set, exercise, block, allBlocks),
                   child: Container(
-                    width: 54,
-                    height: 40,
+                    width: 44,
+                    height: 36,
                     decoration: BoxDecoration(
                       color: isCompleted
                           ? Colors.green
@@ -1053,24 +1150,26 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
                     ),
                     child: Icon(
                       LucideIcons.check,
-                      size: 22,
+                      size: 20,
                       color: isCompleted
                           ? Colors.white
                           : Theme.of(context).colorScheme.outline,
                     ),
                   ),
                 ),
+                const SizedBox(width: 2),
                 IconButton(
                   icon: Icon(
                     LucideIcons.pencilLine,
-                    size: 16,
+                    size: 14,
                     color: set.notes?.isNotEmpty == true
                         ? Theme.of(context).colorScheme.primary
-                        : Theme.of(context).colorScheme.outline.withValues(alpha: 0.5),
+                        : Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
                   ),
                   onPressed: () => _showSetNoteDialog(set),
                   constraints: const BoxConstraints(),
-                  padding: const EdgeInsets.only(left: 4),
+                  padding: EdgeInsets.zero,
+                  visualDensity: VisualDensity.compact,
                 ),
               ],
             ),
@@ -2408,67 +2507,93 @@ class _ExerciseMediaWidgetState extends State<_ExerciseMediaWidget> {
         : (widget.exercise.imageUrls.isNotEmpty
             ? widget.exercise.imageUrls.first
             : null);
+
     if (url == null || url.isEmpty) return const SizedBox.shrink();
+
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         GestureDetector(
           onTap: () => setState(() => _isExpanded = !_isExpanded),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              Text(
-                _isExpanded ? 'Hide Demo' : 'Show Demo',
-                style: TextStyle(
-                  fontSize: 11,
-                  color: Theme.of(context).colorScheme.primary,
-                  fontWeight: FontWeight.w500,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Text(
+                  _isExpanded ? 'Hide Demo' : 'Show Demo',
+                  style: GoogleFonts.outfit(
+                    fontSize: 12,
+                    color: Theme.of(context).colorScheme.primary,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
-              ),
-              Icon(
-                _isExpanded ? LucideIcons.chevronUp : LucideIcons.chevronDown,
-                size: 14,
-                color: Theme.of(context).colorScheme.primary,
-              ),
-            ],
+                const SizedBox(width: 4),
+                Icon(
+                  _isExpanded ? LucideIcons.chevronUp : LucideIcons.chevronDown,
+                  size: 16,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+              ],
+            ),
           ),
         ),
         AnimatedCrossFade(
-          duration: const Duration(milliseconds: 250),
+          duration: const Duration(milliseconds: 300),
           crossFadeState: _isExpanded
               ? CrossFadeState.showFirst
               : CrossFadeState.showSecond,
-          firstChild: ClipRRect(
-            borderRadius: BorderRadius.circular(12),
+          firstChild: Container(
+            width: double.infinity,
+            height: 200,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16),
+              color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.05),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            clipBehavior: Clip.antiAlias,
             child: CachedNetworkImage(
               imageUrl: url,
-              height: 180,
-              width: double.infinity,
-              fit: BoxFit.cover,
-              placeholder: (_, __) => Container(
-                height: 180,
-                color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                child: const Center(
-                    child: CircularProgressIndicator(strokeWidth: 2)),
-              ),
-              errorWidget: (_, __, ___) => Container(
-                height: 80,
-                decoration: BoxDecoration(
-                  color: Theme.of(context)
-                      .colorScheme
-                      .surfaceContainerHighest
-                      .withValues(alpha: 0.3),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Center(
-                  child: Icon(LucideIcons.dumbbell,
-                      size: 28, color: Theme.of(context).colorScheme.outline),
+              fit: BoxFit.contain,
+              placeholder: (_, __) => Center(
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    Theme.of(context).colorScheme.primary.withValues(alpha: 0.5),
+                  ),
                 ),
               ),
+              errorWidget: (_, err, ___) {
+                debugPrint('Media error for $url: $err');
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(LucideIcons.imageOff,
+                          size: 32, color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5)),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Demo unavailable',
+                        style: GoogleFonts.outfit(
+                          fontSize: 12,
+                          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
             ),
           ),
           secondChild: const SizedBox.shrink(),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 16),
       ],
     );
   }
