@@ -12,8 +12,10 @@ import 'package:uuid/uuid.dart';
 import 'package:drift/drift.dart' hide Column;
 import 'package:ai_gym_mentor/features/exercise_database/presentation/providers/exercise_providers.dart';
 import 'package:ai_gym_mentor/features/exercise_database/presentation/providers/repository_provider.dart';
+import 'package:ai_gym_mentor/features/history/history_providers.dart';
 import 'package:ai_gym_mentor/features/exercise_database/domain/entities/exercise_entity.dart'
     as entity;
+import 'package:ai_gym_mentor/features/exercise_database/presentation/widgets/exercise_media_widget.dart';
 import 'package:ai_gym_mentor/features/exercise_database/presentation/widgets/exercise_picker_overlay.dart';
 import 'package:confetti/confetti.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -461,28 +463,8 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
             canPop: false,
             onPopInvokedWithResult: (didPop, result) async {
               if (didPop) return;
-              final bool? discard = await showDialog<bool>(
-                context: context,
-                builder: (context) => AlertDialog(
-                  title: const Text('Discard Workout?'),
-                  content: const Text(
-                      'Are you sure you want to discard this workout? All progress will be lost.'),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(context, false),
-                      child: const Text('RESUME'),
-                    ),
-                    TextButton(
-                      onPressed: () => Navigator.pop(context, true),
-                      style: TextButton.styleFrom(foregroundColor: Colors.red),
-                      child: const Text('DISCARD'),
-                    ),
-                  ],
-                ),
-              );
-              if (discard == true) {
-                _discardWorkout();
-              }
+              // Call _discardWorkout which handles the confirmation dialog
+              _discardWorkout(showConfirm: true);
             },
             child: Stack(
               children: [
@@ -748,76 +730,96 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
 
   Widget _buildExerciseHeaderCard(Exercise exercise, ExerciseBlock block) {
     return Container(
-      width: double.infinity,
+      margin: const EdgeInsets.only(bottom: 24),
       decoration: BoxDecoration(
-        color: const Color(0xFF1A1A2E), // Dark navy as specified
-        borderRadius: BorderRadius.circular(16),
+        color: const Color(0xFF1E293B),
+        borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+            color: Colors.black.withOpacity(0.2),
+            blurRadius: 15,
+            offset: const Offset(0, 5),
           ),
         ],
       ),
+      clipBehavior: Clip.antiAlias,
       child: Stack(
         children: [
-          Padding(
-            padding: const EdgeInsets.all(20),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        exercise.name,
-                        style: GoogleFonts.inter(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Wrap(
-                        spacing: 6,
-                        runSpacing: 6,
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+               // Exercise Media
+              SizedBox(
+                height: 180,
+                width: double.infinity,
+                child: ExerciseMediaWidget(
+                  animatedUrl: exercise.gifUrl,
+                  staticUrl: exercise.imageUrls.isNotEmpty ? exercise.imageUrls.first : null,
+                  fit: BoxFit.cover,
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(20),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          ...exercise.primaryMuscles.map((m) => _buildPillBadge(m, Colors.blue)),
-                          ...exercise.secondaryMuscles.map((m) => _buildPillBadge(m, Colors.blue.withOpacity(0.5))),
+                          Text(
+                            exercise.name,
+                            style: GoogleFonts.inter(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Wrap(
+                            spacing: 6,
+                            runSpacing: 6,
+                            children: [
+                              ...exercise.primaryMuscles.map((m) => _buildPillBadge(m, Colors.blue)),
+                              ...exercise.secondaryMuscles.map((m) => _buildPillBadge(m, Colors.blue.withOpacity(0.5))),
+                            ],
+                          ),
                         ],
                       ),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Column(
-                  children: [
-                    Container(
-                      width: 48,
-                      height: 48,
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: const Icon(LucideIcons.camera, color: Colors.white70, size: 20),
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Demo',
-                      style: GoogleFonts.inter(fontSize: 10, color: Colors.white70),
+                    const SizedBox(width: 12),
+                    Column(
+                      children: [
+                        Material(
+                          color: Colors.white.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(12),
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(12),
+                            onTap: () => context.push('/exercises/${exercise.id}'),
+                            child: Container(
+                              width: 48,
+                              height: 48,
+                              alignment: Alignment.center,
+                              child: const Icon(LucideIcons.info, color: Colors.white70, size: 24),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Info',
+                          style: GoogleFonts.inter(fontSize: 10, color: Colors.white70),
+                        ),
+                      ],
                     ),
                   ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
           Positioned(
             top: 12,
             right: 8,
             child: IconButton(
-              icon: const Icon(Icons.more_vert, color: Colors.white70, size: 20),
+              icon: const Icon(Icons.more_vert, color: Colors.white, size: 24),
               onPressed: () => _showExerciseMenu(block, exercise),
             ),
           ),
@@ -1235,14 +1237,38 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
     bool isCompleted = false,
   }) {
     final controller = _getController(setId, type, value);
+    final focusNode = _getNode(setId, type);
+
+    // Sync controller text with value if it's different and not currently being edited
+    if (!focusNode.hasFocus && controller.text != value) {
+       controller.text = value;
+    }
+
     return Column(
       children: [
-        Text(
-          value,
-          style: GoogleFonts.inter(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: isCompleted ? Theme.of(context).colorScheme.outline : null,
+        SizedBox(
+          width: 70,
+          child: TextField(
+            controller: controller,
+            focusNode: focusNode,
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            textAlign: TextAlign.center,
+            style: GoogleFonts.inter(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: isCompleted ? Theme.of(context).colorScheme.outline : null,
+            ),
+            decoration: const InputDecoration(
+              isDense: true,
+              contentPadding: EdgeInsets.symmetric(vertical: 4),
+              border: InputBorder.none,
+              hintText: '0',
+            ),
+            onChanged: onChanged,
+            onTap: () {
+               // Focus is handled by TextField itself, adding onTap for clarity
+               focusNode.requestFocus();
+            },
           ),
         ),
         if (!isCompleted)
@@ -2018,7 +2044,12 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
         isScrollControlled: true,
         builder: (context) => RestTimerOverlay(
           nextExerciseName: nextExName,
-          onClose: () => Navigator.pop(context),
+          onClose: () {
+            // Check if we are still mounted before popping
+            if (Navigator.canPop(context)) {
+              Navigator.pop(context);
+            }
+          },
         ),
       );
     }
@@ -2406,35 +2437,55 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
     );
   }
 
-  Future<void> _discardWorkout() async {
-    final confirm = await showDialog<bool>(
-        context: context,
-        builder: (context) => AlertDialog(
-                title: const Text('Discard Workout?'),
-                content: const Text('All progress will be lost.'),
-                actions: [
-                  TextButton(
-                      onPressed: () => Navigator.pop(context, false),
-                      child: const Text('Cancel')),
-                  TextButton(
-                      onPressed: () => Navigator.pop(context, true),
-                      child: const Text('Discard',
-                          style: TextStyle(color: Colors.red)))
-                ]));
+  Future<void> _discardWorkout({bool showConfirm = true}) async {
+    bool? confirm = true;
+    if (showConfirm) {
+      confirm = await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+                  title: const Text('Discard Workout?'),
+                  content: const Text('All progress will be lost.'),
+                  actions: [
+                    TextButton(
+                        onPressed: () => Navigator.pop(context, false),
+                        child: const Text('Cancel')),
+                    TextButton(
+                        onPressed: () => Navigator.pop(context, true),
+                        child: const Text('Discard',
+                            style: TextStyle(color: Colors.red)))
+                  ]));
+    }
     if (confirm == true) {
       final database = ref.read(db.appDatabaseProvider);
-      await (database.delete(database.workouts)
-            ..where((t) => t.id.equals(widget.workoutId)))
-          .go();
-      await (database.delete(database.workoutSets)
-            ..where((t) => t.workoutId.equals(widget.workoutId)))
-          .go();
-      if (mounted) {
-        // Close any open bottom sheet (e.g., summary overlay) first
-        Navigator.of(context, rootNavigator: true).popUntil(
-            (route) => route.isFirst || route.settings.name == '/app');
-        ref.invalidate(workoutHomeProvider);
-        context.go('/app');
+      
+      try {
+        await database.transaction(() async {
+          await (database.delete(database.workoutSets)
+                ..where((t) => t.workoutId.equals(widget.workoutId)))
+              .go();
+          await (database.delete(database.workouts)
+                ..where((t) => t.id.equals(widget.workoutId)))
+              .go();
+        });
+
+        if (mounted) {
+          ref.invalidate(workoutHomeProvider);
+          // Also invalidate history if they are viewing it
+          ref.invalidate(historyListProvider);
+          
+          Navigator.of(context, rootNavigator: true).popUntil(
+              (route) => route.isFirst || route.settings.name == '/app');
+          
+          if (context.mounted) {
+            context.go('/app');
+          }
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error discarding workout: $e')),
+          );
+        }
       }
     }
   }

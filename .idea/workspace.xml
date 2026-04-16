@@ -5,10 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="310b61fb-298a-4d2b-8625-e9028bf4d99c" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.dart_tool/package_config.json" beforeDir="false" afterPath="$PROJECT_DIR$/.dart_tool/package_config.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.dart_tool/package_graph.json" beforeDir="false" afterPath="$PROJECT_DIR$/.dart_tool/package_graph.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.dart_tool/version" beforeDir="false" afterPath="$PROJECT_DIR$/.dart_tool/version" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.flutter-plugins-dependencies" beforeDir="false" afterPath="$PROJECT_DIR$/.flutter-plugins-dependencies" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/features/workout/active_workout_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/workout/active_workout_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/features/workout/providers/workout_home_notifier.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/workout/providers/workout_home_notifier.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/features/workout/workout_repository.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/workout/workout_repository.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pubspec.lock" beforeDir="false" afterPath="$PROJECT_DIR$/pubspec.lock" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
