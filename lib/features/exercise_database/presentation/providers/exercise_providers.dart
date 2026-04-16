@@ -4,6 +4,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:ai_gym_mentor/features/exercise_database/domain/entities/exercise_entity.dart';
 import 'package:ai_gym_mentor/features/exercise_database/data/models/exercise_filter_model.dart';
 import 'package:ai_gym_mentor/features/exercise_database/presentation/providers/repository_provider.dart';
+import 'package:ai_gym_mentor/services/github_exercise_service.dart';
 
 part 'exercise_providers.g.dart';
 
@@ -81,7 +82,7 @@ final exerciseDetailProvider = FutureProvider.family<ExerciseEntity?, int>((ref,
   return repo.getExerciseById(id);
 });
 
-final bodyPartsProvider = FutureProvider<List<String>>((ref) =>
+final exerciseBodyPartsProvider = FutureProvider<List<String>>((ref) =>
   ref.read(exerciseRepositoryProvider).getAvailableBodyParts());
 
 final equipmentProvider = FutureProvider<List<String>>((ref) =>
@@ -128,3 +129,11 @@ Future<List<ExerciseEntity>> searchSuggestions(Ref ref, String query) async {
   if (query.length < 2) return [];
   return ref.read(exerciseRepositoryProvider).searchExercises(query, limit: 5);
 }
+
+final syncExercisesFromCsvProvider = FutureProvider.autoDispose<int>((ref) async {
+  final githubService = GithubExerciseService();
+  final githubExercises = await githubService.getAllExercises();
+  final repo = ref.read(exerciseRepositoryProvider);
+  final synced = await repo.syncAllExercisesFromCsv(githubExercises);
+  return synced;
+});

@@ -73,4 +73,7 @@ abstract class ExerciseRepository {
 
   // Sync GitHub exercise to local DB
   Future<int> ensureGithubExercise(GithubExercise exercise);
+
+  // Sync all exercises from GitHub CSV to local DB
+  Future<int> syncAllExercisesFromCsv(List<GithubExercise> githubExercises);
 }

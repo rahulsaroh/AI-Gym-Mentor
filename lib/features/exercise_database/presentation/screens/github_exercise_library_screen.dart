@@ -6,6 +6,7 @@ import 'package:ai_gym_mentor/features/exercise_database/presentation/providers/
 import 'package:ai_gym_mentor/features/exercise_database/presentation/widgets/github_exercise_card.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ai_gym_mentor/features/exercise_database/presentation/providers/repository_provider.dart';
+import 'package:ai_gym_mentor/services/github_exercise_service.dart';
 
 class GithubExerciseLibraryScreen extends ConsumerStatefulWidget {
   const GithubExerciseLibraryScreen({Key? key}) : super(key: key);
@@ -66,6 +67,23 @@ class _GithubExerciseLibraryScreenState
         title: const Text('Exercise Library'),
         centerTitle: true,
         elevation: 0,
+        actions: [
+          IconButton(
+            icon: const Icon(LucideIcons.upload),
+            tooltip: 'Sync exercises from CSV',
+            onPressed: () async {
+              final githubService = GithubExerciseService();
+              final githubExercises = await githubService.getAllExercises();
+              final repo = ref.read(exerciseRepositoryProvider);
+              final synced = await repo.syncAllExercisesFromCsv(githubExercises);
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Synced $synced exercises from CSV')),
+                );
+              }
+            },
+          ),
+        ],
       ),
       body: RefreshIndicator(
         onRefresh: () async {

@@ -351,4 +351,50 @@ class ExerciseLocalDatasource {
       await _db.delete(_db.exercises).go();
     });
   }
+
+  Future<int> updateExerciseFromCsv({
+    required int exerciseId,
+    String? instructions,
+    String? secondaryMuscle,
+    String? bodyPart,
+    String? equipment,
+    String? gifUrl,
+  }) async {
+    final updates = <ExercisesCompanion>[];
+    
+    if (instructions != null && instructions.isNotEmpty) {
+      updates.add(ExercisesCompanion(instructions: Value(instructions)));
+    }
+    if (secondaryMuscle != null && secondaryMuscle.isNotEmpty) {
+      updates.add(ExercisesCompanion(secondaryMuscle: Value(secondaryMuscle)));
+    }
+    if (equipment != null && equipment.isNotEmpty) {
+      updates.add(ExercisesCompanion(equipment: Value(equipment)));
+    }
+    if (gifUrl != null && gifUrl.isNotEmpty) {
+      updates.add(ExercisesCompanion(gifUrl: Value(gifUrl)));
+    }
+    
+    if (updates.isNotEmpty) {
+      await updateExercise(exerciseId, ExercisesCompanion(
+        instructions: updates.any((u) => u.instructions.present) ? updates.firstWhere((u) => u.instructions.present, orElse: () => ExercisesCompanion()).instructions : const Value.absent(),
+        secondaryMuscle: updates.any((u) => u.secondaryMuscle.present) ? updates.firstWhere((u) => u.secondaryMuscle.present, orElse: () => ExercisesCompanion()).secondaryMuscle : const Value.absent(),
+        equipment: updates.any((u) => u.equipment.present) ? updates.firstWhere((u) => u.equipment.present, orElse: () => ExercisesCompanion()).equipment : const Value.absent(),
+        gifUrl: updates.any((u) => u.gifUrl.present) ? updates.firstWhere((u) => u.gifUrl.present, orElse: () => ExercisesCompanion()).gifUrl : const Value.absent(),
+      ));
+    }
+
+    if (bodyPart != null && bodyPart.isNotEmpty) {
+      await (_db.delete(_db.exerciseBodyParts)..where((t) => t.exerciseId.equals(exerciseId))).go();
+      await _db.into(_db.exerciseBodyParts).insert(
+        ExerciseBodyPartsCompanion.insert(exerciseId: exerciseId, bodyPart: bodyPart),
+      );
+    }
+
+    return exerciseId;
+  }
+
+  Future<List<ExerciseTable>> getAllExercisesRaw() async {
+    return await _db.select(_db.exercises).get();
+  }
 }

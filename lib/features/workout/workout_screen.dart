@@ -396,11 +396,22 @@ class _TodayPlanSection extends ConsumerWidget {
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: () {
+                    onPressed: () async {
                       if (state.activeDraft != null) {
                         // Navigate directly to the active workout — no need to ask anything
                         context.push('/app/workout/active?id=${state.activeDraft!.id}');
+                      } else if (state.templateId != null && state.nextDayId != null && !state.isRestDay) {
+                        // Auto-start today's workout
+                        final workoutId = await ref.read(workoutHomeProvider.notifier).startWorkout(
+                          templateId: state.templateId,
+                          dayId: state.nextDayId,
+                          name: state.todayDayName ?? 'Today\'s Workout',
+                        );
+                        if (context.mounted) {
+                          context.push('/app/workout/active?id=$workoutId&dayId=${state.nextDayId}');
+                        }
                       } else {
+                        // Show selection sheet if no plan is set or it's a rest day and user wants a quick workout
                         showModalBottomSheet(
                           context: context,
                           isScrollControlled: true,

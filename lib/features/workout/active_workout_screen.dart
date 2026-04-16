@@ -187,24 +187,30 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
 
   Future<void> _initializeFromTemplate() async {
     try {
-      if (widget.dayId == null) {
+      final database = ref.read(db.appDatabaseProvider);
+      int? dayId = widget.dayId;
+
+      // If dayId is null, try to fetch it from the workout record in DB
+      if (dayId == null) {
+        final workoutRow = await (database.select(database.workouts)
+              ..where((t) => t.id.equals(widget.workoutId)))
+            .getSingleOrNull();
+        dayId = workoutRow?.dayId;
+      }
+
+      if (dayId == null) {
         if (mounted) setState(() => _isInitializing = false);
         return;
       }
-      final database = ref.read(db.appDatabaseProvider);
+
       final existingSets = await (database.select(database.workoutSets)
             ..where((t) => t.workoutId.equals(widget.workoutId)))
           .get();
 
       if (existingSets.isEmpty) {
-        final dayId = widget.dayId;
-        if (dayId == null) {
-          if (mounted) setState(() => _isInitializing = false);
-          return;
-        }
         final templateExercises =
             await (database.select(database.templateExercises)
-                  ..where((t) => t.dayId.equals(dayId))
+                  ..where((t) => t.dayId.equals(dayId!))
                   ..orderBy([(t) => OrderingTerm(expression: t.order)]))
                 .get();
 

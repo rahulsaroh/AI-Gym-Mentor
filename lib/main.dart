@@ -13,6 +13,8 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:ai_gym_mentor/l10n/app_localizations.dart';
 import 'package:ai_gym_mentor/services/background_worker.dart';
 import 'package:ai_gym_mentor/features/exercise_database/data/datasources/exercise_db_seeder.dart';
+import 'package:ai_gym_mentor/features/workout/data/datasources/program_db_seeder.dart';
+import 'package:ai_gym_mentor/core/database/database.dart';
 
 void main() async {
   // Ensure Flutter is initialized before any async code
@@ -56,7 +58,11 @@ void main() async {
   try {
     if (kDebugMode) debugPrint('Step 4: Seeding Exercise Database...');
     await ExerciseDbSeeder.instance.seed();
-    if (kDebugMode) debugPrint('Exercise Database Seeded Successfully');
+    
+    if (kDebugMode) debugPrint('Step 5: Seeding Workout Programs...');
+    await ProgramDbSeeder.instance.seed(AppDatabase());
+    
+    if (kDebugMode) debugPrint('Exercise and Program Database Seeded Successfully');
   } catch (e) {
     debugPrint('Exercise Database Seeding Failed: $e');
   }

@@ -359,4 +359,49 @@ class ExerciseRepositoryImpl implements ExerciseRepository {
 
     return id;
   }
+
+  @override
+  Future<int> syncAllExercisesFromCsv(List<GithubExercise> githubExercises) async {
+    int synced = 0;
+    final localExercises = await _localDatasource.getAllExercisesRaw();
+    final localByName = <String, ExerciseTable>{};
+    for (final ex in localExercises) {
+      localByName[ex.name.toLowerCase()] = ex;
+    }
+
+    for (final githubEx in githubExercises) {
+      if (githubEx.name.isEmpty) continue;
+      
+      final normalizedName = githubEx.name.toLowerCase();
+      final existing = localByName[normalizedName];
+
+      if (existing != null) {
+        final needsUpdate = 
+            existing.instructions == null || existing.instructions!.isEmpty ||
+            existing.secondaryMuscle == null || existing.secondaryMuscle!.isEmpty ||
+            existing.gifUrl == null || existing.gifUrl!.isEmpty;
+
+        if (needsUpdate) {
+          final secondaryMuscle = githubEx.secondaryMuscles.isNotEmpty 
+              ? githubEx.secondaryMuscles.join(', ') 
+              : null;
+          
+          await _localDatasource.updateExerciseFromCsv(
+            exerciseId: existing.id,
+            instructions: githubEx.instructions.isNotEmpty ? githubEx.instructions.join('|') : null,
+            secondaryMuscle: secondaryMuscle,
+            bodyPart: githubEx.bodyPart.isNotEmpty ? githubEx.bodyPart : null,
+            equipment: githubEx.equipment.isNotEmpty ? githubEx.equipment : null,
+            gifUrl: githubEx.gifUrl,
+          );
+          synced++;
+        }
+      } else {
+        await ensureGithubExercise(githubEx);
+        synced++;
+      }
+    }
+
+    return synced;
+  }
 }
