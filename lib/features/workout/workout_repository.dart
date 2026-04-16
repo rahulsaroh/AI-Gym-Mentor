@@ -604,6 +604,65 @@ class WorkoutRepository {
     return id;
   }
 
+  /// Deletes draft workouts older than 24 hours that have no completed sets.
+  Future<void> cleanupStaleDrafts() async {
+    try {
+      final staleTime = DateTime.now().subtract(const Duration(hours: 24));
+      
+      // Find drafts older than 24 hours
+      final staleDrafts = await (_db.select(_db.workouts)
+            ..where((t) => t.status.equals('draft') & t.date.isSmallerThanValue(staleTime)))
+          .get();
+
+      if (staleDrafts.isEmpty) return;
+
+      int cleanupCount = 0;
+      for (var draft in staleDrafts) {
+        // Check if it has any completed sets
+        final completedSetsCount = await (_db.selectOnly(_db.workoutSets)
+              ..addColumns([_db.workoutSets.id])
+              ..where(_db.workoutSets.workoutId.equals(draft.id) & _db.workoutSets.completed.equals(true))
+              ..limit(1))
+            .get();
+        
+        if (completedSetsCount.isEmpty) {
+          debugPrint('WorkoutRepository: Cleaning up stale draft workout ${draft.id} ("${draft.name}")');
+          await deleteWorkout(draft.id);
+          cleanupCount++;
+        }
+      }
+      if (cleanupCount > 0) {
+        debugPrint('WorkoutRepository: Performance cleanup completed, removed $cleanupCount stale drafts.');
+      }
+    } catch (e) {
+      debugPrint('WorkoutRepository: Error during stale draft cleanup: $e');
+    }
+  }
+
+  /// Finds an existing draft for the same template/day created within the last 12 hours.
+  Future<int?> findExistingRecentDraft({int? templateId, int? dayId}) async {
+    final recentTime = DateTime.now().subtract(const Duration(hours: 12));
+    
+    final query = _db.select(_db.workouts);
+    
+    Expression<bool> whereClause = _db.workouts.status.equals('draft') & 
+                                  _db.workouts.date.isBiggerThanValue(recentTime);
+    
+    if (templateId != null) {
+      whereClause = whereClause & _db.workouts.templateId.equals(templateId);
+    }
+    if (dayId != null) {
+      whereClause = whereClause & _db.workouts.dayId.equals(dayId);
+    }
+    
+    query.where((t) => whereClause);
+    query.orderBy([(t) => OrderingTerm(expression: t.id, mode: OrderingMode.desc)]);
+    query.limit(1);
+    
+    final draft = await query.getSingleOrNull();
+    return draft?.id;
+  }
+
   Future<List<ent.WorkoutProgram>> getAllTemplates() async {
     final rows = await _db.select(_db.workoutTemplates).get();
     final List<ent.WorkoutProgram> result = [];

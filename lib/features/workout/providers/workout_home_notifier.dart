@@ -70,6 +70,10 @@ class WorkoutHomeNotifier extends _$WorkoutHomeNotifier {
 
   Future<WorkoutHomeState> _fetchHomeData({int? forcedDayId}) async {
     final workoutRepo = ref.read(workoutRepositoryProvider);
+    
+    // Performance: Cleanup stale draft workouts (older than 24h with no progress)
+    await workoutRepo.cleanupStaleDrafts();
+
     final stats = await workoutRepo.getStats();
     final lastWorkout = await workoutRepo.getLastWorkout();
     final activeDraft = await workoutRepo.getActiveWorkoutDraft();
@@ -269,6 +273,20 @@ class WorkoutHomeNotifier extends _$WorkoutHomeNotifier {
   Future<int> startWorkout({int? templateId, int? dayId, String? name}) async {
     final repo = ref.read(workoutRepositoryProvider);
     debugPrint('WorkoutHomeNotifier.startWorkout: templateId=$templateId, dayId=$dayId, name=$name');
+
+    // 1. Check if we already have a RECENT draft (within 12h) for this specific day/template
+    // This prevents "Stacking" drafts if the user starts a session, leaves, and starts same again.
+    final existingId = await repo.findExistingRecentDraft(
+      templateId: templateId,
+      dayId: dayId,
+    );
+
+    if (existingId != null) {
+      debugPrint('WorkoutHomeNotifier.startWorkout: Reusing existing draft id=$existingId');
+      return existingId;
+    }
+
+    // 2. Otherwise create a new one
     final id = await repo.createWorkout(
       name: name ?? 'New Workout',
       templateId: templateId,
@@ -277,6 +295,15 @@ class WorkoutHomeNotifier extends _$WorkoutHomeNotifier {
     debugPrint('WorkoutHomeNotifier.startWorkout: created workout id=$id');
     ref.invalidateSelf();
     return id;
+  }
+
+  Future<void> discardActiveDraft() async {
+    final activeDraft = state.asData?.value.activeDraft;
+    if (activeDraft == null) return;
+
+    final repo = ref.read(workoutRepositoryProvider);
+    await repo.deleteWorkout(activeDraft.id);
+    ref.invalidateSelf();
   }
 
   Future<void> logWeight(double weight) async {
