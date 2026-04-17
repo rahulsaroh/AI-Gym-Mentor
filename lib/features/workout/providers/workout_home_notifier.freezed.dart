@@ -13,7 +13,7 @@ part of 'workout_home_notifier.dart';
 T _$identity<T>(T value) => value;
 
 /// @nodoc
-mixin _$MotivationTip {
+mixin _$MotivationTip implements DiagnosticableTreeMixin {
   String get text;
   String get category;
 
@@ -24,6 +24,14 @@ mixin _$MotivationTip {
   $MotivationTipCopyWith<MotivationTip> get copyWith =>
       _$MotivationTipCopyWithImpl<MotivationTip>(
           this as MotivationTip, _$identity);
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    properties
+      ..add(DiagnosticsProperty('type', 'MotivationTip'))
+      ..add(DiagnosticsProperty('text', text))
+      ..add(DiagnosticsProperty('category', category));
+  }
 
   @override
   bool operator ==(Object other) {
@@ -39,7 +47,7 @@ mixin _$MotivationTip {
   int get hashCode => Object.hash(runtimeType, text, category);
 
   @override
-  String toString() {
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
     return 'MotivationTip(text: $text, category: $category)';
   }
 }
@@ -241,7 +249,7 @@ extension MotivationTipPatterns on MotivationTip {
 
 /// @nodoc
 
-class _MotivationTip extends MotivationTip {
+class _MotivationTip extends MotivationTip with DiagnosticableTreeMixin {
   const _MotivationTip({required this.text, required this.category})
       : super._();
 
@@ -259,6 +267,14 @@ class _MotivationTip extends MotivationTip {
       __$MotivationTipCopyWithImpl<_MotivationTip>(this, _$identity);
 
   @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    properties
+      ..add(DiagnosticsProperty('type', 'MotivationTip'))
+      ..add(DiagnosticsProperty('text', text))
+      ..add(DiagnosticsProperty('category', category));
+  }
+
+  @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
@@ -272,7 +288,7 @@ class _MotivationTip extends MotivationTip {
   int get hashCode => Object.hash(runtimeType, text, category);
 
   @override
-  String toString() {
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
     return 'MotivationTip(text: $text, category: $category)';
   }
 }
@@ -318,7 +334,7 @@ class __$MotivationTipCopyWithImpl<$Res>
 }
 
 /// @nodoc
-mixin _$TodayExercise {
+mixin _$TodayExercise implements DiagnosticableTreeMixin {
   int get id;
   String get name;
   String? get imageUrl;
@@ -330,6 +346,15 @@ mixin _$TodayExercise {
   $TodayExerciseCopyWith<TodayExercise> get copyWith =>
       _$TodayExerciseCopyWithImpl<TodayExercise>(
           this as TodayExercise, _$identity);
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    properties
+      ..add(DiagnosticsProperty('type', 'TodayExercise'))
+      ..add(DiagnosticsProperty('id', id))
+      ..add(DiagnosticsProperty('name', name))
+      ..add(DiagnosticsProperty('imageUrl', imageUrl));
+  }
 
   @override
   bool operator ==(Object other) {
@@ -346,7 +371,7 @@ mixin _$TodayExercise {
   int get hashCode => Object.hash(runtimeType, id, name, imageUrl);
 
   @override
-  String toString() {
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
     return 'TodayExercise(id: $id, name: $name, imageUrl: $imageUrl)';
   }
 }
@@ -553,7 +578,7 @@ extension TodayExercisePatterns on TodayExercise {
 
 /// @nodoc
 
-class _TodayExercise implements TodayExercise {
+class _TodayExercise with DiagnosticableTreeMixin implements TodayExercise {
   const _TodayExercise({required this.id, required this.name, this.imageUrl});
 
   @override
@@ -572,6 +597,15 @@ class _TodayExercise implements TodayExercise {
       __$TodayExerciseCopyWithImpl<_TodayExercise>(this, _$identity);
 
   @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    properties
+      ..add(DiagnosticsProperty('type', 'TodayExercise'))
+      ..add(DiagnosticsProperty('id', id))
+      ..add(DiagnosticsProperty('name', name))
+      ..add(DiagnosticsProperty('imageUrl', imageUrl));
+  }
+
+  @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
@@ -586,7 +620,7 @@ class _TodayExercise implements TodayExercise {
   int get hashCode => Object.hash(runtimeType, id, name, imageUrl);
 
   @override
-  String toString() {
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
     return 'TodayExercise(id: $id, name: $name, imageUrl: $imageUrl)';
   }
 }
@@ -637,7 +671,7 @@ class __$TodayExerciseCopyWithImpl<$Res>
 }
 
 /// @nodoc
-mixin _$WorkoutHomeState {
+mixin _$WorkoutHomeState implements DiagnosticableTreeMixin {
   String get greeting;
   String get userName;
   String get dateString;
@@ -663,6 +697,29 @@ mixin _$WorkoutHomeState {
   $WorkoutHomeStateCopyWith<WorkoutHomeState> get copyWith =>
       _$WorkoutHomeStateCopyWithImpl<WorkoutHomeState>(
           this as WorkoutHomeState, _$identity);
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    properties
+      ..add(DiagnosticsProperty('type', 'WorkoutHomeState'))
+      ..add(DiagnosticsProperty('greeting', greeting))
+      ..add(DiagnosticsProperty('userName', userName))
+      ..add(DiagnosticsProperty('dateString', dateString))
+      ..add(DiagnosticsProperty('currentStreak', currentStreak))
+      ..add(DiagnosticsProperty('dailyTip', dailyTip))
+      ..add(DiagnosticsProperty('lastWorkout', lastWorkout))
+      ..add(DiagnosticsProperty('activeDraft', activeDraft))
+      ..add(DiagnosticsProperty('weeklyVolume', weeklyVolume))
+      ..add(DiagnosticsProperty('lastWeight', lastWeight))
+      ..add(DiagnosticsProperty('lastWorkoutSummary', lastWorkoutSummary))
+      ..add(DiagnosticsProperty('isRestDay', isRestDay))
+      ..add(DiagnosticsProperty('todayDayName', todayDayName))
+      ..add(DiagnosticsProperty('todayExercises', todayExercises))
+      ..add(DiagnosticsProperty('estimatedDuration', estimatedDuration))
+      ..add(DiagnosticsProperty('nextDayId', nextDayId))
+      ..add(DiagnosticsProperty('templateId', templateId))
+      ..add(DiagnosticsProperty('manualDayId', manualDayId));
+  }
 
   @override
   bool operator ==(Object other) {
@@ -727,7 +784,7 @@ mixin _$WorkoutHomeState {
       manualDayId);
 
   @override
-  String toString() {
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
     return 'WorkoutHomeState(greeting: $greeting, userName: $userName, dateString: $dateString, currentStreak: $currentStreak, dailyTip: $dailyTip, lastWorkout: $lastWorkout, activeDraft: $activeDraft, weeklyVolume: $weeklyVolume, lastWeight: $lastWeight, lastWorkoutSummary: $lastWorkoutSummary, isRestDay: $isRestDay, todayDayName: $todayDayName, todayExercises: $todayExercises, estimatedDuration: $estimatedDuration, nextDayId: $nextDayId, templateId: $templateId, manualDayId: $manualDayId)';
   }
 }
@@ -1183,7 +1240,7 @@ extension WorkoutHomeStatePatterns on WorkoutHomeState {
 
 /// @nodoc
 
-class _WorkoutHomeState extends WorkoutHomeState {
+class _WorkoutHomeState extends WorkoutHomeState with DiagnosticableTreeMixin {
   const _WorkoutHomeState(
       {required this.greeting,
       required this.userName,
@@ -1269,6 +1326,29 @@ class _WorkoutHomeState extends WorkoutHomeState {
       __$WorkoutHomeStateCopyWithImpl<_WorkoutHomeState>(this, _$identity);
 
   @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    properties
+      ..add(DiagnosticsProperty('type', 'WorkoutHomeState'))
+      ..add(DiagnosticsProperty('greeting', greeting))
+      ..add(DiagnosticsProperty('userName', userName))
+      ..add(DiagnosticsProperty('dateString', dateString))
+      ..add(DiagnosticsProperty('currentStreak', currentStreak))
+      ..add(DiagnosticsProperty('dailyTip', dailyTip))
+      ..add(DiagnosticsProperty('lastWorkout', lastWorkout))
+      ..add(DiagnosticsProperty('activeDraft', activeDraft))
+      ..add(DiagnosticsProperty('weeklyVolume', weeklyVolume))
+      ..add(DiagnosticsProperty('lastWeight', lastWeight))
+      ..add(DiagnosticsProperty('lastWorkoutSummary', lastWorkoutSummary))
+      ..add(DiagnosticsProperty('isRestDay', isRestDay))
+      ..add(DiagnosticsProperty('todayDayName', todayDayName))
+      ..add(DiagnosticsProperty('todayExercises', todayExercises))
+      ..add(DiagnosticsProperty('estimatedDuration', estimatedDuration))
+      ..add(DiagnosticsProperty('nextDayId', nextDayId))
+      ..add(DiagnosticsProperty('templateId', templateId))
+      ..add(DiagnosticsProperty('manualDayId', manualDayId));
+  }
+
+  @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
@@ -1331,7 +1411,7 @@ class _WorkoutHomeState extends WorkoutHomeState {
       manualDayId);
 
   @override
-  String toString() {
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
     return 'WorkoutHomeState(greeting: $greeting, userName: $userName, dateString: $dateString, currentStreak: $currentStreak, dailyTip: $dailyTip, lastWorkout: $lastWorkout, activeDraft: $activeDraft, weeklyVolume: $weeklyVolume, lastWeight: $lastWeight, lastWorkoutSummary: $lastWorkoutSummary, isRestDay: $isRestDay, todayDayName: $todayDayName, todayExercises: $todayExercises, estimatedDuration: $estimatedDuration, nextDayId: $nextDayId, templateId: $templateId, manualDayId: $manualDayId)';
   }
 }
