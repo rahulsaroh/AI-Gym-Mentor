@@ -39,14 +39,17 @@ class ExportService {
       ]
     ];
 
+    final exerciseById = {for (final e in exercises) e.id: e};
+
     for (var w in workouts) {
       final workoutSets = allSets.where((s) => s.workoutId == w.id).toList();
+      final when = w.startTime ?? w.date;
       for (var s in workoutSets) {
-        final ex = exercises.firstWhere((e) => e.id == s.exerciseId);
+        final ex = exerciseById[s.exerciseId];
         rows.add([
-          DateFormat('yyyy-MM-dd HH:mm').format(w.startTime!),
+          DateFormat('yyyy-MM-dd HH:mm').format(when),
           w.name,
-          ex.name,
+          ex?.name ?? 'Unknown',
           s.setType.name,
           s.weight,
           s.reps,
@@ -78,6 +81,7 @@ class ExportService {
     final allSets = await db.select(db.workoutSets).get();
     final exercises =
         await ref.read(exerciseRepositoryProvider).getAllExercises();
+    final exerciseById = {for (final e in exercises) e.id: e};
 
     final pdf = pw.Document();
 
@@ -108,7 +112,7 @@ class ExportService {
                       mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                       children: [
                         pw.Text(
-                            '${w.name} - ${DateFormat('MMM d, yyyy').format(w.startTime!)}',
+                            '${w.name} - ${DateFormat('MMM d, yyyy').format(w.startTime ?? w.date)}',
                             style:
                                 pw.TextStyle(fontWeight: pw.FontWeight.bold)),
                         pw.Text('${w.duration} mins',
@@ -119,7 +123,7 @@ class ExportService {
                   ),
                   pw.SizedBox(height: 8),
                   ...workoutExercises.map((exId) {
-                    final ex = exercises.firstWhere((e) => e.id == exId);
+                    final ex = exerciseById[exId];
                     final exSets =
                         workoutSets.where((s) => s.exerciseId == exId).toList();
                     return pw.Padding(
@@ -127,7 +131,7 @@ class ExportService {
                       child: pw.Column(
                         crossAxisAlignment: pw.CrossAxisAlignment.start,
                         children: [
-                          pw.Text(ex.name,
+                          pw.Text(ex?.name ?? 'Unknown',
                               style: pw.TextStyle(
                                   fontWeight: pw.FontWeight.bold,
                                   fontSize: 12)),

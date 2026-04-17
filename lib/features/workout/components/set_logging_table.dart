@@ -251,7 +251,9 @@ class SetLoggingTable extends StatelessWidget {
                 ),
                 const SizedBox(width: 8),
                 _buildCompactIntensityInput(context, set, true, isCompleted),
-                const SizedBox(width: 12),
+                const SizedBox(width: 8),
+                _buildSetNoteButton(context, set),
+                const SizedBox(width: 4),
                 GestureDetector(
                   onTap: () => onToggleSet(set, exercise, block, allBlocks),
                   child: TweenAnimationBuilder<double>(
@@ -427,6 +429,90 @@ class SetLoggingTable extends StatelessWidget {
         ),
         child: Icon(icon, size: 16, color: Theme.of(context).primaryColor),
       ),
+    );
+  }
+
+  Widget _buildSetNoteButton(BuildContext context, db.WorkoutSet set) {
+    final hasNote = (set.notes ?? '').trim().isNotEmpty;
+    return GestureDetector(
+      onTap: () => _showSetNoteSheet(context, set),
+      child: Container(
+        width: 28,
+        height: 28,
+        decoration: BoxDecoration(
+          color: hasNote
+              ? Theme.of(context).colorScheme.primary.withOpacity(0.12)
+              : Theme.of(context)
+                  .colorScheme
+                  .surfaceContainerHighest
+                  .withOpacity(0.3),
+          shape: BoxShape.circle,
+        ),
+        alignment: Alignment.center,
+        child: Icon(
+          hasNote ? LucideIcons.messageSquareText : LucideIcons.messageSquare,
+          size: 14,
+          color: hasNote
+              ? Theme.of(context).colorScheme.primary
+              : Theme.of(context).colorScheme.outline,
+        ),
+      ),
+    );
+  }
+
+  void _showSetNoteSheet(BuildContext context, db.WorkoutSet set) {
+    final controller = TextEditingController(text: set.notes ?? '');
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (ctx) {
+        return Padding(
+          padding: EdgeInsets.only(
+            left: 20,
+            right: 20,
+            top: 20,
+            bottom: MediaQuery.of(ctx).viewInsets.bottom + 20,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Note for set ${set.setNumber}',
+                style: GoogleFonts.outfit(
+                    fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: controller,
+                autofocus: true,
+                maxLines: 4,
+                decoration: InputDecoration(
+                  hintText: 'e.g. "Felt heavy", "Add 2.5kg next time"',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              Align(
+                alignment: Alignment.centerRight,
+                child: FilledButton(
+                  onPressed: () {
+                    onUpdateSet(set.id, notes: controller.text);
+                    Navigator.pop(ctx);
+                  },
+                  child: const Text('Save'),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 
