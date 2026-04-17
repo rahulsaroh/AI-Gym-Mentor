@@ -434,6 +434,13 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
               builder: (context, snapshot) {
                 final sets = snapshot.data ?? [];
                 final completedCount = sets.where((s) => s.completed).length;
+                final totalVolume = sets
+                    .where((s) => s.completed)
+                    .fold<double>(0, (a, s) => a + (s.weight * s.reps));
+                final settings = ref.watch(settingsProvider).value;
+                final unit = settings?.weightUnit ?? WeightUnit.kg;
+                final displayVolume =
+                    WeightConverter.toDisplay(totalVolume, unit);
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -466,6 +473,14 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
                             color: Theme.of(context).colorScheme.outline,
                           ),
                         ),
+                        if (totalVolume > 0)
+                          Text(
+                            ' • ${displayVolume.toStringAsFixed(0)}${unit == WeightUnit.kg ? 'kg' : 'lbs'} vol',
+                            style: GoogleFonts.inter(
+                              fontSize: 12,
+                              color: Theme.of(context).colorScheme.outline,
+                            ),
+                          ),
                       ],
                     ),
                   ],
@@ -809,7 +824,10 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
 
             // ── AI Coach Cues (Beat Hevy Phase 3) ──
             AICoachCue(block: block, exerciseName: exercise.name),
-            
+
+            // ── Progressive Overload vs Last Session ──
+            _buildProgressiveOverloadIndicator(block),
+
             // ── Notes Section (Requirement 4) ──
             _buildNotesSection(block),
             
@@ -1070,21 +1088,38 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
 
   Future<void> _loadHistory() async {
     final database = ref.read(db.appDatabaseProvider);
-    final completedWorkouts = await (database.select(database.workouts)
-          ..where((t) => t.status.equals('completed'))
+
+    // Fetch all completed sets from prior workouts, joined with workout dates.
+    // For each exercise, pick the most-recent session's sets (per-exercise,
+    // not per-workout) so that previous-set hints work even when an exercise
+    // wasn't in the most recent session.
+    final rows = await (database.select(database.workoutSets).join([
+      innerJoin(database.workouts,
+          database.workouts.id.equalsExp(database.workoutSets.workoutId)),
+    ])
+          ..where(database.workouts.status.equals('completed') &
+              database.workouts.id.isNotValue(widget.workoutId))
           ..orderBy([
-            (t) => OrderingTerm(expression: t.date, mode: OrderingMode.desc)
+            OrderingTerm(
+                expression: database.workouts.date, mode: OrderingMode.desc),
+            OrderingTerm(expression: database.workoutSets.setNumber),
           ]))
         .get();
-    if (completedWorkouts.isEmpty) return;
-    final lastWorkoutId = completedWorkouts.first.id;
-    final historySets = await (database.select(database.workoutSets)
-          ..where((t) => t.workoutId.equals(lastWorkoutId)))
-        .get();
+
     final Map<int, List<db.WorkoutSet>> historyMap = {};
-    for (var s in historySets) {
-      historyMap.putIfAbsent(s.exerciseId, () => []).add(s);
+    final Map<int, int> lastWorkoutIdForExercise = {};
+    for (final row in rows) {
+      final set = row.readTable(database.workoutSets);
+      final lastId = lastWorkoutIdForExercise[set.exerciseId];
+      if (lastId == null) {
+        lastWorkoutIdForExercise[set.exerciseId] = set.workoutId;
+      } else if (lastId != set.workoutId) {
+        // We've moved past this exercise's most-recent workout — skip older.
+        continue;
+      }
+      historyMap.putIfAbsent(set.exerciseId, () => []).add(set);
     }
+
     if (mounted) setState(() => _previousSessionSets = historyMap);
   }
 
@@ -1211,6 +1246,113 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
               height: 1,
             ),
           ),
+        ],
+      ),
+    );
+  }
+
+  /// Compares current session volume and best weight against the last
+  /// recorded session for this exercise. Returns null when there's no history.
+  Widget _buildProgressiveOverloadIndicator(ExerciseBlock block) {
+    final prev = _previousSessionSets[block.exerciseId];
+    if (prev == null || prev.isEmpty) return const SizedBox.shrink();
+
+    final prevVolume =
+        prev.fold<double>(0, (acc, s) => acc + (s.weight * s.reps));
+    final prevBestWeight =
+        prev.fold<double>(0, (m, s) => s.weight > m ? s.weight : m);
+
+    final currentCompleted = block.sets.where((s) => s.completed).toList();
+    if (currentCompleted.isEmpty) {
+      // Encourage: show the target to beat
+      return Container(
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surfaceContainerHighest
+              .withOpacity(0.4),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          children: [
+            Icon(LucideIcons.target,
+                size: 14,
+                color: Theme.of(context).colorScheme.outline),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                'Beat last session: ${prevVolume.toStringAsFixed(0)} vol · best ${prevBestWeight.toStringAsFixed(1)}',
+                style: GoogleFonts.inter(
+                  fontSize: 12,
+                  color: Theme.of(context).colorScheme.outline,
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    final currentVolume = currentCompleted.fold<double>(
+        0, (acc, s) => acc + (s.weight * s.reps));
+    final currentBestWeight =
+        currentCompleted.fold<double>(0, (m, s) => s.weight > m ? s.weight : m);
+
+    final volDelta = currentVolume - prevVolume;
+    final bestDelta = currentBestWeight - prevBestWeight;
+
+    Color colorFor(double d) {
+      if (d > 0) return Colors.green;
+      if (d < 0) return Colors.orange;
+      return Theme.of(context).colorScheme.outline;
+    }
+
+    IconData iconFor(double d) {
+      if (d > 0) return LucideIcons.trendingUp;
+      if (d < 0) return LucideIcons.trendingDown;
+      return LucideIcons.minus;
+    }
+
+    String fmt(double d) {
+      final sign = d > 0 ? '+' : '';
+      return '$sign${d.toStringAsFixed(d.abs() < 10 ? 1 : 0)}';
+    }
+
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: Theme.of(context)
+            .colorScheme
+            .surfaceContainerHighest
+            .withOpacity(0.4),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: [
+          Icon(LucideIcons.trendingUp,
+              size: 14, color: Theme.of(context).colorScheme.primary),
+          const SizedBox(width: 8),
+          Text('vs last:',
+              style: GoogleFonts.inter(
+                  fontSize: 12,
+                  color: Theme.of(context).colorScheme.outline)),
+          const SizedBox(width: 8),
+          Icon(iconFor(volDelta), size: 12, color: colorFor(volDelta)),
+          const SizedBox(width: 2),
+          Text('${fmt(volDelta)} vol',
+              style: GoogleFonts.inter(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: colorFor(volDelta))),
+          const SizedBox(width: 10),
+          Icon(iconFor(bestDelta), size: 12, color: colorFor(bestDelta)),
+          const SizedBox(width: 2),
+          Text('${fmt(bestDelta)} best',
+              style: GoogleFonts.inter(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: colorFor(bestDelta))),
         ],
       ),
     );

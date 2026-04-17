@@ -262,11 +262,16 @@ class _WorkoutSummaryOverlayState extends ConsumerState<WorkoutSummaryOverlay>
                     ),
                     const SizedBox(height: 12),
                     // Staggered exercise rows
-                    ...exerciseEntries.asMap().entries.map((mapEntry) {
+                    ...exerciseEntries
+                        .asMap()
+                        .entries
+                        .where((mapEntry) => widget.exercises
+                            .any((e) => e.id == mapEntry.value.key))
+                        .map((mapEntry) {
                       final index = mapEntry.key;
                       final entry = mapEntry.value;
-                      final ex =
-                          widget.exercises.firstWhere((e) => e.id == entry.key);
+                      final ex = widget.exercises
+                          .firstWhere((e) => e.id == entry.key);
                       final maxWeight = entry.value.fold(
                           0.0, (prev, s) => s.weight > prev ? s.weight : prev);
 
