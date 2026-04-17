@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'gemini_service.dart';
+part of 'pdf_service.dart';
 
 // **************************************************************************
 // RiverpodGenerator
@@ -9,28 +9,27 @@ part of 'gemini_service.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 
-@ProviderFor(GeminiService)
-final geminiServiceProvider = GeminiServiceProvider._();
+@ProviderFor(PdfService)
+final pdfServiceProvider = PdfServiceProvider._();
 
-final class GeminiServiceProvider
-    extends $NotifierProvider<GeminiService, void> {
-  GeminiServiceProvider._()
+final class PdfServiceProvider extends $NotifierProvider<PdfService, void> {
+  PdfServiceProvider._()
       : super(
           from: null,
           argument: null,
           retry: null,
-          name: r'geminiServiceProvider',
+          name: r'pdfServiceProvider',
           isAutoDispose: true,
           dependencies: null,
           $allTransitiveDependencies: null,
         );
 
   @override
-  String debugGetCreateSourceHash() => _$geminiServiceHash();
+  String debugGetCreateSourceHash() => _$pdfServiceHash();
 
   @$internal
   @override
-  GeminiService create() => GeminiService();
+  PdfService create() => PdfService();
 
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(void value) {
@@ -41,9 +40,9 @@ final class GeminiServiceProvider
   }
 }
 
-String _$geminiServiceHash() => r'03184694cf749f0ab68a6491fcff3ded1666f719';
+String _$pdfServiceHash() => r'31884c4bec6e7b8aa6471ef8d4f88756b21d08ea';
 
-abstract class _$GeminiService extends $Notifier<void> {
+abstract class _$PdfService extends $Notifier<void> {
   void build();
   @$mustCallSuper
   @override

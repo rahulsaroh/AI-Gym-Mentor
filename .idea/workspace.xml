@@ -5,8 +5,38 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="310b61fb-298a-4d2b-8625-e9028bf4d99c" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.dart_tool/package_config.json" beforeDir="false" afterPath="$PROJECT_DIR$/.dart_tool/package_config.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.dart_tool/package_graph.json" beforeDir="false" afterPath="$PROJECT_DIR$/.dart_tool/package_graph.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.dart_tool/version" beforeDir="false" afterPath="$PROJECT_DIR$/.dart_tool/version" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.flutter-plugins-dependencies" beforeDir="false" afterPath="$PROJECT_DIR$/.flutter-plugins-dependencies" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/core/database/daos/bodymap_dao.g.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/core/database/daos/bodymap_dao.g.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/core/database/database.g.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/core/database/database.g.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/core/services/notification_service.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/core/services/notification_service.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/core/services/timer_service.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/core/services/timer_service.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/features/analytics/analytics_dashboard_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/analytics/analytics_dashboard_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/features/analytics/analytics_providers.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/analytics/analytics_providers.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/features/analytics/analytics_providers.g.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/analytics/analytics_providers.g.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/features/analytics/components/fitness_wrapped_card.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/analytics/components/fitness_wrapped_card.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/features/bodymap/providers/bodymap_provider.g.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/bodymap/providers/bodymap_provider.g.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/features/exercise_database/data/datasources/gemini_service.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/exercise_database/data/datasources/gemini_service.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/features/exercise_database/data/datasources/gemini_service.g.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/exercise_database/data/datasources/gemini_service.g.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/features/exercise_database/presentation/screens/exercise_history_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/exercise_database/presentation/screens/exercise_history_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/features/history/workout_detail_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/history/workout_detail_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/features/settings/services/csv_service.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/settings/services/csv_service.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/features/settings/services/csv_service.g.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/settings/services/csv_service.g.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/features/settings/settings_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/settings/settings_screen.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/features/workout/active_workout_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/workout/active_workout_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/features/workout/components/set_logging_table.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/workout/components/set_logging_table.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/features/workout/providers/workout_home_notifier.g.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/workout/providers/workout_home_notifier.g.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/features/workout/workout_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/workout/workout_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/l10n/app_localizations.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/l10n/app_localizations.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/l10n/app_localizations_en.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/l10n/app_localizations_en.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/l10n/app_localizations_hi.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/l10n/app_localizations_hi.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/l10n/app_localizations_mr.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/l10n/app_localizations_mr.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/services/progression_service.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/services/progression_service.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/services/progression_service.g.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/services/progression_service.g.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pubspec.lock" beforeDir="false" afterPath="$PROJECT_DIR$/pubspec.lock" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

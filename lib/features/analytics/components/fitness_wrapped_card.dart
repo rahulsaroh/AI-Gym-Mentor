@@ -39,9 +39,19 @@ class _FitnessWrappedCardState extends ConsumerState<FitnessWrappedCard> {
     }
   }
 
+  int _currentPage = 0;
+  final PageController _pageController = PageController();
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final statsAsync = ref.watch(dashboardStatsProvider);
+    final activityAsync = ref.watch(dailyActivityProvider);
     final settings = ref.watch(settingsProvider).value ?? const SettingsState();
 
     return statsAsync.when(
@@ -50,125 +60,173 @@ class _FitnessWrappedCardState extends ConsumerState<FitnessWrappedCard> {
         final prs = (stats['monthlyPRs'] as num?)?.toInt() ?? 0;
         final streaks = (stats['activeStreak'] as num?)?.toInt() ?? 0;
         final topMuscle = stats['topMuscle'] as String? ?? 'Legs';
-        final unitSuffix =
-            settings.weightUnit == WeightUnit.kg ? 'Tons' : 'k lbs';
+        final workouts = (stats['monthlyWorkouts'] as num?)?.toInt() ?? 0;
+        final unitSuffix = settings.weightUnit == WeightUnit.kg ? 'Tons' : 'k lbs';
         final displayVolume = settings.weightUnit == WeightUnit.kg
             ? volume
-            : volume * 2.20462; // Conversion if stored as kg in DB
+            : volume * 2.20462;
 
         return RepaintBoundary(
           key: _globalKey,
           child: Container(
             margin: const EdgeInsets.all(16),
-          padding: const EdgeInsets.all(24),
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [Color(0xFF6366F1), Color(0xFFA855F7), Color(0xFFEC4899)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
+            height: 380,
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [Color(0xFF6366F1), Color(0xFFA855F7), Color(0xFFEC4899)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(28),
+              boxShadow: [
+                BoxShadow(
+                  color: const Color(0xFF6366F1).withValues(alpha: 0.3),
+                  blurRadius: 20,
+                  offset: const Offset(0, 10),
+                ),
+              ],
             ),
-            borderRadius: BorderRadius.circular(28),
-            boxShadow: [
-              BoxShadow(
-                color: const Color(0xFF6366F1).withValues(alpha: 0.3),
-                blurRadius: 20,
-                offset: const Offset(0, 10),
-              ),
-            ],
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'MONTHLY',
-                        style: GoogleFonts.outfit(
-                          color: Colors.white.withValues(alpha: 0.8),
-                          fontSize: 12,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 2,
+            child: Stack(
+              children: [
+                PageView(
+                  controller: _pageController,
+                  onPageChanged: (i) => setState(() => _currentPage = i),
+                  children: [
+                    // Slide 1: Volume & PRs
+                    _buildSlide(
+                      context,
+                      title: 'STRENGTH',
+                      subtitle: 'Progress this month',
+                      stats: [
+                        _WrappedStat(
+                          label: 'Total Weight Lifted',
+                          value: '${displayVolume.toStringAsFixed(1)} $unitSuffix',
+                          icon: LucideIcons.trendingUp,
                         ),
-                      ),
-                      Text(
-                        'WRAPPED',
-                        style: GoogleFonts.outfit(
-                          color: Colors.white,
-                          fontSize: 28,
-                          fontWeight: FontWeight.w900,
+                        _WrappedStat(
+                          label: 'New Records Set',
+                          value: '$prs PRs',
+                          icon: LucideIcons.trophy,
                         ),
-                      ),
-                    ],
-                  ),
-                  const Icon(LucideIcons.flame, color: Colors.white, size: 40),
-                ],
-              ),
-              const SizedBox(height: 32),
-              _WrappedStat(
-                label: 'Total Weight Lifted',
-                value: '${displayVolume.toStringAsFixed(1)} $unitSuffix',
-                icon: LucideIcons.trendingUp,
-              ),
-              const SizedBox(height: 16),
-              _WrappedStat(
-                label: 'New Records Set',
-                value: '$prs PRs',
-                icon: LucideIcons.trophy,
-              ),
-              const SizedBox(height: 16),
-              _WrappedStat(
-                label: 'Main Focus',
-                value: topMuscle,
-                icon: LucideIcons.target,
-              ),
-              const Divider(color: Colors.white24, height: 40),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Active Streak',
-                        style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.7), fontSize: 13),
-                      ),
-                      Text(
-                        '$streaks Days',
-                        style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold),
-                      ),
-                    ],
-                  ),
-                  ElevatedButton.icon(
-                    onPressed: _shareWrapped,
-                    icon: const Icon(LucideIcons.share2, size: 16),
-                    label: const Text('SHARE'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white.withValues(alpha: 0.2),
-                      foregroundColor: Colors.white,
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12)),
+                      ],
+                      footerValue: '$streaks Day Streak',
                     ),
+                    // Slide 2: Focus & Consistency
+                    _buildSlide(
+                      context,
+                      title: 'FOCUS',
+                      subtitle: 'Where you put the work',
+                      stats: [
+                        _WrappedStat(
+                          label: 'Main Focus',
+                          value: topMuscle,
+                          icon: LucideIcons.target,
+                        ),
+                        _WrappedStat(
+                          label: 'Sessions Logged',
+                          value: '$workouts Workouts',
+                          icon: LucideIcons.calendarCheck,
+                        ),
+                      ],
+                      footerValue: 'Top 5% of Users',
+                    ),
+                    // Slide 3: Growth
+                    _buildConsistencySlide(context, activityAsync),
+                  ],
+                ),
+                Positioned(
+                  bottom: 24,
+                  left: 24,
+                  right: 24,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: List.generate(3, (index) => _buildDot(index == _currentPage)),
+                      ),
+                      IconButton(
+                        onPressed: _shareWrapped,
+                        icon: const Icon(LucideIcons.share2, color: Colors.white, size: 20),
+                        style: IconButton.styleFrom(
+                          backgroundColor: Colors.white.withValues(alpha: 0.2),
+                        ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-            ],
-          ),
+                ),
+              ],
+            ),
           ),
         );
       },
-      loading: () => const SizedBox(
-          height: 350,
-          child: Center(child: CircularProgressIndicator(color: Colors.white))),
+      loading: () => const SizedBox(height: 350, child: Center(child: CircularProgressIndicator())),
       error: (_, __) => const SizedBox.shrink(),
+    );
+  }
+
+  Widget _buildDot(bool active) {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 300),
+      margin: const EdgeInsets.only(right: 6),
+      width: active ? 20 : 6,
+      height: 6,
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: active ? 1.0 : 0.4),
+        borderRadius: BorderRadius.circular(3),
+      ),
+    );
+  }
+
+  Widget _buildSlide(BuildContext context, {required String title, required String subtitle, required List<Widget> stats, required String footerValue}) {
+    return Padding(
+      padding: const EdgeInsets.all(32),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(title, style: GoogleFonts.outfit(color: Colors.white.withValues(alpha: 0.8), fontSize: 12, fontWeight: FontWeight.w800, letterSpacing: 2)),
+          Text(subtitle, style: GoogleFonts.outfit(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w900)),
+          const SizedBox(height: 32),
+          ...stats.map((s) => Padding(padding: const EdgeInsets.only(bottom: 20), child: s)),
+          const Spacer(),
+          Text(footerValue, style: GoogleFonts.outfit(color: Colors.white.withValues(alpha: 0.9), fontSize: 16, fontWeight: FontWeight.w700)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildConsistencySlide(BuildContext context, AsyncValue<Map<DateTime, int>> activityAsync) {
+    return Padding(
+      padding: const EdgeInsets.all(32),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('CONSISTENCY', style: GoogleFonts.outfit(color: Colors.white.withValues(alpha: 0.8), fontSize: 12, fontWeight: FontWeight.w800, letterSpacing: 2)),
+          Text('Yearly Progress', style: GoogleFonts.outfit(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w900)),
+          const SizedBox(height: 24),
+          Expanded(
+            child: activityAsync.maybeWhen(
+              data: (activity) => Center(
+                child: Opacity(
+                  opacity: 0.8,
+                  child: Transform.scale(
+                    scale: 0.8,
+                    child: Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: const Icon(LucideIcons.layoutGrid, size: 100, color: Colors.white24), // Placeholder for heatmap snapshot
+                    ),
+                  ),
+                ),
+              ),
+              orElse: () => const SizedBox.shrink(),
+            ),
+          ),
+          const SizedBox(height: 40),
+        ],
+      ),
     );
   }
 }

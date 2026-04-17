@@ -163,6 +163,9 @@ class SettingsScreen extends ConsumerWidget {
                       builder: (_) => const ImportWizardScreen())),
             ),
             const Divider(height: 32),
+            _buildSectionHeader(context, 'Privacy & Security'),
+            _buildPrivacyCard(context),
+            const Divider(height: 32),
             _buildSectionHeader(context, 'Danger Zone', isDanger: true),
             _buildDangerTile(
               context,
@@ -568,6 +571,37 @@ class SettingsScreen extends ConsumerWidget {
                   : null,
               style: FilledButton.styleFrom(backgroundColor: Colors.red),
               child: const Text('CONFIRM DELETE'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPrivacyCard(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3)),
+        ),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                Icon(LucideIcons.shieldCheck, color: Theme.of(context).colorScheme.primary),
+                const SizedBox(width: 12),
+                const Text('Privacy First Architecture',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              ],
+            ),
+            const SizedBox(height: 12),
+            const Text(
+              'Your workout data is stored exclusively on your device. We use no cloud sync, no tracking, and no external servers. You own your data 100%.',
+              style: TextStyle(fontSize: 13, height: 1.4),
             ),
           ],
         ),

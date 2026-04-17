@@ -58,6 +58,37 @@ Future<Map<String, dynamic>> muscleBalance(Ref ref) async {
 }
 
 @riverpod
+Future<List<Map<String, dynamic>>> volumeVsWeightTrend(Ref ref) async {
+  final volume = await ref.watch(volumeTrendProvider.future);
+  final weight = await ref.watch(weightTrendProvider.future);
+
+  if (volume.isEmpty) return [];
+
+  return volume.map((v) {
+    final vDate = v['date'] as DateTime;
+    
+    // Find closest weight measurement to this week
+    Map<String, dynamic>? closestWeight;
+    int minDiff = 999999999;
+
+    for (var w in weight) {
+      final wDate = w['date'] as DateTime;
+      final diff = (vDate.difference(wDate).inDays).abs();
+      if (diff < minDiff) {
+        minDiff = diff;
+        closestWeight = w;
+      }
+    }
+
+    return {
+      'date': vDate,
+      'volume': v['volume'],
+      'weight': closestWeight?['weight'] ?? 0.0,
+    };
+  }).toList();
+}
+
+@riverpod
 Future<List<Map<String, dynamic>>> plateauAlerts(Ref ref) async {
   final repo = ref.watch(statsRepositoryProvider);
   return await repo.getPlateauAlerts();

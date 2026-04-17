@@ -29,13 +29,18 @@ import 'package:ai_gym_mentor/features/workout/components/superset_bracket_paint
 import 'package:ai_gym_mentor/features/workout/components/rest_timer_overlay.dart';
 import 'package:ai_gym_mentor/features/workout/providers/timer_notifier.dart';
 import 'package:ai_gym_mentor/features/workout/workout_repository.dart';
+import 'package:ai_gym_mentor/features/analytics/analytics_providers.dart';
+import 'package:ai_gym_mentor/features/history/pdf_service.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:ai_gym_mentor/features/settings/settings_provider.dart';
 import 'package:ai_gym_mentor/core/utils/weight_converter.dart';
 import 'package:ai_gym_mentor/features/settings/models/settings_state.dart';
 import 'package:ai_gym_mentor/features/workout/providers/workout_duration_provider.dart';
-import 'package:ai_gym_mentor/features/workout/components/plate_calculator_dialog.dart';
 import 'package:ai_gym_mentor/features/workout/components/exercise_header_card.dart';
+import 'package:ai_gym_mentor/features/workout/components/ai_coach_cue.dart';
+import 'package:ai_gym_mentor/features/workout/components/plate_calculator_dialog.dart';
 import 'package:ai_gym_mentor/features/workout/components/set_logging_table.dart';
+import 'package:ai_gym_mentor/features/workout/components/pr_victory_overlay.dart';
 import 'package:ai_gym_mentor/features/workout/models/workout_models.dart';
 
 typedef Exercise = entity.ExerciseEntity;
@@ -801,6 +806,9 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
             if (_isFocusMode) _buildExerciseProgressDots(allBlocks),
             
             if (_isFocusMode) const SizedBox(height: 16),
+
+            // ── AI Coach Cues (Beat Hevy Phase 3) ──
+            AICoachCue(block: block, exerciseName: exercise.name),
             
             // ── Notes Section (Requirement 4) ──
             _buildNotesSection(block),
@@ -1320,6 +1328,19 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
         SystemSound.play(SystemSoundType.click);
         HapticFeedback.heavyImpact();
 
+        // Show Full Screen Victory Overlay (Beat Hevy Phase 5)
+        if (mounted) {
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (context) => PRVictoryOverlay(
+              exerciseName: exercise.name,
+              achievement: '${displayWeight.toStringAsFixed(1)}$unitLabel x ${set.reps.toInt()}',
+              onDismiss: () => Navigator.pop(context),
+            ),
+          );
+        }
+
         await (database.update(database.workoutSets)
               ..where((t) => t.id.equals(set.id)))
             .write(
@@ -1422,6 +1443,7 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
           .go();
     }
   }
+
 
   Future<void> _showRestTimer(
       int seconds, String currentExName, String? nextExName) async {

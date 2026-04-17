@@ -14,6 +14,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 import 'package:ai_gym_mentor/features/analytics/components/fitness_wrapped_card.dart';
 import 'package:ai_gym_mentor/features/analytics/presentation/widgets/stats_trend_chart.dart';
+import 'package:ai_gym_mentor/features/analytics/components/training_heatmap.dart';
+import 'package:ai_gym_mentor/features/analytics/components/volume_vs_weight_chart.dart';
 
 class AnalyticsDashboardScreen extends ConsumerWidget {
   const AnalyticsDashboardScreen({super.key});
@@ -66,7 +68,15 @@ class AnalyticsDashboardScreen extends ConsumerWidget {
                 error: (e, _) => const SizedBox.shrink(),
               ),
 
-              // 2. Weekly Volume Trend
+              const SizedBox(height: 16),
+              const TrainingHeatmap(),
+
+              // 2. Weekly Volume vs Body Weight (Dual Axis) - Beat Hevy Feature
+              _SectionHeader(
+                  title: 'Volume vs Body Weight', subtitle: 'Strength vs mass trend'),
+              VolumeVsWeightChart(unit: unit),
+
+              // 3. Weekly Volume Trend (Detailed Bar)
               _SectionHeader(
                   title: 'Weekly Volume Trend', subtitle: 'Last 12 weeks'),
               _LazyChart(

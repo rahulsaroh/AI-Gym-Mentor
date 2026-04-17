@@ -59,4 +59,23 @@ class GeminiService extends _$GeminiService {
       throw Exception('AI Enrichment failed: $e');
     }
   }
+
+  Future<String> getCoachCue(String exerciseName, List<Map<String, dynamic>> context) async {
+    final prompt = '''
+    Act as a high-performance strength coach. Give a 10-15 word punchy technical cue or motivational advice for the following exercise:
+    
+    Exercise: $exerciseName
+    Recent Sets: ${context.toString()}
+    
+    If they are hitting their reps, motivate them. If they missed reps, give a technical tip (e.g., 'Drive through heels' or 'Keep elbows tucked'). 
+    NO fluff. Just the cue.
+    ''';
+
+    try {
+      final response = await _model.generateContent([Content.text(prompt)]);
+      return response.text?.trim() ?? "Focus on form and drive!";
+    } catch (e) {
+      return "Keep pushing! Focus on the contraction.";
+    }
+  }
 }

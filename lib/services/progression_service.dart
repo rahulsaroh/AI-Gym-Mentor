@@ -67,21 +67,44 @@ class ProgressionService extends _$ProgressionService {
         lastSessionSets.where((s) => s.reps < currentTargetReps).length;
     final isFail = failCount > (lastSessionSets.length / 2);
 
+    // 4. Analysis with RPE
+    double avgRpe = 0;
+    int rpeCount = 0;
+    for (var s in lastSessionSets) {
+      if (s.rpe != null) {
+        avgRpe += s.rpe!;
+        rpeCount++;
+      }
+    }
+    if (rpeCount > 0) avgRpe /= rpeCount;
+
     double suggestedWeight = lastWeight;
     String reason = 'Maintain weight to perfect form.';
 
-    if (allHitTarget) {
-      suggestedWeight = lastWeight + increment;
-      reason =
-          'Hit target of ${currentTargetReps.toInt()} reps! Increasing by ${increment}kg.';
-    } else if (isFail) {
-      suggestedWeight = max(0.0, lastWeight - increment);
-      reason =
-          'Missed target reps of ${currentTargetReps.toInt()} on most sets. Reducing by ${increment}kg.';
+    if (rpeCount > 0) {
+      // Prioritize RPE-based progression
+      if (avgRpe < 8 && allHitTarget) {
+        suggestedWeight = lastWeight + increment;
+        reason = 'RPE was low ($avgRpe). Increasing by ${increment}kg to push progression.';
+      } else if (avgRpe >= 9.5) {
+        suggestedWeight = lastWeight;
+        reason = 'High intense session (RPE $avgRpe). Maintain weight to improve efficiency.';
+      } else if (allHitTarget) {
+        suggestedWeight = lastWeight + (increment / 2); // Smaller jump
+        reason = 'Targets met with moderate effort. Suggested small +${increment/2}kg increase.';
+      }
     } else {
-      suggestedWeight = lastWeight;
-      reason =
-          'Maintain and focus on hitting your ${currentTargetReps.toInt()} rep target.';
+      // Fallback to hit/miss logic
+      if (allHitTarget) {
+        suggestedWeight = lastWeight + increment;
+        reason = 'Hit target of ${currentTargetReps.toInt()} reps! Increasing by ${increment}kg.';
+      } else if (isFail) {
+        suggestedWeight = max(0.0, lastWeight - increment);
+        reason = 'Missed target reps of ${currentTargetReps.toInt()} on most sets. Reducing by ${increment}kg.';
+      } else {
+        suggestedWeight = lastWeight;
+        reason = 'Maintain and focus on hitting your ${currentTargetReps.toInt()} rep target.';
+      }
     }
 
     // 4. Trend Arrow (last 5 sessions 1RM)

@@ -42,7 +42,7 @@ final class ProgressionServiceProvider
 }
 
 String _$progressionServiceHash() =>
-    r'96ddb7e1bd7d113277d8c6ba6cb7f2b56a66b8a6';
+    r'26611ec3700d6d62ef5af24ff2bc9429db68e077';
 
 abstract class _$ProgressionService extends $Notifier<void> {
   void build();

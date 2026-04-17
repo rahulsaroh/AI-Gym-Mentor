@@ -12,7 +12,7 @@ void onDidReceiveBackgroundNotificationResponse(NotificationResponse details) {
   if (details.actionId == 'skip_rest') {
     service.invoke('skip');
   } else if (details.actionId == 'add_30s') {
-    service.invoke('refresh_timer');
+    service.invoke('add_30s');
   }
 }
 
@@ -49,7 +49,7 @@ class NotificationService {
         if (details.actionId == 'skip_rest') {
           FlutterBackgroundService().invoke('skip');
         } else if (details.actionId == 'add_30s') {
-          FlutterBackgroundService().invoke('refresh_timer');
+          FlutterBackgroundService().invoke('add_30s');
         }
       },
       onDidReceiveBackgroundNotificationResponse:

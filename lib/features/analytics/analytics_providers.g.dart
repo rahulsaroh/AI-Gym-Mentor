@@ -275,6 +275,45 @@ final class MuscleBalanceProvider extends $FunctionalProvider<
 
 String _$muscleBalanceHash() => r'f209ac7ec9c7a0054a7752d3a1a8a827d5dfcbf5';
 
+@ProviderFor(volumeVsWeightTrend)
+final volumeVsWeightTrendProvider = VolumeVsWeightTrendProvider._();
+
+final class VolumeVsWeightTrendProvider extends $FunctionalProvider<
+        AsyncValue<List<Map<String, dynamic>>>,
+        List<Map<String, dynamic>>,
+        FutureOr<List<Map<String, dynamic>>>>
+    with
+        $FutureModifier<List<Map<String, dynamic>>>,
+        $FutureProvider<List<Map<String, dynamic>>> {
+  VolumeVsWeightTrendProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'volumeVsWeightTrendProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$volumeVsWeightTrendHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<List<Map<String, dynamic>>> $createElement(
+          $ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<List<Map<String, dynamic>>> create(Ref ref) {
+    return volumeVsWeightTrend(ref);
+  }
+}
+
+String _$volumeVsWeightTrendHash() =>
+    r'6672c186655f7eb5cf16330793a4d1765a37a4bb';
+
 @ProviderFor(plateauAlerts)
 final plateauAlertsProvider = PlateauAlertsProvider._();
 

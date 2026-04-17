@@ -186,33 +186,54 @@ class SetLoggingTable extends StatelessWidget {
             Row(
               children: [
                 // Set Number Badge
-                Container(
-                  width: 28,
-                  height: 28,
-                  decoration: BoxDecoration(
-                    color: isCompleted 
-                        ? Colors.green 
-                        : (isActive ? Theme.of(context).primaryColor : Colors.grey[200]),
-                    shape: BoxShape.circle,
-                  ),
+                Stack(
                   alignment: Alignment.center,
-                  child: Text(
-                    index.toString(),
-                    style: GoogleFonts.inter(
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                      color: (isCompleted || isActive) ? Colors.white : Colors.grey[600],
+                  children: [
+                    Container(
+                      width: 28,
+                      height: 28,
+                      decoration: BoxDecoration(
+                        color: isCompleted 
+                            ? Colors.green 
+                            : (isActive ? Theme.of(context).primaryColor : Colors.grey[200]),
+                        shape: BoxShape.circle,
+                      ),
+                      alignment: Alignment.center,
+                      child: Text(
+                        index.toString(),
+                        style: GoogleFonts.inter(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: (isCompleted || isActive) ? Colors.white : Colors.grey[600],
+                        ),
+                      ),
                     ),
-                  ),
+                    if (set.setType != db.SetType.straight)
+                      Positioned(
+                        right: -2,
+                        bottom: -2,
+                        child: Container(
+                          padding: const EdgeInsets.all(2),
+                          decoration: BoxDecoration(
+                            color: _getSetTypeColor(set.setType),
+                            shape: BoxShape.circle,
+                            border: Border.all(color: Colors.white, width: 1),
+                          ),
+                          child: Text(
+                            _getSetTypeLetter(set.setType),
+                            style: const TextStyle(fontSize: 7, fontWeight: FontWeight.bold, color: Colors.white),
+                          ),
+                        ),
+                      ),
+                  ],
                 ),
                 const SizedBox(width: 12),
                 // Weight Input
                 Expanded(
                   child: _buildRedesignedCellInput(
                     context,
-                    setId: set.id,
+                    set: set,
                     type: 'weight',
-                    value: WeightConverter.toDisplay(set.weight, unit).toStringAsFixed(1),
                     onChanged: (val) => onUpdateSet(set.id, weight: WeightConverter.toStorage(double.tryParse(val) ?? 0, unit)),
                     isCompleted: isCompleted,
                   ),
@@ -222,9 +243,8 @@ class SetLoggingTable extends StatelessWidget {
                 Expanded(
                   child: _buildRedesignedCellInput(
                     context,
-                    setId: set.id,
+                    set: set,
                     type: exercise.setType == 'Timed' ? 'secs' : 'reps',
-                    value: set.reps.toInt().toString(),
                     onChanged: (val) => onUpdateSet(set.id, reps: double.tryParse(val) ?? 0),
                     isCompleted: isCompleted,
                   ),
@@ -305,14 +325,32 @@ class SetLoggingTable extends StatelessWidget {
 
   Widget _buildRedesignedCellInput(
     BuildContext context, {
-    required int setId,
+    required db.WorkoutSet set,
     required String type,
-    required String value,
     required Function(String) onChanged,
     bool isCompleted = false,
   }) {
-    final controller = getController(setId, type, value);
-    final focusNode = getNode(setId, type);
+    final unit = settings.weightUnit;
+    final value = type == 'weight' 
+        ? WeightConverter.toDisplay(set.weight, unit).toStringAsFixed(1)
+        : set.reps.toInt().toString();
+        
+    final controller = getController(set.id, type, value);
+    final focusNode = getNode(set.id, type);
+
+    // Ghost Data Calculation
+    String hintText = '0';
+    String? ghostValue;
+    if (previousSessionSets.containsKey(set.exerciseId)) {
+      final prevSets = previousSessionSets[set.exerciseId]!;
+      final match = prevSets.where((s) => s.setNumber == set.setNumber).firstOrNull ?? prevSets.lastOrNull;
+      if (match != null) {
+        ghostValue = type == 'weight' 
+            ? WeightConverter.toDisplay(match.weight, unit).toStringAsFixed(1)
+            : match.reps.toInt().toString();
+        hintText = ghostValue;
+      }
+    }
 
     if (!focusNode.hasFocus && controller.text != value) {
        controller.text = value;
@@ -332,15 +370,23 @@ class SetLoggingTable extends StatelessWidget {
               fontWeight: FontWeight.bold,
               color: isCompleted ? Theme.of(context).colorScheme.outline : null,
             ),
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               isDense: true,
-              contentPadding: EdgeInsets.symmetric(vertical: 4),
+              contentPadding: const EdgeInsets.symmetric(vertical: 4),
               border: InputBorder.none,
-              hintText: '0',
+              hintText: hintText,
+              hintStyle: TextStyle(color: Theme.of(context).colorScheme.outline.withOpacity(0.3)),
             ),
             onChanged: onChanged,
             onTap: () {
                focusNode.requestFocus();
+               // Auto-fill logic (Hevy style)
+               if (controller.text == '0' || controller.text == '0.0' || controller.text.isEmpty) {
+                 if (ghostValue != null) {
+                   controller.text = ghostValue;
+                   onChanged(ghostValue);
+                 }
+               }
                controller.selection = TextSelection(
                  baseOffset: 0,
                  extentOffset: controller.text.length,
@@ -355,13 +401,13 @@ class SetLoggingTable extends StatelessWidget {
               _buildRoundIconButton(
                 context,
                 icon: LucideIcons.minus,
-                onPressed: () => onAdjustValue(setId, type, controller, onChanged, -1),
+                onPressed: () => onAdjustValue(set.id, type, controller, onChanged, -1),
               ),
               const SizedBox(width: 8),
               _buildRoundIconButton(
                 context,
                 icon: LucideIcons.plus,
-                onPressed: () => onAdjustValue(setId, type, controller, onChanged, 1),
+                onPressed: () => onAdjustValue(set.id, type, controller, onChanged, 1),
               ),
             ],
           ),
@@ -406,5 +452,29 @@ class SetLoggingTable extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Color _getSetTypeColor(db.SetType type) {
+    switch (type) {
+      case db.SetType.warmup: return Colors.orange;
+      case db.SetType.dropSet: return Colors.purple;
+      case db.SetType.amrap: return Colors.red;
+      case db.SetType.failure: return Colors.red;
+      case db.SetType.timed: return Colors.blue;
+      case db.SetType.superset: return Colors.teal;
+      default: return Colors.grey;
+    }
+  }
+
+  String _getSetTypeLetter(db.SetType type) {
+    switch (type) {
+      case db.SetType.warmup: return 'W';
+      case db.SetType.dropSet: return 'D';
+      case db.SetType.amrap: return 'A';
+      case db.SetType.failure: return 'F';
+      case db.SetType.timed: return 'T';
+      case db.SetType.superset: return 'S';
+      default: return '';
+    }
   }
 }

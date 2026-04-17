@@ -11,6 +11,9 @@ import 'package:drift/drift.dart' hide Column, Table;
 import 'package:ai_gym_mentor/features/history/history_providers.dart';
 import 'package:ai_gym_mentor/features/workout/workout_repository.dart';
 import 'package:ai_gym_mentor/features/analytics/analytics_providers.dart';
+import 'package:ai_gym_mentor/features/history/pdf_service.dart';
+import 'package:ai_gym_mentor/features/exercise_database/presentation/providers/repository_provider.dart';
+import 'package:share_plus/share_plus.dart';
 
 class WorkoutDetailScreen extends ConsumerStatefulWidget {
   final int workoutId;
@@ -69,6 +72,12 @@ class _WorkoutDetailScreenState extends ConsumerState<WorkoutDetailScreen> {
               ),
             ),
             actions: [
+              if (!_isEditing)
+                IconButton(
+                  icon: const Icon(LucideIcons.fileText),
+                  onPressed: () => _exportPdf(workout),
+                  tooltip: 'Export PDF',
+                ),
               if (!_isEditing)
                 IconButton(
                   icon: const Icon(LucideIcons.trash2, color: Colors.red),
@@ -206,6 +215,22 @@ class _WorkoutDetailScreenState extends ConsumerState<WorkoutDetailScreen> {
       ref.invalidate(historyListProvider);
       if (mounted) context.pop();
     }
+  }
+
+  Future<void> _exportPdf(Workout workout) async {
+    final db = ref.read(appDatabaseProvider);
+    final sets = await (db.select(db.workoutSets)..where((t) => t.workoutId.equals(workout.id))).get();
+    final exercises = await ref.read(exerciseRepositoryProvider).getAllExercises();
+    final exNames = {for (var e in exercises) e.id: e.name};
+
+    final pdfService = ref.read(pdfServiceProvider.notifier);
+    final file = await pdfService.generateWorkoutPdf(
+      workout: workout,
+      sets: sets,
+      exerciseNames: exNames,
+    );
+
+    await Share.shareXFiles([XFile(file.path)], text: 'Workout Summary: ${workout.name}');
   }
 
   Future<void> _repeatWorkout() async {
