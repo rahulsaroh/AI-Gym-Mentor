@@ -11,6 +11,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ai_gym_mentor/core/database/initial_data.dart';
 import 'package:ai_gym_mentor/services/github_exercise_service.dart';
+import 'package:ai_gym_mentor/core/services/workout_logic_service.dart';
 
 part 'workout_repository.g.dart';
 
@@ -122,20 +123,41 @@ class WorkoutRepository {
 
     final List<Map<String, dynamic>> result = [];
     for (final w in workouts) {
-      final setsQuery = _db.select(_db.workoutSets)
-        ..where((t) => t.workoutId.equals(w.id));
+      // Fix: Fetch sets and join with exercises to provide a full LoggedExercise list
+      final setsQuery = _db.select(_db.workoutSets).join([
+        innerJoin(_db.exercises, _db.exercises.id.equalsExp(_db.workoutSets.exerciseId)),
+      ])..where(_db.workoutSets.workoutId.equals(w.id));
 
-      final sets = await setsQuery.get();
+      final setsRows = await setsQuery.get();
+      final exercisesMap = <int, ent.LoggedExercise>{};
       double volume = 0;
       int completedSets = 0;
-      for (final s in sets) {
+
+      for (final row in setsRows) {
+        final s = row.readTable(_db.workoutSets);
+        final ex = row.readTable(_db.exercises);
+        final setEntity = _toSetEntity(s);
+        
         if (s.completed) {
           volume += s.weight * s.reps;
           completedSets++;
         }
+
+        if (!exercisesMap.containsKey(s.exerciseId)) {
+          exercisesMap[s.exerciseId] = ent.LoggedExercise(
+            exerciseId: s.exerciseId,
+            exerciseName: ex.name,
+            order: s.exerciseOrder,
+            sets: [setEntity],
+          );
+        } else {
+          final existingEx = exercisesMap[s.exerciseId]!;
+          exercisesMap[s.exerciseId] = existingEx.copyWith(sets: [...existingEx.sets, setEntity]);
+        }
       }
+
       result.add({
-        'workout': _toSessionEntity(w, []), // Changed key from 'session' to 'workout' for consistency with HistoryItem
+        'workout': _toSessionEntity(w, exercisesMap.values.toList()..sort((a,b) => a.order.compareTo(b.order))),
         'volume': volume,
         'setCount': completedSets
       });
@@ -160,50 +182,8 @@ class WorkoutRepository {
       };
     }
 
-    // Streak calculation
-    int currentStreak = 0;
-    int longestStreak = 0;
-    int tempStreak = 0;
-
-    final workoutDates = completedWorkouts
-        .map((w) => DateTime(w.date.year, w.date.month, w.date.day))
-        .toSet()
-        .toList();
-    workoutDates.sort();
-
-    if (workoutDates.isNotEmpty) {
-      tempStreak = 1;
-      longestStreak = 1;
-      for (int i = 1; i < workoutDates.length; i++) {
-        if (workoutDates[i].difference(workoutDates[i - 1]).inDays == 1) {
-          tempStreak++;
-        } else {
-          if (tempStreak > longestStreak) longestStreak = tempStreak;
-          tempStreak = 1;
-        }
-      }
-      if (tempStreak > longestStreak) longestStreak = tempStreak;
-
-      // Current streak check
-      final today = DateTime.now();
-      final lastWorkoutDay = workoutDates.last;
-      final diff = DateTime(today.year, today.month, today.day)
-          .difference(lastWorkoutDay)
-          .inDays;
-
-      if (diff <= 1) {
-        currentStreak = 1;
-        for (int i = workoutDates.length - 1; i > 0; i--) {
-          if (workoutDates[i].difference(workoutDates[i - 1]).inDays == 1) {
-            currentStreak++;
-          } else {
-            break;
-          }
-        }
-      } else {
-        currentStreak = 0;
-      }
-    }
+    final workoutDates = completedWorkouts.map((w) => w.date).toList();
+    final streaks = WorkoutLogicService.calculateStreaks(workoutDates);
 
     // Total Volume using selectOnly
     // Fix #18: Exclude 'Timed' exercise sets from volume calculation
@@ -222,12 +202,37 @@ class WorkoutRepository {
       totalVolume += w * r;
     }
 
+    double avgDuration = 0;
+    double avgExercises = 0;
+    if (completedWorkouts.isNotEmpty) {
+      final totalDuration = completedWorkouts.fold(0, (a, b) => a + (b.duration ?? 0));
+      avgDuration = totalDuration / completedWorkouts.length / 60; // minutes
+      
+      // Approximate exercises per workout from history
+      // We could query workoutSets grouped by workoutId but stats already has completedWorkouts
+      // To keep it simple and efficient, we query total sets and divide by workouts, assuming ~4 sets per ex.
+      final countExp = _db.workoutSets.id.count();
+      final totalSetsQuery = _db.selectOnly(_db.workoutSets)
+        ..addColumns([countExp])
+        ..where(_db.workoutSets.completed.equals(true));
+      final totalSets = (await totalSetsQuery.map((r) => r.read<int>(countExp)).getSingle()) ?? 0;
+      avgExercises = (totalSets.toDouble() / completedWorkouts.length) / 4; 
+      if (avgExercises < 1) avgExercises = 5; // Fallback
+    }
+
     return {
-      'currentStreak': currentStreak,
-      'longestStreak': longestStreak,
+      'currentStreak': streaks['currentStreak'],
+      'longestStreak': streaks['longestStreak'],
       'totalWorkouts': completedWorkouts.length,
       'totalVolume': totalVolume,
+      'avgDuration': avgDuration > 0 ? avgDuration : 45,
+      'avgExercises': avgExercises > 0 ? avgExercises : 5,
     };
+  }
+
+  Future<Workout?> getWorkout(int id) async {
+    return await (_db.select(_db.workouts)..where((t) => t.id.equals(id)))
+        .getSingleOrNull();
   }
 
   Future<List<ent.LoggedSet>> getWorkoutSets(int workoutId) async {

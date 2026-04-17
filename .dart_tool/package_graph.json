@@ -39,6 +39,7 @@
         "lucide_icons_flutter",
         "package_info_plus",
         "path",
+        "path_drawing",
         "path_provider",
         "pdf",
         "permission_handler",
@@ -256,6 +257,16 @@
         "stack_trace",
         "stream_channel",
         "test_api",
+        "vector_math"
+      ]
+    },
+    {
+      "name": "path_drawing",
+      "version": "1.0.1",
+      "dependencies": [
+        "flutter",
+        "meta",
+        "path_parsing",
         "vector_math"
       ]
     },
@@ -1310,6 +1321,14 @@
       ]
     },
     {
+      "name": "path_parsing",
+      "version": "1.1.0",
+      "dependencies": [
+        "meta",
+        "vector_math"
+      ]
+    },
+    {
       "name": "web",
       "version": "1.1.1",
       "dependencies": []
@@ -1681,14 +1700,6 @@
       "dependencies": [
         "flutter",
         "pdf"
-      ]
-    },
-    {
-      "name": "path_parsing",
-      "version": "1.1.0",
-      "dependencies": [
-        "meta",
-        "vector_math"
       ]
     },
     {

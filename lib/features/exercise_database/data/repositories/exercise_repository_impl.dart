@@ -27,6 +27,8 @@ class ExerciseRepositoryImpl implements ExerciseRepository {
     List<String>? safetyTips,
     List<String>? commonMistakes,
     List<String>? variations,
+    List<String>? relatedExercises,
+    List<String>? progressionPath,
   }) {
     return ExerciseEntity(
       id: row.id,
@@ -49,8 +51,8 @@ class ExerciseRepositoryImpl implements ExerciseRepository {
       gifUrl: row.gifUrl,
       videoUrl: row.videoUrl,
       variations: variations ?? [],
-      relatedExerciseIds: [],
-      progressionPath: [],
+      relatedExerciseIds: relatedExercises ?? [],
+      progressionPath: progressionPath ?? [],
       isFavorite: row.isFavorite,
       isEnriched: row.isEnriched,
       nameHi: row.nameHi,
@@ -126,6 +128,12 @@ class ExerciseRepositoryImpl implements ExerciseRepository {
       }
     }
 
+    final relatedRows = await _localDatasource.getRelatedExercises(id);
+    final relatedIds = relatedRows.map((e) => e.id.toString()).toList();
+
+    final progressionRows = await _localDatasource.getProgressionChain(id);
+    final progressionIds = progressionRows.map((e) => e.id.toString()).toList();
+
     return _toEntity(
       row,
       primaryMuscles: primaryMuscles,
@@ -134,6 +142,8 @@ class ExerciseRepositoryImpl implements ExerciseRepository {
       safetyTips: safetyTips,
       commonMistakes: commonMistakes,
       variations: variations,
+      relatedExercises: relatedIds,
+      progressionPath: progressionIds,
     );
   }
 

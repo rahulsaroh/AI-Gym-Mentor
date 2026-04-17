@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter/rendering.dart';
 import 'package:ai_gym_mentor/features/analytics/analytics_providers.dart';
 import 'package:ai_gym_mentor/features/settings/models/settings_state.dart';
 import 'package:ai_gym_mentor/features/settings/settings_provider.dart';
@@ -23,7 +24,7 @@ class _FitnessWrappedCardState extends ConsumerState<FitnessWrappedCard> {
 
   Future<void> _shareWrapped() async {
     try {
-      final boundary = _globalKey.currentContext!.findRenderObject() as ui.RenderRepaintBoundary;
+      final boundary = _globalKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
       final image = await boundary.toImage(pixelRatio: 3.0);
       final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
       final bytes = byteData!.buffer.asUint8List();

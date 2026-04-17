@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart';
 import 'package:ai_gym_mentor/core/database/database.dart';
 import 'package:ai_gym_mentor/features/workout/workout_repository.dart';
+import 'package:ai_gym_mentor/core/services/workout_logic_service.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'stats_repository.g.dart';
@@ -15,14 +16,15 @@ class StatsRepository {
     final monthStart = DateTime(now.year, now.month, 1);
 
     // Total Volume this month
-    final volumeQuery = db.selectOnly(db.workoutSets)
+    // Fix #18: Align with WorkoutRepository to exclude 'Timed' exercises
+    final volumeQuery = db.selectOnly(db.workoutSets).join([
+      innerJoin(db.workouts, db.workouts.id.equalsExp(db.workoutSets.workoutId)),
+      innerJoin(db.exercises, db.exercises.id.equalsExp(db.workoutSets.exerciseId)),
+    ])
       ..addColumns([db.workoutSets.weight, db.workoutSets.reps])
-      ..join([
-        innerJoin(
-            db.workouts, db.workouts.id.equalsExp(db.workoutSets.workoutId)),
-      ])
       ..where(db.workouts.date.isBiggerOrEqualValue(monthStart) &
-          db.workouts.status.equals('completed'));
+          db.workouts.status.equals('completed') &
+          db.exercises.setType.equals('Timed').not());
 
     final volumeData = await volumeQuery.get();
     double totalVolume = 0;
@@ -306,21 +308,32 @@ class StatsRepository {
           'exerciseId': id,
           'name': exercise.name,
           'last5RMs': oneRMs.reversed.toList(),
-          'suggestion': _getSuggestion(exercise.primaryMuscle),
+          'suggestion': _getSuggestion(exercise.primaryMuscle, exercise.name),
         });
       }
     }
     return alerts;
   }
 
-  String _getSuggestion(String muscle) {
-    final list = [
-      'Try adding 1 rep per set next time.',
-      'Reduce weight by 10% and focus on perfect form for one session.',
-      'Try a variation: maybe a pause at the bottom.',
-      'Add an extra set to increase total volume.',
+  String _getSuggestion(String muscle, String exerciseName) {
+    // Intelligent suggestions based on exercise/muscle type
+    if (exerciseName.toLowerCase().contains('bench') || exerciseName.toLowerCase().contains('press')) {
+      return 'Plateau detected. Try incorporating a "pause" at the chest or adding 1-2 sets of tricep accessory work.';
+    }
+    if (muscle.toLowerCase().contains('legs') || muscle.toLowerCase().contains('thigh')) {
+      return 'Stalling on legs? Try adding "tempo" reps or a slight deload (10%) for one week to recover.';
+    }
+    if (muscle.toLowerCase().contains('back')) {
+      return 'Focus on mind-muscle connection. Try using lifting straps to eliminate grip fatigue as a bottleneck.';
+    }
+    
+    final general = [
+      'Try adding 1 extra rep per set next time.',
+      'Reduce weight by 10% and focus on explosive power.',
+      'Change your rep range (e.g., from 8-10 to 4-6 reps) for two sessions.',
+      'Add an extra set to increase total weekly volume for $muscle.',
     ];
-    return (list..shuffle()).first;
+    return (general..shuffle()).first;
   }
 
   Future<List<Map<String, dynamic>>> getRecentPRs() async {

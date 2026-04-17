@@ -30,6 +30,7 @@ import 'package:ai_gym_mentor/features/programs/create_edit_program_screen.dart'
 import 'package:ai_gym_mentor/features/programs/program_details_screen.dart';
 import 'package:ai_gym_mentor/features/workout/start_workout_screen.dart';
 import 'package:ai_gym_mentor/features/exercise_database/presentation/screens/github_exercise_library_screen.dart';
+import 'package:ai_gym_mentor/features/bodymap/screens/body_map_screen.dart';
 
 final router = GoRouter(
   initialLocation: '/',
@@ -206,6 +207,10 @@ final router = GoRouter(
                 GoRoute(
                   path: 'photos',
                   builder: (context, state) => const ProgressPhotosScreen(),
+                ),
+                GoRoute(
+                  path: 'bodymap',
+                  builder: (context, state) => const BodyMapScreen(),
                 ),
               ],
             ),

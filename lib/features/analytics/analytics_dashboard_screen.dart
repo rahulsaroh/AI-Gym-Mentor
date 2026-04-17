@@ -124,6 +124,66 @@ class AnalyticsDashboardScreen extends ConsumerWidget {
                     ),
               ),
 
+              // 4.1 BodyMap Heatmap Entry
+              _SectionHeader(
+                title: 'Muscle Heatmap',
+                subtitle: 'Visualize your training & recovery',
+                onTrailingTap: () => context.push('/analytics/bodymap'),
+                trailingLabel: 'View Full Map',
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: InkWell(
+                  onTap: () => context.push('/analytics/bodymap'),
+                  child: Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                          Theme.of(context).colorScheme.primary.withValues(alpha: 0.05),
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(LucideIcons.accessibility, size: 40),
+                        const SizedBox(width: 16),
+                        const Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'interactive Body Map',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
+                              ),
+                              Text(
+                                'Track volume distribution and predict soreness across all muscle groups.',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Icon(
+                          LucideIcons.chevronRight,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+
               // 5. Plateau Alerts
               alertsAsync.when(
                 data: (alerts) => alerts.isNotEmpty

@@ -34,7 +34,7 @@ final class WorkoutHomeNotifierProvider
 }
 
 String _$workoutHomeNotifierHash() =>
-    r'8bcfe1fe7c7c90e89202e0906823cf32f31e9dd6';
+    r'4f56c8a255c3ad1e14c49a53275ff0136b06f47e';
 
 abstract class _$WorkoutHomeNotifier extends $AsyncNotifier<WorkoutHomeState> {
   FutureOr<WorkoutHomeState> build();

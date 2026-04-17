@@ -204,8 +204,9 @@ class WorkoutHomeNotifier extends _$WorkoutHomeNotifier {
                   ? te.exercise.imageUrls.first
                   : (te.exercise.gifUrl ?? ''),
             )).toList();
-        estimatedDuration =
-            templateExercises.length * 12; // Estimate: 12 mins per exercise
+        // Estimate duration based on historical averages
+        final avgDurationPerExercise = (stats['avgDuration'] ?? 45) / (stats['avgExercises'] ?? 5);
+        estimatedDuration = (templateExercises.length * avgDurationPerExercise).round();
 
         isRestDay = completedToday && forcedDayId == null;
       }

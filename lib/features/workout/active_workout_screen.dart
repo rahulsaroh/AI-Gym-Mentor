@@ -28,6 +28,7 @@ import 'package:ai_gym_mentor/features/workout/components/workout_summary_overla
 import 'package:ai_gym_mentor/features/workout/components/superset_bracket_painter.dart';
 import 'package:ai_gym_mentor/features/workout/components/rest_timer_overlay.dart';
 import 'package:ai_gym_mentor/features/workout/providers/timer_notifier.dart';
+import 'package:ai_gym_mentor/features/workout/workout_repository.dart';
 import 'package:ai_gym_mentor/features/settings/settings_provider.dart';
 import 'package:ai_gym_mentor/core/utils/weight_converter.dart';
 import 'package:ai_gym_mentor/features/settings/models/settings_state.dart';
@@ -184,7 +185,9 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
         map = _noteControllers;
         break;
       default:
-        throw UnimplementedError('Type $type is not implemented in _getController');
+        // production-ready safety: log and fallback instead of crashing
+        debugPrint('ActiveWorkoutScreen: Unknown type $type in _getController. Defaulting to note.');
+        map = _noteControllers;
     }
     if (!map.containsKey(setId)) {
       map[setId] = TextEditingController(text: initialValue);
@@ -208,7 +211,9 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
         map = _rpeNodes;
         break;
       default:
-        throw UnimplementedError('Type $type is not implemented in _getNode');
+        // production-ready safety: log and fallback instead of crashing
+        debugPrint('ActiveWorkoutScreen: Unknown type $type in _getNode. Defaulting to weight.');
+        map = _weightNodes;
     }
     if (!map.containsKey(setId)) {
       map[setId] = FocusNode();
@@ -236,8 +241,11 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
 
         if (workoutRow?.dayId == null) {
           debugPrint(
-              'ActiveWorkoutScreen: dayId is null in widget and database, skipping template init');
-          if (mounted) setState(() => _isInitializing = false);
+              'ActiveWorkoutScreen: dayId is null in widget and database. Cannot initialize from template.');
+          if (mounted) setState(() {
+            _isInitializing = false;
+            _initError = 'Could not find template data for this workout.';
+          });
           return;
         }
 
@@ -1330,13 +1338,7 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
   }
 
   void _handleShake() {
-    if (_lastDeletedSet != null) {
-      _undoLastDeletion();
-      _lastDeletedSet = null;
-    } else if (_lastDeletedExercise != null) {
-      _undoLastDeletion();
-      _lastDeletedExercise = null;
-    }
+    _undoLastDeletion();
   }
 
   void _undoLastDeletion() async {
@@ -1345,37 +1347,26 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
       final s = _lastDeletedSet!;
       await database
           .into(database.workoutSets)
-          .insert(db.WorkoutSetsCompanion.insert(
-            workoutId: s.workoutId,
-            exerciseId: s.exerciseId,
-            exerciseOrder: s.exerciseOrder,
-            setNumber: s.setNumber,
-            reps: s.reps,
-            weight: s.weight,
-            setType: Value(s.setType),
-            notes: Value(s.notes),
-            completed: Value(s.completed),
-          ));
+          .insert(s.toCompanion(true));
+      
+      _lastDeletedSet = null; // Clear after undo
+      
       if (mounted)
         ScaffoldMessenger.of(context)
             .showSnackBar(const SnackBar(content: Text('Set restored')));
     } else if (_lastDeletedExercise != null) {
       final e = _lastDeletedExercise!;
-      for (final s in e.sets) {
-        await database
-            .into(database.workoutSets)
-            .insert(db.WorkoutSetsCompanion.insert(
-              workoutId: s.workoutId,
-              exerciseId: s.exerciseId,
-              exerciseOrder: s.exerciseOrder,
-              setNumber: s.setNumber,
-              reps: s.reps,
-              weight: s.weight,
-              setType: Value(s.setType),
-              notes: Value(s.notes),
-              completed: Value(s.completed),
-            ));
-      }
+      // Batch insert all sets of the exercise
+      await database.transaction(() async {
+        for (final s in e.sets) {
+          await database
+              .into(database.workoutSets)
+              .insert(s.toCompanion(true));
+        }
+      });
+      
+      _lastDeletedExercise = null; // Clear after undo
+      
       if (mounted)
         ScaffoldMessenger.of(context)
             .showSnackBar(const SnackBar(content: Text('Exercise restored')));
@@ -2022,251 +2013,72 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
     );
   }
 
-  Future<void> _undoDelete() async {
-    if (_lastDeletedSet != null) {
-      final database = ref.read(db.appDatabaseProvider);
-      await database
-          .into(database.workoutSets)
-          .insert(_lastDeletedSet!.toCompanion(true));
-      setState(() => _lastDeletedSet = null);
-    }
-  }
-}
-
-class _ActiveWorkoutHeader extends ConsumerWidget {
-  final int workoutId;
-  final bool isEditingTitle;
-  final Function(bool) onEditTitle;
-  final TextEditingController titleController;
-
-  const _ActiveWorkoutHeader({
-    required this.workoutId,
-    required this.isEditingTitle,
-    required this.onEditTitle,
-    required this.titleController,
-  });
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final database = ref.watch(db.appDatabaseProvider);
-    final workoutAsync = ref.watch(workoutUpdateProvider(workoutId));
-
-    return workoutAsync.when(
-      data: (workout) => GestureDetector(
-        onTap: () => onEditTitle(true),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+  Widget _buildBottomNavigation(List<ExerciseBlock> exerciseBlocks) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        border: Border(
+          top: BorderSide(
+            color: Theme.of(context).dividerColor,
+            width: 0.5,
+          ),
+        ),
+      ),
+      child: SafeArea(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            if (isEditingTitle)
-              SizedBox(
-                height: 32,
-                child: TextField(
-                  controller: titleController,
-                  autofocus: true,
-                  style: const TextStyle(
-                      fontSize: 16, fontWeight: FontWeight.bold),
-                  decoration: const InputDecoration(
-                    isDense: true,
-                    contentPadding: EdgeInsets.zero,
-                    border: InputBorder.none,
-                  ),
-                  onSubmitted: (val) async {
-                    await (database.update(database.workouts)
-                          ..where((t) => t.id.equals(workoutId)))
-                        .write(db.WorkoutsCompanion(name: Value(val)));
-                    onEditTitle(false);
-                  },
-                ),
-              )
-            else
-              Text(workout.name,
-                  style: const TextStyle(
-                      fontSize: 16, fontWeight: FontWeight.bold),
-                  overflow: TextOverflow.ellipsis),
             Row(
               children: [
-                const _LiveWorkoutDurationText(),
-                const SizedBox(width: 8),
-                _WorkoutProgressBadge(workoutId: workoutId),
+                IconButton(
+                  icon: const Icon(LucideIcons.chevronLeft),
+                  onPressed: _currentExerciseIndex > 0
+                      ? () {
+                          _pageController.previousPage(
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
+                          );
+                        }
+                      : null,
+                ),
+                Text(
+                  '${_currentExerciseIndex + 1} of ${exerciseBlocks.length}',
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+                IconButton(
+                  icon: const Icon(LucideIcons.chevronRight),
+                  onPressed: _currentExerciseIndex < exerciseBlocks.length - 1
+                      ? () {
+                          _pageController.nextPage(
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
+                          );
+                        }
+                      : null,
+                ),
               ],
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                final workout = await ref.read(workoutRepositoryProvider).getWorkout(widget.workoutId);
+                if (workout != null) {
+                  _showSummary(workout);
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                foregroundColor: Theme.of(context).colorScheme.onPrimary,
+              ),
+              child: const Text('Finish'),
             ),
           ],
         ),
       ),
-      loading: () => const SizedBox.shrink(),
-      error: (_, __) => const SizedBox.shrink(),
     );
   }
 }
 
-class _LiveWorkoutDurationText extends ConsumerWidget {
-  const _LiveWorkoutDurationText();
+// Removed redundant local classes: _ActiveWorkoutHeader, _LiveWorkoutDurationText, _WorkoutProgressBadge, _ExerciseMediaWidget
+// These are either handled by the main Scaffold AppBar or available as shared components.
 
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final duration = ref.watch(workoutDurationProvider);
-    return Text(_formatDuration(duration),
-        style: const TextStyle(fontSize: 12));
-  }
-
-  String _formatDuration(int seconds) {
-    final h = seconds ~/ 3600;
-    final m = (seconds % 3600) ~/ 60;
-    final s = seconds % 60;
-    if (h > 0) {
-      return '$h:${m.toString().padLeft(2, '0')}:${s.toString().padLeft(2, '0')}';
-    }
-    return '${m.toString().padLeft(2, '0')}:${s.toString().padLeft(2, '0')}';
-  }
-}
-
-class _WorkoutProgressBadge extends ConsumerWidget {
-  final int workoutId;
-  const _WorkoutProgressBadge({required this.workoutId});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final database = ref.watch(db.appDatabaseProvider);
-    return StreamBuilder<List<db.WorkoutSet>>(
-      stream: (database.select(database.workoutSets)
-            ..where((t) => t.workoutId.equals(workoutId)))
-          .watch(),
-      builder: (context, snapshot) {
-        final sets = snapshot.data ?? [];
-        final completedCount = sets.where((s) => s.completed).length;
-        return Text(
-          '• $completedCount/${sets.length} sets',
-          style: TextStyle(
-              fontSize: 12, color: Theme.of(context).colorScheme.primary),
-          overflow: TextOverflow.ellipsis,
-        );
-      },
-    );
-  }
-}
-
-final workoutUpdateProvider = StreamProvider.family<db.Workout, int>((ref, id) {
-  final database = ref.watch(db.appDatabaseProvider);
-  return (database.select(database.workouts)..where((t) => t.id.equals(id)))
-      .watchSingleOrNull()
-      .map((workout) =>
-          workout ??
-          db.Workout(
-            id: id,
-            name: 'Loading...',
-            date: DateTime.now(),
-            status: 'draft',
-          ));
-});
-
-
-/// Collapsible exercise media widget — shows GIF or image at top of exercise card.
-class _ExerciseMediaWidget extends StatefulWidget {
-  final Exercise exercise;
-  const _ExerciseMediaWidget({required this.exercise});
-
-  @override
-  State<_ExerciseMediaWidget> createState() => _ExerciseMediaWidgetState();
-}
-
-class _ExerciseMediaWidgetState extends State<_ExerciseMediaWidget> {
-  bool _isExpanded = true;
-
-  @override
-  Widget build(BuildContext context) {
-    final url = widget.exercise.gifUrl?.isNotEmpty == true
-        ? widget.exercise.gifUrl
-        : (widget.exercise.imageUrls.isNotEmpty
-            ? widget.exercise.imageUrls.first
-            : null);
-
-    if (url == null || url.isEmpty) return const SizedBox.shrink();
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        GestureDetector(
-          onTap: () => setState(() => _isExpanded = !_isExpanded),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Text(
-                  _isExpanded ? 'Hide Demo' : 'Show Demo',
-                  style: GoogleFonts.outfit(
-                    fontSize: 12,
-                    color: Theme.of(context).colorScheme.primary,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const SizedBox(width: 4),
-                Icon(
-                  _isExpanded ? LucideIcons.chevronUp : LucideIcons.chevronDown,
-                  size: 16,
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-              ],
-            ),
-          ),
-        ),
-        AnimatedCrossFade(
-          duration: const Duration(milliseconds: 300),
-          crossFadeState: _isExpanded
-              ? CrossFadeState.showFirst
-              : CrossFadeState.showSecond,
-          firstChild: Container(
-            width: double.infinity,
-            height: 200,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(16),
-              color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            clipBehavior: Clip.antiAlias,
-            child: CachedNetworkImage(
-              imageUrl: url,
-              fit: BoxFit.contain,
-              placeholder: (_, __) => Center(
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  valueColor: AlwaysStoppedAnimation<Color>(
-                    Theme.of(context).colorScheme.primary.withValues(alpha: 0.5),
-                  ),
-                ),
-              ),
-              errorWidget: (_, err, ___) {
-                debugPrint('Media error for $url: $err');
-                return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(LucideIcons.imageOff,
-                          size: 32, color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5)),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Demo unavailable',
-                        style: GoogleFonts.outfit(
-                          fontSize: 12,
-                          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5),
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
-          ),
-          secondChild: const SizedBox.shrink(),
-        ),
-        const SizedBox(height: 16),
-      ],
-    );
-  }
-}

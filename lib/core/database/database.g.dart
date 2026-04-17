@@ -7434,6 +7434,289 @@ class ExerciseInstructionsCompanion
   }
 }
 
+class $ExerciseMuscleMapTable extends ExerciseMuscleMap
+    with TableInfo<$ExerciseMuscleMapTable, ExerciseMuscleMapData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ExerciseMuscleMapTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+      'id', aliasedName, false,
+      hasAutoIncrement: true,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+  static const VerificationMeta _exerciseIdMeta =
+      const VerificationMeta('exerciseId');
+  @override
+  late final GeneratedColumn<int> exerciseId = GeneratedColumn<int>(
+      'exercise_id', aliasedName, false,
+      type: DriftSqlType.int,
+      requiredDuringInsert: true,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('REFERENCES exercises (id)'));
+  static const VerificationMeta _primaryMuscleMeta =
+      const VerificationMeta('primaryMuscle');
+  @override
+  late final GeneratedColumn<String> primaryMuscle = GeneratedColumn<String>(
+      'primary_muscle', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _secondaryMuscleMeta =
+      const VerificationMeta('secondaryMuscle');
+  @override
+  late final GeneratedColumn<String> secondaryMuscle = GeneratedColumn<String>(
+      'secondary_muscle', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  @override
+  List<GeneratedColumn> get $columns =>
+      [id, exerciseId, primaryMuscle, secondaryMuscle];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'exercise_muscle_map';
+  @override
+  VerificationContext validateIntegrity(
+      Insertable<ExerciseMuscleMapData> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('exercise_id')) {
+      context.handle(
+          _exerciseIdMeta,
+          exerciseId.isAcceptableOrUnknown(
+              data['exercise_id']!, _exerciseIdMeta));
+    } else if (isInserting) {
+      context.missing(_exerciseIdMeta);
+    }
+    if (data.containsKey('primary_muscle')) {
+      context.handle(
+          _primaryMuscleMeta,
+          primaryMuscle.isAcceptableOrUnknown(
+              data['primary_muscle']!, _primaryMuscleMeta));
+    } else if (isInserting) {
+      context.missing(_primaryMuscleMeta);
+    }
+    if (data.containsKey('secondary_muscle')) {
+      context.handle(
+          _secondaryMuscleMeta,
+          secondaryMuscle.isAcceptableOrUnknown(
+              data['secondary_muscle']!, _secondaryMuscleMeta));
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  ExerciseMuscleMapData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ExerciseMuscleMapData(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
+      exerciseId: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}exercise_id'])!,
+      primaryMuscle: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}primary_muscle'])!,
+      secondaryMuscle: attachedDatabase.typeMapping.read(
+          DriftSqlType.string, data['${effectivePrefix}secondary_muscle']),
+    );
+  }
+
+  @override
+  $ExerciseMuscleMapTable createAlias(String alias) {
+    return $ExerciseMuscleMapTable(attachedDatabase, alias);
+  }
+}
+
+class ExerciseMuscleMapData extends DataClass
+    implements Insertable<ExerciseMuscleMapData> {
+  final int id;
+  final int exerciseId;
+  final String primaryMuscle;
+  final String? secondaryMuscle;
+  const ExerciseMuscleMapData(
+      {required this.id,
+      required this.exerciseId,
+      required this.primaryMuscle,
+      this.secondaryMuscle});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['exercise_id'] = Variable<int>(exerciseId);
+    map['primary_muscle'] = Variable<String>(primaryMuscle);
+    if (!nullToAbsent || secondaryMuscle != null) {
+      map['secondary_muscle'] = Variable<String>(secondaryMuscle);
+    }
+    return map;
+  }
+
+  ExerciseMuscleMapCompanion toCompanion(bool nullToAbsent) {
+    return ExerciseMuscleMapCompanion(
+      id: Value(id),
+      exerciseId: Value(exerciseId),
+      primaryMuscle: Value(primaryMuscle),
+      secondaryMuscle: secondaryMuscle == null && nullToAbsent
+          ? const Value.absent()
+          : Value(secondaryMuscle),
+    );
+  }
+
+  factory ExerciseMuscleMapData.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ExerciseMuscleMapData(
+      id: serializer.fromJson<int>(json['id']),
+      exerciseId: serializer.fromJson<int>(json['exerciseId']),
+      primaryMuscle: serializer.fromJson<String>(json['primaryMuscle']),
+      secondaryMuscle: serializer.fromJson<String?>(json['secondaryMuscle']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'exerciseId': serializer.toJson<int>(exerciseId),
+      'primaryMuscle': serializer.toJson<String>(primaryMuscle),
+      'secondaryMuscle': serializer.toJson<String?>(secondaryMuscle),
+    };
+  }
+
+  ExerciseMuscleMapData copyWith(
+          {int? id,
+          int? exerciseId,
+          String? primaryMuscle,
+          Value<String?> secondaryMuscle = const Value.absent()}) =>
+      ExerciseMuscleMapData(
+        id: id ?? this.id,
+        exerciseId: exerciseId ?? this.exerciseId,
+        primaryMuscle: primaryMuscle ?? this.primaryMuscle,
+        secondaryMuscle: secondaryMuscle.present
+            ? secondaryMuscle.value
+            : this.secondaryMuscle,
+      );
+  ExerciseMuscleMapData copyWithCompanion(ExerciseMuscleMapCompanion data) {
+    return ExerciseMuscleMapData(
+      id: data.id.present ? data.id.value : this.id,
+      exerciseId:
+          data.exerciseId.present ? data.exerciseId.value : this.exerciseId,
+      primaryMuscle: data.primaryMuscle.present
+          ? data.primaryMuscle.value
+          : this.primaryMuscle,
+      secondaryMuscle: data.secondaryMuscle.present
+          ? data.secondaryMuscle.value
+          : this.secondaryMuscle,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ExerciseMuscleMapData(')
+          ..write('id: $id, ')
+          ..write('exerciseId: $exerciseId, ')
+          ..write('primaryMuscle: $primaryMuscle, ')
+          ..write('secondaryMuscle: $secondaryMuscle')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, exerciseId, primaryMuscle, secondaryMuscle);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ExerciseMuscleMapData &&
+          other.id == this.id &&
+          other.exerciseId == this.exerciseId &&
+          other.primaryMuscle == this.primaryMuscle &&
+          other.secondaryMuscle == this.secondaryMuscle);
+}
+
+class ExerciseMuscleMapCompanion
+    extends UpdateCompanion<ExerciseMuscleMapData> {
+  final Value<int> id;
+  final Value<int> exerciseId;
+  final Value<String> primaryMuscle;
+  final Value<String?> secondaryMuscle;
+  const ExerciseMuscleMapCompanion({
+    this.id = const Value.absent(),
+    this.exerciseId = const Value.absent(),
+    this.primaryMuscle = const Value.absent(),
+    this.secondaryMuscle = const Value.absent(),
+  });
+  ExerciseMuscleMapCompanion.insert({
+    this.id = const Value.absent(),
+    required int exerciseId,
+    required String primaryMuscle,
+    this.secondaryMuscle = const Value.absent(),
+  })  : exerciseId = Value(exerciseId),
+        primaryMuscle = Value(primaryMuscle);
+  static Insertable<ExerciseMuscleMapData> custom({
+    Expression<int>? id,
+    Expression<int>? exerciseId,
+    Expression<String>? primaryMuscle,
+    Expression<String>? secondaryMuscle,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (exerciseId != null) 'exercise_id': exerciseId,
+      if (primaryMuscle != null) 'primary_muscle': primaryMuscle,
+      if (secondaryMuscle != null) 'secondary_muscle': secondaryMuscle,
+    });
+  }
+
+  ExerciseMuscleMapCompanion copyWith(
+      {Value<int>? id,
+      Value<int>? exerciseId,
+      Value<String>? primaryMuscle,
+      Value<String?>? secondaryMuscle}) {
+    return ExerciseMuscleMapCompanion(
+      id: id ?? this.id,
+      exerciseId: exerciseId ?? this.exerciseId,
+      primaryMuscle: primaryMuscle ?? this.primaryMuscle,
+      secondaryMuscle: secondaryMuscle ?? this.secondaryMuscle,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (exerciseId.present) {
+      map['exercise_id'] = Variable<int>(exerciseId.value);
+    }
+    if (primaryMuscle.present) {
+      map['primary_muscle'] = Variable<String>(primaryMuscle.value);
+    }
+    if (secondaryMuscle.present) {
+      map['secondary_muscle'] = Variable<String>(secondaryMuscle.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ExerciseMuscleMapCompanion(')
+          ..write('id: $id, ')
+          ..write('exerciseId: $exerciseId, ')
+          ..write('primaryMuscle: $primaryMuscle, ')
+          ..write('secondaryMuscle: $secondaryMuscle')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -7464,6 +7747,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
       $ExerciseProgressionsTable(this);
   late final $ExerciseInstructionsTable exerciseInstructions =
       $ExerciseInstructionsTable(this);
+  late final $ExerciseMuscleMapTable exerciseMuscleMap =
+      $ExerciseMuscleMapTable(this);
+  late final BodyMapDao bodyMapDao = BodyMapDao(this as AppDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -7485,7 +7771,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
         exerciseEnrichedContent,
         recentExercises,
         exerciseProgressions,
-        exerciseInstructions
+        exerciseInstructions,
+        exerciseMuscleMap
       ];
 }
 
@@ -7684,6 +7971,24 @@ final class $$ExercisesTableReferences
 
     final cache =
         $_typedResult.readTableOrNull(_exerciseInstructionsRefsTable($_db));
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: cache));
+  }
+
+  static MultiTypedResultKey<$ExerciseMuscleMapTable,
+      List<ExerciseMuscleMapData>> _exerciseMuscleMapRefsTable(
+          _$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(db.exerciseMuscleMap,
+          aliasName: $_aliasNameGenerator(
+              db.exercises.id, db.exerciseMuscleMap.exerciseId));
+
+  $$ExerciseMuscleMapTableProcessedTableManager get exerciseMuscleMapRefs {
+    final manager =
+        $$ExerciseMuscleMapTableTableManager($_db, $_db.exerciseMuscleMap)
+            .filter((f) => f.exerciseId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache =
+        $_typedResult.readTableOrNull(_exerciseMuscleMapRefsTable($_db));
     return ProcessedTableManager(
         manager.$state.copyWith(prefetchedData: cache));
   }
@@ -7940,6 +8245,27 @@ class $$ExercisesTableFilterComposer
             $$ExerciseInstructionsTableFilterComposer(
               $db: $db,
               $table: $db.exerciseInstructions,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return f(composer);
+  }
+
+  Expression<bool> exerciseMuscleMapRefs(
+      Expression<bool> Function($$ExerciseMuscleMapTableFilterComposer f) f) {
+    final $$ExerciseMuscleMapTableFilterComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.id,
+        referencedTable: $db.exerciseMuscleMap,
+        getReferencedColumn: (t) => t.exerciseId,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$ExerciseMuscleMapTableFilterComposer(
+              $db: $db,
+              $table: $db.exerciseMuscleMap,
               $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
               joinBuilder: joinBuilder,
               $removeJoinBuilderFromRootComposer:
@@ -8297,6 +8623,28 @@ class $$ExercisesTableAnnotationComposer
                 ));
     return f(composer);
   }
+
+  Expression<T> exerciseMuscleMapRefs<T extends Object>(
+      Expression<T> Function($$ExerciseMuscleMapTableAnnotationComposer a) f) {
+    final $$ExerciseMuscleMapTableAnnotationComposer composer =
+        $composerBuilder(
+            composer: this,
+            getCurrentColumn: (t) => t.id,
+            referencedTable: $db.exerciseMuscleMap,
+            getReferencedColumn: (t) => t.exerciseId,
+            builder: (joinBuilder,
+                    {$addJoinBuilderToRootComposer,
+                    $removeJoinBuilderFromRootComposer}) =>
+                $$ExerciseMuscleMapTableAnnotationComposer(
+                  $db: $db,
+                  $table: $db.exerciseMuscleMap,
+                  $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                  joinBuilder: joinBuilder,
+                  $removeJoinBuilderFromRootComposer:
+                      $removeJoinBuilderFromRootComposer,
+                ));
+    return f(composer);
+  }
 }
 
 class $$ExercisesTableTableManager extends RootTableManager<
@@ -8318,7 +8666,8 @@ class $$ExercisesTableTableManager extends RootTableManager<
         bool exerciseBodyPartsRefs,
         bool exerciseEnrichedContentRefs,
         bool recentExercisesRefs,
-        bool exerciseInstructionsRefs})> {
+        bool exerciseInstructionsRefs,
+        bool exerciseMuscleMapRefs})> {
   $$ExercisesTableTableManager(_$AppDatabase db, $ExercisesTable table)
       : super(TableManagerState(
           db: db,
@@ -8451,7 +8800,8 @@ class $$ExercisesTableTableManager extends RootTableManager<
               exerciseBodyPartsRefs = false,
               exerciseEnrichedContentRefs = false,
               recentExercisesRefs = false,
-              exerciseInstructionsRefs = false}) {
+              exerciseInstructionsRefs = false,
+              exerciseMuscleMapRefs = false}) {
             return PrefetchHooks(
               db: db,
               explicitlyWatchedTables: [
@@ -8463,7 +8813,8 @@ class $$ExercisesTableTableManager extends RootTableManager<
                 if (exerciseBodyPartsRefs) db.exerciseBodyParts,
                 if (exerciseEnrichedContentRefs) db.exerciseEnrichedContent,
                 if (recentExercisesRefs) db.recentExercises,
-                if (exerciseInstructionsRefs) db.exerciseInstructions
+                if (exerciseInstructionsRefs) db.exerciseInstructions,
+                if (exerciseMuscleMapRefs) db.exerciseMuscleMap
               ],
               addJoins: null,
               getPrefetchedDataCallback: (items) async {
@@ -8571,6 +8922,19 @@ class $$ExercisesTableTableManager extends RootTableManager<
                         referencedItemsForCurrentItem:
                             (item, referencedItems) => referencedItems
                                 .where((e) => e.exerciseId == item.id),
+                        typedResults: items),
+                  if (exerciseMuscleMapRefs)
+                    await $_getPrefetchedData<ExerciseTable, $ExercisesTable,
+                            ExerciseMuscleMapData>(
+                        currentTable: table,
+                        referencedTable: $$ExercisesTableReferences
+                            ._exerciseMuscleMapRefsTable(db),
+                        managerFromTypedResult: (p0) =>
+                            $$ExercisesTableReferences(db, table, p0)
+                                .exerciseMuscleMapRefs,
+                        referencedItemsForCurrentItem:
+                            (item, referencedItems) => referencedItems
+                                .where((e) => e.exerciseId == item.id),
                         typedResults: items)
                 ];
               },
@@ -8598,7 +8962,8 @@ typedef $$ExercisesTableProcessedTableManager = ProcessedTableManager<
         bool exerciseBodyPartsRefs,
         bool exerciseEnrichedContentRefs,
         bool recentExercisesRefs,
-        bool exerciseInstructionsRefs})>;
+        bool exerciseInstructionsRefs,
+        bool exerciseMuscleMapRefs})>;
 typedef $$WorkoutTemplatesTableCreateCompanionBuilder
     = WorkoutTemplatesCompanion Function({
   Value<int> id,
@@ -13979,6 +14344,267 @@ typedef $$ExerciseInstructionsTableProcessedTableManager
         (ExerciseInstruction, $$ExerciseInstructionsTableReferences),
         ExerciseInstruction,
         PrefetchHooks Function({bool exerciseId})>;
+typedef $$ExerciseMuscleMapTableCreateCompanionBuilder
+    = ExerciseMuscleMapCompanion Function({
+  Value<int> id,
+  required int exerciseId,
+  required String primaryMuscle,
+  Value<String?> secondaryMuscle,
+});
+typedef $$ExerciseMuscleMapTableUpdateCompanionBuilder
+    = ExerciseMuscleMapCompanion Function({
+  Value<int> id,
+  Value<int> exerciseId,
+  Value<String> primaryMuscle,
+  Value<String?> secondaryMuscle,
+});
+
+final class $$ExerciseMuscleMapTableReferences extends BaseReferences<
+    _$AppDatabase, $ExerciseMuscleMapTable, ExerciseMuscleMapData> {
+  $$ExerciseMuscleMapTableReferences(
+      super.$_db, super.$_table, super.$_typedResult);
+
+  static $ExercisesTable _exerciseIdTable(_$AppDatabase db) =>
+      db.exercises.createAlias($_aliasNameGenerator(
+          db.exerciseMuscleMap.exerciseId, db.exercises.id));
+
+  $$ExercisesTableProcessedTableManager get exerciseId {
+    final $_column = $_itemColumn<int>('exercise_id')!;
+
+    final manager = $$ExercisesTableTableManager($_db, $_db.exercises)
+        .filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_exerciseIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: [item]));
+  }
+}
+
+class $$ExerciseMuscleMapTableFilterComposer
+    extends Composer<_$AppDatabase, $ExerciseMuscleMapTable> {
+  $$ExerciseMuscleMapTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get primaryMuscle => $composableBuilder(
+      column: $table.primaryMuscle, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get secondaryMuscle => $composableBuilder(
+      column: $table.secondaryMuscle,
+      builder: (column) => ColumnFilters(column));
+
+  $$ExercisesTableFilterComposer get exerciseId {
+    final $$ExercisesTableFilterComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.exerciseId,
+        referencedTable: $db.exercises,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$ExercisesTableFilterComposer(
+              $db: $db,
+              $table: $db.exercises,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+}
+
+class $$ExerciseMuscleMapTableOrderingComposer
+    extends Composer<_$AppDatabase, $ExerciseMuscleMapTable> {
+  $$ExerciseMuscleMapTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get primaryMuscle => $composableBuilder(
+      column: $table.primaryMuscle,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get secondaryMuscle => $composableBuilder(
+      column: $table.secondaryMuscle,
+      builder: (column) => ColumnOrderings(column));
+
+  $$ExercisesTableOrderingComposer get exerciseId {
+    final $$ExercisesTableOrderingComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.exerciseId,
+        referencedTable: $db.exercises,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$ExercisesTableOrderingComposer(
+              $db: $db,
+              $table: $db.exercises,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+}
+
+class $$ExerciseMuscleMapTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ExerciseMuscleMapTable> {
+  $$ExerciseMuscleMapTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get primaryMuscle => $composableBuilder(
+      column: $table.primaryMuscle, builder: (column) => column);
+
+  GeneratedColumn<String> get secondaryMuscle => $composableBuilder(
+      column: $table.secondaryMuscle, builder: (column) => column);
+
+  $$ExercisesTableAnnotationComposer get exerciseId {
+    final $$ExercisesTableAnnotationComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.exerciseId,
+        referencedTable: $db.exercises,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$ExercisesTableAnnotationComposer(
+              $db: $db,
+              $table: $db.exercises,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+}
+
+class $$ExerciseMuscleMapTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $ExerciseMuscleMapTable,
+    ExerciseMuscleMapData,
+    $$ExerciseMuscleMapTableFilterComposer,
+    $$ExerciseMuscleMapTableOrderingComposer,
+    $$ExerciseMuscleMapTableAnnotationComposer,
+    $$ExerciseMuscleMapTableCreateCompanionBuilder,
+    $$ExerciseMuscleMapTableUpdateCompanionBuilder,
+    (ExerciseMuscleMapData, $$ExerciseMuscleMapTableReferences),
+    ExerciseMuscleMapData,
+    PrefetchHooks Function({bool exerciseId})> {
+  $$ExerciseMuscleMapTableTableManager(
+      _$AppDatabase db, $ExerciseMuscleMapTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ExerciseMuscleMapTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ExerciseMuscleMapTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ExerciseMuscleMapTableAnnotationComposer(
+                  $db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            Value<int> exerciseId = const Value.absent(),
+            Value<String> primaryMuscle = const Value.absent(),
+            Value<String?> secondaryMuscle = const Value.absent(),
+          }) =>
+              ExerciseMuscleMapCompanion(
+            id: id,
+            exerciseId: exerciseId,
+            primaryMuscle: primaryMuscle,
+            secondaryMuscle: secondaryMuscle,
+          ),
+          createCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            required int exerciseId,
+            required String primaryMuscle,
+            Value<String?> secondaryMuscle = const Value.absent(),
+          }) =>
+              ExerciseMuscleMapCompanion.insert(
+            id: id,
+            exerciseId: exerciseId,
+            primaryMuscle: primaryMuscle,
+            secondaryMuscle: secondaryMuscle,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (
+                    e.readTable(table),
+                    $$ExerciseMuscleMapTableReferences(db, table, e)
+                  ))
+              .toList(),
+          prefetchHooksCallback: ({exerciseId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins: <
+                  T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic>>(state) {
+                if (exerciseId) {
+                  state = state.withJoin(
+                    currentTable: table,
+                    currentColumn: table.exerciseId,
+                    referencedTable:
+                        $$ExerciseMuscleMapTableReferences._exerciseIdTable(db),
+                    referencedColumn: $$ExerciseMuscleMapTableReferences
+                        ._exerciseIdTable(db)
+                        .id,
+                  ) as T;
+                }
+
+                return state;
+              },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ));
+}
+
+typedef $$ExerciseMuscleMapTableProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    $ExerciseMuscleMapTable,
+    ExerciseMuscleMapData,
+    $$ExerciseMuscleMapTableFilterComposer,
+    $$ExerciseMuscleMapTableOrderingComposer,
+    $$ExerciseMuscleMapTableAnnotationComposer,
+    $$ExerciseMuscleMapTableCreateCompanionBuilder,
+    $$ExerciseMuscleMapTableUpdateCompanionBuilder,
+    (ExerciseMuscleMapData, $$ExerciseMuscleMapTableReferences),
+    ExerciseMuscleMapData,
+    PrefetchHooks Function({bool exerciseId})>;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -14020,6 +14646,8 @@ class $AppDatabaseManager {
       $$ExerciseProgressionsTableTableManager(_db, _db.exerciseProgressions);
   $$ExerciseInstructionsTableTableManager get exerciseInstructions =>
       $$ExerciseInstructionsTableTableManager(_db, _db.exerciseInstructions);
+  $$ExerciseMuscleMapTableTableManager get exerciseMuscleMap =>
+      $$ExerciseMuscleMapTableTableManager(_db, _db.exerciseMuscleMap);
 }
 
 // **************************************************************************

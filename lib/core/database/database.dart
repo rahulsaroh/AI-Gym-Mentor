@@ -9,6 +9,8 @@ import 'package:path/path.dart' as p;
 import 'package:ai_gym_mentor/core/database/initial_data.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import 'package:ai_gym_mentor/core/database/daos/bodymap_dao.dart';
+
 part 'database.g.dart';
 
 enum SetType {
@@ -181,7 +183,6 @@ class ExerciseProgressionSettings extends Table {
   BoolColumn get autoSuggest => boolean().withDefault(const Constant(true))();
 }
 
-// Phase 3: New tables for exercise database feature
 class ExerciseMuscles extends Table {
   IntColumn get id => integer().autoIncrement()();
   IntColumn get exerciseId => integer().references(Exercises, #id)();
@@ -233,6 +234,13 @@ class ExerciseInstructions extends Table {
   TextColumn get instructionText => text()();
 }
 
+class ExerciseMuscleMap extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get exerciseId => integer().references(Exercises, #id)();
+  TextColumn get primaryMuscle => text()(); // e.g. "chest", "quads"
+  TextColumn get secondaryMuscle => text().nullable()();
+}
+
 @DriftDatabase(tables: [
   Exercises,
   WorkoutTemplates,
@@ -251,6 +259,9 @@ class ExerciseInstructions extends Table {
   RecentExercises,
   ExerciseProgressions,
   ExerciseInstructions,
+  ExerciseMuscleMap,
+], daos: [
+  BodyMapDao,
 ])
 class AppDatabase extends _$AppDatabase {
   static final AppDatabase _instance = AppDatabase._internal();
@@ -270,7 +281,7 @@ class AppDatabase extends _$AppDatabase {
   }
 
   @override
-  int get schemaVersion => 22;
+  int get schemaVersion => 23;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -450,6 +461,14 @@ class AppDatabase extends _$AppDatabase {
             if (!await hasColumn('template_days', 'weekday')) {
               await m.addColumn(templateDays, templateDays.weekday);
             }
+          }
+          if (from < 23) {
+            await m.createTable(exerciseMuscleMap);
+            // Populate from existing exercises data
+            await customStatement('''
+              INSERT INTO exercise_muscle_map (exercise_id, primary_muscle, secondary_muscle)
+              SELECT id, primary_muscle, secondary_muscle FROM exercises
+            ''');
           }
         },
         beforeOpen: (details) async {

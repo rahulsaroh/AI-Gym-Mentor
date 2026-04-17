@@ -818,6 +818,12 @@
       "languageVersion": "3.4"
     },
     {
+      "name": "path_drawing",
+      "rootUri": "file:///C:/Users/dell/AppData/Local/Pub/Cache/hosted/pub.dev/path_drawing-1.0.1",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
       "name": "path_parsing",
       "rootUri": "file:///C:/Users/dell/AppData/Local/Pub/Cache/hosted/pub.dev/path_parsing-1.1.0",
       "packageUri": "lib/",
