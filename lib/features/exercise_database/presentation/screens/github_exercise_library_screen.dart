@@ -268,6 +268,11 @@ class _GithubExerciseLibraryScreenState
           ],
         ),
       ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => context.push('/exercises/create'),
+        label: const Text('Add Exercise'),
+        icon: const Icon(LucideIcons.dumbbell),
+      ),
     );
   }
 

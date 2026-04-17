@@ -68,6 +68,7 @@ class SettingsRepository {
       'autoIncrement': s.autoIncrement,
       'showRpe': s.showRpe,
       'showPreviousData': s.showPreviousData,
+      'autoBackup': s.autoBackup,
       'googleDriveEmail': s.googleDriveEmail,
       'lastSynced': s.lastSynced?.toIso8601String(),
     };
@@ -100,6 +101,7 @@ class SettingsRepository {
       autoIncrement: (map['autoIncrement'] ?? 0.0).toDouble(),
       showRpe: map['showRpe'] ?? true,
       showPreviousData: map['showPreviousData'] ?? true,
+      autoBackup: map['autoBackup'] ?? false,
       googleDriveEmail: map['googleDriveEmail'],
       lastSynced:
           map['lastSynced'] != null ? DateTime.parse(map['lastSynced']) : null,

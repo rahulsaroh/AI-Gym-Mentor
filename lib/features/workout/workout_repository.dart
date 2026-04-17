@@ -105,10 +105,8 @@ class WorkoutRepository {
       ]);
       workoutIdsWithMuscles.addColumns([_db.workoutSets.workoutId]);
       
-      Expression<bool> muscleFilter = _db.exercises.primaryMuscle.isIn(muscleGroups);
-      if (_db.exercises.secondaryMuscle != null) {
-        muscleFilter = muscleFilter | _db.exercises.secondaryMuscle.isIn(muscleGroups);
-      }
+      Expression<bool> muscleFilter = _db.exercises.primaryMuscle.isIn(muscleGroups) |
+          _db.exercises.secondaryMuscle.isIn(muscleGroups);
       workoutIdsWithMuscles.where(muscleFilter);
       
       final ids = await workoutIdsWithMuscles.map((row) => row.read(_db.workoutSets.workoutId)).get();
@@ -208,13 +206,17 @@ class WorkoutRepository {
     }
 
     // Total Volume using selectOnly
-    final volumeQuery = _db.selectOnly(_db.workoutSets)
+    // Fix #18: Exclude 'Timed' exercise sets from volume calculation
+    final volumeQuery = _db.selectOnly(_db.workoutSets).join([
+      innerJoin(_db.exercises, _db.exercises.id.equalsExp(_db.workoutSets.exerciseId)),
+    ])
       ..addColumns([_db.workoutSets.weight, _db.workoutSets.reps])
-      ..where(_db.workoutSets.completed.equals(true));
+      ..where(_db.workoutSets.completed.equals(true) & 
+              _db.exercises.setType.equals('Timed').not());
 
-    final sets = await volumeQuery.get();
+    final rows = await volumeQuery.get();
     double totalVolume = 0;
-    for (final row in sets) {
+    for (final row in rows) {
       final w = row.read(_db.workoutSets.weight) ?? 0;
       final r = row.read(_db.workoutSets.reps) ?? 0;
       totalVolume += w * r;
@@ -345,21 +347,19 @@ class WorkoutRepository {
       );
 
       // 3. Create Template Exercises
+      // Fix #11: Group by exerciseOrder instead of exerciseId to preserve same-exercise-multi-occurrence
       final exerciseGroups = <int, List<WorkoutSet>>{};
       for (var s in sets) {
-        exerciseGroups.putIfAbsent(s.exerciseId, () => []).add(s);
+        exerciseGroups.putIfAbsent(s.exerciseOrder, () => []).add(s);
       }
 
-      final sortedIds = exerciseGroups.keys.toList()..sort((a, b) {
-        final orderA = exerciseGroups[a]!.first.exerciseOrder;
-        final orderB = exerciseGroups[b]!.first.exerciseOrder;
-        return orderA.compareTo(orderB);
-      });
+      final sortedOrders = exerciseGroups.keys.toList()..sort();
 
-      for (var i = 0; i < sortedIds.length; i++) {
-        final exId = sortedIds[i];
-        final exSets = exerciseGroups[exId]!;
+      for (var i = 0; i < sortedOrders.length; i++) {
+        final order = sortedOrders[i];
+        final exSets = exerciseGroups[order]!;
         final firstSet = exSets.first;
+        final exId = firstSet.exerciseId;
         
         final setsJson = jsonEncode(exSets.map((s) => {
           'reps': s.reps,
@@ -412,30 +412,35 @@ class WorkoutRepository {
     
     if (row == null) return null;
 
-    // Fetch sets for this workout to populate the session
-    final sets = await (_db.select(_db.workoutSets)
-          ..where((t) => t.workoutId.equals(row.id))
-          ..orderBy([
-            (t) => OrderingTerm(expression: t.exerciseOrder, mode: OrderingMode.asc),
-            (t) => OrderingTerm(expression: t.setNumber, mode: OrderingMode.asc),
-          ]))
-        .get();
+    // Fetch sets and exercise info for this workout to populate the session
+    final query = _db.select(_db.workoutSets).join([
+      innerJoin(_db.exercises, _db.exercises.id.equalsExp(_db.workoutSets.exerciseId)),
+    ])
+      ..where(_db.workoutSets.workoutId.equals(row.id))
+      ..orderBy([
+        OrderingTerm(expression: _db.workoutSets.exerciseOrder, mode: OrderingMode.asc),
+        OrderingTerm(expression: _db.workoutSets.setNumber, mode: OrderingMode.asc),
+      ]);
+
+    final rows = await query.get();
 
     // Group sets by exercise for the domain entity
     final exercisesMap = <int, ent.LoggedExercise>{};
-    for (final s in sets) {
+    for (final row_data in rows) {
+      final s = row_data.readTable(_db.workoutSets);
+      final ex = row_data.readTable(_db.exercises);
       final setEntity = _toSetEntity(s);
+      
       if (!exercisesMap.containsKey(s.exerciseId)) {
-        // We'd ideally fetch the exercise name here too, but for simplicity:
         exercisesMap[s.exerciseId] = ent.LoggedExercise(
           exerciseId: s.exerciseId,
-          exerciseName: 'Exercise ${s.exerciseId}', // Placeholder
+          exerciseName: ex.name,
           order: s.exerciseOrder,
           sets: [setEntity],
         );
       } else {
-        final ex = exercisesMap[s.exerciseId]!;
-        exercisesMap[s.exerciseId] = ex.copyWith(sets: [...ex.sets, setEntity]);
+        final existingEx = exercisesMap[s.exerciseId]!;
+        exercisesMap[s.exerciseId] = existingEx.copyWith(sets: [...existingEx.sets, setEntity]);
       }
     }
 
@@ -822,7 +827,7 @@ class WorkoutRepository {
             .getSingle();
       }
     } catch (e) {
-      print('GitHub exercise matching failed for "$name": $e');
+      debugPrint('GitHub exercise matching failed for "$name": $e');
     }
 
     return null;
@@ -913,10 +918,10 @@ class WorkoutRepository {
           }
         }
       });
-      print('Import successful: $name');
+      debugPrint('Import successful: $name');
     } catch (e, stack) {
-      print('Import failed: $e');
-      print(stack);
+      debugPrint('Import failed: $e');
+      debugPrint(stack.toString());
       rethrow;
     }
   }
@@ -984,7 +989,7 @@ class WorkoutRepository {
             );
       }
     });
-    print('Import successful: $name');
+    debugPrint('Import successful: $name');
   }
 
   Future<void> clearAllTemplatesAndInsertSample() async {

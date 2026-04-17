@@ -143,6 +143,15 @@ class SettingsScreen extends ConsumerWidget {
               onTap: () => Navigator.push(context,
                   MaterialPageRoute(builder: (_) => const CsvExportScreen())),
             ),
+            _buildSwitchTile(
+              context,
+              title: 'Safe Data Mode',
+              subtitle: 'Keeps data safe during updates & backups',
+              value: settings.autoBackup,
+              onChanged: (v) => ref
+                  .read(settingsProvider.notifier)
+                  .updateSettings(settings.copyWith(autoBackup: v)),
+            ),
             _buildTile(
               context,
               title: 'Import Data from File',

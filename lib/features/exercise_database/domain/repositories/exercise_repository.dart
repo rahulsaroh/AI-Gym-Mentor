@@ -70,6 +70,7 @@ abstract class ExerciseRepository {
 
   // Create/Update Custom Exercise
   Future<int> createExercise(ExerciseEntity exercise);
+  Future<void> updateExercise(ExerciseEntity exercise);
 
   // Sync GitHub exercise to local DB
   Future<int> ensureGithubExercise(GithubExercise exercise);

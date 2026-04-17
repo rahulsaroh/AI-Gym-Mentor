@@ -292,6 +292,10 @@ class ExerciseRepositoryImpl implements ExerciseRepository {
       force: Value(exercise.force),
       source: const Value('custom'),
       isCustom: const Value(true),
+      description: Value(exercise.overview),
+      gifUrl: Value(exercise.gifUrl),
+      imageUrl: Value(exercise.imageUrls.isNotEmpty ? exercise.imageUrls.first : null),
+      instructions: Value(exercise.instructions.isNotEmpty ? exercise.instructions.join('|') : null),
     );
 
     final id = await _localDatasource.insertExercise(companion);
@@ -304,10 +308,40 @@ class ExerciseRepositoryImpl implements ExerciseRepository {
       await _localDatasource.insertExerciseMuscle(id, m, false);
     }
 
-    // Save body parts (auto-mapped during insert usually, but let's be explicit if needed)
-    // For now, let's assume the datasource/seeder logic or we can add it here.
-
     return id;
+  }
+
+  @override
+  Future<void> updateExercise(ExerciseEntity exercise) async {
+    final companion = ExercisesCompanion(
+      name: Value(exercise.name),
+      category: Value(exercise.category),
+      difficulty: Value(exercise.difficulty),
+      primaryMuscle: Value(exercise.primaryMuscles.isNotEmpty ? exercise.primaryMuscles.first : 'Other'),
+      equipment: Value(exercise.equipment ?? 'None'),
+      setType: Value(exercise.setType),
+      restTime: Value(exercise.restTime),
+      mechanic: Value(exercise.mechanic),
+      force: Value(exercise.force),
+      description: Value(exercise.overview),
+      gifUrl: Value(exercise.gifUrl),
+      imageUrl: Value(exercise.imageUrls.isNotEmpty ? exercise.imageUrls.first : null),
+      instructions: Value(exercise.instructions.isNotEmpty ? exercise.instructions.join('|') : null),
+    );
+
+    await _localDatasource.updateExercise(exercise.id, companion);
+
+    // Update muscles (clear and re-insert)
+    await (_localDatasource.database.delete(_localDatasource.database.exerciseMuscles)
+          ..where((t) => t.exerciseId.equals(exercise.id)))
+        .go();
+    
+    for (final m in exercise.primaryMuscles) {
+      await _localDatasource.insertExerciseMuscle(exercise.id, m, true);
+    }
+    for (final m in exercise.secondaryMuscles) {
+      await _localDatasource.insertExerciseMuscle(exercise.id, m, false);
+    }
   }
 
   @override

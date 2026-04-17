@@ -33,6 +33,9 @@ import 'package:ai_gym_mentor/core/utils/weight_converter.dart';
 import 'package:ai_gym_mentor/features/settings/models/settings_state.dart';
 import 'package:ai_gym_mentor/features/workout/providers/workout_duration_provider.dart';
 import 'package:ai_gym_mentor/features/workout/components/plate_calculator_dialog.dart';
+import 'package:ai_gym_mentor/features/workout/components/exercise_header_card.dart';
+import 'package:ai_gym_mentor/features/workout/components/set_logging_table.dart';
+import 'package:ai_gym_mentor/features/workout/models/workout_models.dart';
 
 typedef Exercise = entity.ExerciseEntity;
 
@@ -54,6 +57,7 @@ class ActiveWorkoutScreen extends ConsumerStatefulWidget {
 class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
     with TickerProviderStateMixin {
   bool _isInitializing = true;
+  String? _initError; // Fix #3: track init errors for UI feedback
   bool _timerStarted = false;
   int _prsAchieved = 0;
 
@@ -76,8 +80,10 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
   Map<int, List<db.WorkoutSet>> _previousSessionSets = {}; // exerciseId -> sets
 
   late PageController _pageController;
-
   late ScrollController _scrollController;
+
+  // Fix #7: Cache the sets stream to avoid creating 3 duplicate Drift watchers per build()
+  late Stream<List<db.WorkoutSet>> _setsStream;
 
   // Input management
   final TextEditingController _titleController = TextEditingController();
@@ -111,9 +117,31 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
         }
       });
 
-    // Removed _shakeDetector as per scope control plan
     _scrollController = ScrollController();
     _pageController = PageController(initialPage: _currentExerciseIndex);
+
+    // Fix #7: Initialize the single sets stream here so all StreamBuilders share one watcher
+    final database = ref.read(db.appDatabaseProvider);
+    _setsStream = (database.select(database.workoutSets)
+          ..where((t) => t.workoutId.equals(widget.workoutId)))
+        .watch();
+
+    // Fix #4: Start timer once, safely after first frame, outside StreamBuilder.build
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (!mounted || _timerStarted) return;
+      _timerStarted = true;
+      try {
+        final database = ref.read(db.appDatabaseProvider);
+        final workoutRow = await (database.select(database.workouts)
+              ..where((t) => t.id.equals(widget.workoutId)))
+            .getSingleOrNull();
+        if (workoutRow != null && mounted) {
+          _startTimer(workoutRow.startTime ?? workoutRow.date);
+        }
+      } catch (e) {
+        debugPrint('ActiveWorkoutScreen: Error starting timer: $e');
+      }
+    });
   }
 
   @override
@@ -219,8 +247,10 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
         await _processTemplate(database, dayId);
       }
     } catch (e, stack) {
+      // Fix #3: Surface errors to UI instead of silently swallowing them
       debugPrint('ActiveWorkoutScreen ERROR during initialization: $e');
       debugPrint(stack.toString());
+      if (mounted) setState(() => _initError = 'Failed to load workout: ${e.toString().split('\n').first}');
     } finally {
       if (mounted) setState(() => _isInitializing = false);
     }
@@ -323,7 +353,35 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
     if (_isInitializing) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
-    
+
+    // Fix #3: Show error UI when initialization fails
+    if (_initError != null) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('Error')),
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.error_outline, size: 48, color: Colors.red),
+                const SizedBox(height: 16),
+                Text(_initError!, textAlign: TextAlign.center),
+                const SizedBox(height: 24),
+                FilledButton(
+                  onPressed: () {
+                    setState(() { _initError = null; _isInitializing = true; });
+                    _initializeFromTemplate();
+                  },
+                  child: const Text('Retry'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
     final settings = ref.watch(settingsProvider).value ?? const SettingsState();
     final exercisesAsync = ref.watch(allExercisesProvider);
     final database = ref.read(db.appDatabaseProvider);
@@ -338,16 +396,7 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
           return const Scaffold(body: Center(child: Text('Workout not found')));
         }
 
-        if (!_timerStarted) {
-          _timerStarted = true;
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            try {
-              _startTimer(workout.startTime ?? workout.date);
-            } catch (e) {
-              debugPrint('ActiveWorkoutScreen: Error starting timer: $e');
-            }
-          });
-        }
+        // Fix #4: Timer is now started safely in initState; removed race-prone block from here.
 
         return Scaffold(
           appBar: AppBar(
@@ -504,8 +553,6 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
                         _currentExerciseIndex = exerciseBlocks.length - 1;
                       }
                       if (_currentExerciseIndex < 0) _currentExerciseIndex = 0;
-
-                      final block = exerciseBlocks[_currentExerciseIndex];
                       
                       return Column(
                         children: [
@@ -521,7 +568,8 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
                               itemBuilder: (context, index) {
                                 final block = exerciseBlocks[index];
                                 return SingleChildScrollView(
-                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                  // Fix: Increase bottom padding from 12 to 120 to clear the FloatingActionButton
+                                  padding: const EdgeInsets.only(left: 16, right: 16, top: 12, bottom: 120),
                                   child: _buildExerciseBlock(
                                       block, exerciseBlocks, settings, exercisesAsync),
                                 );
@@ -536,7 +584,8 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
 
                     return ReorderableListView.builder(
                       scrollController: _scrollController,
-                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
+                      // Fix: slightly increase bottom padding for extra safety
+                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 120),
                       physics: const BouncingScrollPhysics(
                           parent: AlwaysScrollableScrollPhysics()),
                       itemCount: exerciseBlocks.length + 1,
@@ -606,7 +655,9 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
                     gravity: 0.1,
                   ),
                 ),
-                if (_prExerciseName != null)
+                // Fix #1: Guard both fields — _prAchievement can theoretically be null
+                // if a race condition sets _prExerciseName but not _prAchievement yet.
+                if (_prExerciseName != null && _prAchievement != null)
                   Positioned(
                     top: 20,
                     left: 0,
@@ -648,7 +699,7 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
               SpeedDialChild(
                   icon: LucideIcons.layers,
                   label: 'Add Superset',
-                  onTap: () {}),
+                  onTap: _showSupersetFlow),
               SpeedDialChild(
                   icon: LucideIcons.check,
                   label: 'Finish Workout',
@@ -670,22 +721,22 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
     );
   }
 
-  Stream<List<db.WorkoutSet>> _watchSets() {
-    final database = ref.read(db.appDatabaseProvider);
-    return (database.select(database.workoutSets)
-          ..where((t) => t.workoutId.equals(widget.workoutId)))
-        .watch();
-  }
+  // Fix #7: Returns the cached stream (initialized in initState) instead of
+  // creating a new Drift watcher on each call. Previously called 3 times per build().
+  Stream<List<db.WorkoutSet>> _watchSets() => _setsStream;
+
 
   List<ExerciseBlock> _groupSetsByExercise(List<db.WorkoutSet> sets) {
-    final Map<int, ExerciseBlock> groups = {};
+    final Map<String, ExerciseBlock> groups = {};
     for (final set in sets) {
+      final key = '${set.exerciseId}_${set.exerciseOrder}';
       groups
           .putIfAbsent(
-              set.exerciseOrder,
+              key,
               () => ExerciseBlock(
                   exerciseOrder: set.exerciseOrder,
                   exerciseId: set.exerciseId,
+                  supersetGroupId: set.supersetGroupId,
                   sets: []))
           .sets
           .add(set);
@@ -709,12 +760,32 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
           orElse: () => exercises.first,
         );
         
+        // Fix #22: use isGlowing
         final bool isGlowing = _glowingExerciseId == exercise.id;
 
         final content = Column(
           children: [
             // ── Exercise Header Card ──
-            _buildExerciseHeaderCard(exercise, block),
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 500),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  if (isGlowing)
+                    BoxShadow(
+                      color: Theme.of(context).primaryColor.withOpacity(0.4),
+                      blurRadius: 20 * _glowController.value,
+                      spreadRadius: 4 * _glowController.value,
+                    ),
+                ],
+              ),
+              child: ExerciseHeaderCard(
+                exercise: exercise,
+                onMenuTap: () => _showExerciseMenu(block, exercise),
+                isGlowing: isGlowing,
+                glowValue: _glowController.value,
+              ),
+            ),
             
             const SizedBox(height: 12),
             
@@ -729,7 +800,22 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
             const SizedBox(height: 20),
             
             // ── Set Logging Table (Requirement 5) ──
-            _buildSetTable(block, exercise, allBlocks, settings),
+            SetLoggingTable(
+                block: block,
+                exercise: exercise,
+                allBlocks: allBlocks,
+                settings: settings,
+                previousSessionSets: _previousSessionSets,
+                onUpdateSet: _updateSet,
+                onAddSet: _addSet,
+                onRemoveSet: _removeSet,
+                onToggleSet: _toggleSet,
+                onIntensityPicker: _showIntensityPicker,
+                onAdjustValue: _adjustValue,
+                getController: _getController,
+                getNode: _getNode,
+                onUndoDelete: () => _handleShake(),
+              ),
             
             const SizedBox(height: 24),
           ],
@@ -752,117 +838,7 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
     );
   }
 
-  Widget _buildExerciseHeaderCard(entity.ExerciseEntity exercise, ExerciseBlock block) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 24),
-      decoration: BoxDecoration(
-        color: Colors.transparent,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: Stack(
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-               // Exercise Media
-              SizedBox(
-                height: 220, // Increased height for larger GIF
-                width: double.infinity,
-                child: ExerciseMediaWidget(
-                  animatedUrl: exercise.gifUrl,
-                  staticUrl: exercise.imageUrls.isNotEmpty ? exercise.imageUrls.first : null,
-                  fit: BoxFit.contain, // Changed to contain to see full GIF clearly
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 8, 16, 12), // Reduced padding
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            exercise.name,
-                            style: GoogleFonts.inter(
-                              fontSize: 24, // Slightly bigger text
-                              fontWeight: FontWeight.bold,
-                              color: Theme.of(context).colorScheme.onSurface,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Wrap(
-                            spacing: 6,
-                            runSpacing: 6,
-                            children: [
-                              ...exercise.primaryMuscles.map((m) => _buildPillBadge(m, Colors.blue)),
-                              ...exercise.secondaryMuscles.map((m) => _buildPillBadge(m, Colors.blue.withOpacity(0.5))),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Column(
-                      children: [
-                        Material(
-                          color: Colors.white.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(12),
-                          child: InkWell(
-                            borderRadius: BorderRadius.circular(12),
-                            onTap: () => context.push('/exercises/${exercise.id}'),
-                            child: Container(
-                              width: 48,
-                              height: 48,
-                              alignment: Alignment.center,
-                              child: Icon(LucideIcons.info, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7), size: 24),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          'Info',
-                          style: GoogleFonts.inter(fontSize: 10, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7)),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          Positioned(
-            top: 12,
-            right: 8,
-            child: IconButton(
-              icon: Icon(Icons.more_vert, color: Theme.of(context).colorScheme.onSurface, size: 24),
-              onPressed: () => _showExerciseMenu(block, exercise),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
-  Widget _buildPillBadge(String label, Color color) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.2),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: color.withOpacity(0.4), width: 0.5),
-      ),
-      child: Text(
-        label,
-        style: GoogleFonts.inter(
-          fontSize: 10,
-          fontWeight: FontWeight.w600,
-          color: Colors.white,
-        ),
-      ),
-    );
-  }
 
   Widget _buildExerciseProgressDots(List<ExerciseBlock> allBlocks) {
     return Row(
@@ -950,525 +926,10 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
       ),
     );
   }
-  Widget _buildSetTable(ExerciseBlock block, Exercise exercise, List<ExerciseBlock> allBlocks, SettingsState settings) {
-    final unit = settings.weightUnit;
-    return Column(
-      children: [
-        // Table Header
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          child: Row(
-            children: [
-              _buildTableHeaderLabel('SET', 40),
-              Expanded(child: _buildTableHeaderLabel('WEIGHT (${unit == WeightUnit.kg ? 'KG' : 'LBS'})', 0)),
-              Expanded(child: _buildTableHeaderLabel(exercise.setType == 'Timed' ? 'SECS' : 'REPS', 0)),
-              _buildTableHeaderLabel('RPE', 50),
-              // RIR removed as requested
-              const SizedBox(width: 44), // Action column
-            ],
-          ),
-        ),
-        const Divider(height: 1),
-        const SizedBox(height: 12),
-        // Set Rows
-        ...block.sets.asMap().entries.map((entry) {
-          return Padding(
-            padding: const EdgeInsets.only(bottom: 8.0),
-            child: _buildSetRow(entry.value, entry.key + 1, exercise, block, allBlocks, settings),
-          );
-        }),
-        const SizedBox(height: 12),
-        // Add Set Button
-        _buildAddSetButton(block),
-      ],
-    );
-  }
-
-  Widget _buildTableHeaderLabel(String label, double? width) {
-    return Container(
-      width: width,
-      alignment: Alignment.center,
-      child: Text(
-        label,
-        style: GoogleFonts.inter(
-          fontSize: 11,
-          fontWeight: FontWeight.bold,
-          color: Theme.of(context).colorScheme.outline.withOpacity(0.6),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildAddSetButton(ExerciseBlock block) {
-    return InkWell(
-      onTap: () => _addSet(block),
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        width: double.infinity,
-        height: 44,
-        decoration: BoxDecoration(
-          border: Border.all(
-            color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
-            style: BorderStyle.solid, // Custom dashed border would need a painter
-          ),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(LucideIcons.plus, size: 16, color: Theme.of(context).colorScheme.outline),
-            const SizedBox(width: 8),
-            Text(
-              'Add Set',
-              style: GoogleFonts.inter(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: Theme.of(context).colorScheme.outline,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildBottomNavigation(List<ExerciseBlock> exerciseBlocks) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Theme.of(context).scaffoldBackgroundColor,
-        border: Border(top: BorderSide(color: Theme.of(context).dividerColor.withOpacity(0.1))),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: OutlinedButton.icon(
-              onPressed: _currentExerciseIndex > 0
-                  ? () {
-                      _pageController.previousPage(
-                        duration: const Duration(milliseconds: 300),
-                        curve: Curves.easeInOut,
-                      );
-                    }
-                  : null,
-              icon: const Icon(LucideIcons.chevronLeft, size: 18),
-              label: const Text('Previous'),
-              style: OutlinedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              ),
-            ),
-          ),
-          const SizedBox(width: 12),
-          Container(
-            decoration: BoxDecoration(
-              color: Theme.of(context).primaryColor,
-              shape: BoxShape.circle,
-            ),
-            child: IconButton(
-              icon: const Icon(LucideIcons.plus, color: Colors.white),
-              onPressed: _showExercisePicker,
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: ElevatedButton.icon(
-              onPressed: _currentExerciseIndex < exerciseBlocks.length - 1
-                  ? () {
-                      _pageController.nextPage(
-                        duration: const Duration(milliseconds: 300),
-                        curve: Curves.easeInOut,
-                      );
-                    }
-                  : null,
-              icon: const Text('Next'),
-              label: const Icon(LucideIcons.chevronRight, size: 18),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Theme.of(context).primaryColor,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSetRow(
-      db.WorkoutSet set,
-      int index,
-      entity.ExerciseEntity exercise,
-      ExerciseBlock block,
-      List<ExerciseBlock> allBlocks,
-      SettingsState settings) {
-    final isCompleted = set.completed;
-    final unit = settings.weightUnit;
-    
-    // Check if this is the "active" set (first non-completed set)
-    final isActive = block.sets.firstWhere((s) => !s.completed, orElse: () => block.sets.first).id == set.id;
-
-    return Slidable(
-      key: ValueKey('set_${set.id}'),
-      endActionPane: ActionPane(
-        motion: const DrawerMotion(),
-        extentRatio: 0.2,
-        children: [
-          SlidableAction(
-            onPressed: (_) {
-              _removeSet(set.id);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: const Text('Set deleted'),
-                  action: SnackBarAction(
-                      label: 'Undo', onPressed: () => _handleShake()),
-                ),
-              );
-            },
-            backgroundColor: Colors.red,
-            foregroundColor: Colors.white,
-            icon: LucideIcons.trash,
-            borderRadius: BorderRadius.circular(12),
-          ),
-        ],
-      ),
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: isCompleted 
-              ? Colors.green.withOpacity(0.08) 
-              : Theme.of(context).colorScheme.surface,
-          borderRadius: BorderRadius.circular(12),
-          border: Border(
-            left: BorderSide(
-              color: isCompleted 
-                  ? Colors.green 
-                  : (isActive ? Theme.of(context).primaryColor : Colors.transparent),
-              width: 4,
-            ),
-          ),
-          boxShadow: [
-            if (isActive && !isCompleted)
-              BoxShadow(
-                color: Colors.black.withOpacity(0.05),
-                blurRadius: 10,
-                offset: const Offset(0, 2),
-              ),
-          ],
-        ),
-        child: Column(
-          children: [
-            Row(
-              children: [
-                // Set Number Badge
-                Container(
-                  width: 28,
-                  height: 28,
-                  decoration: BoxDecoration(
-                    color: isCompleted 
-                        ? Colors.green 
-                        : (isActive ? Theme.of(context).primaryColor : Colors.grey[200]),
-                    shape: BoxShape.circle,
-                  ),
-                  alignment: Alignment.center,
-                  child: Text(
-                    index.toString(),
-                    style: GoogleFonts.inter(
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                      color: (isCompleted || isActive) ? Colors.white : Colors.grey[600],
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                // Weight Input
-                Expanded(
-                  child: _buildRedesignedCellInput(
-                    setId: set.id,
-                    type: 'weight',
-                    value: WeightConverter.toDisplay(set.weight, unit).toStringAsFixed(1),
-                    onChanged: (val) => _updateSet(set.id, weight: WeightConverter.toStorage(double.tryParse(val) ?? 0, unit)),
-                    isCompleted: isCompleted,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                // Reps Input
-                Expanded(
-                  child: _buildRedesignedCellInput(
-                    setId: set.id,
-                    type: exercise.setType == 'Timed' ? 'secs' : 'reps',
-                    value: set.reps.toInt().toString(),
-                    onChanged: (val) => _updateSet(set.id, reps: double.tryParse(val) ?? 0),
-                    isCompleted: isCompleted,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                _buildCompactIntensityInput(set, true, isCompleted),
-                // RIR removed as requested
-                const SizedBox(width: 12),
-                GestureDetector(
-                  onTap: () => _toggleSet(set, exercise, block, allBlocks),
-                  child: TweenAnimationBuilder<double>(
-                    duration: const Duration(milliseconds: 300),
-                    tween: Tween(begin: 0.0, end: isCompleted ? 1.0 : 0.0),
-                    builder: (context, value, child) {
-                      return Container(
-                        width: 32,
-                        height: 32,
-                        decoration: BoxDecoration(
-                          color: Color.lerp(Colors.transparent, Colors.green, value),
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: Color.lerp(Colors.grey[300]!, Colors.green, value)!,
-                            width: 2,
-                          ),
-                          boxShadow: [
-                            if (value > 0.5)
-                              BoxShadow(
-                                color: Colors.green.withOpacity(0.3 * value),
-                                blurRadius: 8,
-                                spreadRadius: 2,
-                              ),
-                          ],
-                        ),
-                        child: value > 0.5 
-                            ? const Icon(LucideIcons.check, size: 18, color: Colors.white) 
-                            : null,
-                      );
-                    },
-                  ),
-                ),
-              ],
-            ),
-            _buildPreviousStatsRow(set, unit),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPreviousStatsRow(db.WorkoutSet set, WeightUnit unit) {
-    if (!_previousSessionSets.containsKey(set.exerciseId)) return const SizedBox.shrink();
-    
-    final prevSets = _previousSessionSets[set.exerciseId]!;
-    final match = prevSets.where((s) => s.setNumber == set.setNumber).firstOrNull ?? prevSets.lastOrNull;
-    
-    if (match == null) return const SizedBox.shrink();
-    
-    final weightStr = WeightConverter.toDisplay(match.weight, unit).toStringAsFixed(1);
-    final repsStr = match.reps.toInt().toString();
-
-    return Padding(
-      padding: const EdgeInsets.only(left: 40, top: 2), // Aligned with the badges
-      child: Row(
-        children: [
-          Icon(LucideIcons.history, size: 10, color: Theme.of(context).colorScheme.outline.withOpacity(0.5)),
-          const SizedBox(width: 4),
-          Text(
-            'Last: ${weightStr}${unit == WeightUnit.kg ? 'kg' : 'lbs'} x $repsStr',
-            style: GoogleFonts.inter(
-              fontSize: 10,
-              color: Theme.of(context).colorScheme.outline.withOpacity(0.7),
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildRedesignedCellInput({
-    required int setId,
-    required String type,
-    required String value,
-    required Function(String) onChanged,
-    bool isCompleted = false,
-  }) {
-    final controller = _getController(setId, type, value);
-    final focusNode = _getNode(setId, type);
-
-    // Sync controller text with value if it's different and not currently being edited
-    if (!focusNode.hasFocus && controller.text != value) {
-       controller.text = value;
-    }
-
-    return Column(
-      children: [
-        SizedBox(
-          width: 70,
-          child: TextField(
-            controller: controller,
-            focusNode: focusNode,
-            keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            textAlign: TextAlign.center,
-            style: GoogleFonts.inter(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: isCompleted ? Theme.of(context).colorScheme.outline : null,
-            ),
-            decoration: const InputDecoration(
-              isDense: true,
-              contentPadding: EdgeInsets.symmetric(vertical: 4),
-              border: InputBorder.none,
-              hintText: '0',
-            ),
-            onChanged: onChanged,
-            onTap: () {
-               focusNode.requestFocus();
-               // Direct enter data: Select all so user can overwrite immediately
-               controller.selection = TextSelection(
-                 baseOffset: 0,
-                 extentOffset: controller.text.length,
-               );
-            },
-          ),
-        ),
-        if (!isCompleted)
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              _buildRoundIconButton(
-                icon: LucideIcons.minus,
-                onPressed: () => _adjustValue(setId, type, controller, onChanged, -1),
-              ),
-              const SizedBox(width: 8),
-              _buildRoundIconButton(
-                icon: LucideIcons.plus,
-                onPressed: () => _adjustValue(setId, type, controller, onChanged, 1),
-              ),
-            ],
-          ),
-      ],
-    );
-  }
-
-  Widget _buildRoundIconButton({required IconData icon, required VoidCallback onPressed}) {
-    return InkWell(
-      onTap: onPressed,
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: const EdgeInsets.all(4),
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.5),
-          shape: BoxShape.circle,
-        ),
-        child: Icon(icon, size: 16, color: Theme.of(context).primaryColor),
-      ),
-    );
-  }
-
-  Widget _buildCompactIntensityInput(db.WorkoutSet set, bool forRpe, bool isCompleted) {
-    final value = forRpe ? set.rpe : set.rir;
-    return GestureDetector(
-      onTap: isCompleted ? null : () => _showIntensityPicker(set, forRpe),
-      child: Container(
-        width: 44,
-        height: 32,
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.3),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        alignment: Alignment.center,
-        child: Text(
-          value?.toString() ?? '—',
-          style: GoogleFonts.inter(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-            color: value == null ? Colors.grey[400] : null,
-          ),
-        ),
-      ),
-    );
-  }
 
   // Removed obsolete methods
 
-  void _showSetNoteDialog(db.WorkoutSet set) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        final controller = _getController(set.id, 'note', set.notes ?? '');
-        return AlertDialog(
-          title: const Text('Set Note'),
-          content: TextField(
-            controller: controller,
-            autofocus: true,
-            decoration: const InputDecoration(hintText: 'Enter note for this set...'),
-          ),
-          actions: [
-            TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
-            TextButton(
-              onPressed: () {
-                _updateSet(set.id, notes: controller.text);
-                Navigator.pop(context);
-                setState(() {}); // Refresh UI for icon color
-              },
-              child: const Text('Save'),
-            ),
-          ],
-        );
-      },
-    );
-  }
 
-  Widget _buildRpePicker(db.WorkoutSet set, bool isCompleted) {
-    return GestureDetector(
-      onTap: isCompleted ? null : () => _showIntensityPicker(set, true),
-      child: Container(
-        height: 32,
-        decoration: BoxDecoration(
-          color: isCompleted
-              ? Colors.transparent
-              : Theme.of(context)
-                  .colorScheme
-                  .surfaceContainerHighest
-                  .withValues(alpha: 0.3),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        alignment: Alignment.center,
-        child: Text(
-          set.rpe == null ? 'RPE' : set.rpe.toString(),
-          style: TextStyle(
-            fontSize: 11,
-            fontWeight: FontWeight.bold,
-            color: set.rpe == null
-                ? Theme.of(context).colorScheme.outline.withValues(alpha: 0.5)
-                : (isCompleted ? Theme.of(context).colorScheme.outline : null),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildRirPicker(db.WorkoutSet set, bool isCompleted) {
-    return GestureDetector(
-      onTap: isCompleted ? null : () => _showIntensityPicker(set, false),
-      child: Container(
-        height: 32,
-        decoration: BoxDecoration(
-          color: isCompleted
-              ? Colors.transparent
-              : Theme.of(context)
-                  .colorScheme
-                  .surfaceContainerHighest
-                  .withValues(alpha: 0.3),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        alignment: Alignment.center,
-        child: Text(
-          set.rir == null ? 'RIR' : set.rir.toString(),
-          style: TextStyle(
-            fontSize: 11,
-            fontWeight: FontWeight.bold,
-            color: set.rir == null
-                ? Theme.of(context).colorScheme.outline.withValues(alpha: 0.5)
-                : (isCompleted ? Theme.of(context).colorScheme.outline : null),
-          ),
-        ),
-      ),
-    );
-  }
 
   void _showIntensityPicker(db.WorkoutSet set, bool forRpe) {
     showModalBottomSheet(
@@ -1502,8 +963,9 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
                 separatorBuilder: (context, index) => const SizedBox(width: 8),
                 itemBuilder: (context, index) {
                   if (index == 0) return _buildIntensityChip(set, null, forRpe);
+                  // Fix #14: and RIR should start from 0 (index 1 -> 0)
                   return _buildIntensityChip(
-                      set, (index - (forRpe ? 0 : 0)).toDouble(), forRpe);
+                      set, (index - (forRpe ? 0 : 1)).toDouble(), forRpe);
                 },
               ),
             ),
@@ -1535,142 +997,31 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
     );
   }
 
-  Widget _buildCellInput({
-    required int setId,
-    required String type,
-    required String value,
-    required String hint,
-    required Function(String) onChanged,
-    bool isCompleted = false,
-    VoidCallback? onLongPress,
-  }) {
-    final bool hasHint = hint != '-' && hint.isNotEmpty;
-    final controller = _getController(setId, type, value);
-
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Row(
-          children: [
-            Expanded(
-              child: Semantics(
-                label: '$type for set',
-                child: GestureDetector(
-                  onLongPress: onLongPress,
-                  child: TextField(
-                    focusNode: _getNode(setId, type),
-                    keyboardType:
-                        const TextInputType.numberWithOptions(decimal: true),
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
-                      color: isCompleted
-                          ? Theme.of(context).colorScheme.outline
-                          : null,
-                      decoration:
-                          isCompleted ? TextDecoration.lineThrough : null,
-                    ),
-                    decoration: InputDecoration(
-                      isDense: true,
-                      contentPadding: const EdgeInsets.symmetric(
-                          vertical: 10, horizontal: 4),
-                      filled: true,
-                      fillColor: isCompleted
-                          ? Colors.transparent
-                          : Theme.of(context)
-                              .colorScheme
-                              .surfaceContainerHighest
-                              .withValues(alpha: 0.3),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide.none,
-                      ),
-                      hintText: hint,
-                      hintStyle: TextStyle(
-                          fontSize: 12,
-                          color: Theme.of(context)
-                              .colorScheme
-                              .outline
-                              .withValues(alpha: 0.4)),
-                    ),
-                    controller: controller,
-                    textInputAction: TextInputAction.next,
-                    onChanged: onChanged,
-                    onTap: () {
-                      if (controller.text.isEmpty && hasHint) {
-                        HapticFeedback.lightImpact();
-                        controller.text = hint;
-                        onChanged(hint);
-                      }
-                    },
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-        if (!isCompleted)
-          Padding(
-            padding: const EdgeInsets.only(top: 4),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                _buildQuickButton(
-                  icon: LucideIcons.minus,
-                  onPressed: () =>
-                      _adjustValue(setId, type, controller, onChanged, -1),
-                ),
-                const SizedBox(width: 8),
-                _buildQuickButton(
-                  icon: LucideIcons.plus,
-                  onPressed: () =>
-                      _adjustValue(setId, type, controller, onChanged, 1),
-                ),
-              ],
-            ),
-          ),
-      ],
-    );
-  }
 
   void _adjustValue(int setId, String type, TextEditingController controller,
       Function(String) onChanged, double direction) {
     HapticFeedback.lightImpact();
     double current = double.tryParse(controller.text) ?? 0;
 
-    double step = type == 'weight' ? 2.5 : 1.0;
+    // Fix #23: Step size based on unit
+    final userSettings = ref.read(settingsProvider).value;
+    final unit = userSettings?.weightUnit ?? WeightUnit.kg;
+    double step = type == 'weight' ? (unit == WeightUnit.kg ? 2.5 : 5.0) : 1.0;
     double next = current + (direction * step);
 
     if (next < 0) next = 0;
 
+    // Fix #12: Clean formatting
     String formatted =
         type == 'weight' ? next.toStringAsFixed(1) : next.toInt().toString();
-    if (formatted.endsWith('.0'))
+    if (formatted.endsWith('.0')) {
       formatted = formatted.substring(0, formatted.length - 2);
+    }
 
     controller.text = formatted;
     onChanged(formatted);
   }
 
-  Widget _buildQuickButton(
-      {required IconData icon, required VoidCallback onPressed}) {
-    return GestureDetector(
-      onTap: onPressed,
-      child: Container(
-        padding: const EdgeInsets.all(4),
-        decoration: BoxDecoration(
-          color: Theme.of(context)
-              .colorScheme
-              .surfaceContainerHighest
-              .withValues(alpha: 0.5),
-          borderRadius: BorderRadius.circular(6),
-        ),
-        child:
-            Icon(icon, size: 14, color: Theme.of(context).colorScheme.primary),
-      ),
-    );
-  }
 
   Future<void> _addSet(ExerciseBlock block) async {
     final database = ref.read(db.appDatabaseProvider);
@@ -1687,7 +1038,8 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
           weight: lastSet.weight,
           setType: Value(lastSet.setType),
         ));
-    _loadHistory();
+    // Fix #8: Removed _loadHistory() here — history from previous sessions
+    // doesn't change during a workout; it's loaded once in initState.
 
     Future.delayed(const Duration(milliseconds: 100), () {
       if (_scrollController.hasClients) {
@@ -1720,28 +1072,6 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
     if (mounted) setState(() => _previousSessionSets = historyMap);
   }
 
-  String _getPreviousValue(
-      int exerciseId, int setNumber, String type, WeightUnit unit) {
-    if (!_previousSessionSets.containsKey(exerciseId)) return '-';
-    final sets = _previousSessionSets[exerciseId]!;
-    final match = sets.where((s) => s.setNumber == setNumber).firstOrNull ??
-        sets.lastOrNull;
-    if (match == null) return '-';
-    switch (type) {
-      case 'weight':
-        return match.weight == 0
-            ? '-'
-            : WeightConverter.toDisplay(match.weight, unit).toStringAsFixed(1);
-      case 'reps':
-        return match.reps == 0 ? '-' : match.reps.toInt().toString();
-      case 'rpe':
-        return match.rpe == null ? '-' : match.rpe.toString();
-      case 'rir':
-        return match.rir == null ? '-' : match.rir.toString();
-      default:
-        return '-';
-    }
-  }
 
   Future<void> _updateSet(int setId,
       {double? weight,
@@ -1784,7 +1114,8 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
       _startAutoTimer(set, exercise, block, allBlocks);
     }
 
-    _loadHistory();
+    // Fix #8: _loadHistory() removed here — re-querying all history on every set
+    // toggle is wasteful; history was already loaded in initState.
     if (mounted) setState(() {});
   }
 
@@ -1884,21 +1215,41 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
     }
   }
 
+  // Fix #6: _isReordering prevents concurrent reorder operations that cause index conflicts.
+  bool _isReordering = false;
+
   Future<void> _reorderExercises(
       List<ExerciseBlock> blocks, int oldIndex, int newIndex) async {
+    if (_isReordering) return;
+    // ReorderableListView includes the trailing fab_space item, so we must
+    // clamp indices to the valid exercise block range first.
+    if (oldIndex >= blocks.length || newIndex > blocks.length) return;
     if (newIndex > oldIndex) newIndex -= 1;
+
+    // Capture the original exerciseOrder values BEFORE mutating the list.
+    // Mutating the snapshot first, then reading .exerciseOrder from it causes
+    // stale-order writes since exerciseOrder hasn't been updated in DB yet.
+    final originalOrders = blocks.map((b) => b.exerciseOrder).toList();
+
     final item = blocks.removeAt(oldIndex);
     blocks.insert(newIndex, item);
-    final database = ref.read(db.appDatabaseProvider);
-    await database.transaction(() async {
-      for (int i = 0; i < blocks.length; i++) {
-        await (database.update(database.workoutSets)
-              ..where((t) =>
-                  t.workoutId.equals(widget.workoutId) &
-                  t.exerciseOrder.equals(blocks[i].exerciseOrder)))
-            .write(db.WorkoutSetsCompanion(exerciseOrder: Value(i)));
-      }
-    });
+
+    setState(() => _isReordering = true);
+    try {
+      final database = ref.read(db.appDatabaseProvider);
+      await database.transaction(() async {
+        for (int i = 0; i < blocks.length; i++) {
+          // Use the captured original order to identify which sets to update.
+          await (database.update(database.workoutSets)
+                ..where((t) =>
+                    t.workoutId.equals(widget.workoutId) &
+                    t.exerciseOrder.equals(originalOrders[blocks.indexOf(blocks[i])])))
+              .write(db.WorkoutSetsCompanion(exerciseOrder: Value(i)));
+        }
+      });
+    } finally {
+      if (mounted) setState(() => _isReordering = false);
+    }
   }
 
   Future<void> _duplicateSet(db.WorkoutSet set) async {
@@ -1945,9 +1296,14 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
     }
     if (currentRM > bestPastRM && bestPastRM > 0) {
       if (mounted) {
+        // Fix #2: Use the user's display unit for the PR achievement string
+        final userSettings = ref.read(settingsProvider).value;
+        final unit = userSettings?.weightUnit ?? WeightUnit.kg;
+        final displayWeight = WeightConverter.toDisplay(set.weight, unit);
+        final unitLabel = unit == WeightUnit.kg ? 'kg' : 'lbs';
         setState(() {
           _prExerciseName = exercise.name;
-          _prAchievement = '${set.weight}kg x ${set.reps.toInt()}';
+          _prAchievement = '${displayWeight.toStringAsFixed(1)}$unitLabel x ${set.reps.toInt()}';
           _prsAchieved++;
           _glowingExerciseId = exercise.id;
         });
@@ -2195,9 +1551,21 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
       backgroundColor: Colors.transparent,
       builder: (context) => ExercisePickerOverlay(
         onSelect: (id) async {
+          // Fix #19: Guard self-superset
+          if (id == block.exerciseId) {
+            if (context.mounted) Navigator.pop(context);
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Cannot superset an exercise with itself')),
+            );
+            return;
+          }
+
           final database = ref.read(db.appDatabaseProvider);
           final firstSet = block.sets.firstOrNull;
-          if (firstSet == null) return;
+          if (firstSet == null) {
+            if (context.mounted) Navigator.pop(context);
+            return;
+          }
           final groupId = firstSet.supersetGroupId ?? const Uuid().v4();
 
           if (firstSet.supersetGroupId == null) {
@@ -2230,24 +1598,87 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
                       db.WorkoutSetsCompanion(exerciseOrder: Value(order + 1)));
             }
 
-            await database
-                .into(database.workoutSets)
-                .insert(db.WorkoutSetsCompanion.insert(
-                  workoutId: widget.workoutId,
-                  exerciseId: id,
-                  exerciseOrder: targetOrder,
-                  setNumber: 1,
-                  reps: 0,
-                  weight: 0,
-                  setType: Value(
-                      block.sets.firstOrNull?.setType ?? db.SetType.straight),
-                  supersetGroupId: Value(groupId),
-                ));
-            if (context.mounted) Navigator.pop(context);
+            final companion = db.WorkoutSetsCompanion.insert(
+              workoutId: widget.workoutId,
+              exerciseId: id,
+              exerciseOrder: targetOrder,
+              setNumber: 1,
+              reps: 10,
+              weight: 0,
+              setType: Value(db.SetType.superset),
+              supersetGroupId: Value(groupId),
+            );
+            await database.into(database.workoutSets).insert(companion);
           });
+          if (context.mounted) Navigator.pop(context);
         },
       ),
     );
+  }
+
+  void _showSupersetFlow() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => ExercisePickerOverlay(
+        onSelect: (firstExId) {
+          Navigator.pop(context);
+          showModalBottomSheet(
+            context: context,
+            isScrollControlled: true,
+            backgroundColor: Colors.transparent,
+            builder: (context) => ExercisePickerOverlay(
+              onSelect: (secondExId) {
+                Navigator.pop(context);
+                _createSupersetPair(firstExId, secondExId);
+              },
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Future<void> _createSupersetPair(int firstExId, int secondExId) async {
+    final database = ref.read(db.appDatabaseProvider);
+    final sets = await (database.select(database.workoutSets)
+          ..where((t) => t.workoutId.equals(widget.workoutId)))
+        .get();
+    final maxOrder = sets.isEmpty
+        ? 0
+        : sets.map((s) => s.exerciseOrder).reduce((a, b) => a > b ? a : b);
+
+    final groupId = const Uuid().v4();
+
+    await database.transaction(() async {
+      // Add first exercise
+      await database.into(database.workoutSets).insert(
+            db.WorkoutSetsCompanion.insert(
+              workoutId: widget.workoutId,
+              exerciseId: firstExId,
+              exerciseOrder: maxOrder + 1,
+              setNumber: 1,
+              reps: 10,
+              weight: 0,
+              setType: Value(db.SetType.superset),
+              supersetGroupId: Value(groupId),
+            ),
+          );
+      // Add second exercise
+      await database.into(database.workoutSets).insert(
+            db.WorkoutSetsCompanion.insert(
+              workoutId: widget.workoutId,
+              exerciseId: secondExId,
+              exerciseOrder: maxOrder + 2,
+              setNumber: 1,
+              reps: 10,
+              weight: 0,
+              setType: Value(db.SetType.superset),
+              supersetGroupId: Value(groupId),
+            ),
+          );
+    });
   }
 
   void _showExercisePicker() {
@@ -2279,6 +1710,25 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
                 setType: Value(db.SetType.straight),
               ));
           if (context.mounted) Navigator.pop(context);
+
+          // Fix: Show feedback and scroll to the end in Focus Mode
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Exercise added to workout')),
+            );
+
+            if (_isFocusMode) {
+              Future.delayed(const Duration(milliseconds: 300), () {
+                if (_pageController.hasClients) {
+                  _pageController.animateToPage(
+                    nextOrder,
+                    duration: const Duration(milliseconds: 500),
+                    curve: Curves.easeInOut,
+                  );
+                }
+              });
+            }
+          }
         },
       ),
     );
@@ -2406,7 +1856,9 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
 
     if (mounted) {
       // Close the summary bottom sheet first
-      Navigator.of(context, rootNavigator: true).pop();
+      if (context.mounted) {
+        Navigator.of(context, rootNavigator: true).pop();
+      }
       ref.invalidate(workoutHomeProvider);
       context.go('/app');
     }
@@ -2707,16 +2159,6 @@ final workoutUpdateProvider = StreamProvider.family<db.Workout, int>((ref, id) {
           ));
 });
 
-class ExerciseBlock {
-  final int exerciseOrder;
-  final int exerciseId;
-  final List<db.WorkoutSet> sets;
-
-  ExerciseBlock(
-      {required this.exerciseOrder,
-      required this.exerciseId,
-      required this.sets});
-}
 
 /// Collapsible exercise media widget — shows GIF or image at top of exercise card.
 class _ExerciseMediaWidget extends StatefulWidget {

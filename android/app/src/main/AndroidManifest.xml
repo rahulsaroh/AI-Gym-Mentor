@@ -14,7 +14,9 @@
         android:label="AI Gym Mentor"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
-        android:requestLegacyExternalStorage="true">
+        android:requestLegacyExternalStorage="true"
+        android:allowBackup="true"
+        android:fullBackupOnly="true">
         <activity
             android:name=".MainActivity"
             android:exported="true"

@@ -44,6 +44,10 @@ class _ExerciseDetailScreenState extends ConsumerState<ExerciseDetailScreen> wit
   String _equipment = 'None';
   String _mechanic = 'Compound';
   String _force = 'Push';
+  String _overview = '';
+  String _gifUrl = '';
+  String _imageUrl = '';
+  String _instructions = '';
 
   @override
   void initState() {
@@ -58,12 +62,16 @@ class _ExerciseDetailScreenState extends ConsumerState<ExerciseDetailScreen> wit
 
   void _setupForm(ExerciseEntity? template) {
     if (template != null) {
-      _name = '${template.name} (Copy)';
+      _name = widget.exerciseId == 0 && widget.templateExercise != null ? '${template.name} (Copy)' : template.name;
       _category = template.category;
       _primaryMuscle = template.primaryMuscles.isNotEmpty ? template.primaryMuscles.first : '';
       _equipment = template.equipment ?? 'None';
       _mechanic = template.mechanic ?? 'Compound';
       _force = template.force ?? 'Push';
+      _overview = template.overview ?? '';
+      _gifUrl = template.gifUrl ?? '';
+      _imageUrl = template.imageUrls.isNotEmpty ? template.imageUrls.first : '';
+      _instructions = template.instructions.join('\n');
     }
   }
 
@@ -161,6 +169,16 @@ class _ExerciseDetailScreenState extends ConsumerState<ExerciseDetailScreen> wit
       ),
       actions: [
         if (!exercise.isEnriched) _buildEnrichmentButton(exercise),
+        Padding(
+          padding: const EdgeInsets.all(4.0),
+          child: CircleAvatar(
+            backgroundColor: Colors.black.withValues(alpha: 0.3),
+            child: IconButton(
+              icon: const Icon(LucideIcons.pencil, color: Colors.white, size: 18),
+              onPressed: () => context.push('/exercises/${exercise.id}/edit'),
+            ),
+          ),
+        ),
         Padding(
           padding: const EdgeInsets.all(4.0),
           child: CircleAvatar(
@@ -826,7 +844,11 @@ class _ExerciseDetailScreenState extends ConsumerState<ExerciseDetailScreen> wit
   }
 
   Widget _buildFormScreen(ExerciseEntity exercise) {
-    _setupForm(widget.templateExercise);
+    if (_name.isEmpty && widget.exerciseId > 0) {
+      _setupForm(exercise);
+    } else if (_name.isEmpty && widget.templateExercise != null) {
+       _setupForm(widget.templateExercise);
+    }
     
     return Scaffold(
       appBar: AppBar(
@@ -837,24 +859,47 @@ class _ExerciseDetailScreenState extends ConsumerState<ExerciseDetailScreen> wit
               if (_formKey.currentState!.validate()) {
                 _formKey.currentState!.save();
                 
-                final newExercise = ExerciseEntity(
-                  id: 0,
-                  exerciseId: '',
-                  name: _name,
-                  category: _category,
-                  primaryMuscles: [_primaryMuscle],
-                  difficulty: 'beginner',
-                  mechanic: _mechanic,
-                  force: _force,
-                  equipment: _equipment,
-                );
+                if (widget.exerciseId == 0) {
+                  final newExercise = ExerciseEntity(
+                    id: 0,
+                    exerciseId: '',
+                    name: _name,
+                    category: _category,
+                    primaryMuscles: [_primaryMuscle],
+                    difficulty: 'beginner',
+                    mechanic: _mechanic,
+                    force: _force,
+                    equipment: _equipment,
+                    overview: _overview,
+                    gifUrl: _gifUrl.isNotEmpty ? _gifUrl : null,
+                    imageUrls: _imageUrl.isNotEmpty ? [_imageUrl] : [],
+                    instructions: _instructions.split('\n').where((s) => s.trim().isNotEmpty).toList(),
+                    source: 'custom',
+                    isCustom: true,
+                  );
+                  await ref.read(exerciseRepositoryProvider).createExercise(newExercise);
+                } else {
+                  final updatedExercise = exercise.copyWith(
+                    name: _name,
+                    category: _category,
+                    primaryMuscles: [_primaryMuscle],
+                    mechanic: _mechanic,
+                    force: _force,
+                    equipment: _equipment,
+                    overview: _overview,
+                    gifUrl: _gifUrl.isNotEmpty ? _gifUrl : null,
+                    imageUrls: _imageUrl.isNotEmpty ? [_imageUrl] : [],
+                    instructions: _instructions.split('\n').where((s) => s.trim().isNotEmpty).toList(),
+                  );
+                  await ref.read(exerciseRepositoryProvider).updateExercise(updatedExercise);
+                }
 
-                await ref.read(exerciseRepositoryProvider).createExercise(newExercise);
                 ref.invalidate(exerciseListProvider);
+                ref.invalidate(exerciseDetailProvider(widget.exerciseId));
                 
                 if (mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Exercise created successfully!')),
+                    SnackBar(content: Text(widget.exerciseId == 0 ? 'Exercise created!' : 'Exercise updated!')),
                   );
                   context.pop();
                 }
@@ -914,6 +959,36 @@ class _ExerciseDetailScreenState extends ConsumerState<ExerciseDetailScreen> wit
               items: ['Push', 'Pull', 'Static'].map((f) => 
                 DropdownMenuItem(value: f, child: Text(f))).toList(),
               onChanged: (val) => setState(() => _force = val ?? 'Push'),
+            ),
+            const SizedBox(height: 20),
+            _buildFormSection('About / Overview'),
+            TextFormField(
+              initialValue: _overview,
+              maxLines: 5,
+              decoration: const InputDecoration(hintText: 'Describe how the exercise works...'),
+              onSaved: (val) => _overview = val ?? '',
+            ),
+            const SizedBox(height: 20),
+            _buildFormSection('GIF URL'),
+            TextFormField(
+              initialValue: _gifUrl,
+              decoration: const InputDecoration(hintText: 'https://.../exercise.gif'),
+              onSaved: (val) => _gifUrl = val ?? '',
+            ),
+             const SizedBox(height: 20),
+            _buildFormSection('Thumbnail Image URL'),
+            TextFormField(
+              initialValue: _imageUrl,
+              decoration: const InputDecoration(hintText: 'https://.../image.jpg'),
+              onSaved: (val) => _imageUrl = val ?? '',
+            ),
+             const SizedBox(height: 20),
+            _buildFormSection('Instructions (Each line is a step)'),
+            TextFormField(
+              initialValue: _instructions,
+              maxLines: 8,
+              decoration: const InputDecoration(hintText: 'Place feet shoulder width apart\nLower your body...'),
+              onSaved: (val) => _instructions = val ?? '',
             ),
             const SizedBox(height: 100), // Space for keyboard
           ],

@@ -5,6 +5,7 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ai_gym_mentor/core/database/database.dart';
 import 'package:ai_gym_mentor/features/workout/workout_repository.dart';
+import 'package:ai_gym_mentor/core/domain/entities/workout_program.dart' as ent;
 
 class ProgramDbSeeder {
   static final ProgramDbSeeder instance = ProgramDbSeeder._();
@@ -32,16 +33,19 @@ class ProgramDbSeeder {
       
       // Get all templates to find the one we just imported
       final templates = await repository.getAllTemplates();
-      final eliteTemplate = templates.firstWhere(
+      final eliteTemplate = templates.where(
         (t) => t.name.contains('6 Day PPL Elite'),
-        orElse: () => templates.first,
-      );
+      ).firstOrNull;
 
-      // Set it as active if none is currently active
+      // Set it as active if none is currently active and we found our target
       final activeId = prefs.getInt('active_template_id');
-      if (activeId == null) {
+      if (activeId == null && eliteTemplate != null) {
         await repository.setActiveTemplate(eliteTemplate.id);
         debugPrint('ProgramDbSeeder: Set "6 Day PPL Elite" as active template');
+      } else if (activeId == null && eliteTemplate == null && templates.isNotEmpty) {
+        // Safe fallback with warning
+        debugPrint('ProgramDbSeeder WARNING: "6 Day PPL Elite" not found, setting ${templates.first.name} as active');
+        await repository.setActiveTemplate(templates.first.id);
       }
 
       await prefs.setBool(_seedKey, true);

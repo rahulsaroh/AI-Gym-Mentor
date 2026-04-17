@@ -177,7 +177,6 @@ class RestTimerOverlay extends ConsumerWidget {
     return TextButton(
       onPressed: () {
         notifier.stop();
-        onClose();
       },
       child: Text(
         'SKIP REST',

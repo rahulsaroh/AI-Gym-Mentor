@@ -90,11 +90,9 @@ class WorkoutHomeNotifier extends _$WorkoutHomeNotifier {
 
     // Get real summary for last workout
     String? lastWorkoutSummary;
-    final lastWorkoutEntity = await workoutRepo.getLastWorkout();
-    final activeDraftEntity = await workoutRepo.getActiveWorkoutDraft();
-    final lastWorkoutDate = lastWorkoutEntity?.date;
-    if (lastWorkoutEntity != null) {
-      final summaryData = await workoutRepo.getWorkoutSummary(lastWorkoutEntity.id);
+    final lastWorkoutDate = lastWorkout?.date;
+    if (lastWorkout != null) {
+      final summaryData = await workoutRepo.getWorkoutSummary(lastWorkout.id);
       if (summaryData.isNotEmpty) {
         lastWorkoutSummary = summaryData.entries
             .take(2)
@@ -159,7 +157,8 @@ class WorkoutHomeNotifier extends _$WorkoutHomeNotifier {
     final activeTemplate = await workoutRepo.getActiveTemplate();
     if (activeTemplate != null) {
       activeTemplateId = activeTemplate.id;
-      final templateDays = await workoutRepo.getTemplateDays(activeTemplate.id);
+      // Fix #16: getActiveTemplate() already fetches days, reuse them.
+      final templateDays = activeTemplate.days;
       if (templateDays.isNotEmpty) {
         final lastTemplateWorkout =
             await workoutRepo.getLastWorkoutOfTemplate(activeTemplate.id);
@@ -227,8 +226,8 @@ class WorkoutHomeNotifier extends _$WorkoutHomeNotifier {
       dateString: dateString,
       currentStreak: stats['currentStreak'] as int,
       dailyTip: tips[tipIndex],
-      lastWorkout: lastWorkoutEntity,
-      activeDraft: activeDraftEntity,
+      lastWorkout: lastWorkout,
+      activeDraft: activeDraft,
       weeklyVolume: weeklyVolume,
       lastWeight: measurements.isNotEmpty ? measurements.first : null,
       lastWorkoutSummary: lastWorkoutSummary,

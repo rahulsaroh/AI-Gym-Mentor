@@ -6,11 +6,40 @@ import 'package:ai_gym_mentor/features/settings/settings_provider.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class FitnessWrappedCard extends ConsumerWidget {
+import 'dart:ui' as ui;
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
+
+class FitnessWrappedCard extends ConsumerStatefulWidget {
   const FitnessWrappedCard({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<FitnessWrappedCard> createState() => _FitnessWrappedCardState();
+}
+
+class _FitnessWrappedCardState extends ConsumerState<FitnessWrappedCard> {
+  final GlobalKey _globalKey = GlobalKey();
+
+  Future<void> _shareWrapped() async {
+    try {
+      final boundary = _globalKey.currentContext!.findRenderObject() as ui.RenderRepaintBoundary;
+      final image = await boundary.toImage(pixelRatio: 3.0);
+      final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+      final bytes = byteData!.buffer.asUint8List();
+
+      final tempDir = await getTemporaryDirectory();
+      final file = File('${tempDir.path}/fitness_wrapped.png');
+      await file.writeAsBytes(bytes);
+
+      await Share.shareXFiles([XFile(file.path)], text: 'My Monthly Fitness Wrapped! 🚀');
+    } catch (e) {
+      debugPrint('Error sharing wrapped: $e');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final statsAsync = ref.watch(dashboardStatsProvider);
     final settings = ref.watch(settingsProvider).value ?? const SettingsState();
 
@@ -26,8 +55,10 @@ class FitnessWrappedCard extends ConsumerWidget {
             ? volume
             : volume * 2.20462; // Conversion if stored as kg in DB
 
-        return Container(
-          margin: const EdgeInsets.all(16),
+        return RepaintBoundary(
+          key: _globalKey,
+          child: Container(
+            margin: const EdgeInsets.all(16),
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
             gradient: const LinearGradient(
@@ -115,9 +146,7 @@ class FitnessWrappedCard extends ConsumerWidget {
                     ],
                   ),
                   ElevatedButton.icon(
-                    onPressed: () {
-                      // Logic for capturing and sharing widget image
-                    },
+                    onPressed: _shareWrapped,
                     icon: const Icon(LucideIcons.share2, size: 16),
                     label: const Text('SHARE'),
                     style: ElevatedButton.styleFrom(
@@ -131,6 +160,7 @@ class FitnessWrappedCard extends ConsumerWidget {
                 ],
               ),
             ],
+          ),
           ),
         );
       },
