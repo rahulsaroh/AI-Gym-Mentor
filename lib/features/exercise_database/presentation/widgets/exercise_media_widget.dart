@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:ai_gym_mentor/shared/widgets/full_screen_media_viewer.dart';
 
 class ExerciseMediaWidget extends StatefulWidget {
   final String? animatedUrl; // e.g., GIF URL
@@ -12,6 +13,8 @@ class ExerciseMediaWidget extends StatefulWidget {
   final BoxFit fit;
   final bool showDecoration;
   final double borderRadius;
+  final bool isTappable;
+  final String? exerciseName;
 
   const ExerciseMediaWidget({
     super.key,
@@ -22,6 +25,8 @@ class ExerciseMediaWidget extends StatefulWidget {
     this.fit = BoxFit.cover,
     this.showDecoration = true,
     this.borderRadius = 16,
+    this.isTappable = false,
+    this.exerciseName,
   });
 
   @override
@@ -32,18 +37,34 @@ class _ExerciseMediaWidgetState extends State<ExerciseMediaWidget> {
   @override
   Widget build(BuildContext context) {
     if (!widget.showDecoration) {
-      return _buildStack();
+      return _buildTappableWrapper(_buildStack());
     }
 
-    return Container(
-      height: widget.height,
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: Colors.grey[900],
-        borderRadius: BorderRadius.circular(widget.borderRadius),
+    return _buildTappableWrapper(
+      Container(
+        height: widget.height,
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: Colors.grey[900],
+          borderRadius: BorderRadius.circular(widget.borderRadius),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: _buildStack(),
       ),
-      clipBehavior: Clip.antiAlias,
-      child: _buildStack(),
+    );
+  }
+
+  Widget _buildTappableWrapper(Widget child) {
+    if (!widget.isTappable) return child;
+
+    return GestureDetector(
+      onTap: () => FullScreenMediaViewer.show(
+        context,
+        animatedUrl: widget.animatedUrl,
+        staticUrl: widget.staticUrl,
+        title: widget.exerciseName,
+      ),
+      child: child,
     );
   }
 

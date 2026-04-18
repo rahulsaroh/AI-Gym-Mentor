@@ -50,6 +50,8 @@ class ExerciseHeaderCard extends StatelessWidget {
                   animatedUrl: exercise.gifUrl,
                   staticUrl: exercise.imageUrls.isNotEmpty ? exercise.imageUrls.first : null,
                   fit: BoxFit.contain,
+                  isTappable: true,
+                  exerciseName: exercise.name,
                 ),
               ),
               Padding(
