@@ -30,17 +30,22 @@ class FullScreenMediaViewer extends StatelessWidget {
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
-      body: Center(
-        child: InteractiveViewer(
-          clipBehavior: Clip.none,
-          minScale: 0.5,
-          maxScale: 4.0,
-          child: ExerciseMediaWidget(
-            animatedUrl: animatedUrl,
-            staticUrl: staticUrl,
-            fit: BoxFit.contain,
-            showDecoration: false,
-            height: double.infinity,
+      body: Container(
+        color: Colors.white, // Most exercise GIFs have white backgrounds, blend them
+        width: double.infinity,
+        height: double.infinity,
+        child: Center(
+          child: InteractiveViewer(
+            clipBehavior: Clip.none,
+            minScale: 0.5,
+            maxScale: 4.0,
+            child: ExerciseMediaWidget(
+              animatedUrl: animatedUrl,
+              staticUrl: staticUrl,
+              fit: BoxFit.contain,
+              showDecoration: false,
+              height: double.infinity,
+            ),
           ),
         ),
       ),

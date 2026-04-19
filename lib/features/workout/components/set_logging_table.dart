@@ -21,7 +21,6 @@ class SetLoggingTable extends StatelessWidget {
   final void Function(ExerciseBlock) onAddSet;
   final void Function(int) onRemoveSet;
   final void Function(db.WorkoutSet, entity.ExerciseEntity, ExerciseBlock, List<ExerciseBlock>) onToggleSet;
-  final void Function(db.WorkoutSet, bool forRpe) onIntensityPicker;
   final void Function(int setId, String type, TextEditingController controller, Function(String) onChanged, double delta) onAdjustValue;
   final TextEditingController Function(int id, String type, String initialValue) getController;
   final FocusNode Function(int id, String type) getNode;
@@ -38,7 +37,6 @@ class SetLoggingTable extends StatelessWidget {
     required this.onAddSet,
     required this.onRemoveSet,
     required this.onToggleSet,
-    required this.onIntensityPicker,
     required this.onAdjustValue,
     required this.getController,
     required this.getNode,
@@ -58,7 +56,7 @@ class SetLoggingTable extends StatelessWidget {
               _buildTableHeaderLabel(context, 'SET', 40),
               Expanded(child: _buildTableHeaderLabel(context, 'WEIGHT (${unit == WeightUnit.kg ? 'KG' : 'LBS'})', 0)),
               Expanded(child: _buildTableHeaderLabel(context, exercise.setType == 'Timed' ? 'SECS' : 'REPS', 0)),
-              _buildTableHeaderLabel(context, 'RPE', 50),
+              _buildTableHeaderLabel(context, '1RM', 50),
               const SizedBox(width: 44), // Action column
             ],
           ),
@@ -250,7 +248,7 @@ class SetLoggingTable extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 8),
-                _buildCompactIntensityInput(context, set, true, isCompleted),
+                _buildOneRMDisplay(context, set, isCompleted),
                 const SizedBox(width: 12),
                 GestureDetector(
                   onTap: () => onToggleSet(set, exercise, block, allBlocks),
@@ -430,26 +428,44 @@ class SetLoggingTable extends StatelessWidget {
     );
   }
 
-  Widget _buildCompactIntensityInput(BuildContext context, db.WorkoutSet set, bool forRpe, bool isCompleted) {
-    final value = forRpe ? set.rpe : set.rir;
-    return GestureDetector(
-      onTap: isCompleted ? null : () => onIntensityPicker(set, forRpe),
-      child: Container(
-        width: 44,
-        height: 32,
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.3),
-          borderRadius: BorderRadius.circular(8),
+  Widget _buildOneRMDisplay(BuildContext context, db.WorkoutSet set, bool isCompleted) {
+    final oneRm = WeightConverter.calculate1RM(set.weight, set.reps);
+    final unit = settings.weightUnit;
+    
+    // Convert to display unit
+    final displayOneRm = WeightConverter.toDisplay(oneRm, unit);
+
+    return Container(
+      width: 50,
+      height: 32,
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outline.withOpacity(0.1),
         ),
-        alignment: Alignment.center,
-        child: Text(
-          value?.toString() ?? '—',
-          style: GoogleFonts.inter(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-            color: value == null ? Colors.grey[400] : null,
+      ),
+      alignment: Alignment.center,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            displayOneRm > 0 ? displayOneRm.toStringAsFixed(1) : '—',
+            style: GoogleFonts.inter(
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+              color: isCompleted ? Theme.of(context).colorScheme.outline : Theme.of(context).colorScheme.primary,
+            ),
           ),
-        ),
+          Text(
+            '1RM',
+            style: GoogleFonts.inter(
+              fontSize: 8,
+              fontWeight: FontWeight.bold,
+              color: Theme.of(context).colorScheme.outline.withOpacity(0.5),
+            ),
+          ),
+        ],
       ),
     );
   }

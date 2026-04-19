@@ -45,7 +45,7 @@ class _ExerciseMediaWidgetState extends State<ExerciseMediaWidget> {
         height: widget.height,
         width: double.infinity,
         decoration: BoxDecoration(
-          color: Colors.grey[900],
+          color: Colors.white, // GIFs usually have white backgrounds
           borderRadius: BorderRadius.circular(widget.borderRadius),
         ),
         clipBehavior: Clip.antiAlias,
@@ -73,6 +73,26 @@ class _ExerciseMediaWidgetState extends State<ExerciseMediaWidget> {
       alignment: Alignment.center,
       children: [
         _buildMedia(),
+        // Gradient overlay to ensure top-aligned icons (like "...") are visible on white GIFs
+        if (widget.showDecoration)
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            height: 60,
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.black.withOpacity(0.4),
+                    Colors.transparent,
+                  ],
+                ),
+              ),
+            ),
+          ),
         if (widget.videoUrl != null)
           Positioned(
             right: 8,
@@ -102,6 +122,8 @@ class _ExerciseMediaWidgetState extends State<ExerciseMediaWidget> {
     return Image.network(
       widget.animatedUrl!,
       fit: widget.fit,
+      width: double.infinity,
+      height: double.infinity,
       loadingBuilder: (context, child, loadingProgress) {
         if (loadingProgress == null) return child;
         return _buildPlaceholder();
@@ -116,6 +138,8 @@ class _ExerciseMediaWidgetState extends State<ExerciseMediaWidget> {
     return CachedNetworkImage(
       imageUrl: widget.staticUrl!,
       fit: widget.fit,
+      width: double.infinity,
+      height: double.infinity,
       placeholder: (context, url) => _buildPlaceholder(),
       errorWidget: (context, url, error) => _buildErrorPlaceholder(),
     );
@@ -123,10 +147,10 @@ class _ExerciseMediaWidgetState extends State<ExerciseMediaWidget> {
 
   Widget _buildPlaceholder() {
     return Shimmer.fromColors(
-      baseColor: Colors.grey[800]!,
-      highlightColor: Colors.grey[700]!,
+      baseColor: Colors.grey[200]!,
+      highlightColor: Colors.white,
       child: Container(
-        color: Colors.grey[800],
+        color: Colors.white,
         height: widget.height,
         width: double.infinity,
       ),
@@ -135,7 +159,7 @@ class _ExerciseMediaWidgetState extends State<ExerciseMediaWidget> {
 
   Widget _buildErrorPlaceholder() {
     return Container(
-      color: Colors.grey[800],
+      color: Colors.grey[100],
       child: const Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [

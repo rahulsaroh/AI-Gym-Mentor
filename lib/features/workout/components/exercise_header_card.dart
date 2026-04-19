@@ -49,7 +49,7 @@ class ExerciseHeaderCard extends StatelessWidget {
                 child: ExerciseMediaWidget(
                   animatedUrl: exercise.gifUrl,
                   staticUrl: exercise.imageUrls.isNotEmpty ? exercise.imageUrls.first : null,
-                  fit: BoxFit.contain,
+                  fit: BoxFit.cover, // Changed from contain to cover to fill the card header
                   isTappable: true,
                   exerciseName: exercise.name,
                 ),

@@ -826,7 +826,6 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
                 onAddSet: _addSet,
                 onRemoveSet: _removeSet,
                 onToggleSet: _toggleSet,
-                onIntensityPicker: _showIntensityPicker,
                 onAdjustValue: _adjustValue,
                 getController: _getController,
                 getNode: _getNode,
@@ -944,75 +943,6 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
   }
 
   // Removed obsolete methods
-
-
-
-  void _showIntensityPicker(db.WorkoutSet set, bool forRpe) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        padding: const EdgeInsets.all(24),
-        decoration: BoxDecoration(
-          color: Theme.of(context).scaffoldBackgroundColor,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(forRpe ? 'Select RPE' : 'Select RIR',
-                style: GoogleFonts.outfit(
-                    fontSize: 20, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 8),
-            Text(
-                forRpe
-                    ? 'Rate of Perceived Exertion (1-10)'
-                    : 'Reps In Reserve (How many more could you do?)',
-                style: TextStyle(color: Theme.of(context).colorScheme.outline)),
-            const SizedBox(height: 24),
-            SizedBox(
-              height: 50,
-              child: ListView.separated(
-                scrollDirection: Axis.horizontal,
-                itemCount: forRpe ? 11 : 6,
-                separatorBuilder: (context, index) => const SizedBox(width: 8),
-                itemBuilder: (context, index) {
-                  if (index == 0) return _buildIntensityChip(set, null, forRpe);
-                  // Fix #14: and RIR should start from 0 (index 1 -> 0)
-                  return _buildIntensityChip(
-                      set, (index - (forRpe ? 0 : 1)).toDouble(), forRpe);
-                },
-              ),
-            ),
-            const SizedBox(height: 24),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildIntensityChip(db.WorkoutSet set, double? value, bool forRpe) {
-    final double? currentValue = forRpe ? set.rpe : (set.rir?.toDouble());
-    final isSelected = currentValue == value;
-    return ChoiceChip(
-      label: Text(value == null
-          ? 'None'
-          : (forRpe ? value.toString() : value.toInt().toString())),
-      selected: isSelected,
-      onSelected: (selected) {
-        if (selected) {
-          if (forRpe) {
-            _updateSet(set.id, rpe: value);
-          } else {
-            _updateSet(set.id, rir: value?.toInt());
-          }
-          Navigator.pop(context);
-        }
-      },
-    );
-  }
-
 
   void _adjustValue(int setId, String type, TextEditingController controller,
       Function(String) onChanged, double direction) {
