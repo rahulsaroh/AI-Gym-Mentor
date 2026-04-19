@@ -110,7 +110,7 @@ class SettingsScreen extends ConsumerWidget {
             _buildAutoIncrementDropdown(context, ref, settings),
             _buildSwitchTile(
               context,
-              title: 'Show RPE Field',
+              title: 'Show 1RM Column',
               value: settings.showRpe,
               onChanged: (v) => ref
                   .read(settingsProvider.notifier)

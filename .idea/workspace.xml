@@ -5,12 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="310b61fb-298a-4d2b-8625-e9028bf4d99c" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/lib/core/utils/weight_converter.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/core/utils/weight_converter.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/features/exercise_database/presentation/widgets/exercise_media_widget.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/exercise_database/presentation/widgets/exercise_media_widget.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/features/settings/settings_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/settings/settings_screen.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/features/workout/active_workout_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/workout/active_workout_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/features/workout/components/exercise_header_card.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/workout/components/exercise_header_card.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/features/workout/components/set_logging_table.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/workout/components/set_logging_table.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/shared/widgets/full_screen_media_viewer.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/shared/widgets/full_screen_media_viewer.dart" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

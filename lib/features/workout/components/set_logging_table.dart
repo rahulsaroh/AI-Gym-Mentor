@@ -56,7 +56,7 @@ class SetLoggingTable extends StatelessWidget {
               _buildTableHeaderLabel(context, 'SET', 40),
               Expanded(child: _buildTableHeaderLabel(context, 'WEIGHT (${unit == WeightUnit.kg ? 'KG' : 'LBS'})', 0)),
               Expanded(child: _buildTableHeaderLabel(context, exercise.setType == 'Timed' ? 'SECS' : 'REPS', 0)),
-              _buildTableHeaderLabel(context, '1RM', 50),
+              if (settings.showRpe) _buildTableHeaderLabel(context, '1RM', 50),
               const SizedBox(width: 44), // Action column
             ],
           ),
@@ -247,8 +247,10 @@ class SetLoggingTable extends StatelessWidget {
                     isCompleted: isCompleted,
                   ),
                 ),
-                const SizedBox(width: 8),
-                _buildOneRMDisplay(context, set, isCompleted),
+                if (settings.showRpe) ...[
+                  const SizedBox(width: 8),
+                  _buildOneRMDisplay(context, set, isCompleted),
+                ],
                 const SizedBox(width: 12),
                 GestureDetector(
                   onTap: () => onToggleSet(set, exercise, block, allBlocks),
@@ -354,10 +356,11 @@ class SetLoggingTable extends StatelessWidget {
        controller.text = value;
     }
 
-    return Column(
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
         SizedBox(
-          width: 70,
+          width: 50,
           child: TextField(
             controller: controller,
             focusNode: focusNode,
@@ -392,23 +395,25 @@ class SetLoggingTable extends StatelessWidget {
             },
           ),
         ),
-        if (!isCompleted)
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+        if (!isCompleted) ...[
+          const SizedBox(width: 4),
+          Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
               _buildRoundIconButton(
                 context,
-                icon: LucideIcons.minus,
-                onPressed: () => onAdjustValue(set.id, type, controller, onChanged, -1),
+                icon: LucideIcons.chevronUp,
+                onPressed: () => onAdjustValue(set.id, type, controller, onChanged, 1),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(height: 2),
               _buildRoundIconButton(
                 context,
-                icon: LucideIcons.plus,
-                onPressed: () => onAdjustValue(set.id, type, controller, onChanged, 1),
+                icon: LucideIcons.chevronDown,
+                onPressed: () => onAdjustValue(set.id, type, controller, onChanged, -1),
               ),
             ],
           ),
+        ],
       ],
     );
   }
@@ -416,14 +421,14 @@ class SetLoggingTable extends StatelessWidget {
   Widget _buildRoundIconButton(BuildContext context, {required IconData icon, required VoidCallback onPressed}) {
     return InkWell(
       onTap: onPressed,
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: BorderRadius.circular(8),
       child: Container(
-        padding: const EdgeInsets.all(4),
+        padding: const EdgeInsets.all(2),
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.5),
-          shape: BoxShape.circle,
+          borderRadius: BorderRadius.circular(6),
         ),
-        child: Icon(icon, size: 16, color: Theme.of(context).primaryColor),
+        child: Icon(icon, size: 14, color: Theme.of(context).primaryColor),
       ),
     );
   }
@@ -435,34 +440,68 @@ class SetLoggingTable extends StatelessWidget {
     // Convert to display unit
     final displayOneRm = WeightConverter.toDisplay(oneRm, unit);
 
+    // Personal Best Logic
+    bool isBest = false;
+    if (previousSessionSets.containsKey(set.exerciseId)) {
+      final prevSets = previousSessionSets[set.exerciseId]!;
+      final bestPrev1RM = prevSets.map((s) => WeightConverter.calculate1RM(s.weight, s.reps)).fold(0.0, (m, v) => v > m ? v : m);
+      if (oneRm > bestPrev1RM && oneRm > 0) {
+        isBest = true;
+      }
+    }
+
     return Container(
-      width: 50,
-      height: 32,
+      width: 54,
+      height: 36,
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(8),
+        gradient: isBest ? LinearGradient(
+          colors: [
+            Theme.of(context).primaryColor.withOpacity(0.15),
+            Theme.of(context).primaryColor.withOpacity(0.05),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ) : null,
+        color: !isBest ? Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.1) : null,
+        borderRadius: BorderRadius.circular(10),
         border: Border.all(
-          color: Theme.of(context).colorScheme.outline.withOpacity(0.1),
+          color: isBest 
+              ? Theme.of(context).primaryColor.withOpacity(0.3) 
+              : Theme.of(context).colorScheme.outline.withOpacity(0.1),
+          width: isBest ? 1.5 : 1,
         ),
+        boxShadow: [
+          if (isBest)
+            BoxShadow(
+              color: Theme.of(context).primaryColor.withOpacity(0.1),
+              blurRadius: 4,
+              spreadRadius: 0,
+            ),
+        ],
       ),
       alignment: Alignment.center,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            displayOneRm > 0 ? displayOneRm.toStringAsFixed(1) : '—',
+            displayOneRm > 0 ? displayOneRm.toStringAsFixed(displayOneRm >= 100 ? 0 : 1) : '—',
             style: GoogleFonts.inter(
-              fontSize: 12,
-              fontWeight: FontWeight.bold,
-              color: isCompleted ? Theme.of(context).colorScheme.outline : Theme.of(context).colorScheme.primary,
+              fontSize: 13,
+              fontWeight: FontWeight.w900,
+              color: isCompleted 
+                  ? Theme.of(context).colorScheme.outline 
+                  : (isBest ? Theme.of(context).primaryColor : Theme.of(context).colorScheme.primary),
             ),
           ),
           Text(
-            '1RM',
+            isBest ? 'BEST' : '1RM',
             style: GoogleFonts.inter(
-              fontSize: 8,
-              fontWeight: FontWeight.bold,
-              color: Theme.of(context).colorScheme.outline.withOpacity(0.5),
+              fontSize: 7,
+              fontWeight: FontWeight.w900,
+              letterSpacing: 0.5,
+              color: isBest 
+                  ? Theme.of(context).primaryColor 
+                  : Theme.of(context).colorScheme.outline.withOpacity(0.5),
             ),
           ),
         ],
