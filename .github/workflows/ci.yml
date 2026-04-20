@@ -9,16 +9,16 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.41.7' # Dart SDK stable - matches pubspec.lock requirements          channel: 'stable'
+          flutter-version: '3.41.7'
+          channel: 'stable'
 
-      - name: Remove Windows .dart_tool (has hardcoded Windows paths)
+      - name: Remove Windows .dart_tool
         run: rm -rf .dart_tool
 
       - name: Install dependencies
@@ -31,8 +31,4 @@ jobs:
         run: flutter analyze --no-fatal-infos --no-fatal-warnings
 
       - name: Run tests
-<<<<<<< HEAD
-                  run: flutter test test/core test/services test/features test/widget_test.dart test/workflow_verification_test.dart
-=======
-                  run: flutter test test/core test/services test/features test/widget_test.dart test/workflow_verification_test.dart
->>>>>>> 5fb77657e9d7346b4ea025c2d3300eb94a153562
+        run: flutter test test/core test/services test/features test/widget_test.dart test/workflow_verification_test.dart
