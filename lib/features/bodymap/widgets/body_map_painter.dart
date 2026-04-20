@@ -24,6 +24,8 @@ class BodyMapPainter extends CustomPainter {
     // Scale factor: our paths are in 200×400 space
     final scaleX = size.width / 200;
     final scaleY = size.height / 400;
+
+    canvas.save();
     canvas.scale(scaleX, scaleY);
 
     // Build a lookup for fast access
@@ -62,7 +64,11 @@ class BodyMapPainter extends CustomPainter {
         ..strokeWidth = muscle == selectedMuscle ? 2.0 : 0.8;
 
       canvas.drawPath(path, strokePaint);
+
+      _drawMuscleLabel(canvas, muscle, path);
     }
+
+    canvas.restore();
   }
 
   void _drawSilhouette(Canvas canvas) {
@@ -72,6 +78,55 @@ class BodyMapPainter extends CustomPainter {
       ..style = PaintingStyle.fill;
     // Use your full body outline path here
     canvas.drawPath(MusclePathRegistry.getFullBodyOutline(), silhouettePaint);
+  }
+
+  void _drawMuscleLabel(Canvas canvas, String muscleName, Path path) {
+    final bounds = path.getBounds();
+    if (bounds.isEmpty || bounds.width < 8) return;
+
+    final displayName = _labelFor(muscleName);
+    final fontSize = (bounds.width * 0.28).clamp(6.0, 11.0);
+
+    final tp = TextPainter(
+      text: TextSpan(
+        text: displayName,
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: fontSize,
+          fontWeight: FontWeight.w600,
+          shadows: const [
+            Shadow(color: Colors.black, blurRadius: 3, offset: Offset(0.5, 0.5)),
+            Shadow(color: Colors.black, blurRadius: 3, offset: Offset(-0.5, -0.5)),
+          ],
+        ),
+      ),
+      textDirection: TextDirection.ltr,
+      textAlign: TextAlign.center,
+    )..layout(maxWidth: bounds.width);
+
+    final offset = Offset(
+      bounds.center.dx - tp.width / 2,
+      bounds.center.dy - tp.height / 2,
+    );
+    tp.paint(canvas, offset);
+  }
+
+  String _labelFor(String muscle) {
+    const labels = {
+      'chest': 'Chest',
+      'shoulders': 'Delt',
+      'biceps': 'Biceps',
+      'abs': 'Abs',
+      'quads': 'Quads',
+      'calves': 'Calves',
+      'back': 'Back',
+      'triceps': 'Triceps',
+      'glutes': 'Glutes',
+      'hamstrings': 'Hams',
+      'forearms': 'Fore',
+      'neck': 'Neck',
+    };
+    return labels[muscle] ?? muscle;
   }
 
   @override
