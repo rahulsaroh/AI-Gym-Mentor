@@ -42,7 +42,7 @@ void main() {
       weight: 0,
     ));
 
-    // 2. Wrap screen in ProviderScope and Material with fixed size
+    // 2. Wrap screen in ProviderScope and Material
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
@@ -54,16 +54,17 @@ void main() {
       ),
     );
 
-    // Wait for initial data load
-    await tester.pumpAndSettle(const Duration(seconds: 3));
+    // Wait for initial data load using fixed pump duration
+    await tester.pump(const Duration(milliseconds: 500));
+    await tester.pump(const Duration(milliseconds: 500));
 
-    // 3. Find "Add Set" button, scroll it into view, then tap it
+    // 3. Find "Add Set" button, scroll into view, then tap
     final addSetButton = find.text('Add Set');
     expect(addSetButton, findsOneWidget);
     await tester.ensureVisible(addSetButton);
-    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 100));
     await tester.tap(addSetButton);
-    await tester.pumpAndSettle(const Duration(seconds: 3));
+    await tester.pump(const Duration(milliseconds: 500));
 
     // 4. Verify a new set was added (check DB has 2 sets now)
     final sets = await (db.select(db.workoutSets)
