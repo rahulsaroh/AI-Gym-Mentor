@@ -43,6 +43,7 @@ import 'package:ai_gym_mentor/features/workout/components/plate_calculator_dialo
 import 'package:ai_gym_mentor/features/workout/components/set_logging_table.dart';
 import 'package:ai_gym_mentor/features/workout/components/pr_victory_overlay.dart';
 import 'package:ai_gym_mentor/features/workout/models/workout_models.dart';
+import 'package:ai_gym_mentor/features/analytics/data/strength_repository.dart';
 
 typedef Exercise = entity.ExerciseEntity;
 
