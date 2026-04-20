@@ -16,7 +16,7 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.32.0' # Dart 3.8.0 - matches pubspec sdk >=3.8.0
+          flutter-version: '3.35.0' # Dart 3.9.0 - required by google_fonts 8+, fl_chart 1.1+
           channel: 'stable'
 
       - name: Remove Windows pubspec.lock
