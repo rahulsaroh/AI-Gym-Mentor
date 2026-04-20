@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:ai_gym_mentor/shared/widgets/full_screen_media_viewer.dart';
 
 class ExerciseMediaWidget extends StatefulWidget {
   final String? animatedUrl; // e.g., GIF URL
@@ -12,6 +13,8 @@ class ExerciseMediaWidget extends StatefulWidget {
   final BoxFit fit;
   final bool showDecoration;
   final double borderRadius;
+  final bool isTappable;
+  final String? exerciseName;
 
   const ExerciseMediaWidget({
     super.key,
@@ -22,6 +25,8 @@ class ExerciseMediaWidget extends StatefulWidget {
     this.fit = BoxFit.cover,
     this.showDecoration = true,
     this.borderRadius = 16,
+    this.isTappable = false,
+    this.exerciseName,
   });
 
   @override
@@ -32,18 +37,34 @@ class _ExerciseMediaWidgetState extends State<ExerciseMediaWidget> {
   @override
   Widget build(BuildContext context) {
     if (!widget.showDecoration) {
-      return _buildStack();
+      return _buildTappableWrapper(_buildStack());
     }
 
-    return Container(
-      height: widget.height,
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: Colors.grey[900],
-        borderRadius: BorderRadius.circular(widget.borderRadius),
+    return _buildTappableWrapper(
+      Container(
+        height: widget.height,
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: Colors.white, // GIFs usually have white backgrounds
+          borderRadius: BorderRadius.circular(widget.borderRadius),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: _buildStack(),
       ),
-      clipBehavior: Clip.antiAlias,
-      child: _buildStack(),
+    );
+  }
+
+  Widget _buildTappableWrapper(Widget child) {
+    if (!widget.isTappable) return child;
+
+    return GestureDetector(
+      onTap: () => FullScreenMediaViewer.show(
+        context,
+        animatedUrl: widget.animatedUrl,
+        staticUrl: widget.staticUrl,
+        title: widget.exerciseName,
+      ),
+      child: child,
     );
   }
 
@@ -52,6 +73,26 @@ class _ExerciseMediaWidgetState extends State<ExerciseMediaWidget> {
       alignment: Alignment.center,
       children: [
         _buildMedia(),
+        // Gradient overlay to ensure top-aligned icons (like "...") are visible on white GIFs
+        if (widget.showDecoration)
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            height: 60,
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.black.withOpacity(0.4),
+                    Colors.transparent,
+                  ],
+                ),
+              ),
+            ),
+          ),
         if (widget.videoUrl != null)
           Positioned(
             right: 8,
@@ -81,6 +122,8 @@ class _ExerciseMediaWidgetState extends State<ExerciseMediaWidget> {
     return Image.network(
       widget.animatedUrl!,
       fit: widget.fit,
+      width: double.infinity,
+      height: double.infinity,
       loadingBuilder: (context, child, loadingProgress) {
         if (loadingProgress == null) return child;
         return _buildPlaceholder();
@@ -95,6 +138,8 @@ class _ExerciseMediaWidgetState extends State<ExerciseMediaWidget> {
     return CachedNetworkImage(
       imageUrl: widget.staticUrl!,
       fit: widget.fit,
+      width: double.infinity,
+      height: double.infinity,
       placeholder: (context, url) => _buildPlaceholder(),
       errorWidget: (context, url, error) => _buildErrorPlaceholder(),
     );
@@ -102,10 +147,10 @@ class _ExerciseMediaWidgetState extends State<ExerciseMediaWidget> {
 
   Widget _buildPlaceholder() {
     return Shimmer.fromColors(
-      baseColor: Colors.grey[800]!,
-      highlightColor: Colors.grey[700]!,
+      baseColor: Colors.grey[200]!,
+      highlightColor: Colors.white,
       child: Container(
-        color: Colors.grey[800],
+        color: Colors.white,
         height: widget.height,
         width: double.infinity,
       ),
@@ -114,7 +159,7 @@ class _ExerciseMediaWidgetState extends State<ExerciseMediaWidget> {
 
   Widget _buildErrorPlaceholder() {
     return Container(
-      color: Colors.grey[800],
+      color: Colors.grey[100],
       child: const Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [

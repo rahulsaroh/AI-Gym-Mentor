@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:drift/drift.dart';
 import 'package:ai_gym_mentor/core/database/database.dart';
 import 'package:ai_gym_mentor/core/domain/entities/body_measurement.dart' as ent_m;
@@ -28,7 +29,8 @@ class MeasurementsRepository {
       thighLeft: row.thighLeft,
       thighRight: row.thighRight,
       calfLeft: row.calfLeft,
-      calfRight: row.calfRight,
+      height: row.height,
+      customValues: row.customValues != null ? Map<String, double>.from(json.decode(row.customValues!)) : null,
       notes: row.notes,
     );
   }
@@ -84,6 +86,8 @@ class MeasurementsRepository {
             thighRight: Value(measurement.thighRight),
             calfLeft: Value(measurement.calfLeft),
             calfRight: Value(measurement.calfRight),
+            height: Value(measurement.height),
+            customValues: Value(measurement.customValues != null ? json.encode(measurement.customValues) : null),
             notes: Value(measurement.notes),
           ));
       await db.into(db.syncQueue).insert(SyncQueueCompanion.insert(
@@ -114,6 +118,8 @@ class MeasurementsRepository {
       thighRight: measurement.thighRight,
       calfLeft: measurement.calfLeft,
       calfRight: measurement.calfRight,
+      height: measurement.height,
+      customValues: measurement.customValues != null ? json.encode(measurement.customValues) : null,
       notes: measurement.notes,
     ));
   }

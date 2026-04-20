@@ -15,15 +15,15 @@ final workoutDurationProvider = WorkoutDurationProvider._();
 final class WorkoutDurationProvider
     extends $NotifierProvider<WorkoutDuration, int> {
   WorkoutDurationProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'workoutDurationProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'workoutDurationProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$workoutDurationHash();
@@ -49,8 +49,14 @@ abstract class _$WorkoutDuration extends $Notifier<int> {
   @override
   void runBuild() {
     final ref = this.ref as $Ref<int, int>;
-    final element = ref.element
-        as $ClassProviderElement<AnyNotifier<int, int>, int, Object?, Object?>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<int, int>,
+              int,
+              Object?,
+              Object?
+            >;
     element.handleCreate(ref, build);
   }
 }

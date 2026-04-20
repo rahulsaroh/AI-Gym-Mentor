@@ -23,4 +23,12 @@ class WeightConverter {
     final unitStr = unit == WeightUnit.kg ? 'kg' : 'lbs';
     return '$formattedValue $unitStr';
   }
+
+  /// Calculates 1RM (One Rep Max) using the Epley formula
+  /// 1RM = Weight * (1 + 0.0333 * Reps)
+  static double calculate1RM(double weight, double reps) {
+    if (reps <= 0) return 0;
+    if (reps == 1) return weight;
+    return weight * (1 + 0.0333 * reps);
+  }
 }

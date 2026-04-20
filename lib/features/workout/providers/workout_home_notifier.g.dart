@@ -15,15 +15,15 @@ final workoutHomeProvider = WorkoutHomeNotifierProvider._();
 final class WorkoutHomeNotifierProvider
     extends $AsyncNotifierProvider<WorkoutHomeNotifier, WorkoutHomeState> {
   WorkoutHomeNotifierProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'workoutHomeProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'workoutHomeProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$workoutHomeNotifierHash();
@@ -43,11 +43,14 @@ abstract class _$WorkoutHomeNotifier extends $AsyncNotifier<WorkoutHomeState> {
   void runBuild() {
     final ref =
         this.ref as $Ref<AsyncValue<WorkoutHomeState>, WorkoutHomeState>;
-    final element = ref.element as $ClassProviderElement<
-        AnyNotifier<AsyncValue<WorkoutHomeState>, WorkoutHomeState>,
-        AsyncValue<WorkoutHomeState>,
-        Object?,
-        Object?>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<AsyncValue<WorkoutHomeState>, WorkoutHomeState>,
+              AsyncValue<WorkoutHomeState>,
+              Object?,
+              Object?
+            >;
     element.handleCreate(ref, build);
   }
 }

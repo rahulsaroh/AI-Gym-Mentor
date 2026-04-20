@@ -7,25 +7,26 @@ part of 'logged_set.dart';
 // **************************************************************************
 
 _LoggedSet _$LoggedSetFromJson(Map<String, dynamic> json) => _LoggedSet(
-      id: (json['id'] as num).toInt(),
-      workoutId: (json['workoutId'] as num).toInt(),
-      exerciseId: (json['exerciseId'] as num).toInt(),
-      exerciseOrder: (json['exerciseOrder'] as num).toInt(),
-      setNumber: (json['setNumber'] as num).toInt(),
-      weight: (json['weight'] as num).toDouble(),
-      reps: (json['reps'] as num).toDouble(),
-      rpe: (json['rpe'] as num?)?.toDouble(),
-      rir: (json['rir'] as num?)?.toInt(),
-      setType: $enumDecodeNullable(_$SetTypeEnumMap, json['setType']) ??
-          SetType.straight,
-      notes: json['notes'] as String?,
-      completed: json['completed'] as bool? ?? false,
-      completedAt: json['completedAt'] == null
-          ? null
-          : DateTime.parse(json['completedAt'] as String),
-      isPr: json['isPr'] as bool? ?? false,
-      supersetGroupId: json['supersetGroupId'] as String?,
-    );
+  id: (json['id'] as num).toInt(),
+  workoutId: (json['workoutId'] as num).toInt(),
+  exerciseId: (json['exerciseId'] as num).toInt(),
+  exerciseOrder: (json['exerciseOrder'] as num).toInt(),
+  setNumber: (json['setNumber'] as num).toInt(),
+  weight: (json['weight'] as num).toDouble(),
+  reps: (json['reps'] as num).toDouble(),
+  rpe: (json['rpe'] as num?)?.toDouble(),
+  rir: (json['rir'] as num?)?.toInt(),
+  setType:
+      $enumDecodeNullable(_$SetTypeEnumMap, json['setType']) ??
+      SetType.straight,
+  notes: json['notes'] as String?,
+  completed: json['completed'] as bool? ?? false,
+  completedAt: json['completedAt'] == null
+      ? null
+      : DateTime.parse(json['completedAt'] as String),
+  isPr: json['isPr'] as bool? ?? false,
+  supersetGroupId: json['supersetGroupId'] as String?,
+);
 
 Map<String, dynamic> _$LoggedSetToJson(_LoggedSet instance) =>
     <String, dynamic>{

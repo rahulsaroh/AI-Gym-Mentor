@@ -19,7 +19,6 @@ import 'package:ai_gym_mentor/features/exercise_database/presentation/widgets/ex
 import 'package:ai_gym_mentor/features/exercise_database/presentation/widgets/exercise_picker_overlay.dart';
 import 'package:confetti/confetti.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:ai_gym_mentor/core/widgets/speed_dial_fab.dart';
 import 'package:ai_gym_mentor/features/workout/components/pr_banner.dart';
 import 'package:ai_gym_mentor/features/workout/components/set_type_selector.dart';
 import 'package:ai_gym_mentor/services/progression_service.dart';
@@ -28,8 +27,10 @@ import 'package:ai_gym_mentor/features/workout/components/workout_summary_overla
 import 'package:ai_gym_mentor/features/workout/components/superset_bracket_painter.dart';
 import 'package:ai_gym_mentor/features/workout/components/rest_timer_overlay.dart';
 import 'package:ai_gym_mentor/features/workout/providers/timer_notifier.dart';
+import 'package:ai_gym_mentor/features/workout/components/floating_rest_timer.dart';
 import 'package:ai_gym_mentor/features/workout/workout_repository.dart';
 import 'package:ai_gym_mentor/features/analytics/analytics_providers.dart';
+import 'package:ai_gym_mentor/features/analytics/data/strength_repository.dart';
 import 'package:ai_gym_mentor/features/history/pdf_service.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:ai_gym_mentor/features/settings/settings_provider.dart';
@@ -42,6 +43,7 @@ import 'package:ai_gym_mentor/features/workout/components/plate_calculator_dialo
 import 'package:ai_gym_mentor/features/workout/components/set_logging_table.dart';
 import 'package:ai_gym_mentor/features/workout/components/pr_victory_overlay.dart';
 import 'package:ai_gym_mentor/features/workout/models/workout_models.dart';
+import 'package:ai_gym_mentor/features/analytics/data/strength_repository.dart';
 
 typedef Exercise = entity.ExerciseEntity;
 
@@ -81,6 +83,10 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
   // Focus Mode State
   bool _isFocusMode = true; // Default to focus mode as requested
   int _currentExerciseIndex = 0;
+  
+  // Timer Overlay State
+  bool _isTimerOverlayVisible = false;
+  String? _timerNextExName;
 
   // Ghost text history
   Map<int, List<db.WorkoutSet>> _previousSessionSets = {}; // exerciseId -> sets
@@ -238,27 +244,43 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
       debugPrint(
           'ActiveWorkoutScreen: Starting init for workout ${widget.workoutId}, dayId=$dayId');
 
-      if (dayId == null) {
-        // Try to fetch it from the workout record in DB if not provided via constructor
-        final workoutRow = await (database.select(database.workouts)
-              ..where((t) => t.id.equals(widget.workoutId)))
-            .getSingleOrNull();
+      // 1. Fetch workout record first to see what kind of workout it is
+      final workoutRow = await (database.select(database.workouts)
+            ..where((t) => t.id.equals(widget.workoutId)))
+          .getSingleOrNull();
 
-        if (workoutRow?.dayId == null) {
-          debugPrint(
-              'ActiveWorkoutScreen: dayId is null in widget and database. Cannot initialize from template.');
-          if (mounted) setState(() {
-            _isInitializing = false;
-            _initError = 'Could not find template data for this workout.';
-          });
-          return;
-        }
-
-        // Proceed with the fetched dayId
-        await _processTemplate(database, workoutRow!.dayId!);
-      } else {
-        await _processTemplate(database, dayId);
+      if (workoutRow == null) {
+        if (mounted) setState(() {
+          _isInitializing = false;
+          _initError = 'Workout not found.';
+        });
+        return;
       }
+
+      // 2. Check if we already have sets for this workout (e.g. Resume or Mesocycle)
+      final existingSets = await (database.select(database.workoutSets)
+            ..where((t) => t.workoutId.equals(widget.workoutId)))
+          .get();
+
+      if (existingSets.isNotEmpty) {
+        debugPrint('ActiveWorkoutScreen: Workout already has ${existingSets.length} sets, skipping initialization');
+        return;
+      }
+
+      // 3. If no sets, we must initialize from a template (dayId)
+      final effectiveDayId = dayId ?? workoutRow.dayId;
+
+      if (effectiveDayId == null) {
+        debugPrint(
+            'ActiveWorkoutScreen: No dayId found and no sets exist. Cannot initialize.');
+        if (mounted) setState(() {
+          _isInitializing = false;
+          _initError = 'Could not find workout data to initialize.';
+        });
+        return;
+      }
+
+      await _processTemplate(database, effectiveDayId);
     } catch (e, stack) {
       // Fix #3: Surface errors to UI instead of silently swallowing them
       debugPrint('ActiveWorkoutScreen ERROR during initialization: $e');
@@ -270,19 +292,6 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
   }
 
   Future<void> _processTemplate(db.AppDatabase database, int dayId) async {
-    // Check if we already have sets for this workout to avoid duplicates
-    final existingSets = await (database.select(database.workoutSets)
-          ..where((t) => t.workoutId.equals(widget.workoutId)))
-        .get();
-
-    debugPrint(
-        'ActiveWorkoutScreen: Found ${existingSets.length} existing sets for workout ${widget.workoutId}');
-
-    if (existingSets.isNotEmpty) {
-      debugPrint('ActiveWorkoutScreen: Workout already has sets, skipping initialization');
-      return;
-    }
-
     final templateExercises = await (database.select(database.templateExercises)
           ..where((t) => t.dayId.equals(dayId))
           ..orderBy([(t) => OrderingTerm(expression: t.order)]))
@@ -417,10 +426,16 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
             leading: IconButton(
                 icon: const Icon(LucideIcons.chevronLeft, size: 22),
                 onPressed: () async {
-                  if (widget.dayId != null) {
+                  if (workout?.mesocycleId != null) {
+                    context.go('/programs/programs/mesocycle/${workout!.mesocycleId}');
+                    return;
+                  }
+                  
+                  if (widget.dayId != null || workout?.dayId != null) {
+                    final dId = widget.dayId ?? workout?.dayId;
                     final database = ref.read(db.appDatabaseProvider);
                     final day = await (database.select(database.templateDays)
-                          ..where((t) => t.id.equals(widget.dayId!)))
+                          ..where((t) => t.id.equals(dId!)))
                         .getSingleOrNull();
                     if (day != null && context.mounted) {
                       context.go('/programs/details/${day.templateId}');
@@ -538,10 +553,16 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
             onPopInvokedWithResult: (didPop, result) async {
               if (didPop) return;
               
-              if (widget.dayId != null) {
+              if (workout?.mesocycleId != null) {
+                context.go('/programs/programs/mesocycle/${workout!.mesocycleId}');
+                return;
+              }
+
+              if (widget.dayId != null || workout?.dayId != null) {
+                final dId = widget.dayId ?? workout?.dayId;
                 final database = ref.read(db.appDatabaseProvider);
                 final day = await (database.select(database.templateDays)
-                      ..where((t) => t.id.equals(widget.dayId!)))
+                      ..where((t) => t.id.equals(dId!)))
                     .getSingleOrNull();
                 if (day != null && context.mounted) {
                   context.go('/programs/details/${day.templateId}');
@@ -567,37 +588,27 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
                       }
                       if (_currentExerciseIndex < 0) _currentExerciseIndex = 0;
                       
-                      return Column(
-                        children: [
-                          Expanded(
-                            child: PageView.builder(
-                              controller: _pageController,
-                              onPageChanged: (index) {
-                                setState(() {
-                                  _currentExerciseIndex = index;
-                                });
-                              },
-                              itemCount: exerciseBlocks.length,
-                              itemBuilder: (context, index) {
-                                final block = exerciseBlocks[index];
-                                return SingleChildScrollView(
-                                  // Fix: Increase bottom padding from 12 to 120 to clear the FloatingActionButton
-                                  padding: const EdgeInsets.only(left: 16, right: 16, top: 12, bottom: 120),
-                                  child: _buildExerciseBlock(
-                                      block, exerciseBlocks, settings, exercisesAsync),
-                                );
-                              },
-                            ),
-                          ),
-                          // Bottom Navigation Controls
-                          _buildBottomNavigation(exerciseBlocks),
-                        ],
+                      return PageView.builder(
+                        controller: _pageController,
+                        onPageChanged: (index) {
+                          setState(() {
+                            _currentExerciseIndex = index;
+                          });
+                        },
+                        itemCount: exerciseBlocks.length,
+                        itemBuilder: (context, index) {
+                          final block = exerciseBlocks[index];
+                          return SingleChildScrollView(
+                            padding: const EdgeInsets.only(left: 16, right: 16, top: 12, bottom: 120),
+                            child: _buildExerciseBlock(
+                                block, exerciseBlocks, settings, exercisesAsync),
+                          );
+                        },
                       );
                     }
 
                     return ReorderableListView.builder(
                       scrollController: _scrollController,
-                      // Fix: slightly increase bottom padding for extra safety
                       padding: const EdgeInsets.fromLTRB(16, 16, 16, 120),
                       physics: const BouncingScrollPhysics(
                           parent: AlwaysScrollableScrollPhysics()),
@@ -684,50 +695,28 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
                       }),
                     ),
                   ),
+                
+                // Floating Rest Timer
+                if (_isTimerOverlayVisible)
+                  Positioned(
+                    bottom: 0,
+                    left: 20,
+                    right: 20,
+                    child: FloatingRestTimer(
+                      nextExerciseName: _timerNextExName,
+                      onClose: () => setState(() => _isTimerOverlayVisible = false),
+                    ),
+                  ),
               ],
             ),
           ),
-          floatingActionButton: SpeedDialFab(
-            heroTagPrefix: 'active_workout',
-            icon: LucideIcons.plus,
-            backgroundColor: Theme.of(context).colorScheme.primary,
-            foregroundColor: Theme.of(context).colorScheme.onPrimary,
-            children: [
-              SpeedDialChild(
-                icon: LucideIcons.plus,
-                label: 'Add Exercise',
-                onTap: () {
-                  HapticFeedback.lightImpact();
-                  _showExercisePicker();
-                },
-              ),
-              SpeedDialChild(
-                icon: LucideIcons.plus,
-                label: 'New Library Exercise',
-                onTap: () {
-                  HapticFeedback.lightImpact();
-                  context.push('/exercises/create');
-                },
-              ),
-              SpeedDialChild(
-                  icon: LucideIcons.layers,
-                  label: 'Add Superset',
-                  onTap: _showSupersetFlow),
-              SpeedDialChild(
-                  icon: LucideIcons.check,
-                  label: 'Finish Workout',
-                  onTap: () => _showSummary(workout)),
-              SpeedDialChild(
-                icon: LucideIcons.trash2,
-                label: 'Discard Workout',
-                backgroundColor: Colors.red.withValues(alpha: 0.1),
-                foregroundColor: Colors.red,
-                onTap: () {
-                  HapticFeedback.heavyImpact();
-                  _discardWorkout();
-                },
-              ),
-            ],
+          bottomNavigationBar: StreamBuilder<List<db.WorkoutSet>>(
+            stream: _watchSets(),
+            builder: (context, snapshot) {
+              final sets = snapshot.data ?? [];
+              final blocks = _groupSetsByExercise(sets);
+              return _buildBottomNavigation(context, blocks, workout);
+            },
           ),
         );
       },
@@ -797,6 +786,7 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
                 onMenuTap: () => _showExerciseMenu(block, exercise),
                 isGlowing: isGlowing,
                 glowValue: _glowController.value,
+                hideMedia: block.sets.any((s) => s.completed),
               ),
             ),
             
@@ -810,10 +800,7 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
             // ── AI Coach Cues (Beat Hevy Phase 3) ──
             AICoachCue(block: block, exerciseName: exercise.name),
             
-            // ── Notes Section (Requirement 4) ──
-            _buildNotesSection(block),
-            
-            const SizedBox(height: 20),
+            const SizedBox(height: 12),
             
             // ── Set Logging Table (Requirement 5) ──
             SetLoggingTable(
@@ -826,7 +813,6 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
                 onAddSet: _addSet,
                 onRemoveSet: _removeSet,
                 onToggleSet: _toggleSet,
-                onIntensityPicker: _showIntensityPicker,
                 onAdjustValue: _adjustValue,
                 getController: _getController,
                 getNode: _getNode,
@@ -900,43 +886,95 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
     );
   }
 
-  Widget _buildNotesSection(ExerciseBlock block) {
-    final firstSet = block.sets.firstOrNull;
-    if (firstSet == null) return const SizedBox.shrink();
+  // Notes moved to bottom icon dialog
+  void _showNotesDialog(ExerciseBlock block) {
+    if (block.sets.isEmpty) return;
+    final firstSet = block.sets.first;
     
-    return Container(
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.3),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Theme(
-        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
-        child: ExpansionTile(
-          collapsedShape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          tilePadding: const EdgeInsets.symmetric(horizontal: 16),
-          leading: const Icon(LucideIcons.pencil, size: 16),
-          title: Text(
-            'Add a note for this exercise...',
-            style: GoogleFonts.inter(fontSize: 14, color: Theme.of(context).colorScheme.outline),
-          ),
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Row(
           children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-              child: TextField(
-                controller: _getController(firstSet.id, 'note', firstSet.notes ?? ''),
-                maxLines: 3,
-                style: GoogleFonts.inter(fontSize: 14),
-                decoration: InputDecoration(
-                  hintText: 'Type your note here...',
-                  border: InputBorder.none,
-                  fillColor: Theme.of(context).colorScheme.surface,
-                  filled: true,
-                  contentPadding: const EdgeInsets.all(12),
-                ),
-                onChanged: (val) => _updateSet(firstSet.id, notes: val),
+            const Icon(LucideIcons.pencil, size: 20),
+            const SizedBox(width: 12),
+            const Text('Exercise Note'),
+          ],
+        ),
+        content: TextField(
+          controller: _getController(firstSet.id, 'note', firstSet.notes ?? ''),
+          maxLines: 5,
+          autofocus: true,
+          decoration: const InputDecoration(
+            hintText: 'Type your note here...',
+            border: OutlineInputBorder(),
+          ),
+          onChanged: (val) => _updateSet(firstSet.id, notes: val),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Close'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showMoreMenu(ExerciseBlock? block, db.Workout workout) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 8),
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(2),
               ),
             ),
+            const SizedBox(height: 16),
+            ListTile(
+              leading: const Icon(LucideIcons.plus),
+              title: const Text('Add Exercise'),
+              onTap: () {
+                Navigator.pop(context);
+                _showExercisePicker();
+              },
+            ),
+            ListTile(
+              leading: const Icon(LucideIcons.circlePlus),
+              title: const Text('New Library Exercise'),
+              onTap: () {
+                Navigator.pop(context);
+                context.push('/exercises/create');
+              },
+            ),
+            ListTile(
+              leading: const Icon(LucideIcons.layers),
+              title: const Text('Add Superset'),
+              onTap: () {
+                Navigator.pop(context);
+                _showSupersetFlow();
+              },
+            ),
+            const Divider(),
+            ListTile(
+              leading: const Icon(LucideIcons.trash2, color: Colors.red),
+              title: const Text('Discard Workout', style: TextStyle(color: Colors.red)),
+              onTap: () {
+                Navigator.pop(context);
+                _discardWorkout();
+              },
+            ),
+            const SizedBox(height: 16),
           ],
         ),
       ),
@@ -944,75 +982,6 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
   }
 
   // Removed obsolete methods
-
-
-
-  void _showIntensityPicker(db.WorkoutSet set, bool forRpe) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        padding: const EdgeInsets.all(24),
-        decoration: BoxDecoration(
-          color: Theme.of(context).scaffoldBackgroundColor,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(forRpe ? 'Select RPE' : 'Select RIR',
-                style: GoogleFonts.outfit(
-                    fontSize: 20, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 8),
-            Text(
-                forRpe
-                    ? 'Rate of Perceived Exertion (1-10)'
-                    : 'Reps In Reserve (How many more could you do?)',
-                style: TextStyle(color: Theme.of(context).colorScheme.outline)),
-            const SizedBox(height: 24),
-            SizedBox(
-              height: 50,
-              child: ListView.separated(
-                scrollDirection: Axis.horizontal,
-                itemCount: forRpe ? 11 : 6,
-                separatorBuilder: (context, index) => const SizedBox(width: 8),
-                itemBuilder: (context, index) {
-                  if (index == 0) return _buildIntensityChip(set, null, forRpe);
-                  // Fix #14: and RIR should start from 0 (index 1 -> 0)
-                  return _buildIntensityChip(
-                      set, (index - (forRpe ? 0 : 1)).toDouble(), forRpe);
-                },
-              ),
-            ),
-            const SizedBox(height: 24),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildIntensityChip(db.WorkoutSet set, double? value, bool forRpe) {
-    final double? currentValue = forRpe ? set.rpe : (set.rir?.toDouble());
-    final isSelected = currentValue == value;
-    return ChoiceChip(
-      label: Text(value == null
-          ? 'None'
-          : (forRpe ? value.toString() : value.toInt().toString())),
-      selected: isSelected,
-      onSelected: (selected) {
-        if (selected) {
-          if (forRpe) {
-            _updateSet(set.id, rpe: value);
-          } else {
-            _updateSet(set.id, rir: value?.toInt());
-          }
-          Navigator.pop(context);
-        }
-      },
-    );
-  }
-
 
   void _adjustValue(int setId, String type, TextEditingController controller,
       Function(String) onChanged, double direction) {
@@ -1460,20 +1429,10 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
 
     notifier.start(seconds, currentExName);
     if (mounted) {
-      showModalBottomSheet(
-        context: context,
-        backgroundColor: Colors.transparent,
-        isScrollControlled: true,
-        builder: (context) => RestTimerOverlay(
-          nextExerciseName: nextExName,
-          onClose: () {
-            // Check if we are still mounted before popping
-            if (Navigator.canPop(context)) {
-              Navigator.pop(context);
-            }
-          },
-        ),
-      );
+      setState(() {
+        _isTimerOverlayVisible = true;
+        _timerNextExName = nextExName;
+      });
     }
   }
 
@@ -1865,6 +1824,11 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
       for (final id in exerciseIds) {
         await repo.incrementUsageCount(id);
       }
+
+      // Generate 1RM snapshots (Beat Hevy Phase 5: Advanced Analytics)
+      final settings = await ref.read(settingsProvider.future);
+      final strengthRepo = ref.read(strengthRepositoryProvider);
+      await strengthRepo.processWorkout(workout.id, settings.oneRmFormula);
     });
 
     if (mounted) {
@@ -2035,66 +1999,129 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
     );
   }
 
-  Widget _buildBottomNavigation(List<ExerciseBlock> exerciseBlocks) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        border: Border(
-          top: BorderSide(
-            color: Theme.of(context).dividerColor,
-            width: 0.5,
+  Widget _buildBottomNavigation(
+      BuildContext context, List<ExerciseBlock> exerciseBlocks, db.Workout? workout) {
+    final currentBlock =
+        exerciseBlocks.isNotEmpty && _currentExerciseIndex < exerciseBlocks.length
+            ? exerciseBlocks[_currentExerciseIndex]
+            : null;
+    final hasNote =
+        currentBlock?.sets.any((s) => s.notes != null && s.notes!.isNotEmpty) ??
+            false;
+
+    return Material(
+      color: Theme.of(context).cardColor,
+      elevation: 8,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+        decoration: BoxDecoration(
+          border: Border(
+            top: BorderSide(
+              color: Theme.of(context).dividerColor,
+              width: 0.5,
+            ),
           ),
         ),
-      ),
-      child: SafeArea(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
-              children: [
-                IconButton(
-                  icon: const Icon(LucideIcons.chevronLeft),
-                  onPressed: _currentExerciseIndex > 0
-                      ? () {
-                          _pageController.previousPage(
-                            duration: const Duration(milliseconds: 300),
-                            curve: Curves.easeInOut,
-                          );
-                        }
-                      : null,
+        child: SafeArea(
+          bottom: true,
+          top: false,
+          child: Row(
+            children: [
+              // Navigation Controls
+              Container(
+                decoration: BoxDecoration(
+                  color: Theme.of(context)
+                      .colorScheme
+                      .surfaceContainerHighest
+                      .withOpacity(0.3),
+                  borderRadius: BorderRadius.circular(12),
                 ),
-                Text(
-                  '${_currentExerciseIndex + 1} of ${exerciseBlocks.length}',
-                  style: const TextStyle(fontWeight: FontWeight.bold),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      icon: const Icon(LucideIcons.chevronLeft, size: 20),
+                      onPressed: _currentExerciseIndex > 0
+                          ? () {
+                              _pageController.previousPage(
+                                duration: const Duration(milliseconds: 300),
+                                curve: Curves.easeInOut,
+                              );
+                            }
+                          : null,
+                    ),
+                    Text(
+                      '${_currentExerciseIndex + 1} of ${exerciseBlocks.length}',
+                      style: GoogleFonts.inter(
+                        fontWeight: FontWeight.w900,
+                        fontSize: 13,
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(LucideIcons.chevronRight, size: 20),
+                      onPressed:
+                          _currentExerciseIndex < exerciseBlocks.length - 1
+                              ? () {
+                                  _pageController.nextPage(
+                                    duration: const Duration(milliseconds: 300),
+                                    curve: Curves.easeInOut,
+                                  );
+                                }
+                              : null,
+                    ),
+                  ],
                 ),
-                IconButton(
-                  icon: const Icon(LucideIcons.chevronRight),
-                  onPressed: _currentExerciseIndex < exerciseBlocks.length - 1
-                      ? () {
-                          _pageController.nextPage(
-                            duration: const Duration(milliseconds: 300),
-                            curve: Curves.easeInOut,
-                          );
-                        }
-                      : null,
-                ),
-              ],
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                final workout = await ref.read(workoutRepositoryProvider).getWorkout(widget.workoutId);
-                if (workout != null) {
-                  _showSummary(workout);
-                }
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Theme.of(context).colorScheme.primary,
-                foregroundColor: Theme.of(context).colorScheme.onPrimary,
               ),
-              child: const Text('Finish'),
-            ),
-          ],
+
+              const Spacer(),
+
+              // Action Icons
+              IconButton(
+                icon: const Icon(LucideIcons.plus, size: 22),
+                color: Theme.of(context).primaryColor,
+                onPressed: _showExercisePicker,
+                tooltip: 'Add Exercise',
+              ),
+
+              Stack(
+                children: [
+                  IconButton(
+                    icon: Icon(
+                      hasNote ? LucideIcons.fileText : LucideIcons.pencil,
+                      color: hasNote
+                          ? Theme.of(context).primaryColor
+                          : Theme.of(context).colorScheme.outline,
+                      size: 22,
+                    ),
+                    onPressed: currentBlock != null
+                        ? () => _showNotesDialog(currentBlock)
+                        : null,
+                  ),
+                  if (hasNote)
+                    Positioned(
+                      right: 8,
+                      top: 8,
+                      child: Container(
+                        width: 8,
+                        height: 8,
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).primaryColor,
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.white, width: 1.5),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+
+              IconButton(
+                icon: const Icon(LucideIcons.ellipsisVertical, size: 22),
+                onPressed: workout != null
+                    ? () => _showMoreMenu(currentBlock, workout)
+                    : null,
+              ),
+            ],
+          ),
         ),
       ),
     );

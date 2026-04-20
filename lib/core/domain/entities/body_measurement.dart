@@ -25,6 +25,8 @@ abstract class BodyMeasurement with _$BodyMeasurement {
     double? thighRight,
     double? calfLeft,
     double? calfRight,
+    double? height,
+    Map<String, double>? customValues,
     String? notes,
   }) = _BodyMeasurement;
 

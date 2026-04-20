@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:ai_gym_mentor/services/github_exercise_service.dart';
+import 'package:ai_gym_mentor/features/exercise_database/presentation/widgets/exercise_media_widget.dart';
 
 class GithubExerciseCard extends StatelessWidget {
   final GithubExercise exercise;
@@ -32,11 +33,12 @@ class GithubExerciseCard extends StatelessWidget {
                   topLeft: Radius.circular(12),
                   topRight: Radius.circular(12),
                 ),
-                child: CachedNetworkImage(
-                  imageUrl: exercise.gifUrl,
+                child: ExerciseMediaWidget(
+                  animatedUrl: exercise.gifUrl,
                   fit: BoxFit.cover,
-                  placeholder: (context, url) => _buildShimmerPlaceholder(),
-                  errorWidget: (context, url, error) => _buildErrorWidget(),
+                  isTappable: true,
+                  exerciseName: exercise.name,
+                  showDecoration: false,
                 ),
               ),
             ),

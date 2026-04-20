@@ -12,23 +12,26 @@ part of 'muscle_recovery_provider.dart';
 @ProviderFor(muscleRecovery)
 final muscleRecoveryProvider = MuscleRecoveryProvider._();
 
-final class MuscleRecoveryProvider extends $FunctionalProvider<
-        AsyncValue<Map<String, double>>,
-        Map<String, double>,
-        FutureOr<Map<String, double>>>
+final class MuscleRecoveryProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<Map<String, double>>,
+          Map<String, double>,
+          FutureOr<Map<String, double>>
+        >
     with
         $FutureModifier<Map<String, double>>,
         $FutureProvider<Map<String, double>> {
   MuscleRecoveryProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'muscleRecoveryProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'muscleRecoveryProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$muscleRecoveryHash();
@@ -36,8 +39,8 @@ final class MuscleRecoveryProvider extends $FunctionalProvider<
   @$internal
   @override
   $FutureProviderElement<Map<String, double>> $createElement(
-          $ProviderPointer pointer) =>
-      $FutureProviderElement(pointer);
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
 
   @override
   FutureOr<Map<String, double>> create(Ref ref) {
@@ -45,4 +48,4 @@ final class MuscleRecoveryProvider extends $FunctionalProvider<
   }
 }
 
-String _$muscleRecoveryHash() => r'8d917b9da75c49229f760c4ad52cd0c340bc7495';
+String _$muscleRecoveryHash() => r'b99fff22fb2e2e54ea745e5f4c9d6c3846e78999';

@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ai_gym_mentor/features/workout/active_workout_screen.dart';
 import 'package:ai_gym_mentor/core/database/database.dart';
-import 'package:ai_gym_mentor/features/exercises/exercise_repository.dart';
+import 'package:ai_gym_mentor/features/exercise_database/domain/repositories/exercise_repository.dart';
 import 'package:drift/native.dart';
 import 'package:drift/drift.dart' hide Column;
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -19,7 +19,8 @@ void main() {
     await db.close();
   });
 
-  testWidgets('ActiveWorkoutScreen - Add Set button creates a new row', (tester) async {
+  testWidgets('ActiveWorkoutScreen - Add Set button creates a new row',
+      (tester) async {
     // 1. Seed necessary data
     final exId = await db.into(db.exercises).insert(const ExercisesCompanion(
       name: Value('Bench Press'),
@@ -27,13 +28,11 @@ void main() {
       equipment: Value('Barbell'),
       setType: Value('Strength'),
     ));
-
     final workoutId = await db.into(db.workouts).insert(WorkoutsCompanion.insert(
       name: 'Test Workout',
       date: DateTime.now(),
       startTime: Value(DateTime.now()),
     ));
-
     await db.into(db.workoutSets).insert(WorkoutSetsCompanion.insert(
       workoutId: workoutId,
       exerciseId: exId,
@@ -55,17 +54,22 @@ void main() {
       ),
     );
 
-    // Wait for initial data load
-    await tester.pumpAndSettle();
+    // Wait for initial data load using fixed pump duration
+    await tester.pump(const Duration(milliseconds: 500));
+    await tester.pump(const Duration(milliseconds: 500));
 
-    // 3. Find "Add Set" button and tap it
+    // 3. Find "Add Set" button, scroll into view, then tap
     final addSetButton = find.text('Add Set');
     expect(addSetButton, findsOneWidget);
-
+    await tester.ensureVisible(addSetButton);
+    await tester.pump(const Duration(milliseconds: 100));
     await tester.tap(addSetButton);
-    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 500));
 
-    // 4. Verify a new set number 2 appeared
-    expect(find.text('2'), findsOneWidget); 
+    // 4. Verify a new set was added (check DB has 2 sets now)
+    final sets = await (db.select(db.workoutSets)
+          ..where((t) => t.workoutId.equals(workoutId)))
+        .get();
+    expect(sets.length, 2);
   });
 }

@@ -15,15 +15,15 @@ final exerciseFilterStateProvider = ExerciseFilterStateProvider._();
 final class ExerciseFilterStateProvider
     extends $NotifierProvider<ExerciseFilterState, ExerciseFilter> {
   ExerciseFilterStateProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'exerciseFilterStateProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'exerciseFilterStateProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$exerciseFilterStateHash();
@@ -50,11 +50,14 @@ abstract class _$ExerciseFilterState extends $Notifier<ExerciseFilter> {
   @override
   void runBuild() {
     final ref = this.ref as $Ref<ExerciseFilter, ExerciseFilter>;
-    final element = ref.element as $ClassProviderElement<
-        AnyNotifier<ExerciseFilter, ExerciseFilter>,
-        ExerciseFilter,
-        Object?,
-        Object?>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<ExerciseFilter, ExerciseFilter>,
+              ExerciseFilter,
+              Object?,
+              Object?
+            >;
     element.handleCreate(ref, build);
   }
 }
@@ -65,15 +68,15 @@ final exerciseListProvider = ExerciseListProvider._();
 final class ExerciseListProvider
     extends $AsyncNotifierProvider<ExerciseList, List<ExerciseEntity>> {
   ExerciseListProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'exerciseListProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'exerciseListProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$exerciseListHash();
@@ -90,13 +93,20 @@ abstract class _$ExerciseList extends $AsyncNotifier<List<ExerciseEntity>> {
   @$mustCallSuper
   @override
   void runBuild() {
-    final ref = this.ref
-        as $Ref<AsyncValue<List<ExerciseEntity>>, List<ExerciseEntity>>;
-    final element = ref.element as $ClassProviderElement<
-        AnyNotifier<AsyncValue<List<ExerciseEntity>>, List<ExerciseEntity>>,
-        AsyncValue<List<ExerciseEntity>>,
-        Object?,
-        Object?>;
+    final ref =
+        this.ref
+            as $Ref<AsyncValue<List<ExerciseEntity>>, List<ExerciseEntity>>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<
+                AsyncValue<List<ExerciseEntity>>,
+                List<ExerciseEntity>
+              >,
+              AsyncValue<List<ExerciseEntity>>,
+              Object?,
+              Object?
+            >;
     element.handleCreate(ref, build);
   }
 }
@@ -104,22 +114,26 @@ abstract class _$ExerciseList extends $AsyncNotifier<List<ExerciseEntity>> {
 @ProviderFor(relatedExercises)
 final relatedExercisesProvider = RelatedExercisesFamily._();
 
-final class RelatedExercisesProvider extends $FunctionalProvider<
-        AsyncValue<List<ExerciseEntity>>,
-        List<ExerciseEntity>,
-        FutureOr<List<ExerciseEntity>>>
+final class RelatedExercisesProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<ExerciseEntity>>,
+          List<ExerciseEntity>,
+          FutureOr<List<ExerciseEntity>>
+        >
     with
         $FutureModifier<List<ExerciseEntity>>,
         $FutureProvider<List<ExerciseEntity>> {
-  RelatedExercisesProvider._(
-      {required RelatedExercisesFamily super.from, required int super.argument})
-      : super(
-          retry: null,
-          name: r'relatedExercisesProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+  RelatedExercisesProvider._({
+    required RelatedExercisesFamily super.from,
+    required int super.argument,
+  }) : super(
+         retry: null,
+         name: r'relatedExercisesProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
 
   @override
   String debugGetCreateSourceHash() => _$relatedExercisesHash();
@@ -134,16 +148,13 @@ final class RelatedExercisesProvider extends $FunctionalProvider<
   @$internal
   @override
   $FutureProviderElement<List<ExerciseEntity>> $createElement(
-          $ProviderPointer pointer) =>
-      $FutureProviderElement(pointer);
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
 
   @override
   FutureOr<List<ExerciseEntity>> create(Ref ref) {
     final argument = this.argument as int;
-    return relatedExercises(
-      ref,
-      argument,
-    );
+    return relatedExercises(ref, argument);
   }
 
   @override
@@ -162,17 +173,15 @@ String _$relatedExercisesHash() => r'0b7f6ea7a699f5de1819ce3b574d15b0a2622e1c';
 final class RelatedExercisesFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<List<ExerciseEntity>>, int> {
   RelatedExercisesFamily._()
-      : super(
-          retry: null,
-          name: r'relatedExercisesProvider',
-          dependencies: null,
-          $allTransitiveDependencies: null,
-          isAutoDispose: true,
-        );
+    : super(
+        retry: null,
+        name: r'relatedExercisesProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
 
-  RelatedExercisesProvider call(
-    int exerciseId,
-  ) =>
+  RelatedExercisesProvider call(int exerciseId) =>
       RelatedExercisesProvider._(argument: exerciseId, from: this);
 
   @override
@@ -182,22 +191,26 @@ final class RelatedExercisesFamily extends $Family
 @ProviderFor(progressionChain)
 final progressionChainProvider = ProgressionChainFamily._();
 
-final class ProgressionChainProvider extends $FunctionalProvider<
-        AsyncValue<List<ExerciseEntity>>,
-        List<ExerciseEntity>,
-        FutureOr<List<ExerciseEntity>>>
+final class ProgressionChainProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<ExerciseEntity>>,
+          List<ExerciseEntity>,
+          FutureOr<List<ExerciseEntity>>
+        >
     with
         $FutureModifier<List<ExerciseEntity>>,
         $FutureProvider<List<ExerciseEntity>> {
-  ProgressionChainProvider._(
-      {required ProgressionChainFamily super.from, required int super.argument})
-      : super(
-          retry: null,
-          name: r'progressionChainProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+  ProgressionChainProvider._({
+    required ProgressionChainFamily super.from,
+    required int super.argument,
+  }) : super(
+         retry: null,
+         name: r'progressionChainProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
 
   @override
   String debugGetCreateSourceHash() => _$progressionChainHash();
@@ -212,16 +225,13 @@ final class ProgressionChainProvider extends $FunctionalProvider<
   @$internal
   @override
   $FutureProviderElement<List<ExerciseEntity>> $createElement(
-          $ProviderPointer pointer) =>
-      $FutureProviderElement(pointer);
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
 
   @override
   FutureOr<List<ExerciseEntity>> create(Ref ref) {
     final argument = this.argument as int;
-    return progressionChain(
-      ref,
-      argument,
-    );
+    return progressionChain(ref, argument);
   }
 
   @override
@@ -240,17 +250,15 @@ String _$progressionChainHash() => r'8c84e4dc1c7709371bc7cf9595bedd55619dbfa5';
 final class ProgressionChainFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<List<ExerciseEntity>>, int> {
   ProgressionChainFamily._()
-      : super(
-          retry: null,
-          name: r'progressionChainProvider',
-          dependencies: null,
-          $allTransitiveDependencies: null,
-          isAutoDispose: true,
-        );
+    : super(
+        retry: null,
+        name: r'progressionChainProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
 
-  ProgressionChainProvider call(
-    int exerciseId,
-  ) =>
+  ProgressionChainProvider call(int exerciseId) =>
       ProgressionChainProvider._(argument: exerciseId, from: this);
 
   @override
@@ -262,15 +270,16 @@ final favoriteToggleProvider = FavoriteToggleFamily._();
 
 final class FavoriteToggleProvider
     extends $AsyncNotifierProvider<FavoriteToggle, void> {
-  FavoriteToggleProvider._(
-      {required FavoriteToggleFamily super.from, required int super.argument})
-      : super(
-          retry: null,
-          name: r'favoriteToggleProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+  FavoriteToggleProvider._({
+    required FavoriteToggleFamily super.from,
+    required int super.argument,
+  }) : super(
+         retry: null,
+         name: r'favoriteToggleProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
 
   @override
   String debugGetCreateSourceHash() => _$favoriteToggleHash();
@@ -301,20 +310,23 @@ String _$favoriteToggleHash() => r'9231399d769e2508085c84429b772053e76b0b66';
 
 final class FavoriteToggleFamily extends $Family
     with
-        $ClassFamilyOverride<FavoriteToggle, AsyncValue<void>, void,
-            FutureOr<void>, int> {
+        $ClassFamilyOverride<
+          FavoriteToggle,
+          AsyncValue<void>,
+          void,
+          FutureOr<void>,
+          int
+        > {
   FavoriteToggleFamily._()
-      : super(
-          retry: null,
-          name: r'favoriteToggleProvider',
-          dependencies: null,
-          $allTransitiveDependencies: null,
-          isAutoDispose: true,
-        );
+    : super(
+        retry: null,
+        name: r'favoriteToggleProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
 
-  FavoriteToggleProvider call(
-    int exerciseId,
-  ) =>
+  FavoriteToggleProvider call(int exerciseId) =>
       FavoriteToggleProvider._(argument: exerciseId, from: this);
 
   @override
@@ -325,46 +337,46 @@ abstract class _$FavoriteToggle extends $AsyncNotifier<void> {
   late final _$args = ref.$arg as int;
   int get exerciseId => _$args;
 
-  FutureOr<void> build(
-    int exerciseId,
-  );
+  FutureOr<void> build(int exerciseId);
   @$mustCallSuper
   @override
   void runBuild() {
     final ref = this.ref as $Ref<AsyncValue<void>, void>;
-    final element = ref.element as $ClassProviderElement<
-        AnyNotifier<AsyncValue<void>, void>,
-        AsyncValue<void>,
-        Object?,
-        Object?>;
-    element.handleCreate(
-        ref,
-        () => build(
-              _$args,
-            ));
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<AsyncValue<void>, void>,
+              AsyncValue<void>,
+              Object?,
+              Object?
+            >;
+    element.handleCreate(ref, () => build(_$args));
   }
 }
 
 @ProviderFor(allExercises)
 final allExercisesProvider = AllExercisesProvider._();
 
-final class AllExercisesProvider extends $FunctionalProvider<
-        AsyncValue<List<ExerciseEntity>>,
-        List<ExerciseEntity>,
-        FutureOr<List<ExerciseEntity>>>
+final class AllExercisesProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<ExerciseEntity>>,
+          List<ExerciseEntity>,
+          FutureOr<List<ExerciseEntity>>
+        >
     with
         $FutureModifier<List<ExerciseEntity>>,
         $FutureProvider<List<ExerciseEntity>> {
   AllExercisesProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'allExercisesProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'allExercisesProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$allExercisesHash();
@@ -372,8 +384,8 @@ final class AllExercisesProvider extends $FunctionalProvider<
   @$internal
   @override
   $FutureProviderElement<List<ExerciseEntity>> $createElement(
-          $ProviderPointer pointer) =>
-      $FutureProviderElement(pointer);
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
 
   @override
   FutureOr<List<ExerciseEntity>> create(Ref ref) {
@@ -386,23 +398,26 @@ String _$allExercisesHash() => r'8a0630411988eb9ada499861829028912caa9ca5';
 @ProviderFor(searchSuggestions)
 final searchSuggestionsProvider = SearchSuggestionsFamily._();
 
-final class SearchSuggestionsProvider extends $FunctionalProvider<
-        AsyncValue<List<ExerciseEntity>>,
-        List<ExerciseEntity>,
-        FutureOr<List<ExerciseEntity>>>
+final class SearchSuggestionsProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<ExerciseEntity>>,
+          List<ExerciseEntity>,
+          FutureOr<List<ExerciseEntity>>
+        >
     with
         $FutureModifier<List<ExerciseEntity>>,
         $FutureProvider<List<ExerciseEntity>> {
-  SearchSuggestionsProvider._(
-      {required SearchSuggestionsFamily super.from,
-      required String super.argument})
-      : super(
-          retry: null,
-          name: r'searchSuggestionsProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+  SearchSuggestionsProvider._({
+    required SearchSuggestionsFamily super.from,
+    required String super.argument,
+  }) : super(
+         retry: null,
+         name: r'searchSuggestionsProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
 
   @override
   String debugGetCreateSourceHash() => _$searchSuggestionsHash();
@@ -417,16 +432,13 @@ final class SearchSuggestionsProvider extends $FunctionalProvider<
   @$internal
   @override
   $FutureProviderElement<List<ExerciseEntity>> $createElement(
-          $ProviderPointer pointer) =>
-      $FutureProviderElement(pointer);
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
 
   @override
   FutureOr<List<ExerciseEntity>> create(Ref ref) {
     final argument = this.argument as String;
-    return searchSuggestions(
-      ref,
-      argument,
-    );
+    return searchSuggestions(ref, argument);
   }
 
   @override
@@ -445,17 +457,15 @@ String _$searchSuggestionsHash() => r'0172dc89113bb0d075511300572663a3e59350a8';
 final class SearchSuggestionsFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<List<ExerciseEntity>>, String> {
   SearchSuggestionsFamily._()
-      : super(
-          retry: null,
-          name: r'searchSuggestionsProvider',
-          dependencies: null,
-          $allTransitiveDependencies: null,
-          isAutoDispose: true,
-        );
+    : super(
+        retry: null,
+        name: r'searchSuggestionsProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
 
-  SearchSuggestionsProvider call(
-    String query,
-  ) =>
+  SearchSuggestionsProvider call(String query) =>
       SearchSuggestionsProvider._(argument: query, from: this);
 
   @override

@@ -25,6 +25,10 @@ _BodyMeasurement _$BodyMeasurementFromJson(Map<String, dynamic> json) =>
       thighRight: (json['thighRight'] as num?)?.toDouble(),
       calfLeft: (json['calfLeft'] as num?)?.toDouble(),
       calfRight: (json['calfRight'] as num?)?.toDouble(),
+      height: (json['height'] as num?)?.toDouble(),
+      customValues: (json['customValues'] as Map<String, dynamic>?)?.map(
+        (k, e) => MapEntry(k, (e as num).toDouble()),
+      ),
       notes: json['notes'] as String?,
     );
 
@@ -47,5 +51,7 @@ Map<String, dynamic> _$BodyMeasurementToJson(_BodyMeasurement instance) =>
       'thighRight': instance.thighRight,
       'calfLeft': instance.calfLeft,
       'calfRight': instance.calfRight,
+      'height': instance.height,
+      'customValues': instance.customValues,
       'notes': instance.notes,
     };

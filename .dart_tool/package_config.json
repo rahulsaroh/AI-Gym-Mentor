@@ -1370,6 +1370,18 @@
       "languageVersion": "3.5"
     },
     {
+      "name": "watch_connectivity",
+      "rootUri": "file:///C:/Users/rahul/AppData/Local/Pub/Cache/hosted/pub.dev/watch_connectivity-0.2.8",
+      "packageUri": "lib/",
+      "languageVersion": "2.15"
+    },
+    {
+      "name": "watch_connectivity_platform_interface",
+      "rootUri": "file:///C:/Users/rahul/AppData/Local/Pub/Cache/hosted/pub.dev/watch_connectivity_platform_interface-0.4.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.17"
+    },
+    {
       "name": "watcher",
       "rootUri": "file:///C:/Users/rahul/AppData/Local/Pub/Cache/hosted/pub.dev/watcher-1.2.1",
       "packageUri": "lib/",
@@ -1457,7 +1469,7 @@
       "name": "ai_gym_mentor",
       "rootUri": "../",
       "packageUri": "lib/",
-      "languageVersion": "3.3"
+      "languageVersion": "3.8"
     }
   ],
   "generator": "pub",

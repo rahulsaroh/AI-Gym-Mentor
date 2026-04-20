@@ -31,13 +31,25 @@ class _ChartContent extends StatelessWidget {
   Widget build(BuildContext context) {
     if (data.isEmpty) return const Center(child: Text('Not enough data yet.'));
 
-    // Dual axis means we need to normalize or use fl_chart's built-in scaling
-    // We'll normalize volume to weight range for display overlay
-    final maxVolume = data.map((e) => e['volume'] as double).reduce((a, b) => a > b ? a : b);
-    final maxWeight = data.map((e) => e['weight'] as double).reduce((a, b) => a > b ? a : b);
-    
-    // Scale volume to weight range roughly (0 to maxWeight)
-    final volumeScale = maxVolume > 0 ? (maxWeight > 0 ? maxWeight / maxVolume : 1.0) : 1.0;
+    // Convert volume from KG to Tons for display
+    final dataWithTons = data
+        .map((e) => {
+              'date': e['date'],
+              'volume': (e['volume'] as double) / 1000, // Convert kg to tons
+              'weight': e['weight'] as double,
+            })
+        .toList();
+
+    final maxVolume = dataWithTons
+        .map((e) => e['volume'] as double)
+        .reduce((a, b) => a > b ? a : b);
+    final maxWeight = dataWithTons
+        .map((e) => e['weight'] as double)
+        .reduce((a, b) => a > b ? a : b);
+
+    // Scale volume to weight range for display overlay
+    final volumeScale =
+        maxVolume > 0 && maxWeight > 0 ? maxWeight / maxVolume : 1.0;
 
     return Container(
       height: 250,
@@ -48,25 +60,29 @@ class _ChartContent extends StatelessWidget {
             child: LineChart(
               LineChartData(
                 lineBarsData: [
-                  // Volume Bar (Primary Axis - Scale for overlay)
+                  // Volume Line (Scaled to match weight range)
                   LineChartBarData(
-                    spots: data.asMap().entries.map((e) {
-                      return FlSpot(e.key.toDouble(), (e.value['volume'] as double) * volumeScale);
+                    spots: dataWithTons.asMap().entries.map((e) {
+                      return FlSpot(e.key.toDouble(),
+                          (e.value['volume'] as double) * volumeScale);
                     }).toList(),
                     isCurved: true,
-                    color: Theme.of(context).primaryColor.withOpacity(0.5),
+                    color:
+                        Theme.of(context).primaryColor.withValues(alpha: 0.5),
                     barWidth: 2,
                     isStrokeCapRound: true,
                     dotData: const FlDotData(show: false),
                     belowBarData: BarAreaData(
                       show: true,
-                      color: Theme.of(context).primaryColor.withOpacity(0.1),
+                      color:
+                          Theme.of(context).primaryColor.withValues(alpha: 0.1),
                     ),
                   ),
-                  // Weight Bar (Secondary Axis)
+                  // Weight Line
                   LineChartBarData(
-                    spots: data.asMap().entries.map((e) {
-                      return FlSpot(e.key.toDouble(), e.value['weight'] as double);
+                    spots: dataWithTons.asMap().entries.map((e) {
+                      return FlSpot(
+                          e.key.toDouble(), e.value['weight'] as double);
                     }).toList(),
                     isCurved: true,
                     color: Colors.orange,
@@ -82,7 +98,8 @@ class _ChartContent extends StatelessWidget {
                       reservedSize: 40,
                       getTitlesWidget: (val, meta) => Text(
                         '${val.toInt()}',
-                        style: const TextStyle(fontSize: 10, color: Colors.grey),
+                        style:
+                            const TextStyle(fontSize: 10, color: Colors.grey),
                       ),
                     ),
                   ),
@@ -91,22 +108,34 @@ class _ChartContent extends StatelessWidget {
                       showTitles: true,
                       reservedSize: 40,
                       getTitlesWidget: (val, meta) {
-                        final volVal = maxWeight > 0 ? (val / volumeScale) / 1000 : 0.0;
+                        final volVal =
+                            maxWeight > 0 ? (val / volumeScale) : 0.0;
                         return Text(
                           '${volVal.toStringAsFixed(1)}T',
-                          style: TextStyle(fontSize: 10, color: Theme.of(context).primaryColor.withOpacity(0.5)),
+                          style: TextStyle(
+                              fontSize: 10,
+                              color: Theme.of(context)
+                                  .primaryColor
+                                  .withValues(alpha: 0.5)),
                         );
                       },
                     ),
                   ),
-                  topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  topTitles: const AxisTitles(
+                      sideTitles: SideTitles(showTitles: false)),
                   bottomTitles: AxisTitles(
                     sideTitles: SideTitles(
                       showTitles: true,
                       getTitlesWidget: (val, meta) {
-                        if (val.toInt() >= data.length || val.toInt() % 4 != 0) return const SizedBox.shrink();
+                        if (val.toInt() >= data.length ||
+                            val.toInt() % 4 != 0) {
+                          return const SizedBox.shrink();
+                        }
                         final d = data[val.toInt()]['date'] as DateTime;
-                        return Text(DateFormat('MM/dd').format(d), style: const TextStyle(fontSize: 10));
+                        return Text(
+                          DateFormat('MM/dd').format(d),
+                          style: const TextStyle(fontSize: 10),
+                        );
                       },
                     ),
                   ),
@@ -120,9 +149,14 @@ class _ChartContent extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              _LegendItem(label: 'Body Weight (${unit == WeightUnit.kg ? 'kg' : 'lbs'})', color: Colors.orange),
+              _LegendItem(
+                  label:
+                      'Body Weight (${unit == WeightUnit.kg ? 'kg' : 'lbs'})',
+                  color: Colors.orange),
               const SizedBox(width: 24),
-              _LegendItem(label: 'Weekly Volume (Tons)', color: Theme.of(context).primaryColor),
+              _LegendItem(
+                  label: 'Weekly Volume (Tons)',
+                  color: Theme.of(context).primaryColor),
             ],
           ),
         ],
@@ -140,7 +174,10 @@ class _LegendItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Container(width: 10, height: 10, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
+        Container(
+            width: 10,
+            height: 10,
+            decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
         const SizedBox(width: 8),
         Text(label, style: const TextStyle(fontSize: 10, color: Colors.grey)),
       ],

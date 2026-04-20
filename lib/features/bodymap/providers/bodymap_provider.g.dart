@@ -15,15 +15,15 @@ final bodymapModeProvider = BodymapModeProvider._();
 final class BodymapModeProvider
     extends $NotifierProvider<BodymapMode, BodyMapMode> {
   BodymapModeProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'bodymapModeProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'bodymapModeProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$bodymapModeHash();
@@ -49,8 +49,14 @@ abstract class _$BodymapMode extends $Notifier<BodyMapMode> {
   @override
   void runBuild() {
     final ref = this.ref as $Ref<BodyMapMode, BodyMapMode>;
-    final element = ref.element as $ClassProviderElement<
-        AnyNotifier<BodyMapMode, BodyMapMode>, BodyMapMode, Object?, Object?>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<BodyMapMode, BodyMapMode>,
+              BodyMapMode,
+              Object?,
+              Object?
+            >;
     element.handleCreate(ref, build);
   }
 }

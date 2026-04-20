@@ -1,6 +1,8 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:drift/drift.dart' hide Column;
 import 'package:ai_gym_mentor/core/database/database.dart';
 import 'package:ai_gym_mentor/core/services/doms_service.dart';
+import 'package:drift/drift.dart';
 
 part 'muscle_recovery_provider.g.dart';
 
@@ -23,7 +25,7 @@ Future<Map<String, double>> muscleRecovery(Ref ref) async {
   for (var row in sets) {
     final workout = row.readTable(db.workouts);
     final exercise = row.readTable(db.exercises);
-    final muscles = exercise.primaryMuscles.split(',');
+    final muscles = exercise.primaryMuscle.split(',');
 
     for (var muscle in muscles) {
       final name = muscle.trim();

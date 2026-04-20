@@ -6,6 +6,8 @@ enum ExperienceLevel { beginner, intermediate, advanced }
 
 enum FontSize { normal, large }
 
+enum OneRmFormula { epley, brzycki }
+
 class SettingsState {
   final String userName;
   final ExperienceLevel experienceLevel;
@@ -37,6 +39,8 @@ class SettingsState {
   final String? googleDriveEmail;
   final DateTime? lastSynced;
   final DateTime? lastDriveBackup;
+  final OneRmFormula oneRmFormula;
+  final String? geminiApiKey;
 
   const SettingsState({
     this.userName = 'Alex',
@@ -71,6 +75,8 @@ class SettingsState {
     this.googleDriveEmail,
     this.lastSynced,
     this.lastDriveBackup,
+    this.oneRmFormula = OneRmFormula.epley,
+    this.geminiApiKey,
   });
 
   SettingsState copyWith({
@@ -98,6 +104,8 @@ class SettingsState {
     String? googleDriveEmail,
     DateTime? lastSynced,
     DateTime? lastDriveBackup,
+    OneRmFormula? oneRmFormula,
+    String? geminiApiKey,
   }) {
     return SettingsState(
       userName: userName ?? this.userName,
@@ -125,6 +133,8 @@ class SettingsState {
       googleDriveEmail: googleDriveEmail ?? this.googleDriveEmail,
       lastSynced: lastSynced ?? this.lastSynced,
       lastDriveBackup: lastDriveBackup ?? this.lastDriveBackup,
+      oneRmFormula: oneRmFormula ?? this.oneRmFormula,
+      geminiApiKey: geminiApiKey ?? this.geminiApiKey,
     );
   }
 }
