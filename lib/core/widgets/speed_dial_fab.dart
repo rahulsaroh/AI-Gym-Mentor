@@ -127,7 +127,7 @@ class _SpeedDialFabState extends State<SpeedDialFab>
             })
             .toList()
             .reversed
-            .toList(),
+            ,
 
         // Main FAB
         GestureDetector(
@@ -148,7 +148,7 @@ class _SpeedDialFabState extends State<SpeedDialFab>
                 Theme.of(context).colorScheme.onPrimary,
             child: AnimatedBuilder(
               animation: _controller,
-              builder: (_, __) => Transform.rotate(
+              builder: (_, _) => Transform.rotate(
                 angle: _controller.value * 0.785398, // 45 degrees in radians
                 child: Icon(widget.icon),
               ),

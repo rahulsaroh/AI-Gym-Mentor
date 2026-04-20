@@ -285,11 +285,11 @@ class _TargetProgressHeader extends ConsumerWidget {
             );
           },
           loading: () => const SizedBox.shrink(),
-          error: (_, __) => const SizedBox.shrink(),
+          error: (_, _) => const SizedBox.shrink(),
         );
       },
       loading: () => const SizedBox.shrink(),
-      error: (_, __) => const SizedBox.shrink(),
+      error: (_, _) => const SizedBox.shrink(),
     );
   }
 
@@ -321,8 +321,7 @@ class _TargetTile extends ConsumerWidget {
       margin: const EdgeInsets.only(bottom: 12),
       child: ListTile(
         title: Text('${bodyTarget.metric.toUpperCase()} Target: ${bodyTarget.targetValue}', style: const TextStyle(fontWeight: FontWeight.bold)),
-        subtitle: Text('Set on ${DateFormat('MMM d, yyyy').format(bodyTarget.createdAt)}' + 
-            (bodyTarget.deadline != null ? ' â€¢ Deadline: ${DateFormat('MMM d').format(bodyTarget.deadline!)}' : '')),
+        subtitle: Text('Set on ${DateFormat('MMM d, yyyy').format(bodyTarget.createdAt)}${bodyTarget.deadline != null ? ' â€¢ Deadline: ${DateFormat('MMM d').format(bodyTarget.deadline!)}' : ''}'),
         trailing: IconButton(
           icon: const Icon(LucideIcons.trash2, size: 18, color: Colors.grey),
           onPressed: () => ref.read(bodyTargetsListProvider.notifier).deleteTarget(bodyTarget.id),
@@ -572,7 +571,7 @@ class _MetricChart extends StatelessWidget {
         final targetValue = targetsAsync.when(
           data: (targets) => targets.where((t) => t.metric == metric).firstOrNull?.targetValue,
           loading: () => null,
-          error: (_, __) => null,
+          error: (_, _) => null,
         );
 
         return Container(
@@ -753,7 +752,7 @@ class _MeasurementTile extends ConsumerWidget {
         child: const Icon(LucideIcons.trash2, color: Colors.white),
       ),
       onDismissed: (_) {
-        ref.read(bodyMeasurementsListProvider.notifier).deleteMeasurement(measurement.id!);
+        ref.read(bodyMeasurementsListProvider.notifier).deleteMeasurement(measurement.id);
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Measurement deleted')));
       },
       child: Padding(

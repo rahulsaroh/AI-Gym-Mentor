@@ -3,7 +3,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:ai_gym_mentor/main.dart' as app;
 import 'package:lucide_icons_flutter/lucide_icons.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();

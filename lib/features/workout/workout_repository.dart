@@ -490,9 +490,7 @@ class WorkoutRepository {
           .getSingleOrNull();
     }
 
-    if (template == null) {
-      template = await (_db.select(_db.workoutTemplates)..limit(1)).getSingleOrNull();
-    }
+    template ??= await (_db.select(_db.workoutTemplates)..limit(1)).getSingleOrNull();
 
     if (template == null) return null;
 

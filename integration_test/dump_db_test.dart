@@ -1,8 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
-import 'package:ai_gym_mentor/core/database/database.dart';
 import 'package:ai_gym_mentor/main.dart' as app;
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();

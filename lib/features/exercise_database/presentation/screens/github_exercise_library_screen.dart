@@ -9,7 +9,7 @@ import 'package:ai_gym_mentor/features/exercise_database/presentation/providers/
 import 'package:ai_gym_mentor/services/github_exercise_service.dart';
 
 class GithubExerciseLibraryScreen extends ConsumerStatefulWidget {
-  const GithubExerciseLibraryScreen({Key? key}) : super(key: key);
+  const GithubExerciseLibraryScreen({super.key});
 
   @override
   ConsumerState<GithubExerciseLibraryScreen> createState() =>

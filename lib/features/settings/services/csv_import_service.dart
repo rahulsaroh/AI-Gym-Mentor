@@ -1,9 +1,4 @@
-import 'dart:convert';
 import 'package:csv/csv.dart';
-import 'package:drift/drift.dart';
-import 'package:ai_gym_mentor/core/database/database.dart';
-import 'package:ai_gym_mentor/core/utils/weight_converter.dart';
-import 'package:ai_gym_mentor/features/settings/models/settings_state.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:intl/intl.dart';
 
@@ -44,8 +39,9 @@ class CsvImportService extends _$CsvImportService {
 
     for (var h in headers) {
       final l = h.toLowerCase();
-      if (l.contains('date')) mapping[h] = 'date';
-      else if (l.contains('exercise')) mapping[h] = 'exercise';
+      if (l.contains('date')) {
+        mapping[h] = 'date';
+      } else if (l.contains('exercise')) mapping[h] = 'exercise';
       else if (l.contains('weight')) mapping[h] = 'weight';
       else if (l.contains('reps')) mapping[h] = 'reps';
       else if (l.contains('set') && !l.contains('type')) mapping[h] = 'set_number';

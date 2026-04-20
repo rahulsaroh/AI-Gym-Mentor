@@ -4,7 +4,6 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ai_gym_mentor/features/exercise_database/domain/entities/exercise_entity.dart' as entity;
 import 'package:ai_gym_mentor/features/exercise_database/presentation/widgets/exercise_media_widget.dart';
-import 'package:ai_gym_mentor/features/workout/models/workout_models.dart';
 
 class ExerciseHeaderCard extends StatelessWidget {
   final entity.ExerciseEntity exercise;

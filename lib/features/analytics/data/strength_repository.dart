@@ -50,7 +50,9 @@ class StrengthRepository {
           reps: s.reps, 
           exerciseSetType: ex.setType, 
           exerciseCategory: ex.category
-        )) continue;
+        )) {
+          continue;
+        }
 
         final rm = OneRmService.calculate(
           weight: s.weight, 

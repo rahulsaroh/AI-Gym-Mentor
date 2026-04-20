@@ -1,9 +1,6 @@
 import 'package:flutter/foundation.dart';
-import 'package:drift/drift.dart' hide JsonKey;
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:ai_gym_mentor/core/database/database.dart';
 import 'package:ai_gym_mentor/core/domain/entities/body_measurement.dart';
-import 'package:ai_gym_mentor/core/domain/entities/workout_program.dart';
 import 'package:ai_gym_mentor/core/domain/entities/workout_session.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:ai_gym_mentor/features/workout/workout_repository.dart';

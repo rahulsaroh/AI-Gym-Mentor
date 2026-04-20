@@ -61,7 +61,7 @@ class BeginSessionSheet extends ConsumerWidget {
               return const SizedBox.shrink();
             },
             loading: () => const SizedBox.shrink(),
-            error: (_, __) => const SizedBox.shrink(),
+            error: (_, _) => const SizedBox.shrink(),
           ),
 
           const SizedBox(height: 16),
@@ -87,7 +87,7 @@ class BeginSessionSheet extends ConsumerWidget {
                 return ListView.separated(
                   scrollDirection: Axis.horizontal,
                   itemCount: templates.length,
-                  separatorBuilder: (_, __) => const SizedBox(width: 12),
+                  separatorBuilder: (_, _) => const SizedBox(width: 12),
                   itemBuilder: (context, index) => _ProgramCard(
                     template: templates[index],
                     onSelect: () =>

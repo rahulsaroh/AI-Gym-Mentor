@@ -26,7 +26,7 @@ class ExerciseList extends _$ExerciseList {
 
   @override
   Future<List<ExerciseEntity>> build() async {
-    ref.listen(exerciseFilterStateProvider, (_, __) {
+    ref.listen(exerciseFilterStateProvider, (_, _) {
       _resetAndReload();
     });
     return _fetchPage();

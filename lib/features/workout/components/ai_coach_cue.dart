@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ai_gym_mentor/features/exercise_database/data/datasources/gemini_service.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
-import 'package:ai_gym_mentor/core/database/database.dart';
 import 'package:ai_gym_mentor/features/workout/models/workout_models.dart';
 
 class AICoachCue extends ConsumerStatefulWidget {

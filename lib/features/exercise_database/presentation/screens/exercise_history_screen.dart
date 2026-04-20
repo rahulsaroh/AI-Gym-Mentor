@@ -35,7 +35,7 @@ class _ExerciseHistoryScreenState extends ConsumerState<ExerciseHistoryScreen> {
           data: (ex) =>
               Text(ex?.name ?? 'History'),
           loading: () => const Text('History'),
-          error: (_, __) => const Text('Error'),
+          error: (_, _) => const Text('Error'),
         ),
       ),
       body: CustomScrollView(
@@ -174,7 +174,7 @@ class _ExerciseHistoryScreenState extends ConsumerState<ExerciseHistoryScreen> {
                       );
                     },
                     loading: () => const SizedBox.shrink(),
-                    error: (_, __) => const SizedBox.shrink(),
+                    error: (_, _) => const SizedBox.shrink(),
                   ),
                   const SizedBox(height: 16),
                   SizedBox(
@@ -211,7 +211,7 @@ class _ExerciseHistoryScreenState extends ConsumerState<ExerciseHistoryScreen> {
                       (p['date'] as DateTime).year == (session['date'] as DateTime).year
                     ),
                     loading: () => false,
-                    error: (_, __) => false,
+                    error: (_, _) => false,
                   );
 
                   return _SessionCard(

@@ -1,7 +1,6 @@
 import 'package:drift/drift.dart';
 import 'package:ai_gym_mentor/core/database/database.dart';
 import 'package:ai_gym_mentor/features/workout/workout_repository.dart';
-import 'package:ai_gym_mentor/core/services/workout_logic_service.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'stats_repository.g.dart';

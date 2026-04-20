@@ -163,9 +163,9 @@ class _CsvExportScreenState extends ConsumerState<CsvExportScreen> {
               selected: isSelected,
               onSelected: (val) {
                 setState(() {
-                  if (val)
+                  if (val) {
                     _selectedColumns.add(col);
-                  else if (_selectedColumns.length > 1)
+                  } else if (_selectedColumns.length > 1)
                     _selectedColumns.remove(col);
                 });
               },
@@ -188,11 +188,13 @@ class _CsvExportScreenState extends ConsumerState<CsvExportScreen> {
     return FutureBuilder(
       future: _fetchPreviewData(),
       builder: (context, snapshot) {
-        if (!snapshot.hasData)
+        if (!snapshot.hasData) {
           return const Center(child: CircularProgressIndicator());
+        }
         final rows = snapshot.data as List<List<dynamic>>;
-        if (rows.isEmpty)
+        if (rows.isEmpty) {
           return const Center(child: Text('No data found for this range.'));
+        }
 
         return SingleChildScrollView(
           scrollDirection: Axis.horizontal,
@@ -300,9 +302,10 @@ class _CsvExportScreenState extends ConsumerState<CsvExportScreen> {
       await Share.shareXFiles([XFile(file.path)],
           subject: 'Workout Log Export');
     } catch (e) {
-      if (mounted)
+      if (mounted) {
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text('Export failed: $e')));
+      }
     } finally {
       if (mounted) setState(() => _isExporting = false);
     }

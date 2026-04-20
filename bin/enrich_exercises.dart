@@ -26,7 +26,7 @@ Future<void> main() async {
   // 2. Initialize Gemini
   GenerativeModel? model;
   if (!isMockMode) {
-    model = GenerativeModel(model: 'gemini-1.5-flash', apiKey: apiKey!);
+    model = GenerativeModel(model: 'gemini-1.5-flash', apiKey: apiKey);
   }
   
   // 3. Load Local Exercises

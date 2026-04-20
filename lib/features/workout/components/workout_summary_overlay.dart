@@ -202,7 +202,7 @@ class _WorkoutSummaryOverlayState extends ConsumerState<WorkoutSummaryOverlay>
                         child: Lottie.asset(
                           'assets/animations/trophy.json',
                           repeat: false,
-                          errorBuilder: (_, __, ___) => const Icon(
+                          errorBuilder: (_, _, _) => const Icon(
                               LucideIcons.trophy,
                               size: 60,
                               color: Color(0xFFFFD700)),

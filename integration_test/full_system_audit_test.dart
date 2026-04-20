@@ -4,7 +4,6 @@ import 'package:integration_test/integration_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ai_gym_mentor/main.dart' as app;
 import 'package:go_router/go_router.dart';
-import 'dart:io';
 
 void main() {
   final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();

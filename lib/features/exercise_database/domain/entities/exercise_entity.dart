@@ -1,4 +1,3 @@
-import 'dart:convert';
 
 class ExerciseEntity {
   final int id;

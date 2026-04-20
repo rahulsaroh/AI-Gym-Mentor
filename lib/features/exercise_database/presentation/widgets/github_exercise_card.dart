@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:ai_gym_mentor/services/github_exercise_service.dart';
 import 'package:ai_gym_mentor/features/exercise_database/presentation/widgets/exercise_media_widget.dart';
@@ -9,10 +8,10 @@ class GithubExerciseCard extends StatelessWidget {
   final VoidCallback onTap;
 
   const GithubExerciseCard({
-    Key? key,
+    super.key,
     required this.exercise,
     required this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

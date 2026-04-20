@@ -149,8 +149,9 @@ class ProgressionService extends _$ProgressionService {
       weight * (1 + reps / 40);
 
   Map<String, double> getAll1RMs(double weight, double reps) {
-    if (reps <= 0)
+    if (reps <= 0) {
       return {'Epley': 0, 'Brzycki': 0, 'Lombardi': 0, 'OConner': 0};
+    }
     return {
       'Epley': calculateEpley(weight, reps),
       'Brzycki': calculateBrzycki(weight, reps),

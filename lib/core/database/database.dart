@@ -1,12 +1,9 @@
 import 'dart:io';
-import 'dart:convert';
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart' show rootBundle;
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
-import 'package:ai_gym_mentor/core/database/initial_data.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import 'package:ai_gym_mentor/core/database/daos/bodymap_dao.dart';

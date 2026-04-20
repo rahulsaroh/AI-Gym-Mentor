@@ -96,8 +96,9 @@ class StatsTrendChart extends StatelessWidget {
               getTooltipItems: (touchedSpots) {
                 return touchedSpots.map((spot) {
                   String label = spot.y.toStringAsFixed(1);
-                  if (type == StatType.volume) label += ' Tons';
-                  else if (type == StatType.duration) label += ' min';
+                  if (type == StatType.volume) {
+                    label += ' Tons';
+                  } else if (type == StatType.duration) label += ' min';
                   else if (valueSuffix != null) label += valueSuffix!;
                   
                   return LineTooltipItem(

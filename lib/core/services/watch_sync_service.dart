@@ -1,4 +1,3 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:ai_gym_mentor/core/services/watch_service.dart';
 import 'package:ai_gym_mentor/features/workout/providers/timer_notifier.dart';

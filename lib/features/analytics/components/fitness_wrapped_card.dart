@@ -160,7 +160,7 @@ class _FitnessWrappedCardState extends ConsumerState<FitnessWrappedCard> {
         );
       },
       loading: () => const SizedBox(height: 350, child: Center(child: CircularProgressIndicator())),
-      error: (_, __) => const SizedBox.shrink(),
+      error: (_, _) => const SizedBox.shrink(),
     );
   }
 

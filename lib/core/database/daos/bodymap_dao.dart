@@ -5,7 +5,7 @@ part 'bodymap_dao.g.dart';
 
 @DriftAccessor(tables: [WorkoutSets, Workouts, Exercises, ExerciseMuscleMap])
 class BodyMapDao extends DatabaseAccessor<AppDatabase> with _$BodyMapDaoMixin {
-  BodyMapDao(AppDatabase db) : super(db);
+  BodyMapDao(super.db);
 
   Future<Map<String, double>> getMuscleVolumeLastSevenDays() async {
     final sevenDaysAgo = DateTime.now().subtract(const Duration(days: 7));

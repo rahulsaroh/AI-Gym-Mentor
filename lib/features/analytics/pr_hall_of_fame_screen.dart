@@ -67,7 +67,7 @@ class _PRHallOfFameScreenState extends ConsumerState<PRHallOfFameScreen> {
               loading: () => ListView.builder(
                 padding: const EdgeInsets.all(16),
                 itemCount: 8,
-                itemBuilder: (_, __) => const SkeletonCard(height: 80, margin: EdgeInsets.only(bottom: 12)),
+                itemBuilder: (_, _) => const SkeletonCard(height: 80, margin: EdgeInsets.only(bottom: 12)),
               ),
               error: (e, _) => Center(child: Text('Error: $e')),
             ),
@@ -97,7 +97,7 @@ class _FilterBar extends StatelessWidget {
       'Abs'
     ];
 
-    return Container(
+    return SizedBox(
       height: 60,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,

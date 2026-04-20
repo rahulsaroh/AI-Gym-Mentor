@@ -1,4 +1,3 @@
-import 'package:ai_gym_mentor/core/database/database.dart';
 
 class YearInReviewData {
   final int year;

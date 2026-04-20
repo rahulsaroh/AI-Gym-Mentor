@@ -6,7 +6,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:ai_gym_mentor/core/database/database.dart' as db;
 import 'package:uuid/uuid.dart';
 import 'package:drift/drift.dart' hide Column;
@@ -15,24 +14,17 @@ import 'package:ai_gym_mentor/features/exercise_database/presentation/providers/
 import 'package:ai_gym_mentor/features/history/history_providers.dart';
 import 'package:ai_gym_mentor/features/exercise_database/domain/entities/exercise_entity.dart'
     as entity;
-import 'package:ai_gym_mentor/features/exercise_database/presentation/widgets/exercise_media_widget.dart';
 import 'package:ai_gym_mentor/features/exercise_database/presentation/widgets/exercise_picker_overlay.dart';
 import 'package:confetti/confetti.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:ai_gym_mentor/features/workout/components/pr_banner.dart';
 import 'package:ai_gym_mentor/features/workout/components/set_type_selector.dart';
 import 'package:ai_gym_mentor/services/progression_service.dart';
 import 'package:ai_gym_mentor/features/workout/providers/workout_home_notifier.dart';
 import 'package:ai_gym_mentor/features/workout/components/workout_summary_overlay.dart';
 import 'package:ai_gym_mentor/features/workout/components/superset_bracket_painter.dart';
-import 'package:ai_gym_mentor/features/workout/components/rest_timer_overlay.dart';
 import 'package:ai_gym_mentor/features/workout/providers/timer_notifier.dart';
 import 'package:ai_gym_mentor/features/workout/components/floating_rest_timer.dart';
-import 'package:ai_gym_mentor/features/workout/workout_repository.dart';
-import 'package:ai_gym_mentor/features/analytics/analytics_providers.dart';
 import 'package:ai_gym_mentor/features/analytics/data/strength_repository.dart';
-import 'package:ai_gym_mentor/features/history/pdf_service.dart';
-import 'package:share_plus/share_plus.dart';
 import 'package:ai_gym_mentor/features/settings/settings_provider.dart';
 import 'package:ai_gym_mentor/core/utils/weight_converter.dart';
 import 'package:ai_gym_mentor/features/settings/models/settings_state.dart';
@@ -99,7 +91,7 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
 
   // Input management
   final TextEditingController _titleController = TextEditingController();
-  bool _isEditingTitle = false;
+  final bool _isEditingTitle = false;
   final Map<int, TextEditingController> _weightControllers = {};
   final Map<int, TextEditingController> _repsControllers = {};
   final Map<int, TextEditingController> _secsControllers = {};
@@ -162,15 +154,33 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
     _glowController.dispose();
     // Removed _shakeDetector.dispose()
     _titleController.dispose();
-    for (var c in _weightControllers.values) c.dispose();
-    for (var c in _repsControllers.values) c.dispose();
-    for (var c in _secsControllers.values) c.dispose();
-    for (var c in _rpeControllers.values) c.dispose();
-    for (var c in _noteControllers.values) c.dispose();
-    for (var n in _weightNodes.values) n.dispose();
-    for (var n in _repsNodes.values) n.dispose();
-    for (var n in _secsNodes.values) n.dispose();
-    for (var n in _rpeNodes.values) n.dispose();
+    for (var c in _weightControllers.values) {
+      c.dispose();
+    }
+    for (var c in _repsControllers.values) {
+      c.dispose();
+    }
+    for (var c in _secsControllers.values) {
+      c.dispose();
+    }
+    for (var c in _rpeControllers.values) {
+      c.dispose();
+    }
+    for (var c in _noteControllers.values) {
+      c.dispose();
+    }
+    for (var n in _weightNodes.values) {
+      n.dispose();
+    }
+    for (var n in _repsNodes.values) {
+      n.dispose();
+    }
+    for (var n in _secsNodes.values) {
+      n.dispose();
+    }
+    for (var n in _rpeNodes.values) {
+      n.dispose();
+    }
     _scrollController.dispose();
     _pageController.dispose();
     super.dispose();
@@ -250,10 +260,12 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
           .getSingleOrNull();
 
       if (workoutRow == null) {
-        if (mounted) setState(() {
+        if (mounted) {
+          setState(() {
           _isInitializing = false;
           _initError = 'Workout not found.';
         });
+        }
         return;
       }
 
@@ -273,10 +285,12 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
       if (effectiveDayId == null) {
         debugPrint(
             'ActiveWorkoutScreen: No dayId found and no sets exist. Cannot initialize.');
-        if (mounted) setState(() {
+        if (mounted) {
+          setState(() {
           _isInitializing = false;
           _initError = 'Could not find workout data to initialize.';
         });
+        }
         return;
       }
 
@@ -426,13 +440,13 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
             leading: IconButton(
                 icon: const Icon(LucideIcons.chevronLeft, size: 22),
                 onPressed: () async {
-                  if (workout?.mesocycleId != null) {
-                    context.go('/programs/programs/mesocycle/${workout!.mesocycleId}');
+                  if (workout.mesocycleId != null) {
+                    context.go('/programs/programs/mesocycle/${workout.mesocycleId}');
                     return;
                   }
                   
-                  if (widget.dayId != null || workout?.dayId != null) {
-                    final dId = widget.dayId ?? workout?.dayId;
+                  if (widget.dayId != null || workout.dayId != null) {
+                    final dId = widget.dayId ?? workout.dayId;
                     final database = ref.read(db.appDatabaseProvider);
                     final day = await (database.select(database.templateDays)
                           ..where((t) => t.id.equals(dId!)))
@@ -453,7 +467,7 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      workout?.name ?? 'Workout',
+                      workout.name ?? 'Workout',
                       style: GoogleFonts.inter(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -553,13 +567,13 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
             onPopInvokedWithResult: (didPop, result) async {
               if (didPop) return;
               
-              if (workout?.mesocycleId != null) {
-                context.go('/programs/programs/mesocycle/${workout!.mesocycleId}');
+              if (workout.mesocycleId != null) {
+                context.go('/programs/programs/mesocycle/${workout.mesocycleId}');
                 return;
               }
 
-              if (widget.dayId != null || workout?.dayId != null) {
-                final dId = widget.dayId ?? workout?.dayId;
+              if (widget.dayId != null || workout.dayId != null) {
+                final dId = widget.dayId ?? workout.dayId;
                 final database = ref.read(db.appDatabaseProvider);
                 final day = await (database.select(database.templateDays)
                       ..where((t) => t.id.equals(dId!)))
@@ -1341,9 +1355,10 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
       
       _lastDeletedSet = null; // Clear after undo
       
-      if (mounted)
+      if (mounted) {
         ScaffoldMessenger.of(context)
             .showSnackBar(const SnackBar(content: Text('Set restored')));
+      }
     } else if (_lastDeletedExercise != null) {
       final e = _lastDeletedExercise!;
       // Batch insert all sets of the exercise
@@ -1357,9 +1372,10 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
       
       _lastDeletedExercise = null; // Clear after undo
       
-      if (mounted)
+      if (mounted) {
         ScaffoldMessenger.of(context)
             .showSnackBar(const SnackBar(content: Text('Exercise restored')));
+      }
     }
   }
 
@@ -1913,7 +1929,7 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
             );
           },
           loading: () => const SizedBox.shrink(),
-          error: (_, __) => const SizedBox.shrink(),
+          error: (_, _) => const SizedBox.shrink(),
         );
       },
     );

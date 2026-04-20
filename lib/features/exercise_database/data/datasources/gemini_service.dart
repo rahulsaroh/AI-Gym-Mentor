@@ -4,7 +4,6 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:ai_gym_mentor/features/exercise_database/domain/entities/exercise_entity.dart';
 import 'package:ai_gym_mentor/features/settings/settings_provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:flutter/foundation.dart';
 
 part 'gemini_service.g.dart';
 

@@ -1,6 +1,5 @@
 import 'package:ai_gym_mentor/features/analytics/data/strength_repository.dart';
 import 'package:ai_gym_mentor/features/settings/settings_provider.dart';
-import 'package:drift/drift.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:ai_gym_mentor/core/database/database.dart';
 

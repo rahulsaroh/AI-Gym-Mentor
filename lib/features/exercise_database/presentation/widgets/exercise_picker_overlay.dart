@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:ai_gym_mentor/services/github_exercise_service.dart';
-import 'package:ai_gym_mentor/features/exercise_database/domain/repositories/exercise_repository.dart';
 import 'package:ai_gym_mentor/features/exercise_database/presentation/providers/repository_provider.dart';
 
 class ExercisePickerOverlay extends ConsumerStatefulWidget {
@@ -139,7 +138,7 @@ class _ExercisePickerOverlayState extends ConsumerState<ExercisePickerOverlay> {
                           icon: Container(
                             padding: const EdgeInsets.all(4),
                             decoration: BoxDecoration(
-                              color: Theme.of(context).colorScheme.surfaceVariant.withValues(alpha: 0.5),
+                              color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
                               shape: BoxShape.circle,
                             ),
                             child: const Icon(LucideIcons.x, size: 18),
@@ -163,7 +162,7 @@ class _ExercisePickerOverlayState extends ConsumerState<ExercisePickerOverlay> {
                         filled: true,
                         fillColor: Theme.of(context)
                             .colorScheme
-                            .surfaceVariant
+                            .surfaceContainerHighest
                             .withValues(alpha: 0.3),
                         contentPadding: const EdgeInsets.symmetric(vertical: 12),
                         border: OutlineInputBorder(
@@ -228,7 +227,7 @@ class _ExercisePickerOverlayState extends ConsumerState<ExercisePickerOverlay> {
                             controller: scrollController,
                             padding: const EdgeInsets.fromLTRB(24, 0, 24, 40),
                             itemCount: _filteredExercises.length,
-                            separatorBuilder: (_, __) => const SizedBox(height: 12),
+                            separatorBuilder: (_, _) => const SizedBox(height: 12),
                             itemBuilder: (context, index) {
                               final ex = _filteredExercises[index];
                               return _CompactPickerCard(
@@ -237,10 +236,8 @@ class _ExercisePickerOverlayState extends ConsumerState<ExercisePickerOverlay> {
                                   final exerciseId = await ref
                                       .read(exerciseRepositoryProvider)
                                       .ensureGithubExercise(ex);
-                                  if (exerciseId != null) {
-                                    widget.onSelect(exerciseId);
-                                  }
-                                },
+                                  widget.onSelect(exerciseId);
+                                                                },
                               );
                             },
                           ),
@@ -282,8 +279,8 @@ class _CompactPickerCard extends StatelessWidget {
               child: CachedNetworkImage(
                 imageUrl: exercise.gifUrl,
                 fit: BoxFit.cover,
-                placeholder: (_, __) => Center(child: Icon(LucideIcons.dumbbell, size: 20, color: Theme.of(context).colorScheme.primary)),
-                errorWidget: (_, __, ___) => Center(child: Icon(LucideIcons.dumbbell, size: 20, color: Theme.of(context).colorScheme.primary)),
+                placeholder: (_, _) => Center(child: Icon(LucideIcons.dumbbell, size: 20, color: Theme.of(context).colorScheme.primary)),
+                errorWidget: (_, _, _) => Center(child: Icon(LucideIcons.dumbbell, size: 20, color: Theme.of(context).colorScheme.primary)),
               ),
             ),
             const SizedBox(width: 16),

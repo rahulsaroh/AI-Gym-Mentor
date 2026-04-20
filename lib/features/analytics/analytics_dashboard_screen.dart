@@ -218,7 +218,7 @@ class AnalyticsDashboardScreen extends ConsumerWidget {
                           ? _PlateauSection(alerts: alerts)
                           : const SizedBox.shrink(),
                       loading: () => const SizedBox.shrink(),
-                      error: (_, __) => const SizedBox.shrink(),
+                      error: (_, _) => const SizedBox.shrink(),
                     ),
   
                     // 6. Recent PRs
@@ -231,7 +231,7 @@ class AnalyticsDashboardScreen extends ConsumerWidget {
                     prsAsync.when(
                       data: (prs) => _RecentPRsCarousel(prs: prs),
                       loading: () => const _SkeletonRow(),
-                      error: (_, __) => const SizedBox.shrink(),
+                      error: (_, _) => const SizedBox.shrink(),
                     ),
                   ],
                 ),
@@ -310,7 +310,7 @@ class AnalyticsDashboardScreen extends ConsumerWidget {
         );
       },
       loading: () => const SizedBox.shrink(),
-      error: (_, __) => const SizedBox.shrink(),
+      error: (_, _) => const SizedBox.shrink(),
     );
   }
 }
@@ -460,9 +460,10 @@ class _VolumeChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (data.isEmpty)
+    if (data.isEmpty) {
       return const _EmptyChartTip(
           message: 'Log some workouts to see volume trends.');
+    }
 
     return Container(
       height: 250,
@@ -500,8 +501,9 @@ class _VolumeChart extends StatelessWidget {
                 showTitles: true,
                 interval: 3, // Shows every 3 weeks
                 getTitlesWidget: (val, meta) {
-                  if (val.toInt() >= data.length)
+                  if (val.toInt() >= data.length) {
                     return const SizedBox.shrink();
+                  }
                   final date = data[val.toInt()]['date'] as DateTime;
                   return Text(DateFormat('MM/dd').format(date),
                       style: const TextStyle(fontSize: 10));
@@ -524,9 +526,10 @@ class _FrequencyChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (data.isEmpty)
+    if (data.isEmpty) {
       return const _EmptyChartTip(
           message: 'Complete workouts regularly to see your frequency.');
+    }
 
     return Container(
       height: 200,
@@ -556,8 +559,9 @@ class _FrequencyChart extends StatelessWidget {
               sideTitles: SideTitles(
                 showTitles: true,
                 getTitlesWidget: (val, meta) {
-                  if (val.toInt() >= data.length || val.toInt() % 4 != 0)
+                  if (val.toInt() >= data.length || val.toInt() % 4 != 0) {
                     return const SizedBox.shrink();
+                  }
                   final date = data[val.toInt()]['date'] as DateTime;
                   return Text(DateFormat('MM/dd').format(date),
                       style: const TextStyle(fontSize: 10));
@@ -583,9 +587,10 @@ class _MuscleBarChart extends StatelessWidget {
     final thisMonth = (data['thisMonth'] as List? ?? []).cast<double>();
     final lastMonth = (data['lastMonth'] as List? ?? []).cast<double>();
 
-    if (labels.isEmpty)
+    if (labels.isEmpty) {
       return const _EmptyChartTip(
           message: 'No muscle data available for comparisons.');
+    }
 
     return Column(
       children: [
@@ -821,9 +826,10 @@ class _RecentPRsCarousel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (prs.isEmpty)
+    if (prs.isEmpty) {
       return const _EmptyChartTip(
           message: 'New Personal Records will appear here!');
+    }
 
     return SizedBox(
       height: 120,

@@ -241,7 +241,7 @@ class _MesocycleWizardScreenState extends ConsumerState<MesocycleWizardScreen> {
         Text(label, style: GoogleFonts.outfit(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.grey[700])),
         const SizedBox(height: 8),
         DropdownButtonFormField<T>(
-          value: value,
+          initialValue: value,
           items: items,
           onChanged: onChanged,
           decoration: InputDecoration(border: OutlineInputBorder(borderRadius: BorderRadius.circular(12))),

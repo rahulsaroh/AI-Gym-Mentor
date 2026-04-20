@@ -311,7 +311,7 @@ class SetLoggingTable extends StatelessWidget {
           Icon(LucideIcons.history, size: 10, color: Theme.of(context).colorScheme.outline.withOpacity(0.5)),
           const SizedBox(width: 4),
           Text(
-            'Last: ${weightStr}${unit == WeightUnit.kg ? 'kg' : 'lbs'} x $repsStr',
+            'Last: $weightStr${unit == WeightUnit.kg ? 'kg' : 'lbs'} x $repsStr',
             style: GoogleFonts.inter(
               fontSize: 10,
               color: Theme.of(context).colorScheme.outline.withOpacity(0.7),

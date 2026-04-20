@@ -1,11 +1,8 @@
-import 'dart:convert';
-import 'package:drift/drift.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ai_gym_mentor/core/database/database.dart';
 import 'package:ai_gym_mentor/features/workout/workout_repository.dart';
-import 'package:ai_gym_mentor/core/domain/entities/workout_program.dart' as ent;
 
 class ProgramDbSeeder {
   static final ProgramDbSeeder instance = ProgramDbSeeder._();

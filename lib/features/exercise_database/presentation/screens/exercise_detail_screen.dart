@@ -1,5 +1,3 @@
-import 'dart:convert';
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -596,7 +594,7 @@ class _ExerciseDetailScreenState extends ConsumerState<ExerciseDetailScreen> wit
         );
       },
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (_, __) => const SizedBox.shrink(),
+      error: (_, _) => const SizedBox.shrink(),
     );
   }
 
@@ -614,7 +612,7 @@ class _ExerciseDetailScreenState extends ConsumerState<ExerciseDetailScreen> wit
         );
       },
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (_, __) => const SizedBox.shrink(),
+      error: (_, _) => const SizedBox.shrink(),
     );
   }
 
@@ -652,7 +650,7 @@ class _ExerciseDetailScreenState extends ConsumerState<ExerciseDetailScreen> wit
         );
       },
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (_, __) => const SizedBox.shrink(),
+      error: (_, _) => const SizedBox.shrink(),
     );
   }
 
@@ -673,7 +671,7 @@ class _ExerciseDetailScreenState extends ConsumerState<ExerciseDetailScreen> wit
       return CachedNetworkImage(
         imageUrl: exercise.imageUrls.first,
         fit: BoxFit.cover,
-        placeholder: (_, __) => _buildImagePlaceholder(context),
+        placeholder: (_, _) => _buildImagePlaceholder(context),
         errorWidget: (context, url, error) => _buildMuscleIconPlaceholder(context),
       );
     }
@@ -896,7 +894,7 @@ class _ExerciseDetailScreenState extends ConsumerState<ExerciseDetailScreen> wit
             const SizedBox(height: 20),
             _buildFormSection('Category'),
             DropdownButtonFormField<String>(
-              value: _category.substring(0, 1).toUpperCase() + _category.substring(1).toLowerCase(),
+              initialValue: _category.substring(0, 1).toUpperCase() + _category.substring(1).toLowerCase(),
               items: ['Strength', 'Cardio', 'Flexibility'].map((c) => 
                 DropdownMenuItem(value: c, child: Text(c))).toList(),
               onChanged: (val) => setState(() => _category = val ?? 'Strength'),
@@ -919,7 +917,7 @@ class _ExerciseDetailScreenState extends ConsumerState<ExerciseDetailScreen> wit
              const SizedBox(height: 20),
             _buildFormSection('Mechanic Type'),
             DropdownButtonFormField<String>(
-              value: _mechanic,
+              initialValue: _mechanic,
               items: ['Compound', 'Isolation'].map((m) => 
                 DropdownMenuItem(value: m, child: Text(m))).toList(),
               onChanged: (val) => setState(() => _mechanic = val ?? 'Compound'),
@@ -927,7 +925,7 @@ class _ExerciseDetailScreenState extends ConsumerState<ExerciseDetailScreen> wit
              const SizedBox(height: 20),
             _buildFormSection('Force Type'),
             DropdownButtonFormField<String>(
-              value: _force,
+              initialValue: _force,
               items: ['Push', 'Pull', 'Static'].map((f) => 
                 DropdownMenuItem(value: f, child: Text(f))).toList(),
               onChanged: (val) => setState(() => _force = val ?? 'Push'),

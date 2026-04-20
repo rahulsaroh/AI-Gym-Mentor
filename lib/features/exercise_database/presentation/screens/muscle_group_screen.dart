@@ -55,7 +55,7 @@ class _MuscleGroupScreenState extends ConsumerState<MuscleGroupScreen> {
               height: 300,
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.surfaceVariant.withValues(alpha: 0.3),
+                color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(24),
               ),
               child: Stack(

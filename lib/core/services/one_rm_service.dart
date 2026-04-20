@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'package:ai_gym_mentor/features/settings/models/settings_state.dart';
 
 class OneRmService {

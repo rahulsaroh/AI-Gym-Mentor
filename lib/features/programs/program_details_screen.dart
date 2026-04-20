@@ -27,8 +27,9 @@ class ProgramDetailScreen extends ConsumerWidget {
           final program = snapshot.data?.firstWhere((t) => t.id == templateId,
               orElse: () => throw Exception('Program not found'));
 
-          if (program == null)
+          if (program == null) {
             return const Center(child: Text('Program not found'));
+          }
 
           return DefaultTabController(
             length: program.days.length,

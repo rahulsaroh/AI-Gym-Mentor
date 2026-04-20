@@ -15,7 +15,6 @@ import 'package:ai_gym_mentor/services/background_worker.dart';
 import 'package:ai_gym_mentor/features/exercise_database/data/datasources/exercise_db_seeder.dart';
 import 'package:ai_gym_mentor/features/workout/data/datasources/program_db_seeder.dart';
 import 'package:ai_gym_mentor/core/database/database.dart';
-import 'package:ai_gym_mentor/core/services/watch_service.dart';
 import 'package:ai_gym_mentor/core/services/watch_sync_service.dart';
 
 void main() async {

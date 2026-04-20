@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ai_gym_mentor/features/analytics/analytics_providers.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:intl/intl.dart';
 
 class TrainingHeatmap extends ConsumerWidget {
   const TrainingHeatmap({super.key});

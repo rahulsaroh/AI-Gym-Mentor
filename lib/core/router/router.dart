@@ -33,7 +33,7 @@ import 'package:ai_gym_mentor/features/programs/mesocycle_details_screen.dart';
 import 'package:ai_gym_mentor/features/workout/start_workout_screen.dart';
 import 'package:ai_gym_mentor/features/exercise_database/presentation/screens/github_exercise_library_screen.dart';
 import 'package:ai_gym_mentor/features/analytics/presentation/screens/year_in_review_screen.dart';
-import 'package:ai_gym_mentor/screens/body_scan_screen.dart';
+import 'package:ai_gym_mentor/features/bodymap/screens/body_scan_screen.dart';
 
 final router = GoRouter(
   initialLocation: '/',

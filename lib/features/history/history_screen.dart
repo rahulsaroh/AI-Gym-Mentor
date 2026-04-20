@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:ai_gym_mentor/core/domain/entities/logged_set.dart' as ent;
-import 'package:ai_gym_mentor/core/domain/entities/workout_session.dart' as ent;
 import 'package:ai_gym_mentor/features/workout/workout_repository.dart';
 import 'package:ai_gym_mentor/core/widgets/skeleton_card.dart';
 import 'package:ai_gym_mentor/core/widgets/number_ticker.dart';
@@ -162,7 +161,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
             },
             loading: () => SliverList(
               delegate: SliverChildBuilderDelegate(
-                (_, __) => const SkeletonCard(
+                (_, _) => const SkeletonCard(
                     height: 100,
                     margin: EdgeInsets.symmetric(horizontal: 16, vertical: 6)),
                 childCount: 6,

@@ -99,7 +99,7 @@ class ExerciseStrengthDetailScreen extends ConsumerWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _buildSmallIconStat(LucideIcons.calendarDays, '${sessionCount} sessions'),
+              _buildSmallIconStat(LucideIcons.calendarDays, '$sessionCount sessions'),
               _buildSmallIconStat(LucideIcons.history, 'Last: ${DateFormat.MMMd().format(latest.date)}'),
               _buildSmallIconStat(LucideIcons.calculator, 'Formula: ${latest.formula}'),
             ],

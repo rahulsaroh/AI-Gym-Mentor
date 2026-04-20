@@ -101,7 +101,7 @@ class MeasurementsRepository {
 
   Future<void> updateMeasurement(ent_m.BodyMeasurement measurement) async {
     await db.update(db.bodyMeasurements).replace(BodyMeasurementTable(
-      id: measurement.id!,
+      id: measurement.id,
       date: measurement.date,
       weight: measurement.weight,
       bodyFat: measurement.bodyFat,

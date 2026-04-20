@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:ai_gym_mentor/core/database/database.dart';
@@ -786,8 +785,9 @@ class _LastWorkoutSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (state.lastWorkout == null)
+    if (state.lastWorkout == null) {
       return const SliverToBoxAdapter(child: SizedBox());
+    }
 
     final timeAgo = DateFormat.yMMMd().format(state.lastWorkout!.date);
 
@@ -918,7 +918,7 @@ class _ConsistencySection extends ConsumerWidget {
             );
           },
           loading: () => const SizedBox(height: 150),
-          error: (_, __) => const SizedBox.shrink(),
+          error: (_, _) => const SizedBox.shrink(),
         ),
       ),
     );
@@ -1049,8 +1049,9 @@ class _PlateauAlertSectionState extends ConsumerState<_PlateauAlertSection> {
 
   @override
   Widget build(BuildContext context) {
-    if (_loading || _plateaus.isEmpty)
+    if (_loading || _plateaus.isEmpty) {
       return const SliverToBoxAdapter(child: SizedBox.shrink());
+    }
 
     return SliverToBoxAdapter(
       child: Column(

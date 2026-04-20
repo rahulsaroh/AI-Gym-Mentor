@@ -26,7 +26,7 @@ class _CreateEditProgramScreenState
   final _nameController = TextEditingController();
   final _descriptionController = TextEditingController();
   List<_DayData> _days = [];
-  Set<int> _expandedIndices = {0}; // Default expand first day
+  final Set<int> _expandedIndices = {0}; // Default expand first day
   bool _isLoading = false;
   bool _isEditing = false;
 
@@ -640,7 +640,7 @@ class _DayCardState extends ConsumerState<_DayCard> {
                             },
                             loading: () =>
                                 const ListTile(title: Text('Loading...')),
-                            error: (_, __) => const ListTile(title: Text('Error')),
+                            error: (_, _) => const ListTile(title: Text('Error')),
                           ),
                         );
                       },

@@ -240,9 +240,9 @@ class ExerciseDbSeeder {
     final parts = <String>{};
 
     for (var m in all) {
-      if (m.contains('pector') || m.contains('chest'))
+      if (m.contains('pector') || m.contains('chest')) {
         parts.add('Chest');
-      else if (m.contains('lat') ||
+      } else if (m.contains('lat') ||
           m.contains('rhombo') ||
           m.contains('trape') ||
           m.contains('back'))

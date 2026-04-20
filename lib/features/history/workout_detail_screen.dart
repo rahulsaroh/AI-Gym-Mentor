@@ -1,6 +1,4 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ai_gym_mentor/core/database/database.dart';
 
@@ -52,9 +50,10 @@ class _WorkoutDetailScreenState extends ConsumerState<WorkoutDetailScreen> {
       stream: workoutStream.watch(),
       builder: (context, workoutSnapshot) {
         final workout = workoutSnapshot.data?.firstOrNull;
-        if (workout == null)
+        if (workout == null) {
           return const Scaffold(
               body: Center(child: CircularProgressIndicator()));
+        }
 
         final prsAsync = ref.watch(workoutPRsProvider(widget.workoutId));
 
@@ -120,7 +119,7 @@ class _WorkoutDetailScreenState extends ConsumerState<WorkoutDetailScreen> {
                     child: _WorkoutSummaryHeader(
                         workout: workout, 
                         muscleVolume: muscleVolume,
-                        prsAchieved: prsAsync.when(data: (ids) => ids.length, loading: () => 0, error: (_,__) => 0),
+                        prsAchieved: prsAsync.when(data: (ids) => ids.length, loading: () => 0, error: (_,_) => 0),
                     ),
                   ),
                   SliverPadding(
@@ -140,7 +139,7 @@ class _WorkoutDetailScreenState extends ConsumerState<WorkoutDetailScreen> {
                             exercise: exercise,
                             rows: exerciseSets,
                             isEditing: _isEditing,
-                            isPR: prsAsync.when(data: (ids) => ids.contains(exercise.id), loading: () => false, error: (_,__) => false),
+                            isPR: prsAsync.when(data: (ids) => ids.contains(exercise.id), loading: () => false, error: (_,_) => false),
                             onUpdate: (setId, weight, reps) =>
                                 _updateSet(setId, weight, reps),
                           );
@@ -438,7 +437,7 @@ class _ExerciseDetailBlock extends ConsumerWidget {
                       child: Text('${s.rpe ?? '-'}',
                           style: const TextStyle(fontSize: 12))),
                   TableCell(
-                      child: Text('${(s.weight * s.reps).toStringAsFixed(0)}',
+                      child: Text((s.weight * s.reps).toStringAsFixed(0),
                           textAlign: TextAlign.right,
                           style: const TextStyle(
                               fontSize: 12, fontWeight: FontWeight.bold))),

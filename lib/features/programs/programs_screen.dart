@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
@@ -11,7 +10,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:ai_gym_mentor/features/workout/workout_repository.dart';
 import 'package:ai_gym_mentor/features/workout/providers/workout_home_notifier.dart';
 import 'package:ai_gym_mentor/features/programs/components/mesocycle_list_view.dart';
-import 'package:ai_gym_mentor/features/programs/providers/mesocycles_notifier.dart';
 
 class ProgramsScreen extends ConsumerStatefulWidget {
   const ProgramsScreen({super.key});

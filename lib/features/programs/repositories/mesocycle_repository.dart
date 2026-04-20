@@ -1,6 +1,5 @@
 import 'package:ai_gym_mentor/core/database/database.dart';
 import 'package:ai_gym_mentor/core/domain/entities/mesocycle.dart';
-import 'package:ai_gym_mentor/features/exercise_database/domain/entities/exercise_entity.dart';
 import 'package:ai_gym_mentor/features/exercise_database/domain/repositories/exercise_repository.dart';
 import 'package:ai_gym_mentor/features/exercise_database/presentation/providers/repository_provider.dart';
 import 'package:drift/drift.dart';
@@ -214,7 +213,7 @@ class MesocycleRepository {
       
       final id = await _db.into(_db.workouts).insert(
         WorkoutsCompanion.insert(
-          name: '${mesocycleName} - W${week.weekNumber} ${dayEntity.title}',
+          name: '$mesocycleName - W${week.weekNumber} ${dayEntity.title}',
           date: DateTime.now(),
           startTime: Value(DateTime.now()),
           status: const Value('draft'),
