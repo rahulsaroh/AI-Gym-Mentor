@@ -5,6 +5,7 @@ import 'package:drift/native.dart';
 import 'package:drift/drift.dart' hide Column, isNull, isNotNull;
 import 'package:mocktail/mocktail.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:drift/drift.dart' hide isNull, isNotNull;
 
 void main() {
   late AppDatabase db;
