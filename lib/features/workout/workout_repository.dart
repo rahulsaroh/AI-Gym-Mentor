@@ -612,20 +612,26 @@ class WorkoutRepository {
     return id;
   }
 
-  /// Deletes draft workouts older than 24 hours that have no completed sets.
+  /// Deletes draft workouts that are abandoned or stale.
+  /// Empty drafts are removed after 2 hours.
+  /// Drafts with progress are removed after 24 hours.
   Future<void> cleanupStaleDrafts() async {
     try {
-      final staleTime = DateTime.now().subtract(const Duration(hours: 24));
+      final now = DateTime.now();
+      final emptyStaleThreshold = now.subtract(const Duration(hours: 2));
+      final activeStaleThreshold = now.subtract(const Duration(hours: 24));
       
-      // Find drafts older than 24 hours
-      final staleDrafts = await (_db.select(_db.workouts)
-            ..where((t) => t.status.equals('draft') & t.date.isSmallerThanValue(staleTime)))
+      // Find all drafts older than at least the empty threshold
+      final candidateDrafts = await (_db.select(_db.workouts)
+            ..where((t) => t.status.equals('draft') & t.date.isSmallerThanValue(emptyStaleThreshold)))
           .get();
 
-      if (staleDrafts.isEmpty) return;
+      if (candidateDrafts.isEmpty) return;
 
       int cleanupCount = 0;
-      for (var draft in staleDrafts) {
+      for (var draft in candidateDrafts) {
+        final isOlderThan24h = draft.date.isBefore(activeStaleThreshold);
+        
         // Check if it has any completed sets
         final completedSetsCount = await (_db.selectOnly(_db.workoutSets)
               ..addColumns([_db.workoutSets.id])
@@ -633,7 +639,10 @@ class WorkoutRepository {
               ..limit(1))
             .get();
         
-        if (completedSetsCount.isEmpty) {
+        // Cleanup if:
+        // 1. It's truly stale (> 24 hours) regardless of progress
+        // 2. It has no progress and is older than 2 hours
+        if (isOlderThan24h || completedSetsCount.isEmpty) {
           debugPrint('WorkoutRepository: Cleaning up stale draft workout ${draft.id} ("${draft.name}")');
           await deleteWorkout(draft.id);
           cleanupCount++;
@@ -647,9 +656,9 @@ class WorkoutRepository {
     }
   }
 
-  /// Finds an existing draft for the same template/day created within the last 12 hours.
+  /// Finds an existing draft for the same template/day created within the last 4 hours.
   Future<int?> findExistingRecentDraft({int? templateId, int? dayId}) async {
-    final recentTime = DateTime.now().subtract(const Duration(hours: 12));
+    final recentTime = DateTime.now().subtract(const Duration(hours: 4));
     
     final query = _db.select(_db.workouts);
     
