@@ -3,11 +3,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:ai_gym_mentor/features/settings/models/settings_state.dart';
 import 'package:ai_gym_mentor/features/settings/settings_provider.dart';
 import 'package:ai_gym_mentor/services/backup_service.dart';
 import 'package:ai_gym_mentor/features/settings/csv_export_screen.dart';
 import 'package:ai_gym_mentor/features/settings/import_wizard_screen.dart';
+import 'package:ai_gym_mentor/features/settings/csv_import_wizard.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -154,13 +156,41 @@ class SettingsScreen extends ConsumerWidget {
             ),
             _buildTile(
               context,
-              title: 'Import Data from File',
+              title: 'Import Backup (JSON)',
               subtitle: 'Restore from .json backup',
               icon: LucideIcons.upload,
               onTap: () => Navigator.push(
                   context,
                   MaterialPageRoute(
                       builder: (_) => const ImportWizardScreen())),
+            ),
+            _buildTile(
+              context,
+              title: 'Import Data (CSV)',
+              subtitle: 'Old workout logs & measurements',
+              icon: LucideIcons.fileSpreadsheet,
+              onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (_) => const CsvImportWizard())),
+            ),
+            const Divider(height: 32),
+            _buildSectionHeader(context, 'AI Configuration'),
+            _buildTile(
+              context,
+              title: 'Gemini API Key',
+              subtitle: settings.geminiApiKey == null || settings.geminiApiKey!.isEmpty
+                  ? 'Not set (AI features will fail)'
+                  : '••••••••${settings.geminiApiKey!.substring(settings.geminiApiKey!.length > 4 ? settings.geminiApiKey!.length - 4 : 0)}',
+              icon: LucideIcons.bot,
+              onTap: () => _showGeminiApiKeyDialog(context, ref, settings.geminiApiKey),
+            ),
+            _buildTile(
+              context,
+              title: 'How to get a key?',
+              subtitle: 'Get a free key from Google AI Studio',
+              icon: LucideIcons.externalLink,
+              onTap: () => _launchUrl('https://aistudio.google.com/app/apikey'),
             ),
             const Divider(height: 32),
             _buildSectionHeader(context, 'Privacy & Security'),
@@ -621,6 +651,58 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 
+  void _showGeminiApiKeyDialog(
+      BuildContext context, WidgetRef ref, String? currentKey) {
+    final controller = TextEditingController(text: currentKey);
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Gemini API Key'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Used for AI workout generation and exercise enrichment.',
+              style: TextStyle(fontSize: 13),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: controller,
+              decoration: const InputDecoration(
+                hintText: 'Enter AIza...',
+                border: OutlineInputBorder(),
+              ),
+              obscureText: true,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () {
+              ref
+                  .read(settingsProvider.notifier)
+                  .updateGeminiApiKey(controller.text.trim());
+              Navigator.pop(context);
+            },
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _launchUrl(String url) async {
+    final uri = Uri.parse(url);
+    if (!await launchUrl(uri)) {
+      throw Exception('Could not launch $url');
+    }
+  }
+
   String _capitalize(String s) => s[0].toUpperCase() + s.substring(1);
 
   Widget _buildSectionHeader(BuildContext context, String title,
@@ -650,7 +732,7 @@ class SettingsScreen extends ConsumerWidget {
       title: Text(title),
       subtitle: subtitle != null
           ? Text(subtitle,
-              style: TextStyle(color: Theme.of(context).colorScheme.primary))
+               style: TextStyle(color: Theme.of(context).colorScheme.primary))
           : null,
       trailing: const Icon(Icons.chevron_right, size: 20),
       onTap: onTap,

@@ -30,9 +30,10 @@ class _HeatmapContent extends StatelessWidget {
     final today = DateTime(now.year, now.month, now.day);
     // Show last 20 weeks (approx 140 days)
     final startDate = today.subtract(const Duration(days: 140));
-    
+
     // Normalize start date to the beginning of that week (Monday)
-    final adjustedStart = startDate.subtract(Duration(days: startDate.weekday - 1));
+    final adjustedStart =
+        startDate.subtract(Duration(days: startDate.weekday - 1));
     final totalDays = today.difference(adjustedStart).inDays + 1;
 
     return Column(
@@ -43,18 +44,26 @@ class _HeatmapContent extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                'Training Consistency',
-                style: GoogleFonts.inter(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
+              Flexible(
+                child: Text(
+                  'Training Consistency',
+                  style: GoogleFonts.inter(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
-              Text(
-                '${activity.length} active days',
-                style: GoogleFonts.inter(
-                  fontSize: 12,
-                  color: Theme.of(context).colorScheme.outline,
+              const SizedBox(width: 8),
+              Flexible(
+                child: Text(
+                  '${activity.length} active days',
+                  style: GoogleFonts.inter(
+                    fontSize: 12,
+                    color: Theme.of(context).colorScheme.outline,
+                  ),
+                  textAlign: TextAlign.right,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
             ],
@@ -65,7 +74,10 @@ class _HeatmapContent extends StatelessWidget {
           margin: const EdgeInsets.symmetric(horizontal: 16),
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.1),
+            color: Theme.of(context)
+                .colorScheme
+                .surfaceContainerHighest
+                .withOpacity(0.1),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
               color: Theme.of(context).colorScheme.outline.withOpacity(0.05),
@@ -74,39 +86,49 @@ class _HeatmapContent extends StatelessWidget {
           child: SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             reverse: true,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: List.generate(21, (weekIndex) {
-                // Column for each week
-                return Column(
-                  children: List.generate(7, (dayIndex) {
-                    final dayDate = adjustedStart.add(Duration(days: (weekIndex * 7) + dayIndex));
-                    
-                    if (dayDate.isAfter(today)) {
-                       return _buildDayTile(context, null);
-                    }
+            physics: const BouncingScrollPhysics(),
+            child: IntrinsicWidth(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: List.generate(21, (weekIndex) {
+                  // Column for each week
+                  return Column(
+                    children: List.generate(7, (dayIndex) {
+                      final dayDate = adjustedStart
+                          .add(Duration(days: (weekIndex * 7) + dayIndex));
 
-                    final normalizedDay = DateTime(dayDate.year, dayDate.month, dayDate.day);
-                    final sessions = activity[normalizedDay] ?? 0;
-                    
-                    return _buildDayTile(context, sessions, dayDate: normalizedDay);
-                  }),
-                );
-              }),
+                      if (dayDate.isAfter(today)) {
+                        return _buildDayTile(context, null);
+                      }
+
+                      final normalizedDay =
+                          DateTime(dayDate.year, dayDate.month, dayDate.day);
+                      final sessions = activity[normalizedDay] ?? 0;
+
+                      return _buildDayTile(context, sessions,
+                          dayDate: normalizedDay);
+                    }),
+                  );
+                }),
+              ),
             ),
           ),
         ),
         Padding(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
+          child: Wrap(
+            alignment: WrapAlignment.end,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: 4,
             children: [
-              Text('Less ', style: GoogleFonts.inter(fontSize: 10, color: Colors.grey)),
+              Text('Less ',
+                  style: GoogleFonts.inter(fontSize: 10, color: Colors.grey)),
               _buildDayTile(context, 0, size: 10),
               _buildDayTile(context, 1, size: 10),
               _buildDayTile(context, 2, size: 10),
               _buildDayTile(context, 3, size: 10),
-              Text(' More', style: GoogleFonts.inter(fontSize: 10, color: Colors.grey)),
+              Text(' More',
+                  style: GoogleFonts.inter(fontSize: 10, color: Colors.grey)),
             ],
           ),
         ),
@@ -114,12 +136,16 @@ class _HeatmapContent extends StatelessWidget {
     );
   }
 
-  Widget _buildDayTile(BuildContext context, int? sessions, {DateTime? dayDate, double size = 12}) {
+  Widget _buildDayTile(BuildContext context, int? sessions,
+      {DateTime? dayDate, double size = 12}) {
     Color color;
     if (sessions == null) {
       color = Colors.transparent;
     } else if (sessions == 0) {
-      color = Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.5);
+      color = Theme.of(context)
+          .colorScheme
+          .surfaceContainerHighest
+          .withOpacity(0.5);
     } else if (sessions == 1) {
       color = Theme.of(context).primaryColor.withOpacity(0.3);
     } else if (sessions == 2) {

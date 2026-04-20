@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ai_gym_mentor/features/workout/active_workout_screen.dart';
 import 'package:ai_gym_mentor/core/database/database.dart';
-import 'package:ai_gym_mentor/features/exercises/exercise_repository.dart';
+import 'package:ai_gym_mentor/features/exercise_database/domain/repositories/exercise_repository.dart';
 import 'package:drift/native.dart';
 import 'package:drift/drift.dart' hide Column;
 import 'package:lucide_icons_flutter/lucide_icons.dart';

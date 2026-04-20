@@ -30,6 +30,7 @@ import 'package:ai_gym_mentor/features/workout/providers/timer_notifier.dart';
 import 'package:ai_gym_mentor/features/workout/components/floating_rest_timer.dart';
 import 'package:ai_gym_mentor/features/workout/workout_repository.dart';
 import 'package:ai_gym_mentor/features/analytics/analytics_providers.dart';
+import 'package:ai_gym_mentor/features/analytics/data/strength_repository.dart';
 import 'package:ai_gym_mentor/features/history/pdf_service.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:ai_gym_mentor/features/settings/settings_provider.dart';
@@ -242,27 +243,43 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
       debugPrint(
           'ActiveWorkoutScreen: Starting init for workout ${widget.workoutId}, dayId=$dayId');
 
-      if (dayId == null) {
-        // Try to fetch it from the workout record in DB if not provided via constructor
-        final workoutRow = await (database.select(database.workouts)
-              ..where((t) => t.id.equals(widget.workoutId)))
-            .getSingleOrNull();
+      // 1. Fetch workout record first to see what kind of workout it is
+      final workoutRow = await (database.select(database.workouts)
+            ..where((t) => t.id.equals(widget.workoutId)))
+          .getSingleOrNull();
 
-        if (workoutRow?.dayId == null) {
-          debugPrint(
-              'ActiveWorkoutScreen: dayId is null in widget and database. Cannot initialize from template.');
-          if (mounted) setState(() {
-            _isInitializing = false;
-            _initError = 'Could not find template data for this workout.';
-          });
-          return;
-        }
-
-        // Proceed with the fetched dayId
-        await _processTemplate(database, workoutRow!.dayId!);
-      } else {
-        await _processTemplate(database, dayId);
+      if (workoutRow == null) {
+        if (mounted) setState(() {
+          _isInitializing = false;
+          _initError = 'Workout not found.';
+        });
+        return;
       }
+
+      // 2. Check if we already have sets for this workout (e.g. Resume or Mesocycle)
+      final existingSets = await (database.select(database.workoutSets)
+            ..where((t) => t.workoutId.equals(widget.workoutId)))
+          .get();
+
+      if (existingSets.isNotEmpty) {
+        debugPrint('ActiveWorkoutScreen: Workout already has ${existingSets.length} sets, skipping initialization');
+        return;
+      }
+
+      // 3. If no sets, we must initialize from a template (dayId)
+      final effectiveDayId = dayId ?? workoutRow.dayId;
+
+      if (effectiveDayId == null) {
+        debugPrint(
+            'ActiveWorkoutScreen: No dayId found and no sets exist. Cannot initialize.');
+        if (mounted) setState(() {
+          _isInitializing = false;
+          _initError = 'Could not find workout data to initialize.';
+        });
+        return;
+      }
+
+      await _processTemplate(database, effectiveDayId);
     } catch (e, stack) {
       // Fix #3: Surface errors to UI instead of silently swallowing them
       debugPrint('ActiveWorkoutScreen ERROR during initialization: $e');
@@ -274,19 +291,6 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
   }
 
   Future<void> _processTemplate(db.AppDatabase database, int dayId) async {
-    // Check if we already have sets for this workout to avoid duplicates
-    final existingSets = await (database.select(database.workoutSets)
-          ..where((t) => t.workoutId.equals(widget.workoutId)))
-        .get();
-
-    debugPrint(
-        'ActiveWorkoutScreen: Found ${existingSets.length} existing sets for workout ${widget.workoutId}');
-
-    if (existingSets.isNotEmpty) {
-      debugPrint('ActiveWorkoutScreen: Workout already has sets, skipping initialization');
-      return;
-    }
-
     final templateExercises = await (database.select(database.templateExercises)
           ..where((t) => t.dayId.equals(dayId))
           ..orderBy([(t) => OrderingTerm(expression: t.order)]))
@@ -421,10 +425,16 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
             leading: IconButton(
                 icon: const Icon(LucideIcons.chevronLeft, size: 22),
                 onPressed: () async {
-                  if (widget.dayId != null) {
+                  if (workout?.mesocycleId != null) {
+                    context.go('/programs/programs/mesocycle/${workout!.mesocycleId}');
+                    return;
+                  }
+                  
+                  if (widget.dayId != null || workout?.dayId != null) {
+                    final dId = widget.dayId ?? workout?.dayId;
                     final database = ref.read(db.appDatabaseProvider);
                     final day = await (database.select(database.templateDays)
-                          ..where((t) => t.id.equals(widget.dayId!)))
+                          ..where((t) => t.id.equals(dId!)))
                         .getSingleOrNull();
                     if (day != null && context.mounted) {
                       context.go('/programs/details/${day.templateId}');
@@ -542,10 +552,16 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
             onPopInvokedWithResult: (didPop, result) async {
               if (didPop) return;
               
-              if (widget.dayId != null) {
+              if (workout?.mesocycleId != null) {
+                context.go('/programs/programs/mesocycle/${workout!.mesocycleId}');
+                return;
+              }
+
+              if (widget.dayId != null || workout?.dayId != null) {
+                final dId = widget.dayId ?? workout?.dayId;
                 final database = ref.read(db.appDatabaseProvider);
                 final day = await (database.select(database.templateDays)
-                      ..where((t) => t.id.equals(widget.dayId!)))
+                      ..where((t) => t.id.equals(dId!)))
                     .getSingleOrNull();
                 if (day != null && context.mounted) {
                   context.go('/programs/details/${day.templateId}');
@@ -571,37 +587,27 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
                       }
                       if (_currentExerciseIndex < 0) _currentExerciseIndex = 0;
                       
-                      return Column(
-                        children: [
-                          Expanded(
-                            child: PageView.builder(
-                              controller: _pageController,
-                              onPageChanged: (index) {
-                                setState(() {
-                                  _currentExerciseIndex = index;
-                                });
-                              },
-                              itemCount: exerciseBlocks.length,
-                              itemBuilder: (context, index) {
-                                final block = exerciseBlocks[index];
-                                return SingleChildScrollView(
-                                  // Fix: Increase bottom padding from 12 to 120 to clear the FloatingActionButton
-                                  padding: const EdgeInsets.only(left: 16, right: 16, top: 12, bottom: 120),
-                                  child: _buildExerciseBlock(
-                                      block, exerciseBlocks, settings, exercisesAsync),
-                                );
-                              },
-                            ),
-                          ),
-                          // Bottom Navigation Controls
-                          _buildBottomNavigation(exerciseBlocks),
-                        ],
+                      return PageView.builder(
+                        controller: _pageController,
+                        onPageChanged: (index) {
+                          setState(() {
+                            _currentExerciseIndex = index;
+                          });
+                        },
+                        itemCount: exerciseBlocks.length,
+                        itemBuilder: (context, index) {
+                          final block = exerciseBlocks[index];
+                          return SingleChildScrollView(
+                            padding: const EdgeInsets.only(left: 16, right: 16, top: 12, bottom: 120),
+                            child: _buildExerciseBlock(
+                                block, exerciseBlocks, settings, exercisesAsync),
+                          );
+                        },
                       );
                     }
 
                     return ReorderableListView.builder(
                       scrollController: _scrollController,
-                      // Fix: slightly increase bottom padding for extra safety
                       padding: const EdgeInsets.fromLTRB(16, 16, 16, 120),
                       physics: const BouncingScrollPhysics(
                           parent: AlwaysScrollableScrollPhysics()),
@@ -692,7 +698,7 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
                 // Floating Rest Timer
                 if (_isTimerOverlayVisible)
                   Positioned(
-                    bottom: 100,
+                    bottom: 0,
                     left: 20,
                     right: 20,
                     child: FloatingRestTimer(
@@ -703,7 +709,14 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
               ],
             ),
           ),
-          // Removed floatingActionButton, logic moved to bottom bar
+          bottomNavigationBar: StreamBuilder<List<db.WorkoutSet>>(
+            stream: _watchSets(),
+            builder: (context, snapshot) {
+              final sets = snapshot.data ?? [];
+              final blocks = _groupSetsByExercise(sets);
+              return _buildBottomNavigation(context, blocks, workout);
+            },
+          ),
         );
       },
     );
@@ -772,6 +785,7 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
                 onMenuTap: () => _showExerciseMenu(block, exercise),
                 isGlowing: isGlowing,
                 glowValue: _glowController.value,
+                hideMedia: block.sets.any((s) => s.completed),
               ),
             ),
             
@@ -1809,6 +1823,11 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
       for (final id in exerciseIds) {
         await repo.incrementUsageCount(id);
       }
+
+      // Generate 1RM snapshots (Beat Hevy Phase 5: Advanced Analytics)
+      final settings = await ref.read(settingsProvider.future);
+      final strengthRepo = ref.read(strengthRepositoryProvider);
+      await strengthRepo.processWorkout(workout.id, settings.oneRmFormula);
     });
 
     if (mounted) {
@@ -1979,146 +1998,131 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
     );
   }
 
-  Widget _buildBottomNavigation(List<ExerciseBlock> exerciseBlocks) {
-    return StreamBuilder<db.Workout>(
-      stream: ref.watch(db.appDatabaseProvider).select(ref.watch(db.appDatabaseProvider).workouts).watchSingle(),
-      builder: (context, snapshot) {
-        final workout = snapshot.data;
-        final currentBlock = exerciseBlocks.isNotEmpty && _currentExerciseIndex < exerciseBlocks.length 
-            ? exerciseBlocks[_currentExerciseIndex] 
+  Widget _buildBottomNavigation(
+      BuildContext context, List<ExerciseBlock> exerciseBlocks, db.Workout? workout) {
+    final currentBlock =
+        exerciseBlocks.isNotEmpty && _currentExerciseIndex < exerciseBlocks.length
+            ? exerciseBlocks[_currentExerciseIndex]
             : null;
-        final hasNote = currentBlock?.sets.any((s) => s.notes != null && s.notes!.isNotEmpty) ?? false;
+    final hasNote =
+        currentBlock?.sets.any((s) => s.notes != null && s.notes!.isNotEmpty) ??
+            false;
 
-        return Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-          decoration: BoxDecoration(
-            color: Theme.of(context).cardColor,
-            border: Border(
-              top: BorderSide(
-                color: Theme.of(context).dividerColor,
-                width: 0.5,
-              ),
+    return Material(
+      color: Theme.of(context).cardColor,
+      elevation: 8,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+        decoration: BoxDecoration(
+          border: Border(
+            top: BorderSide(
+              color: Theme.of(context).dividerColor,
+              width: 0.5,
             ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.05),
-                blurRadius: 10,
-                offset: const Offset(0, -2),
+          ),
+        ),
+        child: SafeArea(
+          bottom: true,
+          top: false,
+          child: Row(
+            children: [
+              // Navigation Controls
+              Container(
+                decoration: BoxDecoration(
+                  color: Theme.of(context)
+                      .colorScheme
+                      .surfaceContainerHighest
+                      .withOpacity(0.3),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      icon: const Icon(LucideIcons.chevronLeft, size: 20),
+                      onPressed: _currentExerciseIndex > 0
+                          ? () {
+                              _pageController.previousPage(
+                                duration: const Duration(milliseconds: 300),
+                                curve: Curves.easeInOut,
+                              );
+                            }
+                          : null,
+                    ),
+                    Text(
+                      '${_currentExerciseIndex + 1} of ${exerciseBlocks.length}',
+                      style: GoogleFonts.inter(
+                        fontWeight: FontWeight.w900,
+                        fontSize: 13,
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(LucideIcons.chevronRight, size: 20),
+                      onPressed:
+                          _currentExerciseIndex < exerciseBlocks.length - 1
+                              ? () {
+                                  _pageController.nextPage(
+                                    duration: const Duration(milliseconds: 300),
+                                    curve: Curves.easeInOut,
+                                  );
+                                }
+                              : null,
+                    ),
+                  ],
+                ),
+              ),
+
+              const Spacer(),
+
+              // Action Icons
+              IconButton(
+                icon: const Icon(LucideIcons.plus, size: 22),
+                color: Theme.of(context).primaryColor,
+                onPressed: _showExercisePicker,
+                tooltip: 'Add Exercise',
+              ),
+
+              Stack(
+                children: [
+                  IconButton(
+                    icon: Icon(
+                      hasNote ? LucideIcons.fileText : LucideIcons.pencil,
+                      color: hasNote
+                          ? Theme.of(context).primaryColor
+                          : Theme.of(context).colorScheme.outline,
+                      size: 22,
+                    ),
+                    onPressed: currentBlock != null
+                        ? () => _showNotesDialog(currentBlock)
+                        : null,
+                  ),
+                  if (hasNote)
+                    Positioned(
+                      right: 8,
+                      top: 8,
+                      child: Container(
+                        width: 8,
+                        height: 8,
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).primaryColor,
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.white, width: 1.5),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+
+              IconButton(
+                icon: const Icon(LucideIcons.ellipsisVertical, size: 22),
+                onPressed: workout != null
+                    ? () => _showMoreMenu(currentBlock, workout)
+                    : null,
               ),
             ],
           ),
-          child: SafeArea(
-            bottom: true,
-            top: false,
-            child: Row(
-              children: [
-                // Navigation Controls
-                Container(
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.3),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        icon: const Icon(LucideIcons.chevronLeft, size: 20),
-                        onPressed: _currentExerciseIndex > 0
-                            ? () {
-                                _pageController.previousPage(
-                                  duration: const Duration(milliseconds: 300),
-                                  curve: Curves.easeInOut,
-                                );
-                              }
-                            : null,
-                      ),
-                      Text(
-                        '${_currentExerciseIndex + 1} of ${exerciseBlocks.length}',
-                        style: GoogleFonts.inter(
-                          fontWeight: FontWeight.w900,
-                          fontSize: 13,
-                        ),
-                      ),
-                      IconButton(
-                        icon: const Icon(LucideIcons.chevronRight, size: 20),
-                        onPressed: _currentExerciseIndex < exerciseBlocks.length - 1
-                            ? () {
-                                _pageController.nextPage(
-                                  duration: const Duration(milliseconds: 300),
-                                  curve: Curves.easeInOut,
-                                );
-                              }
-                            : null,
-                      ),
-                    ],
-                  ),
-                ),
-                
-                const Spacer(),
-                
-                // Action Icons
-                Stack(
-                  children: [
-                    IconButton(
-                      icon: Icon(
-                        hasNote ? LucideIcons.fileText : LucideIcons.pencil,
-                        color: hasNote ? Theme.of(context).primaryColor : Theme.of(context).colorScheme.outline,
-                        size: 22,
-                      ),
-                      onPressed: currentBlock != null ? () => _showNotesDialog(currentBlock) : null,
-                    ),
-                    if (hasNote)
-                      Positioned(
-                        right: 8,
-                        top: 8,
-                        child: Container(
-                          width: 8,
-                          height: 8,
-                          decoration: BoxDecoration(
-                            color: Theme.of(context).primaryColor,
-                            shape: BoxShape.circle,
-                            border: Border.all(color: Colors.white, width: 1.5),
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
-                
-                IconButton(
-                  icon: const Icon(LucideIcons.ellipsisVertical, size: 22),
-                  onPressed: workout != null ? () => _showMoreMenu(currentBlock, workout) : null,
-                ),
-                
-                const SizedBox(width: 8),
-                
-                // Finish Button
-                SizedBox(
-                  height: 44,
-                  child: ElevatedButton(
-                    onPressed: workout != null ? () => _showSummary(workout) : null,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Theme.of(context).colorScheme.primary,
-                      foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                      elevation: 0,
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    child: Text(
-                      'Finish',
-                      style: GoogleFonts.inter(
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: 0.5,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
+        ),
+      ),
     );
   }
 }

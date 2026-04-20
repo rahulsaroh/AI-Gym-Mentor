@@ -2,7 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:ai_gym_mentor/core/database/database.dart';
 import 'package:ai_gym_mentor/services/progression_service.dart';
 import 'package:drift/native.dart';
-import 'package:drift/drift.dart' hide Column;
+import 'package:drift/drift.dart' hide Column, isNull, isNotNull;
 import 'package:mocktail/mocktail.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

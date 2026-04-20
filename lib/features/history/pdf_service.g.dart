@@ -14,15 +14,15 @@ final pdfServiceProvider = PdfServiceProvider._();
 
 final class PdfServiceProvider extends $NotifierProvider<PdfService, void> {
   PdfServiceProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'pdfServiceProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'pdfServiceProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$pdfServiceHash();
@@ -48,8 +48,14 @@ abstract class _$PdfService extends $Notifier<void> {
   @override
   void runBuild() {
     final ref = this.ref as $Ref<void, void>;
-    final element = ref.element as $ClassProviderElement<
-        AnyNotifier<void, void>, void, Object?, Object?>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<void, void>,
+              void,
+              Object?,
+              Object?
+            >;
     element.handleCreate(ref, build);
   }
 }

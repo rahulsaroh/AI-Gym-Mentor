@@ -15,15 +15,15 @@ final plateauServiceProvider = PlateauServiceProvider._();
 final class PlateauServiceProvider
     extends $NotifierProvider<PlateauService, void> {
   PlateauServiceProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'plateauServiceProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'plateauServiceProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$plateauServiceHash();
@@ -49,8 +49,14 @@ abstract class _$PlateauService extends $Notifier<void> {
   @override
   void runBuild() {
     final ref = this.ref as $Ref<void, void>;
-    final element = ref.element as $ClassProviderElement<
-        AnyNotifier<void, void>, void, Object?, Object?>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<void, void>,
+              void,
+              Object?,
+              Object?
+            >;
     element.handleCreate(ref, build);
   }
 }

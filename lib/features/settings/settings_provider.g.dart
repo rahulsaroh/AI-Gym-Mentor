@@ -15,15 +15,15 @@ final settingsProvider = SettingsProvider._();
 final class SettingsProvider
     extends $AsyncNotifierProvider<Settings, SettingsState> {
   SettingsProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'settingsProvider',
-          isAutoDispose: false,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'settingsProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$settingsHash();
@@ -33,7 +33,7 @@ final class SettingsProvider
   Settings create() => Settings();
 }
 
-String _$settingsHash() => r'374df1393faa783907ebbf2e020b6afa5691a493';
+String _$settingsHash() => r'42bf68ca204bb5692aa5b2157ea517dce33c8497';
 
 abstract class _$Settings extends $AsyncNotifier<SettingsState> {
   FutureOr<SettingsState> build();
@@ -41,11 +41,14 @@ abstract class _$Settings extends $AsyncNotifier<SettingsState> {
   @override
   void runBuild() {
     final ref = this.ref as $Ref<AsyncValue<SettingsState>, SettingsState>;
-    final element = ref.element as $ClassProviderElement<
-        AnyNotifier<AsyncValue<SettingsState>, SettingsState>,
-        AsyncValue<SettingsState>,
-        Object?,
-        Object?>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<AsyncValue<SettingsState>, SettingsState>,
+              AsyncValue<SettingsState>,
+              Object?,
+              Object?
+            >;
     element.handleCreate(ref, build);
   }
 }
@@ -57,15 +60,15 @@ final class DataServiceProvider
     extends $FunctionalProvider<DataService, DataService, DataService>
     with $Provider<DataService> {
   DataServiceProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'dataServiceProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'dataServiceProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$dataServiceHash();

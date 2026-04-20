@@ -110,12 +110,21 @@ class FloatingRestTimer extends ConsumerWidget {
                 ),
                 const SizedBox(width: 8),
                 // Actions
-                IconButton(
-                  icon: const Icon(LucideIcons.plus, size: 20),
-                  onPressed: () => notifier.extend(15),
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
-                  visualDensity: VisualDensity.compact,
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _buildTimerButton(
+                      context,
+                      label: '-15',
+                      onPressed: () => notifier.extend(-15),
+                    ),
+                    const SizedBox(width: 8),
+                    _buildTimerButton(
+                      context,
+                      label: '+15',
+                      onPressed: () => notifier.extend(15),
+                    ),
+                  ],
                 ),
                 const SizedBox(width: 12),
                 GestureDetector(
@@ -140,6 +149,7 @@ class FloatingRestTimer extends ConsumerWidget {
                     ),
                   ),
                 ),
+
               ],
             ),
           ),
@@ -148,7 +158,32 @@ class FloatingRestTimer extends ConsumerWidget {
     );
   }
 
+  Widget _buildTimerButton(BuildContext context, {required String label, required VoidCallback onPressed}) {
+    return GestureDetector(
+      onTap: onPressed,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: Theme.of(context).primaryColor.withOpacity(0.3),
+            width: 1,
+          ),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Text(
+          label,
+          style: GoogleFonts.inter(
+            fontSize: 10,
+            fontWeight: FontWeight.bold,
+            color: Theme.of(context).primaryColor,
+          ),
+        ),
+      ),
+    );
+  }
+
   String _formatTime(int seconds) {
+
     final m = seconds ~/ 60;
     final s = seconds % 60;
     if (m > 0) return '$m:${s.toString().padLeft(1, '0')}';

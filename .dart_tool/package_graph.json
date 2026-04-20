@@ -54,6 +54,7 @@
         "url_launcher",
         "uuid",
         "visibility_detector",
+        "watch_connectivity",
         "workmanager"
       ],
       "devDependencies": [
@@ -324,6 +325,14 @@
         "meta",
         "nm",
         "web"
+      ]
+    },
+    {
+      "name": "watch_connectivity",
+      "version": "0.2.8",
+      "dependencies": [
+        "flutter",
+        "watch_connectivity_platform_interface"
       ]
     },
     {
@@ -1386,6 +1395,15 @@
       ]
     },
     {
+      "name": "watch_connectivity_platform_interface",
+      "version": "0.4.0",
+      "dependencies": [
+        "flutter",
+        "meta",
+        "uuid"
+      ]
+    },
+    {
       "name": "workmanager_apple",
       "version": "0.9.1+2",
       "dependencies": [
@@ -2284,20 +2302,6 @@
       ]
     },
     {
-      "name": "sync_http",
-      "version": "0.3.1",
-      "dependencies": []
-    },
-    {
-      "name": "process",
-      "version": "5.0.5",
-      "dependencies": [
-        "file",
-        "path",
-        "platform"
-      ]
-    },
-    {
       "name": "test",
       "version": "1.30.0",
       "dependencies": [
@@ -2329,6 +2333,27 @@
       ]
     },
     {
+      "name": "sync_http",
+      "version": "0.3.1",
+      "dependencies": []
+    },
+    {
+      "name": "process",
+      "version": "5.0.5",
+      "dependencies": [
+        "file",
+        "path",
+        "platform"
+      ]
+    },
+    {
+      "name": "webkit_inspection_protocol",
+      "version": "1.2.1",
+      "dependencies": [
+        "logging"
+      ]
+    },
+    {
       "name": "test_core",
       "version": "0.6.16",
       "dependencies": [
@@ -2353,13 +2378,6 @@
         "test_api",
         "vm_service",
         "yaml"
-      ]
-    },
-    {
-      "name": "webkit_inspection_protocol",
-      "version": "1.2.1",
-      "dependencies": [
-        "logging"
       ]
     },
     {
