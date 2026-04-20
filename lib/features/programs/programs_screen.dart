@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,6 +10,8 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:ai_gym_mentor/features/workout/workout_repository.dart';
 import 'package:ai_gym_mentor/features/workout/providers/workout_home_notifier.dart';
+import 'package:ai_gym_mentor/features/programs/components/mesocycle_list_view.dart';
+import 'package:ai_gym_mentor/features/programs/providers/mesocycles_notifier.dart';
 
 class ProgramsScreen extends ConsumerStatefulWidget {
   const ProgramsScreen({super.key});
@@ -32,79 +35,119 @@ class _ProgramsScreenState extends ConsumerState<ProgramsScreen> {
   Widget build(BuildContext context) {
     final stateAsync = ref.watch(programsProvider);
 
-    return Scaffold(
-      backgroundColor: Colors.grey[50],
-      appBar: AppBar(
-        title: Text('Exercise Plans',
-            style: GoogleFonts.outfit(fontWeight: FontWeight.bold)),
-        actions: [
-          IconButton(
-            icon: const Icon(LucideIcons.rotateCcw),
-            tooltip: 'Reset to Sample',
-            onPressed: () => _showResetConfirm(context),
+    return DefaultTabController(
+      length: 2,
+      child: Scaffold(
+        backgroundColor: Colors.grey[50],
+        appBar: AppBar(
+          title: Text('Training Programs',
+              style: GoogleFonts.outfit(fontWeight: FontWeight.bold)),
+          actions: [
+            IconButton(
+              icon: const Icon(LucideIcons.rotateCcw),
+              tooltip: 'Reset to Sample',
+              onPressed: () => _showResetConfirm(context),
+            ),
+            IconButton(
+              icon: const Icon(LucideIcons.download),
+              onPressed: () => _showImportOptions(context, ref),
+              tooltip: 'Import JSON',
+            ),
+          ],
+          bottom: TabBar(
+            tabs: const [
+              Tab(text: 'Exercise Plans'),
+              Tab(text: 'Mesocycles'),
+            ],
+            labelStyle: GoogleFonts.outfit(fontWeight: FontWeight.bold),
+            indicatorColor: Colors.orange[700],
+            indicatorWeight: 3,
+            labelColor: Colors.orange[800],
+            unselectedLabelColor: Colors.grey[600],
           ),
-          IconButton(
-            icon: const Icon(LucideIcons.download),
-            onPressed: () => _showImportOptions(context, ref),
-            tooltip: 'Import JSON',
-          ),
-        ],
-      ),
-      body: Column(
-        children: [
-          _buildFilters(),
-          Expanded(
-            child: stateAsync.when(
-              data: (state) {
-                final filteredTemplates = _selectedGoal == 'All Goals'
-                    ? state.templates
-                    : state.templates.where((t) {
-                        final desc = t.description?.toLowerCase() ?? '';
-                        return desc.contains(_selectedGoal.toLowerCase());
-                      }).toList();
-
-                if (state.templates.isEmpty) {
-                  return _buildEmptyState(context, ref);
-                }
-                return RefreshIndicator(
-                  onRefresh: () => ref.read(programsProvider.notifier).refresh(),
-                  child: ListView.builder(
-                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 100),
-                    itemCount: filteredTemplates.length,
-                    itemBuilder: (context, index) {
-                      final template = filteredTemplates[index];
-                      return _ProgramCard(template: template);
-                    },
+        ),
+        body: TabBarView(
+          children: [
+            _buildPlansList(stateAsync),
+            const MesocycleListView(),
+          ],
+        ),
+        floatingActionButton: Builder(
+          builder: (context) {
+            final tabController = DefaultTabController.of(context);
+            return ListenableBuilder(
+              listenable: tabController,
+              builder: (context, _) {
+                final isMesocycleTab = tabController.index == 1;
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: SizedBox(
+                    width: double.infinity,
+                    height: 56,
+                    child: FloatingActionButton.extended(
+                      onPressed: () {
+                        if (isMesocycleTab) {
+                          context.push('/programs/mesocycle/create');
+                        } else {
+                          context.push('/programs/create');
+                        }
+                      },
+                      backgroundColor: Colors.orange[700],
+                      icon: const Icon(LucideIcons.plus, color: Colors.white),
+                      label: Text(
+                        isMesocycleTab ? 'Create Mesocycle' : 'New Plan',
+                        style: GoogleFonts.outfit(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
                   ),
                 );
               },
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (e, s) => Center(child: Text('Error: $e')),
-            ),
-          ),
-        ],
+            );
+          },
+        ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: SizedBox(
-          width: double.infinity,
-          height: 56,
-          child: FloatingActionButton.extended(
-            onPressed: () => context.push('/programs/create'),
-            backgroundColor: Colors.orange[700],
-            icon: const Icon(LucideIcons.plus, color: Colors.white),
-            label: Text(
-              'New Plan',
-              style: GoogleFonts.outfit(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-              ),
-            ),
+    );
+  }
+
+  Widget _buildPlansList(AsyncValue<ProgramsState> stateAsync) {
+    return Column(
+      children: [
+        _buildFilters(),
+        Expanded(
+          child: stateAsync.when(
+            data: (state) {
+              final filteredTemplates = _selectedGoal == 'All Goals'
+                  ? state.templates
+                  : state.templates.where((t) {
+                      final desc = t.description?.toLowerCase() ?? '';
+                      return desc.contains(_selectedGoal.toLowerCase());
+                    }).toList();
+
+              if (state.templates.isEmpty) {
+                return _buildEmptyState(context, ref);
+              }
+              return RefreshIndicator(
+                onRefresh: () => ref.read(programsProvider.notifier).refresh(),
+                child: ListView.builder(
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 100),
+                  itemCount: filteredTemplates.length,
+                  itemBuilder: (context, index) {
+                    final template = filteredTemplates[index];
+                    return _ProgramCard(template: template);
+                  },
+                ),
+              );
+            },
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error: (e, s) => Center(child: Text('Error: $e')),
           ),
         ),
-      ),
+      ],
     );
   }
 
@@ -228,6 +271,16 @@ class _ProgramsScreenState extends ConsumerState<ProgramsScreen> {
                   ref.read(programsProvider.notifier).importPplEliteProgram();
                 },
               ),
+              const Divider(),
+              ListTile(
+                leading: const Icon(LucideIcons.code),
+                title: const Text('View Sample JSON Template'),
+                subtitle: const Text('Copy format to use with your own AI'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _showSampleJsonDialog(context, ref);
+                },
+              ),
             ],
           ),
         ),
@@ -304,6 +357,73 @@ class _ProgramsScreenState extends ConsumerState<ProgramsScreen> {
               }
             },
             child: Text('Import', style: GoogleFonts.outfit(fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showSampleJsonDialog(BuildContext context, WidgetRef ref) {
+    final repo = ref.read(workoutRepositoryProvider);
+    final rawJson = repo.getSampleJson();
+    
+    // Pretty-print JSON
+    final decoded = jsonDecode(rawJson);
+    final prettyJson = const JsonEncoder.withIndent('  ').convert(decoded);
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text('Sample JSON Template', style: GoogleFonts.outfit(fontWeight: FontWeight.bold)),
+            IconButton(
+              icon: const Icon(LucideIcons.copy, size: 20),
+              tooltip: 'Copy to Clipboard',
+              onPressed: () {
+                Clipboard.setData(ClipboardData(text: prettyJson));
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('JSON copied to clipboard')),
+                );
+              },
+            ),
+          ],
+        ),
+        content: SizedBox(
+          width: double.maxFinite,
+          height: MediaQuery.of(context).size.height * 0.6,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Use this format to ask your AI (ChatGPT/Gemini) to generate new plans for you.',
+                style: TextStyle(fontSize: 12, color: Colors.grey),
+              ),
+              const SizedBox(height: 12),
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[100],
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.grey[300]!),
+                  ),
+                  child: SingleChildScrollView(
+                    child: SelectableText(
+                      prettyJson,
+                      style: GoogleFonts.firaCode(fontSize: 11, color: Colors.blueGrey[900]),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Close', style: GoogleFonts.outfit(fontWeight: FontWeight.bold)),
           ),
         ],
       ),

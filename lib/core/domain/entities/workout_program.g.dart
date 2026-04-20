@@ -14,7 +14,8 @@ _WorkoutProgram _$WorkoutProgramFromJson(Map<String, dynamic> json) =>
       lastUsed: json['lastUsed'] == null
           ? null
           : DateTime.parse(json['lastUsed'] as String),
-      days: (json['days'] as List<dynamic>?)
+      days:
+          (json['days'] as List<dynamic>?)
               ?.map((e) => ProgramDay.fromJson(e as Map<String, dynamic>))
               .toList() ??
           const [],
@@ -30,16 +31,17 @@ Map<String, dynamic> _$WorkoutProgramToJson(_WorkoutProgram instance) =>
     };
 
 _ProgramDay _$ProgramDayFromJson(Map<String, dynamic> json) => _ProgramDay(
-      id: (json['id'] as num).toInt(),
-      templateId: (json['templateId'] as num).toInt(),
-      name: json['name'] as String,
-      order: (json['order'] as num).toInt(),
-      weekday: (json['weekday'] as num?)?.toInt(),
-      exercises: (json['exercises'] as List<dynamic>?)
-              ?.map((e) => ProgramExercise.fromJson(e as Map<String, dynamic>))
-              .toList() ??
-          const [],
-    );
+  id: (json['id'] as num).toInt(),
+  templateId: (json['templateId'] as num).toInt(),
+  name: json['name'] as String,
+  order: (json['order'] as num).toInt(),
+  weekday: (json['weekday'] as num?)?.toInt(),
+  exercises:
+      (json['exercises'] as List<dynamic>?)
+          ?.map((e) => ProgramExercise.fromJson(e as Map<String, dynamic>))
+          .toList() ??
+      const [],
+);
 
 Map<String, dynamic> _$ProgramDayToJson(_ProgramDay instance) =>
     <String, dynamic>{
@@ -55,8 +57,9 @@ _ProgramExercise _$ProgramExerciseFromJson(Map<String, dynamic> json) =>
     _ProgramExercise(
       id: (json['id'] as num).toInt(),
       dayId: (json['dayId'] as num).toInt(),
-      exercise:
-          ExerciseEntity.fromJson(json['exercise'] as Map<String, dynamic>),
+      exercise: ExerciseEntity.fromJson(
+        json['exercise'] as Map<String, dynamic>,
+      ),
       order: (json['order'] as num).toInt(),
       setType: json['setType'] as String? ?? 'Straight',
       setsJson: json['setsJson'] as String? ?? '[]',

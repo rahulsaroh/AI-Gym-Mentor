@@ -15,15 +15,15 @@ final historyFilterStateProvider = HistoryFilterStateProvider._();
 final class HistoryFilterStateProvider
     extends $NotifierProvider<HistoryFilterState, HistoryFilter> {
   HistoryFilterStateProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'historyFilterStateProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'historyFilterStateProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$historyFilterStateHash();
@@ -50,11 +50,14 @@ abstract class _$HistoryFilterState extends $Notifier<HistoryFilter> {
   @override
   void runBuild() {
     final ref = this.ref as $Ref<HistoryFilter, HistoryFilter>;
-    final element = ref.element as $ClassProviderElement<
-        AnyNotifier<HistoryFilter, HistoryFilter>,
-        HistoryFilter,
-        Object?,
-        Object?>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<HistoryFilter, HistoryFilter>,
+              HistoryFilter,
+              Object?,
+              Object?
+            >;
     element.handleCreate(ref, build);
   }
 }
@@ -62,23 +65,26 @@ abstract class _$HistoryFilterState extends $Notifier<HistoryFilter> {
 @ProviderFor(historyStats)
 final historyStatsProvider = HistoryStatsProvider._();
 
-final class HistoryStatsProvider extends $FunctionalProvider<
-        AsyncValue<Map<String, dynamic>>,
-        Map<String, dynamic>,
-        FutureOr<Map<String, dynamic>>>
+final class HistoryStatsProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<Map<String, dynamic>>,
+          Map<String, dynamic>,
+          FutureOr<Map<String, dynamic>>
+        >
     with
         $FutureModifier<Map<String, dynamic>>,
         $FutureProvider<Map<String, dynamic>> {
   HistoryStatsProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'historyStatsProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'historyStatsProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$historyStatsHash();
@@ -86,8 +92,8 @@ final class HistoryStatsProvider extends $FunctionalProvider<
   @$internal
   @override
   $FutureProviderElement<Map<String, dynamic>> $createElement(
-          $ProviderPointer pointer) =>
-      $FutureProviderElement(pointer);
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
 
   @override
   FutureOr<Map<String, dynamic>> create(Ref ref) {
@@ -103,15 +109,15 @@ final historyListProvider = HistoryListProvider._();
 final class HistoryListProvider
     extends $AsyncNotifierProvider<HistoryList, List<HistoryItem>> {
   HistoryListProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'historyListProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'historyListProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$historyListHash();
@@ -130,11 +136,14 @@ abstract class _$HistoryList extends $AsyncNotifier<List<HistoryItem>> {
   void runBuild() {
     final ref =
         this.ref as $Ref<AsyncValue<List<HistoryItem>>, List<HistoryItem>>;
-    final element = ref.element as $ClassProviderElement<
-        AnyNotifier<AsyncValue<List<HistoryItem>>, List<HistoryItem>>,
-        AsyncValue<List<HistoryItem>>,
-        Object?,
-        Object?>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<AsyncValue<List<HistoryItem>>, List<HistoryItem>>,
+              AsyncValue<List<HistoryItem>>,
+              Object?,
+              Object?
+            >;
     element.handleCreate(ref, build);
   }
 }
@@ -142,23 +151,26 @@ abstract class _$HistoryList extends $AsyncNotifier<List<HistoryItem>> {
 @ProviderFor(heatmapSets)
 final heatmapSetsProvider = HeatmapSetsProvider._();
 
-final class HeatmapSetsProvider extends $FunctionalProvider<
-        AsyncValue<List<ent.LoggedSet>>,
-        List<ent.LoggedSet>,
-        FutureOr<List<ent.LoggedSet>>>
+final class HeatmapSetsProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<ent.LoggedSet>>,
+          List<ent.LoggedSet>,
+          FutureOr<List<ent.LoggedSet>>
+        >
     with
         $FutureModifier<List<ent.LoggedSet>>,
         $FutureProvider<List<ent.LoggedSet>> {
   HeatmapSetsProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'heatmapSetsProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'heatmapSetsProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$heatmapSetsHash();
@@ -166,8 +178,8 @@ final class HeatmapSetsProvider extends $FunctionalProvider<
   @$internal
   @override
   $FutureProviderElement<List<ent.LoggedSet>> $createElement(
-          $ProviderPointer pointer) =>
-      $FutureProviderElement(pointer);
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
 
   @override
   FutureOr<List<ent.LoggedSet>> create(Ref ref) {

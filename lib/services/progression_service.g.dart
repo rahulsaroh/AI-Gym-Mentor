@@ -15,15 +15,15 @@ final progressionServiceProvider = ProgressionServiceProvider._();
 final class ProgressionServiceProvider
     extends $NotifierProvider<ProgressionService, void> {
   ProgressionServiceProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'progressionServiceProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'progressionServiceProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$progressionServiceHash();
@@ -42,7 +42,7 @@ final class ProgressionServiceProvider
 }
 
 String _$progressionServiceHash() =>
-    r'96ddb7e1bd7d113277d8c6ba6cb7f2b56a66b8a6';
+    r'26611ec3700d6d62ef5af24ff2bc9429db68e077';
 
 abstract class _$ProgressionService extends $Notifier<void> {
   void build();
@@ -50,8 +50,14 @@ abstract class _$ProgressionService extends $Notifier<void> {
   @override
   void runBuild() {
     final ref = this.ref as $Ref<void, void>;
-    final element = ref.element as $ClassProviderElement<
-        AnyNotifier<void, void>, void, Object?, Object?>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<void, void>,
+              void,
+              Object?,
+              Object?
+            >;
     element.handleCreate(ref, build);
   }
 }

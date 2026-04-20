@@ -11,14 +11,18 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:drift/drift.dart' show OrderingTerm, OrderingMode;
 import 'package:ai_gym_mentor/features/workout/providers/workout_home_notifier.dart';
 import 'package:ai_gym_mentor/features/workout/components/begin_session_sheet.dart';
+import 'package:ai_gym_mentor/features/workout/components/instant_workout_generator_sheet.dart';
 import 'package:ai_gym_mentor/services/plateau_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ai_gym_mentor/features/workout/workout_repository.dart';
 import 'package:ai_gym_mentor/features/analytics/presentation/widgets/stats_trend_chart.dart';
-import 'package:ai_gym_mentor/features/analytics/presentation/widgets/workout_heatmap.dart';
 import 'package:ai_gym_mentor/features/analytics/analytics_providers.dart';
-
+import 'package:ai_gym_mentor/features/analytics/presentation/widgets/workout_heatmap.dart';
 import 'package:ai_gym_mentor/core/widgets/skeleton_card.dart';
+import 'package:ai_gym_mentor/features/bodymap/providers/bodymap_provider.dart';
+import 'package:ai_gym_mentor/features/bodymap/widgets/body_map_painter.dart';
+import 'package:ai_gym_mentor/features/bodymap/widgets/muscle_path_registry.dart';
+import 'package:ai_gym_mentor/core/services/heatmap_color_service.dart';
 
 class WorkoutHomeScreen extends ConsumerWidget {
   const WorkoutHomeScreen({super.key});
@@ -40,6 +44,7 @@ class WorkoutHomeScreen extends ConsumerWidget {
                   _PlateauAlertSection(),
                   _TodayPlanSection(state: state),
                   _QuickActionSection(),
+                  _MuscleRecoveryHeatmap(),
                   _LastWorkoutSection(state: state),
                   _ConsistencySection(),
                   _WeeklyVolumeSection(state: state),
@@ -305,10 +310,10 @@ class _TodayPlanSection extends ConsumerWidget {
                                     child: Row(
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
-                                        const Icon(LucideIcons.repeat, size: 10, color: Colors.white),
-                                        const SizedBox(width: 4),
-                                        Text(
-                                          'CHANGE',
+                                  const Icon(LucideIcons.repeat, size: 10, color: Colors.white),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    'CHANGE',
                                           style: GoogleFonts.outfit(
                                             fontSize: 9,
                                             fontWeight: FontWeight.bold,
@@ -586,6 +591,21 @@ class _QuickActionSection extends StatelessWidget {
               color: Colors.blue.shade400,
               onTap: () => context.push('/exercises'),
             ),
+            const SizedBox(width: 12),
+            _QuickActionItem(
+              icon: LucideIcons.sparkles,
+              label: 'AI AI',
+              color: Colors.amber.shade600,
+              isAi: true,
+              onTap: () {
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  backgroundColor: Colors.transparent,
+                  builder: (context) => const InstantWorkoutGeneratorSheet(),
+                );
+              },
+            ),
           ],
         ),
       ),
@@ -598,16 +618,20 @@ class _QuickActionItem extends StatelessWidget {
   final String label;
   final Color color;
   final VoidCallback onTap;
+  final bool isAi;
 
   const _QuickActionItem({
     required this.icon,
     required this.label,
     required this.color,
     required this.onTap,
+    this.isAi = false,
   });
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    
     return Expanded(
       child: InkWell(
         onTap: onTap,
@@ -615,30 +639,143 @@ class _QuickActionItem extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 16),
           decoration: BoxDecoration(
-            color: Theme.of(context)
-                .colorScheme
-                .surfaceContainerHighest
-                .withValues(alpha: 0.5),
+            color: isAi 
+                ? colorScheme.primary.withValues(alpha: 0.1)
+                : colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: Theme.of(context).dividerColor.withValues(alpha: 0.1),
+              color: isAi
+                  ? colorScheme.primary.withValues(alpha: 0.3)
+                  : Theme.of(context).dividerColor.withValues(alpha: 0.1),
+              width: isAi ? 1.5 : 1,
             ),
           ),
           child: Column(
             children: [
-              Icon(icon, color: color),
+              if (isAi)
+                 ShaderMask(
+                  shaderCallback: (Rect bounds) {
+                    return LinearGradient(
+                      colors: [Colors.orange.shade700, Colors.pink.shade500],
+                    ).createShader(bounds);
+                  },
+                  child: Icon(icon, color: Colors.white),
+                )
+              else
+                Icon(icon, color: color),
               const SizedBox(height: 8),
               Text(
                 label,
                 style: GoogleFonts.outfit(
                   fontSize: 12,
-                  fontWeight: FontWeight.w600,
+                  fontWeight: isAi ? FontWeight.w800 : FontWeight.w600,
+                  color: isAi ? colorScheme.primary : null,
+                  letterSpacing: isAi ? 0.5 : 0,
                 ),
               ),
             ],
           ),
         ),
       ),
+    );
+  }
+}
+
+class _MuscleRecoveryHeatmap extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final heatAsync = ref.watch(muscleHeatDataProvider);
+    
+    return SliverToBoxAdapter(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surface,
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.1)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Recovery Status',
+                    style: GoogleFonts.outfit(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const Icon(LucideIcons.activity, size: 16, color: Colors.purple),
+                ],
+              ),
+              const SizedBox(height: 16),
+              SizedBox(
+                height: 200,
+                child: heatAsync.when(
+                  data: (data) => Row(
+                    children: [
+                      Expanded(
+                        child: CustomPaint(
+                          painter: BodyMapPainter(
+                            heatData: data,
+                            musclePaths: MusclePathRegistry.getFrontPaths(),
+                            mode: BodyMapMode.doms,
+                            colorService: HeatmapColorService(),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 20),
+                      Expanded(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _RecoveryIndicator(label: 'Sore', color: const Color(0xFF7C4DFF)),
+                            const SizedBox(height: 8),
+                            _RecoveryIndicator(label: 'Recovered', color: const Color(0xFFBDBDBD)),
+                            const SizedBox(height: 16),
+                            Text(
+                              'Muscles highlighted in purple are still recovering. Avoid heavy loading until recovered.',
+                              style: TextStyle(fontSize: 11, color: Theme.of(context).colorScheme.outline),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  loading: () => const Center(child: CircularProgressIndicator()),
+                  error: (e, _) => Text('Error: $e'),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _RecoveryIndicator extends StatelessWidget {
+  final String label;
+  final Color color;
+  const _RecoveryIndicator({required this.label, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Container(
+          width: 12,
+          height: 12,
+          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+        ),
+        const SizedBox(width: 8),
+        Text(label, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
+      ],
     );
   }
 }

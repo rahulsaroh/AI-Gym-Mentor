@@ -14,15 +14,15 @@ final csvServiceProvider = CsvServiceProvider._();
 
 final class CsvServiceProvider extends $NotifierProvider<CsvService, void> {
   CsvServiceProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'csvServiceProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'csvServiceProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$csvServiceHash();
@@ -40,7 +40,7 @@ final class CsvServiceProvider extends $NotifierProvider<CsvService, void> {
   }
 }
 
-String _$csvServiceHash() => r'eee97f157dec52dd0592c3c0a98c1fa09ee143f3';
+String _$csvServiceHash() => r'21d9cdc111b8acbfab049ba5c790f804e7802972';
 
 abstract class _$CsvService extends $Notifier<void> {
   void build();
@@ -48,8 +48,14 @@ abstract class _$CsvService extends $Notifier<void> {
   @override
   void runBuild() {
     final ref = this.ref as $Ref<void, void>;
-    final element = ref.element as $ClassProviderElement<
-        AnyNotifier<void, void>, void, Object?, Object?>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<void, void>,
+              void,
+              Object?,
+              Object?
+            >;
     element.handleCreate(ref, build);
   }
 }

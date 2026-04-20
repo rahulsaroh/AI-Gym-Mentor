@@ -83,43 +83,94 @@ class _ExerciseHistoryScreenState extends ConsumerState<ExerciseHistoryScreen> {
                           .reduce((a, b) => a > b ? a : b);
                       final diff = latest1RM - oldest1RM;
 
-                      return Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: diff > 0
-                              ? Colors.green.withValues(alpha: 0.1)
-                              : Colors.grey.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                              color: diff > 0
-                                  ? Colors.green.withValues(alpha: 0.3)
-                                  : Colors.grey.withValues(alpha: 0.3)),
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(
-                                diff > 0
-                                    ? LucideIcons.trendingUp
-                                    : LucideIcons.minus,
-                                size: 16,
-                                color: diff > 0 ? Colors.green : Colors.grey),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                diff > 0
-                                    ? "You've gained ~${diff.toStringAsFixed(1)}kg est. 1RM over this period"
-                                    : "No significant 1RM gain detected in this range",
-                                style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.bold,
-                                    color:
-                                        diff > 0 ? Colors.green : Colors.grey),
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 1,
+                      // Plateau Detection (Beat Hevy Phase 5)
+                      bool isPlateau = false;
+                      if (sessions.length >= 4) {
+                        double avgPrev3 = 0;
+                        for (int i = 1; i < 4; i++) {
+                          final sSets = sessions[i]['sets'] as List<WorkoutSet>;
+                          if (sSets.isNotEmpty) {
+                            avgPrev3 += sSets
+                                .map((s) => s.weight * (1 + s.reps / 30))
+                                .reduce((a, b) => a > b ? a : b);
+                          }
+                        }
+                        avgPrev3 /= 3;
+                        if (latest1RM <= avgPrev3 * 1.01) {
+                          isPlateau = true;
+                        }
+                      }
+
+                      return Column(
+                        children: [
+                          if (isPlateau)
+                            Container(
+                              margin: const EdgeInsets.only(bottom: 12),
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: Colors.orange.withValues(alpha: 0.1),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(color: Colors.orange.withValues(alpha: 0.3)),
+                              ),
+                              child: Row(
+                                children: [
+                                  const Icon(LucideIcons.triangleAlert, size: 16, color: Colors.orange),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        const Text('Plateau Detected',
+                                            style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.orange)),
+                                        Text(
+                                          'Your strength has stalled for 4 sessions. Try increasing rest time or reducing volume by 10% for a week (Deload).',
+                                          style: TextStyle(fontSize: 10, color: Colors.orange.withValues(alpha: 0.8)),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                          ],
-                        ),
+                          Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: diff > 0
+                                  ? Colors.green.withValues(alpha: 0.1)
+                                  : Colors.grey.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                  color: diff > 0
+                                      ? Colors.green.withValues(alpha: 0.3)
+                                      : Colors.grey.withValues(alpha: 0.3)),
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(
+                                    diff > 0
+                                        ? LucideIcons.trendingUp
+                                        : LucideIcons.minus,
+                                    size: 16,
+                                    color: diff > 0 ? Colors.green : Colors.grey),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    diff > 0
+                                        ? "You've gained ~${diff.toStringAsFixed(1)}kg est. 1RM over this period"
+                                        : "No significant 1RM gain detected in this range",
+                                    style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold,
+                                        color:
+                                            diff > 0 ? Colors.green : Colors.grey),
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 1,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       );
                     },
                     loading: () => const SizedBox.shrink(),

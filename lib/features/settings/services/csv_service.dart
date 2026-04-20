@@ -35,6 +35,7 @@ class CsvService extends _$CsvService {
     if (selectedColumns.contains('Reps')) header.add('Reps');
     if (selectedColumns.contains('RPE')) header.add('RPE');
     if (selectedColumns.contains('Volume')) header.add('Volume($unitStr)');
+    if (selectedColumns.contains('Est. 1RM')) header.add('Est. 1RM($unitStr)');
     if (selectedColumns.contains('Is PR')) header.add('Is PR');
     if (selectedColumns.contains('Notes')) header.add('Notes');
     rows.add(header);
@@ -64,6 +65,10 @@ class CsvService extends _$CsvService {
       if (selectedColumns.contains('Volume'))
         row.add(WeightConverter.toDisplay(s.weight * s.reps, unit)
             .toStringAsFixed(1));
+      if (selectedColumns.contains('Est. 1RM')) {
+        final rm = s.weight * (1 + s.reps / 30);
+        row.add(WeightConverter.toDisplay(rm, unit).toStringAsFixed(1));
+      }
       if (selectedColumns.contains('Is PR')) row.add(s.isPr ? 'TRUE' : 'FALSE');
       if (selectedColumns.contains('Notes')) row.add(s.notes ?? '');
       rows.add(row);

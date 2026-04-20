@@ -203,20 +203,20 @@ class _ExerciseDetailScreenState extends ConsumerState<ExerciseDetailScreen> wit
       ],
       flexibleSpace: FlexibleSpaceBar(
         stretchModes: const [StretchMode.zoomBackground, StretchMode.blurBackground],
-        background: GestureDetector(
-          onTap: () => _showFullScreenMedia(context, exercise, isOffline),
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              Hero(
-                tag: 'ex_${exercise.id}',
-                child: ExerciseMediaWidget(
-                  animatedUrl: isOffline ? null : exercise.gifUrl,
-                  staticUrl: isOffline ? null : (exercise.imageUrls.isNotEmpty ? exercise.imageUrls.first : null),
-                  fit: BoxFit.cover,
-                  showDecoration: false, // Handle decoration in SliverAppBar
-                ),
+        background: Stack(
+          fit: StackFit.expand,
+          children: [
+            Hero(
+              tag: 'ex_${exercise.id}',
+              child: ExerciseMediaWidget(
+                animatedUrl: isOffline ? null : exercise.gifUrl,
+                staticUrl: isOffline ? null : (exercise.imageUrls.isNotEmpty ? exercise.imageUrls.first : null),
+                fit: BoxFit.cover,
+                showDecoration: false, // Handle decoration in SliverAppBar
+                isTappable: true,
+                exerciseName: _getLocalizedName(exercise),
               ),
+            ),
               DecoratedBox(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
@@ -302,9 +302,8 @@ class _ExerciseDetailScreenState extends ConsumerState<ExerciseDetailScreen> wit
           ],
         ),
       ),
-    ),
-  );
-}
+    );
+  }
 
   Widget _buildOverviewTab(ExerciseEntity exercise) {
     final l10n = AppLocalizations.of(context)!;
@@ -696,34 +695,7 @@ class _ExerciseDetailScreenState extends ConsumerState<ExerciseDetailScreen> wit
     );
   }
 
-  void _showFullScreenMedia(BuildContext context, ExerciseEntity exercise, bool isOffline) {
-    showDialog(
-      context: context,
-      useSafeArea: false,
-      builder: (context) => Scaffold(
-        backgroundColor: Colors.black,
-        appBar: AppBar(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          leading: IconButton(
-            icon: const Icon(Icons.close, color: Colors.white),
-            onPressed: () => Navigator.pop(context),
-          ),
-        ),
-        body: Center(
-          child: InteractiveViewer(
-            clipBehavior: Clip.none,
-            child: ExerciseMediaWidget(
-              animatedUrl: isOffline ? null : exercise.gifUrl,
-              staticUrl: isOffline ? null : (exercise.imageUrls.isNotEmpty ? exercise.imageUrls.first : null),
-              fit: BoxFit.contain,
-              showDecoration: false,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
+  // Removing local _showFullScreenMedia as it's now handled by ExerciseMediaWidget
 
   Widget _buildEmptyInstructions(ExerciseEntity exercise) {
     return Container(

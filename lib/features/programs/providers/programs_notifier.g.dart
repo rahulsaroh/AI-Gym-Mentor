@@ -15,15 +15,15 @@ final programsProvider = ProgramsNotifierProvider._();
 final class ProgramsNotifierProvider
     extends $AsyncNotifierProvider<ProgramsNotifier, ProgramsState> {
   ProgramsNotifierProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'programsProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'programsProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$programsNotifierHash();
@@ -41,11 +41,14 @@ abstract class _$ProgramsNotifier extends $AsyncNotifier<ProgramsState> {
   @override
   void runBuild() {
     final ref = this.ref as $Ref<AsyncValue<ProgramsState>, ProgramsState>;
-    final element = ref.element as $ClassProviderElement<
-        AnyNotifier<AsyncValue<ProgramsState>, ProgramsState>,
-        AsyncValue<ProgramsState>,
-        Object?,
-        Object?>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<AsyncValue<ProgramsState>, ProgramsState>,
+              AsyncValue<ProgramsState>,
+              Object?,
+              Object?
+            >;
     element.handleCreate(ref, build);
   }
 }

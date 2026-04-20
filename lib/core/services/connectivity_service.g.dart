@@ -15,15 +15,15 @@ final connectivityServiceProvider = ConnectivityServiceProvider._();
 final class ConnectivityServiceProvider
     extends $StreamNotifierProvider<ConnectivityService, bool> {
   ConnectivityServiceProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'connectivityServiceProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'connectivityServiceProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$connectivityServiceHash();
@@ -42,11 +42,14 @@ abstract class _$ConnectivityService extends $StreamNotifier<bool> {
   @override
   void runBuild() {
     final ref = this.ref as $Ref<AsyncValue<bool>, bool>;
-    final element = ref.element as $ClassProviderElement<
-        AnyNotifier<AsyncValue<bool>, bool>,
-        AsyncValue<bool>,
-        Object?,
-        Object?>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<AsyncValue<bool>, bool>,
+              AsyncValue<bool>,
+              Object?,
+              Object?
+            >;
     element.handleCreate(ref, build);
   }
 }

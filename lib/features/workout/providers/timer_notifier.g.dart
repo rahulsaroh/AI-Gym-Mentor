@@ -15,15 +15,15 @@ final timerProvider = TimerNotifierProvider._();
 final class TimerNotifierProvider
     extends $NotifierProvider<TimerNotifier, TimerState> {
   TimerNotifierProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'timerProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'timerProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$timerNotifierHash();
@@ -49,8 +49,14 @@ abstract class _$TimerNotifier extends $Notifier<TimerState> {
   @override
   void runBuild() {
     final ref = this.ref as $Ref<TimerState, TimerState>;
-    final element = ref.element as $ClassProviderElement<
-        AnyNotifier<TimerState, TimerState>, TimerState, Object?, Object?>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<TimerState, TimerState>,
+              TimerState,
+              Object?,
+              Object?
+            >;
     element.handleCreate(ref, build);
   }
 }

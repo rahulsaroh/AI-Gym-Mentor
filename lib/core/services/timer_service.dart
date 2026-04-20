@@ -46,6 +46,13 @@ Future<bool> onStart(ServiceInstance service) async {
     service.stopSelf();
   });
 
+  service.on('add_30s').listen((event) async {
+    if (endTime != null) {
+      endTime = endTime!.add(const Duration(seconds: 30));
+      await prefs.setString('rest_timer_end_timestamp', endTime!.toIso8601String());
+    }
+  });
+
   service.on('refresh_timer').listen((event) async {
     // Reload metadata to get the new endTime set by UI or previous action
     loadMetadata();

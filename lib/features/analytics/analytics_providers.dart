@@ -7,6 +7,26 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'analytics_providers.g.dart';
 
+class AnalyticsDashboardData {
+  final Map<String, dynamic> overview;
+  final List<Map<String, dynamic>> recentPRs;
+  final List<Map<String, dynamic>> volumeTrend;
+  final List<Map<String, dynamic>> durationTrend;
+  final List<Map<String, dynamic>> weightTrend;
+  final Map<String, dynamic> muscleBalance;
+  final Map<DateTime, int> activity;
+
+  AnalyticsDashboardData({
+    required this.overview,
+    required this.recentPRs,
+    required this.volumeTrend,
+    required this.durationTrend,
+    required this.weightTrend,
+    required this.muscleBalance,
+    required this.activity,
+  });
+}
+
 @riverpod
 Future<Map<String, dynamic>> dashboardStats(Ref ref) async {
   final repo = ref.watch(statsRepositoryProvider);
@@ -55,6 +75,37 @@ Future<List<Map<String, dynamic>>> weightTrend(Ref ref) async {
 Future<Map<String, dynamic>> muscleBalance(Ref ref) async {
   final repo = ref.watch(statsRepositoryProvider);
   return await repo.getMuscleBalance();
+}
+
+@riverpod
+Future<List<Map<String, dynamic>>> volumeVsWeightTrend(Ref ref) async {
+  final volume = await ref.watch(volumeTrendProvider.future);
+  final weight = await ref.watch(weightTrendProvider.future);
+
+  if (volume.isEmpty) return [];
+
+  return volume.map((v) {
+    final vDate = v['date'] as DateTime;
+    
+    // Find closest weight measurement to this week
+    Map<String, dynamic>? closestWeight;
+    int minDiff = 999999999;
+
+    for (var w in weight) {
+      final wDate = w['date'] as DateTime;
+      final diff = (vDate.difference(wDate).inDays).abs();
+      if (diff < minDiff) {
+        minDiff = diff;
+        closestWeight = w;
+      }
+    }
+
+    return {
+      'date': vDate,
+      'volume': v['volume'],
+      'weight': closestWeight?['weight'] ?? 0.0,
+    };
+  }).toList();
 }
 
 @riverpod
@@ -152,4 +203,28 @@ class ProgressPhotosList extends _$ProgressPhotosList {
     await repo.deletePhoto(id);
     ref.invalidateSelf();
   }
+}
+
+@riverpod
+Future<AnalyticsDashboardData> unifiedDashboardData(Ref ref) async {
+  // Use .future to wait for all the individual providers to resolve
+  final results = await Future.wait([
+    ref.watch(dashboardStatsProvider.future),
+    ref.watch(recentPRsProvider.future),
+    ref.watch(volumeTrendProvider.future),
+    ref.watch(durationTrendProvider.future),
+    ref.watch(weightTrendProvider.future),
+    ref.watch(muscleBalanceProvider.future),
+    ref.watch(dailyActivityProvider.future),
+  ]);
+
+  return AnalyticsDashboardData(
+    overview: results[0] as Map<String, dynamic>,
+    recentPRs: results[1] as List<Map<String, dynamic>>,
+    volumeTrend: results[2] as List<Map<String, dynamic>>,
+    durationTrend: results[3] as List<Map<String, dynamic>>,
+    weightTrend: results[4] as List<Map<String, dynamic>>,
+    muscleBalance: results[5] as Map<String, dynamic>,
+    activity: results[6] as Map<DateTime, int>,
+  );
 }

@@ -12,23 +12,26 @@ part of 'analytics_providers.dart';
 @ProviderFor(dashboardStats)
 final dashboardStatsProvider = DashboardStatsProvider._();
 
-final class DashboardStatsProvider extends $FunctionalProvider<
-        AsyncValue<Map<String, dynamic>>,
-        Map<String, dynamic>,
-        FutureOr<Map<String, dynamic>>>
+final class DashboardStatsProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<Map<String, dynamic>>,
+          Map<String, dynamic>,
+          FutureOr<Map<String, dynamic>>
+        >
     with
         $FutureModifier<Map<String, dynamic>>,
         $FutureProvider<Map<String, dynamic>> {
   DashboardStatsProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'dashboardStatsProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'dashboardStatsProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$dashboardStatsHash();
@@ -36,8 +39,8 @@ final class DashboardStatsProvider extends $FunctionalProvider<
   @$internal
   @override
   $FutureProviderElement<Map<String, dynamic>> $createElement(
-          $ProviderPointer pointer) =>
-      $FutureProviderElement(pointer);
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
 
   @override
   FutureOr<Map<String, dynamic>> create(Ref ref) {
@@ -50,23 +53,26 @@ String _$dashboardStatsHash() => r'855c50e866eaaa1317733f2cbe30e16ea5a518a4';
 @ProviderFor(volumeTrend)
 final volumeTrendProvider = VolumeTrendProvider._();
 
-final class VolumeTrendProvider extends $FunctionalProvider<
-        AsyncValue<List<Map<String, dynamic>>>,
-        List<Map<String, dynamic>>,
-        FutureOr<List<Map<String, dynamic>>>>
+final class VolumeTrendProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<Map<String, dynamic>>>,
+          List<Map<String, dynamic>>,
+          FutureOr<List<Map<String, dynamic>>>
+        >
     with
         $FutureModifier<List<Map<String, dynamic>>>,
         $FutureProvider<List<Map<String, dynamic>>> {
   VolumeTrendProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'volumeTrendProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'volumeTrendProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$volumeTrendHash();
@@ -74,8 +80,8 @@ final class VolumeTrendProvider extends $FunctionalProvider<
   @$internal
   @override
   $FutureProviderElement<List<Map<String, dynamic>>> $createElement(
-          $ProviderPointer pointer) =>
-      $FutureProviderElement(pointer);
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
 
   @override
   FutureOr<List<Map<String, dynamic>>> create(Ref ref) {
@@ -88,23 +94,26 @@ String _$volumeTrendHash() => r'a64c01d9c700354b43e62c6464ee636bc52c28b2';
 @ProviderFor(durationTrend)
 final durationTrendProvider = DurationTrendProvider._();
 
-final class DurationTrendProvider extends $FunctionalProvider<
-        AsyncValue<List<Map<String, dynamic>>>,
-        List<Map<String, dynamic>>,
-        FutureOr<List<Map<String, dynamic>>>>
+final class DurationTrendProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<Map<String, dynamic>>>,
+          List<Map<String, dynamic>>,
+          FutureOr<List<Map<String, dynamic>>>
+        >
     with
         $FutureModifier<List<Map<String, dynamic>>>,
         $FutureProvider<List<Map<String, dynamic>>> {
   DurationTrendProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'durationTrendProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'durationTrendProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$durationTrendHash();
@@ -112,8 +121,8 @@ final class DurationTrendProvider extends $FunctionalProvider<
   @$internal
   @override
   $FutureProviderElement<List<Map<String, dynamic>>> $createElement(
-          $ProviderPointer pointer) =>
-      $FutureProviderElement(pointer);
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
 
   @override
   FutureOr<List<Map<String, dynamic>>> create(Ref ref) {
@@ -126,23 +135,26 @@ String _$durationTrendHash() => r'7a68f9e8f7c586305099cb022e292120333c4b49';
 @ProviderFor(frequencyTrend)
 final frequencyTrendProvider = FrequencyTrendProvider._();
 
-final class FrequencyTrendProvider extends $FunctionalProvider<
-        AsyncValue<List<Map<String, dynamic>>>,
-        List<Map<String, dynamic>>,
-        FutureOr<List<Map<String, dynamic>>>>
+final class FrequencyTrendProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<Map<String, dynamic>>>,
+          List<Map<String, dynamic>>,
+          FutureOr<List<Map<String, dynamic>>>
+        >
     with
         $FutureModifier<List<Map<String, dynamic>>>,
         $FutureProvider<List<Map<String, dynamic>>> {
   FrequencyTrendProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'frequencyTrendProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'frequencyTrendProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$frequencyTrendHash();
@@ -150,8 +162,8 @@ final class FrequencyTrendProvider extends $FunctionalProvider<
   @$internal
   @override
   $FutureProviderElement<List<Map<String, dynamic>>> $createElement(
-          $ProviderPointer pointer) =>
-      $FutureProviderElement(pointer);
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
 
   @override
   FutureOr<List<Map<String, dynamic>>> create(Ref ref) {
@@ -164,23 +176,26 @@ String _$frequencyTrendHash() => r'5377d5c0eacc71e4b75e313016bc72f21fa933ed';
 @ProviderFor(dailyActivity)
 final dailyActivityProvider = DailyActivityProvider._();
 
-final class DailyActivityProvider extends $FunctionalProvider<
-        AsyncValue<Map<DateTime, int>>,
-        Map<DateTime, int>,
-        FutureOr<Map<DateTime, int>>>
+final class DailyActivityProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<Map<DateTime, int>>,
+          Map<DateTime, int>,
+          FutureOr<Map<DateTime, int>>
+        >
     with
         $FutureModifier<Map<DateTime, int>>,
         $FutureProvider<Map<DateTime, int>> {
   DailyActivityProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'dailyActivityProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'dailyActivityProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$dailyActivityHash();
@@ -188,8 +203,8 @@ final class DailyActivityProvider extends $FunctionalProvider<
   @$internal
   @override
   $FutureProviderElement<Map<DateTime, int>> $createElement(
-          $ProviderPointer pointer) =>
-      $FutureProviderElement(pointer);
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
 
   @override
   FutureOr<Map<DateTime, int>> create(Ref ref) {
@@ -202,23 +217,26 @@ String _$dailyActivityHash() => r'19fde8f629f016c2e66f114bd10e0b2d2883cebd';
 @ProviderFor(weightTrend)
 final weightTrendProvider = WeightTrendProvider._();
 
-final class WeightTrendProvider extends $FunctionalProvider<
-        AsyncValue<List<Map<String, dynamic>>>,
-        List<Map<String, dynamic>>,
-        FutureOr<List<Map<String, dynamic>>>>
+final class WeightTrendProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<Map<String, dynamic>>>,
+          List<Map<String, dynamic>>,
+          FutureOr<List<Map<String, dynamic>>>
+        >
     with
         $FutureModifier<List<Map<String, dynamic>>>,
         $FutureProvider<List<Map<String, dynamic>>> {
   WeightTrendProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'weightTrendProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'weightTrendProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$weightTrendHash();
@@ -226,8 +244,8 @@ final class WeightTrendProvider extends $FunctionalProvider<
   @$internal
   @override
   $FutureProviderElement<List<Map<String, dynamic>>> $createElement(
-          $ProviderPointer pointer) =>
-      $FutureProviderElement(pointer);
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
 
   @override
   FutureOr<List<Map<String, dynamic>>> create(Ref ref) {
@@ -240,23 +258,26 @@ String _$weightTrendHash() => r'0460708393741bba4d707f4fe15a67cb07bacb0f';
 @ProviderFor(muscleBalance)
 final muscleBalanceProvider = MuscleBalanceProvider._();
 
-final class MuscleBalanceProvider extends $FunctionalProvider<
-        AsyncValue<Map<String, dynamic>>,
-        Map<String, dynamic>,
-        FutureOr<Map<String, dynamic>>>
+final class MuscleBalanceProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<Map<String, dynamic>>,
+          Map<String, dynamic>,
+          FutureOr<Map<String, dynamic>>
+        >
     with
         $FutureModifier<Map<String, dynamic>>,
         $FutureProvider<Map<String, dynamic>> {
   MuscleBalanceProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'muscleBalanceProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'muscleBalanceProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$muscleBalanceHash();
@@ -264,8 +285,8 @@ final class MuscleBalanceProvider extends $FunctionalProvider<
   @$internal
   @override
   $FutureProviderElement<Map<String, dynamic>> $createElement(
-          $ProviderPointer pointer) =>
-      $FutureProviderElement(pointer);
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
 
   @override
   FutureOr<Map<String, dynamic>> create(Ref ref) {
@@ -275,26 +296,71 @@ final class MuscleBalanceProvider extends $FunctionalProvider<
 
 String _$muscleBalanceHash() => r'f209ac7ec9c7a0054a7752d3a1a8a827d5dfcbf5';
 
+@ProviderFor(volumeVsWeightTrend)
+final volumeVsWeightTrendProvider = VolumeVsWeightTrendProvider._();
+
+final class VolumeVsWeightTrendProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<Map<String, dynamic>>>,
+          List<Map<String, dynamic>>,
+          FutureOr<List<Map<String, dynamic>>>
+        >
+    with
+        $FutureModifier<List<Map<String, dynamic>>>,
+        $FutureProvider<List<Map<String, dynamic>>> {
+  VolumeVsWeightTrendProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'volumeVsWeightTrendProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$volumeVsWeightTrendHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<List<Map<String, dynamic>>> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<List<Map<String, dynamic>>> create(Ref ref) {
+    return volumeVsWeightTrend(ref);
+  }
+}
+
+String _$volumeVsWeightTrendHash() =>
+    r'6672c186655f7eb5cf16330793a4d1765a37a4bb';
+
 @ProviderFor(plateauAlerts)
 final plateauAlertsProvider = PlateauAlertsProvider._();
 
-final class PlateauAlertsProvider extends $FunctionalProvider<
-        AsyncValue<List<Map<String, dynamic>>>,
-        List<Map<String, dynamic>>,
-        FutureOr<List<Map<String, dynamic>>>>
+final class PlateauAlertsProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<Map<String, dynamic>>>,
+          List<Map<String, dynamic>>,
+          FutureOr<List<Map<String, dynamic>>>
+        >
     with
         $FutureModifier<List<Map<String, dynamic>>>,
         $FutureProvider<List<Map<String, dynamic>>> {
   PlateauAlertsProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'plateauAlertsProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'plateauAlertsProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$plateauAlertsHash();
@@ -302,8 +368,8 @@ final class PlateauAlertsProvider extends $FunctionalProvider<
   @$internal
   @override
   $FutureProviderElement<List<Map<String, dynamic>>> $createElement(
-          $ProviderPointer pointer) =>
-      $FutureProviderElement(pointer);
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
 
   @override
   FutureOr<List<Map<String, dynamic>>> create(Ref ref) {
@@ -316,23 +382,26 @@ String _$plateauAlertsHash() => r'd73aa8790884bff04ee1f39639dd3c3f331bac6f';
 @ProviderFor(recentPRs)
 final recentPRsProvider = RecentPRsProvider._();
 
-final class RecentPRsProvider extends $FunctionalProvider<
-        AsyncValue<List<Map<String, dynamic>>>,
-        List<Map<String, dynamic>>,
-        FutureOr<List<Map<String, dynamic>>>>
+final class RecentPRsProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<Map<String, dynamic>>>,
+          List<Map<String, dynamic>>,
+          FutureOr<List<Map<String, dynamic>>>
+        >
     with
         $FutureModifier<List<Map<String, dynamic>>>,
         $FutureProvider<List<Map<String, dynamic>>> {
   RecentPRsProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'recentPRsProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'recentPRsProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$recentPRsHash();
@@ -340,8 +409,8 @@ final class RecentPRsProvider extends $FunctionalProvider<
   @$internal
   @override
   $FutureProviderElement<List<Map<String, dynamic>>> $createElement(
-          $ProviderPointer pointer) =>
-      $FutureProviderElement(pointer);
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
 
   @override
   FutureOr<List<Map<String, dynamic>>> create(Ref ref) {
@@ -354,23 +423,26 @@ String _$recentPRsHash() => r'd130b371b2a845a632292098586dd4184211b1c5';
 @ProviderFor(fullPRHistory)
 final fullPRHistoryProvider = FullPRHistoryProvider._();
 
-final class FullPRHistoryProvider extends $FunctionalProvider<
-        AsyncValue<List<Map<String, dynamic>>>,
-        List<Map<String, dynamic>>,
-        FutureOr<List<Map<String, dynamic>>>>
+final class FullPRHistoryProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<Map<String, dynamic>>>,
+          List<Map<String, dynamic>>,
+          FutureOr<List<Map<String, dynamic>>>
+        >
     with
         $FutureModifier<List<Map<String, dynamic>>>,
         $FutureProvider<List<Map<String, dynamic>>> {
   FullPRHistoryProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'fullPRHistoryProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'fullPRHistoryProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$fullPRHistoryHash();
@@ -378,8 +450,8 @@ final class FullPRHistoryProvider extends $FunctionalProvider<
   @$internal
   @override
   $FutureProviderElement<List<Map<String, dynamic>>> $createElement(
-          $ProviderPointer pointer) =>
-      $FutureProviderElement(pointer);
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
 
   @override
   FutureOr<List<Map<String, dynamic>>> create(Ref ref) {
@@ -392,18 +464,24 @@ String _$fullPRHistoryHash() => r'dc8e2c6288fd7d2669d56dcbfe14fbc8470430f7';
 @ProviderFor(workoutPRs)
 final workoutPRsProvider = WorkoutPRsFamily._();
 
-final class WorkoutPRsProvider extends $FunctionalProvider<
-        AsyncValue<List<int>>, List<int>, FutureOr<List<int>>>
+final class WorkoutPRsProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<int>>,
+          List<int>,
+          FutureOr<List<int>>
+        >
     with $FutureModifier<List<int>>, $FutureProvider<List<int>> {
-  WorkoutPRsProvider._(
-      {required WorkoutPRsFamily super.from, required int super.argument})
-      : super(
-          retry: null,
-          name: r'workoutPRsProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+  WorkoutPRsProvider._({
+    required WorkoutPRsFamily super.from,
+    required int super.argument,
+  }) : super(
+         retry: null,
+         name: r'workoutPRsProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
 
   @override
   String debugGetCreateSourceHash() => _$workoutPRsHash();
@@ -423,10 +501,7 @@ final class WorkoutPRsProvider extends $FunctionalProvider<
   @override
   FutureOr<List<int>> create(Ref ref) {
     final argument = this.argument as int;
-    return workoutPRs(
-      ref,
-      argument,
-    );
+    return workoutPRs(ref, argument);
   }
 
   @override
@@ -445,17 +520,15 @@ String _$workoutPRsHash() => r'9e3de2bff240a1f01e9999f99113ee69c33feaf1';
 final class WorkoutPRsFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<List<int>>, int> {
   WorkoutPRsFamily._()
-      : super(
-          retry: null,
-          name: r'workoutPRsProvider',
-          dependencies: null,
-          $allTransitiveDependencies: null,
-          isAutoDispose: true,
-        );
+    : super(
+        retry: null,
+        name: r'workoutPRsProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
 
-  WorkoutPRsProvider call(
-    int workoutId,
-  ) =>
+  WorkoutPRsProvider call(int workoutId) =>
       WorkoutPRsProvider._(argument: workoutId, from: this);
 
   @override
@@ -465,18 +538,22 @@ final class WorkoutPRsFamily extends $Family
 @ProviderFor(BodyMeasurementsList)
 final bodyMeasurementsListProvider = BodyMeasurementsListProvider._();
 
-final class BodyMeasurementsListProvider extends $AsyncNotifierProvider<
-    BodyMeasurementsList, List<ent.BodyMeasurement>> {
+final class BodyMeasurementsListProvider
+    extends
+        $AsyncNotifierProvider<
+          BodyMeasurementsList,
+          List<ent.BodyMeasurement>
+        > {
   BodyMeasurementsListProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'bodyMeasurementsListProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'bodyMeasurementsListProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$bodyMeasurementsListHash();
@@ -495,14 +572,23 @@ abstract class _$BodyMeasurementsList
   @$mustCallSuper
   @override
   void runBuild() {
-    final ref = this.ref as $Ref<AsyncValue<List<ent.BodyMeasurement>>,
-        List<ent.BodyMeasurement>>;
-    final element = ref.element as $ClassProviderElement<
-        AnyNotifier<AsyncValue<List<ent.BodyMeasurement>>,
-            List<ent.BodyMeasurement>>,
-        AsyncValue<List<ent.BodyMeasurement>>,
-        Object?,
-        Object?>;
+    final ref =
+        this.ref
+            as $Ref<
+              AsyncValue<List<ent.BodyMeasurement>>,
+              List<ent.BodyMeasurement>
+            >;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<
+                AsyncValue<List<ent.BodyMeasurement>>,
+                List<ent.BodyMeasurement>
+              >,
+              AsyncValue<List<ent.BodyMeasurement>>,
+              Object?,
+              Object?
+            >;
     element.handleCreate(ref, build);
   }
 }
@@ -513,15 +599,15 @@ final bodyTargetsListProvider = BodyTargetsListProvider._();
 final class BodyTargetsListProvider
     extends $AsyncNotifierProvider<BodyTargetsList, List<target.BodyTarget>> {
   BodyTargetsListProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'bodyTargetsListProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'bodyTargetsListProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$bodyTargetsListHash();
@@ -539,14 +625,23 @@ abstract class _$BodyTargetsList
   @$mustCallSuper
   @override
   void runBuild() {
-    final ref = this.ref
-        as $Ref<AsyncValue<List<target.BodyTarget>>, List<target.BodyTarget>>;
-    final element = ref.element as $ClassProviderElement<
-        AnyNotifier<AsyncValue<List<target.BodyTarget>>,
-            List<target.BodyTarget>>,
-        AsyncValue<List<target.BodyTarget>>,
-        Object?,
-        Object?>;
+    final ref =
+        this.ref
+            as $Ref<
+              AsyncValue<List<target.BodyTarget>>,
+              List<target.BodyTarget>
+            >;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<
+                AsyncValue<List<target.BodyTarget>>,
+                List<target.BodyTarget>
+              >,
+              AsyncValue<List<target.BodyTarget>>,
+              Object?,
+              Object?
+            >;
     element.handleCreate(ref, build);
   }
 }
@@ -554,18 +649,19 @@ abstract class _$BodyTargetsList
 @ProviderFor(ProgressPhotosList)
 final progressPhotosListProvider = ProgressPhotosListProvider._();
 
-final class ProgressPhotosListProvider extends $AsyncNotifierProvider<
-    ProgressPhotosList, List<photo.ProgressPhoto>> {
+final class ProgressPhotosListProvider
+    extends
+        $AsyncNotifierProvider<ProgressPhotosList, List<photo.ProgressPhoto>> {
   ProgressPhotosListProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'progressPhotosListProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'progressPhotosListProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$progressPhotosListHash();
@@ -584,14 +680,65 @@ abstract class _$ProgressPhotosList
   @$mustCallSuper
   @override
   void runBuild() {
-    final ref = this.ref as $Ref<AsyncValue<List<photo.ProgressPhoto>>,
-        List<photo.ProgressPhoto>>;
-    final element = ref.element as $ClassProviderElement<
-        AnyNotifier<AsyncValue<List<photo.ProgressPhoto>>,
-            List<photo.ProgressPhoto>>,
-        AsyncValue<List<photo.ProgressPhoto>>,
-        Object?,
-        Object?>;
+    final ref =
+        this.ref
+            as $Ref<
+              AsyncValue<List<photo.ProgressPhoto>>,
+              List<photo.ProgressPhoto>
+            >;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<
+                AsyncValue<List<photo.ProgressPhoto>>,
+                List<photo.ProgressPhoto>
+              >,
+              AsyncValue<List<photo.ProgressPhoto>>,
+              Object?,
+              Object?
+            >;
     element.handleCreate(ref, build);
   }
 }
+
+@ProviderFor(unifiedDashboardData)
+final unifiedDashboardDataProvider = UnifiedDashboardDataProvider._();
+
+final class UnifiedDashboardDataProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<AnalyticsDashboardData>,
+          AnalyticsDashboardData,
+          FutureOr<AnalyticsDashboardData>
+        >
+    with
+        $FutureModifier<AnalyticsDashboardData>,
+        $FutureProvider<AnalyticsDashboardData> {
+  UnifiedDashboardDataProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'unifiedDashboardDataProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$unifiedDashboardDataHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<AnalyticsDashboardData> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<AnalyticsDashboardData> create(Ref ref) {
+    return unifiedDashboardData(ref);
+  }
+}
+
+String _$unifiedDashboardDataHash() =>
+    r'552cc5fb23e00cffc0c293a96a3e72536ce8b490';

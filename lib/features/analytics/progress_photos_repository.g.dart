@@ -12,20 +12,24 @@ part of 'progress_photos_repository.dart';
 @ProviderFor(progressPhotosRepository)
 final progressPhotosRepositoryProvider = ProgressPhotosRepositoryProvider._();
 
-final class ProgressPhotosRepositoryProvider extends $FunctionalProvider<
-    ProgressPhotosRepository,
-    ProgressPhotosRepository,
-    ProgressPhotosRepository> with $Provider<ProgressPhotosRepository> {
+final class ProgressPhotosRepositoryProvider
+    extends
+        $FunctionalProvider<
+          ProgressPhotosRepository,
+          ProgressPhotosRepository,
+          ProgressPhotosRepository
+        >
+    with $Provider<ProgressPhotosRepository> {
   ProgressPhotosRepositoryProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'progressPhotosRepositoryProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'progressPhotosRepositoryProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$progressPhotosRepositoryHash();
@@ -33,8 +37,8 @@ final class ProgressPhotosRepositoryProvider extends $FunctionalProvider<
   @$internal
   @override
   $ProviderElement<ProgressPhotosRepository> $createElement(
-          $ProviderPointer pointer) =>
-      $ProviderElement(pointer);
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
 
   @override
   ProgressPhotosRepository create(Ref ref) {
