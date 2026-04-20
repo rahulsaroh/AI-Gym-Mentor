@@ -16,13 +16,10 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.35.0' # Dart 3.9.0 - required by google_fonts 8+, fl_chart 1.1+
+          flutter-version: '3.32.0' # Dart 3.8.0 - matches local dev environment
           channel: 'stable'
 
-      - name: Remove Windows pubspec.lock
-        run: rm -f pubspec.lock
-
-      - name: Remove Windows .dart_tool
+      - name: Remove Windows .dart_tool (has hardcoded Windows paths)
         run: rm -rf .dart_tool
 
       - name: Install dependencies
