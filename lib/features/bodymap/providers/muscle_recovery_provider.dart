@@ -2,6 +2,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:drift/drift.dart' hide Column;
 import 'package:ai_gym_mentor/core/database/database.dart';
 import 'package:ai_gym_mentor/core/services/doms_service.dart';
+import 'package:drift/drift.dart';
 
 part 'muscle_recovery_provider.g.dart';
 
