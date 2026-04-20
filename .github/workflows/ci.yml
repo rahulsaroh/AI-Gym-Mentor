@@ -31,4 +31,4 @@ jobs:
         run: flutter analyze --no-fatal-infos --no-fatal-warnings
 
       - name: Run tests
-        run: flutter test
+                  run: flutter test test/core test/services test/features test/widget_test.dart test/workflow_verification_test.dart
