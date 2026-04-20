@@ -16,7 +16,7 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.32.0' # Dart 3.8.0 - matches local dev environment
+          flutter-version: '3.38.0' # Dart 3.10.0 - matches pubspec.lock requirements
           channel: 'stable'
 
       - name: Remove Windows .dart_tool (has hardcoded Windows paths)
