@@ -99,6 +99,9 @@ class Workouts extends Table {
   TextColumn get notes => text().nullable()();
   TextColumn get status =>
       text().withDefault(const Constant('draft'))(); // draft, completed
+  IntColumn get mesocycleId => integer().nullable().references(Mesocycles, #id)();
+  IntColumn get mesocycleWeekId => integer().nullable().references(MesocycleWeeks, #id)();
+  IntColumn get mesocycleDayId => integer().nullable().references(MesocycleDays, #id)();
 }
 
 class WorkoutSets extends Table {
@@ -140,6 +143,8 @@ class BodyMeasurements extends Table {
   RealColumn get thighRight => real().nullable()();
   RealColumn get calfLeft => real().nullable()();
   RealColumn get calfRight => real().nullable()();
+  RealColumn get height => real().nullable()();
+  TextColumn get customValues => text().nullable()(); // JSON Map<String, double>
   TextColumn get notes => text().nullable()();
 }
 
@@ -241,6 +246,64 @@ class ExerciseMuscleMap extends Table {
   TextColumn get secondaryMuscle => text().nullable()();
 }
 
+class Mesocycles extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get name => text()();
+  TextColumn get goal => text()(); // Hypertrophy, Strength, etc.
+  TextColumn get splitType => text()(); // PPL, Upper/Lower, etc.
+  TextColumn get experienceLevel => text()();
+  IntColumn get weeksCount => integer()(); // 4, 5, 6
+  IntColumn get daysPerWeek => integer()();
+  DateTimeColumn get createdAt => dateTime()();
+  DateTimeColumn get updatedAt => dateTime()();
+  TextColumn get notes => text().nullable()();
+  BoolColumn get isArchived => boolean().withDefault(const Constant(false))();
+}
+
+class MesocycleWeeks extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get mesocycleId => integer().references(Mesocycles, #id)();
+  IntColumn get weekNumber => integer()();
+  TextColumn get phaseName => text()(); // On-Ramp, Accumulation, Intensification, Deload
+  RealColumn get volumeMultiplier => real().withDefault(const Constant(1.0))();
+  RealColumn get intensityMultiplier => real().withDefault(const Constant(1.0))();
+  TextColumn get notes => text().nullable()();
+}
+
+class MesocycleDays extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get mesocycleWeekId => integer().references(MesocycleWeeks, #id)();
+  IntColumn get dayNumber => integer()();
+  TextColumn get title => text()();
+  TextColumn get splitLabel => text().nullable()();
+}
+
+class MesocycleExercises extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get mesocycleDayId => integer().references(MesocycleDays, #id)();
+  IntColumn get exerciseId => integer().references(Exercises, #id)();
+  IntColumn get exerciseOrder => integer()();
+  IntColumn get targetSets => integer()();
+  IntColumn get minReps => integer()();
+  IntColumn get maxReps => integer()();
+  RealColumn get targetRpe => real().nullable()();
+  TextColumn get progressionType => text().withDefault(const Constant('none'))(); // none, load, reps, sets
+  RealColumn get progressionValue => real().nullable()();
+  TextColumn get notes => text().nullable()();
+}
+
+class Exercise1RmSnapshots extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get exerciseId => integer().references(Exercises, #id)();
+  IntColumn get workoutId => integer().nullable().references(Workouts, #id)();
+  DateTimeColumn get date => dateTime()();
+  RealColumn get weight => real()();
+  RealColumn get reps => real()();
+  RealColumn get estimated1Rm => real()();
+  TextColumn get formula => text()(); // epley, brzycki
+  BoolColumn get isPr => boolean().withDefault(const Constant(false))();
+}
+
 @DriftDatabase(tables: [
   Exercises,
   WorkoutTemplates,
@@ -260,13 +323,16 @@ class ExerciseMuscleMap extends Table {
   ExerciseProgressions,
   ExerciseInstructions,
   ExerciseMuscleMap,
+  Mesocycles,
+  MesocycleWeeks,
+  MesocycleDays,
+  MesocycleExercises,
+  Exercise1RmSnapshots,
 ], daos: [
   BodyMapDao,
 ])
 class AppDatabase extends _$AppDatabase {
-  static final AppDatabase _instance = AppDatabase._internal();
-  factory AppDatabase() => _instance;
-  AppDatabase._internal() : super(_openConnection());
+  AppDatabase([QueryExecutor? e]) : super(e ?? _openConnection());
 
   Future<List<ExerciseTable>> searchExercises(String query) async {
     final results = await customSelect(
@@ -281,7 +347,7 @@ class AppDatabase extends _$AppDatabase {
   }
 
   @override
-  int get schemaVersion => 23;
+  int get schemaVersion => 26;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -469,6 +535,30 @@ class AppDatabase extends _$AppDatabase {
               INSERT INTO exercise_muscle_map (exercise_id, primary_muscle, secondary_muscle)
               SELECT id, primary_muscle, secondary_muscle FROM exercises
             ''');
+          }
+          if (from < 24) {
+            await m.createTable(mesocycles);
+            await m.createTable(mesocycleWeeks);
+            await m.createTable(mesocycleDays);
+            await m.createTable(mesocycleExercises);
+            
+            if (!await hasColumn('workouts', 'mesocycle_id')) {
+              await m.addColumn(workouts, workouts.mesocycleId);
+            }
+            if (!await hasColumn('workouts', 'mesocycle_week_id')) {
+              await m.addColumn(workouts, workouts.mesocycleWeekId);
+            }
+            if (!await hasColumn('workouts', 'mesocycle_day_id')) {
+              await m.addColumn(workouts, workouts.mesocycleDayId);
+            }
+          }
+          if (from < 26) {
+            if (!await hasColumn('body_measurements', 'height')) {
+              await m.addColumn(bodyMeasurements, bodyMeasurements.height);
+            }
+            if (!await hasColumn('body_measurements', 'custom_values')) {
+              await m.addColumn(bodyMeasurements, bodyMeasurements.customValues);
+            }
           }
         },
         beforeOpen: (details) async {

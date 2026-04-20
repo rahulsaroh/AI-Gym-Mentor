@@ -28,8 +28,11 @@ import 'package:ai_gym_mentor/features/settings/about_screen.dart';
 import 'package:ai_gym_mentor/features/programs/programs_screen.dart';
 import 'package:ai_gym_mentor/features/programs/create_edit_program_screen.dart';
 import 'package:ai_gym_mentor/features/programs/program_details_screen.dart';
+import 'package:ai_gym_mentor/features/programs/mesocycle_wizard_screen.dart';
+import 'package:ai_gym_mentor/features/programs/mesocycle_details_screen.dart';
 import 'package:ai_gym_mentor/features/workout/start_workout_screen.dart';
 import 'package:ai_gym_mentor/features/exercise_database/presentation/screens/github_exercise_library_screen.dart';
+import 'package:ai_gym_mentor/features/analytics/presentation/screens/year_in_review_screen.dart';
 import 'package:ai_gym_mentor/screens/body_scan_screen.dart';
 
 final router = GoRouter(
@@ -186,6 +189,17 @@ final router = GoRouter(
                     return CreateEditProgramScreen(templateId: id);
                   },
                 ),
+                GoRoute(
+                  path: 'mesocycle/create',
+                  builder: (context, state) => const MesocycleWizardScreen(),
+                ),
+                GoRoute(
+                  path: 'mesocycle/:id',
+                  builder: (context, state) {
+                    final id = int.tryParse(state.pathParameters['id'] ?? '0') ?? 0;
+                    return MesocycleDetailsScreen(mesocycleId: id);
+                  },
+                ),
               ],
             ),
           ],
@@ -211,6 +225,13 @@ final router = GoRouter(
                 GoRoute(
                   path: 'bodymap',
                   builder: (context, state) => const BodyScanScreen(),
+                ),
+                GoRoute(
+                  path: 'year-in-review/:year',
+                  builder: (context, state) {
+                    final year = int.tryParse(state.pathParameters['year'] ?? '') ?? DateTime.now().year;
+                    return YearInReviewScreen(initialYear: year);
+                  },
                 ),
               ],
             ),

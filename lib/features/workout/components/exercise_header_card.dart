@@ -11,6 +11,7 @@ class ExerciseHeaderCard extends StatelessWidget {
   final VoidCallback onMenuTap;
   final bool isGlowing;
   final double glowValue;
+  final bool hideMedia;
 
   const ExerciseHeaderCard({
     super.key,
@@ -18,6 +19,7 @@ class ExerciseHeaderCard extends StatelessWidget {
     required this.onMenuTap,
     this.isGlowing = false,
     this.glowValue = 0.0,
+    this.hideMedia = false,
   });
 
   @override
@@ -43,17 +45,20 @@ class ExerciseHeaderCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Exercise Media
-              SizedBox(
-                height: 220,
-                width: double.infinity,
-                child: ExerciseMediaWidget(
-                  animatedUrl: exercise.gifUrl,
-                  staticUrl: exercise.imageUrls.isNotEmpty ? exercise.imageUrls.first : null,
-                  fit: BoxFit.contain,
+              if (!hideMedia)
+                SizedBox(
+                  height: 220,
+                  width: double.infinity,
+                  child: ExerciseMediaWidget(
+                    animatedUrl: exercise.gifUrl,
+                    staticUrl: exercise.imageUrls.isNotEmpty ? exercise.imageUrls.first : null,
+                    fit: BoxFit.cover,
+                    isTappable: true,
+                    exerciseName: exercise.name,
+                  ),
                 ),
-              ),
               Padding(
-                padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+                padding: EdgeInsets.fromLTRB(16, hideMedia ? 16 : 8, 16, 12),
                 child: Row(
                   children: [
                     Expanded(

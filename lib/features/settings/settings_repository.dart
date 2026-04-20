@@ -71,6 +71,7 @@ class SettingsRepository {
       'autoBackup': s.autoBackup,
       'googleDriveEmail': s.googleDriveEmail,
       'lastSynced': s.lastSynced?.toIso8601String(),
+      'geminiApiKey': s.geminiApiKey,
     };
   }
 
@@ -105,6 +106,7 @@ class SettingsRepository {
       googleDriveEmail: map['googleDriveEmail'],
       lastSynced:
           map['lastSynced'] != null ? DateTime.parse(map['lastSynced']) : null,
+      geminiApiKey: map['geminiApiKey'],
     );
   }
 

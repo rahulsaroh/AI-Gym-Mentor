@@ -2,9 +2,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:ai_gym_mentor/core/database/database.dart';
 import 'package:ai_gym_mentor/services/progression_service.dart';
 import 'package:drift/native.dart';
-import 'package:drift/drift.dart' hide Column;
+import 'package:drift/drift.dart' hide Column, isNull, isNotNull;
 import 'package:mocktail/mocktail.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:drift/drift.dart' hide isNull, isNotNull;
 
 void main() {
   late AppDatabase db;
@@ -53,12 +54,14 @@ void main() {
 
     test('getSuggestion suggests increase when all targets hit', () async {
       final service = container.read(progressionServiceProvider.notifier);
-      
-      // 1. Setup exercise
+
+      // 1. Setup exercise (include all required fields)
       await db.into(db.exercises).insert(const ExercisesCompanion(
         id: Value(1),
         name: Value('Bench Press'),
         primaryMuscle: Value('Chest'),
+        equipment: Value('Barbell'),
+        setType: Value('Straight'),
       ));
 
       // 2. Setup mock history (Hit all targets)
@@ -83,7 +86,7 @@ void main() {
 
       // 3. Get suggestion (Default target is 10 reps)
       final suggestion = await service.getSuggestion(1, targetReps: 10);
-      
+
       expect(suggestion, isNotNull);
       expect(suggestion!.suggestedWeight, 102.5); // Default increment is 2.5
       expect(suggestion.trendArrow, 'flat'); // Only one session
@@ -91,11 +94,13 @@ void main() {
 
     test('getSuggestion suggests maintain when target not fully hit', () async {
       final service = container.read(progressionServiceProvider.notifier);
-      
+
       await db.into(db.exercises).insert(const ExercisesCompanion(
         id: Value(2),
         name: Value('Squat'),
         primaryMuscle: Value('Quads'),
+        equipment: Value('Barbell'),
+        setType: Value('Straight'),
       ));
 
       final workoutId = await db.into(db.workouts).insert(WorkoutsCompanion.insert(
@@ -127,7 +132,7 @@ void main() {
       ));
 
       final suggestion = await service.getSuggestion(2, targetReps: 10);
-      
+
       expect(suggestion!.suggestedWeight, 100.0);
       expect(suggestion.reason, contains('Maintain'));
     });

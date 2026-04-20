@@ -11,6 +11,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:drift/drift.dart' show OrderingTerm, OrderingMode;
 import 'package:ai_gym_mentor/features/workout/providers/workout_home_notifier.dart';
 import 'package:ai_gym_mentor/features/workout/components/begin_session_sheet.dart';
+import 'package:ai_gym_mentor/features/workout/components/instant_workout_generator_sheet.dart';
 import 'package:ai_gym_mentor/services/plateau_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ai_gym_mentor/features/workout/workout_repository.dart';
@@ -590,6 +591,21 @@ class _QuickActionSection extends StatelessWidget {
               color: Colors.blue.shade400,
               onTap: () => context.push('/exercises'),
             ),
+            const SizedBox(width: 12),
+            _QuickActionItem(
+              icon: LucideIcons.sparkles,
+              label: 'AI AI',
+              color: Colors.amber.shade600,
+              isAi: true,
+              onTap: () {
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  backgroundColor: Colors.transparent,
+                  builder: (context) => const InstantWorkoutGeneratorSheet(),
+                );
+              },
+            ),
           ],
         ),
       ),
@@ -602,16 +618,20 @@ class _QuickActionItem extends StatelessWidget {
   final String label;
   final Color color;
   final VoidCallback onTap;
+  final bool isAi;
 
   const _QuickActionItem({
     required this.icon,
     required this.label,
     required this.color,
     required this.onTap,
+    this.isAi = false,
   });
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    
     return Expanded(
       child: InkWell(
         onTap: onTap,
@@ -619,24 +639,38 @@ class _QuickActionItem extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 16),
           decoration: BoxDecoration(
-            color: Theme.of(context)
-                .colorScheme
-                .surfaceContainerHighest
-                .withValues(alpha: 0.5),
+            color: isAi 
+                ? colorScheme.primary.withValues(alpha: 0.1)
+                : colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: Theme.of(context).dividerColor.withValues(alpha: 0.1),
+              color: isAi
+                  ? colorScheme.primary.withValues(alpha: 0.3)
+                  : Theme.of(context).dividerColor.withValues(alpha: 0.1),
+              width: isAi ? 1.5 : 1,
             ),
           ),
           child: Column(
             children: [
-              Icon(icon, color: color),
+              if (isAi)
+                 ShaderMask(
+                  shaderCallback: (Rect bounds) {
+                    return LinearGradient(
+                      colors: [Colors.orange.shade700, Colors.pink.shade500],
+                    ).createShader(bounds);
+                  },
+                  child: Icon(icon, color: Colors.white),
+                )
+              else
+                Icon(icon, color: color),
               const SizedBox(height: 8),
               Text(
                 label,
                 style: GoogleFonts.outfit(
                   fontSize: 12,
-                  fontWeight: FontWeight.w600,
+                  fontWeight: isAi ? FontWeight.w800 : FontWeight.w600,
+                  color: isAi ? colorScheme.primary : null,
+                  letterSpacing: isAi ? 0.5 : 0,
                 ),
               ),
             ],

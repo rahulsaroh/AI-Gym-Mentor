@@ -22,7 +22,8 @@ _WorkoutSession _$WorkoutSessionFromJson(Map<String, dynamic> json) =>
       dayId: (json['dayId'] as num?)?.toInt(),
       notes: json['notes'] as String?,
       status: json['status'] as String? ?? 'draft',
-      exercises: (json['exercises'] as List<dynamic>?)
+      exercises:
+          (json['exercises'] as List<dynamic>?)
               ?.map((e) => LoggedExercise.fromJson(e as Map<String, dynamic>))
               .toList() ??
           const [],
@@ -48,7 +49,8 @@ _LoggedExercise _$LoggedExerciseFromJson(Map<String, dynamic> json) =>
       exerciseId: (json['exerciseId'] as num).toInt(),
       exerciseName: json['exerciseName'] as String,
       order: (json['order'] as num).toInt(),
-      sets: (json['sets'] as List<dynamic>?)
+      sets:
+          (json['sets'] as List<dynamic>?)
               ?.map((e) => LoggedSet.fromJson(e as Map<String, dynamic>))
               .toList() ??
           const [],

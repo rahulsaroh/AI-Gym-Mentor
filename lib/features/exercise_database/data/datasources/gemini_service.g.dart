@@ -15,15 +15,15 @@ final geminiServiceProvider = GeminiServiceProvider._();
 final class GeminiServiceProvider
     extends $NotifierProvider<GeminiService, void> {
   GeminiServiceProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'geminiServiceProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'geminiServiceProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$geminiServiceHash();
@@ -41,7 +41,7 @@ final class GeminiServiceProvider
   }
 }
 
-String _$geminiServiceHash() => r'03184694cf749f0ab68a6491fcff3ded1666f719';
+String _$geminiServiceHash() => r'973671704fc9e5f864fa3339da3e1ace4b34b4f0';
 
 abstract class _$GeminiService extends $Notifier<void> {
   void build();
@@ -49,8 +49,14 @@ abstract class _$GeminiService extends $Notifier<void> {
   @override
   void runBuild() {
     final ref = this.ref as $Ref<void, void>;
-    final element = ref.element as $ClassProviderElement<
-        AnyNotifier<void, void>, void, Object?, Object?>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<void, void>,
+              void,
+              Object?,
+              Object?
+            >;
     element.handleCreate(ref, build);
   }
 }

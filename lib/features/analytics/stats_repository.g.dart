@@ -12,18 +12,20 @@ part of 'stats_repository.dart';
 @ProviderFor(statsRepository)
 final statsRepositoryProvider = StatsRepositoryProvider._();
 
-final class StatsRepositoryProvider extends $FunctionalProvider<StatsRepository,
-    StatsRepository, StatsRepository> with $Provider<StatsRepository> {
+final class StatsRepositoryProvider
+    extends
+        $FunctionalProvider<StatsRepository, StatsRepository, StatsRepository>
+    with $Provider<StatsRepository> {
   StatsRepositoryProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'statsRepositoryProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'statsRepositoryProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$statsRepositoryHash();

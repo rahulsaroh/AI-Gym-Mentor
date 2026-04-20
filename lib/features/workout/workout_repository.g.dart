@@ -12,20 +12,24 @@ part of 'workout_repository.dart';
 @ProviderFor(workoutRepository)
 final workoutRepositoryProvider = WorkoutRepositoryProvider._();
 
-final class WorkoutRepositoryProvider extends $FunctionalProvider<
-    WorkoutRepository,
-    WorkoutRepository,
-    WorkoutRepository> with $Provider<WorkoutRepository> {
+final class WorkoutRepositoryProvider
+    extends
+        $FunctionalProvider<
+          WorkoutRepository,
+          WorkoutRepository,
+          WorkoutRepository
+        >
+    with $Provider<WorkoutRepository> {
   WorkoutRepositoryProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'workoutRepositoryProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'workoutRepositoryProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$workoutRepositoryHash();
@@ -33,8 +37,8 @@ final class WorkoutRepositoryProvider extends $FunctionalProvider<
   @$internal
   @override
   $ProviderElement<WorkoutRepository> $createElement(
-          $ProviderPointer pointer) =>
-      $ProviderElement(pointer);
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
 
   @override
   WorkoutRepository create(Ref ref) {

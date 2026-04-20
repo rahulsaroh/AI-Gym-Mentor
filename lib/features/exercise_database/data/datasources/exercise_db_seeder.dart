@@ -11,7 +11,7 @@ class ExerciseDbSeeder {
   ExerciseDbSeeder._();
 
   static const String _seedKey =
-      'exercises_seed_v7'; // Stable seed with Uniqueness Constraints and Cleanup
+      'exercises_seed_v8'; // v8: Integrated 2197 exercises from combined datasets
 
   Future<void> seed([AppDatabase? providedDb]) async {
     final prefs = await SharedPreferences.getInstance();
@@ -50,7 +50,10 @@ class ExerciseDbSeeder {
       // Pass 1: Exercises (Upsert Logic)
       for (final item in jsonList) {
         final extId = item['id'].toString();
-        final primaryMuscles = item['primaryMuscles'] as List<dynamic>? ?? [];
+        final rawPrimary = item['primaryMuscles'];
+        final List<dynamic> primaryMuscles = rawPrimary is List
+            ? rawPrimary
+            : (rawPrimary != null ? [rawPrimary] : []);
         final primaryMuscle = primaryMuscles.isNotEmpty
             ? primaryMuscles.first.toString()
             : 'Other';
@@ -130,7 +133,10 @@ class ExerciseDbSeeder {
           }
 
           // Muscles (Secondary)
-          final secondary = item['secondaryMuscles'] as List<dynamic>? ?? [];
+          final rawSecondary = item['secondaryMuscles'];
+          final List<dynamic> secondary = rawSecondary is List
+              ? rawSecondary
+              : (rawSecondary != null ? [rawSecondary] : []);
           for (var muscle in secondary) {
             batch.insert(
                 database.exerciseMuscles,

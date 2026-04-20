@@ -12,13 +12,7 @@ class AnalyticsDashboardScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final prsAsync = ref.watch(recentPRsProvider);
-    final volumeAsync = ref.watch(volumeTrendProvider);
-    final durationAsync = ref.watch(durationTrendProvider);
-    final weightAsync = ref.watch(weightTrendProvider);
-    final muscleAsync = ref.watch(muscleBalanceProvider);
-    final activityAsync = ref.watch(dailyActivityProvider);
-    final dashboardAsync = ref.watch(dashboardStatsProvider);
+    final dataAsync = ref.watch(unifiedDashboardDataProvider);
 
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
@@ -41,116 +35,114 @@ class AnalyticsDashboardScreen extends ConsumerWidget {
           ref.invalidate(dailyActivityProvider);
           ref.invalidate(dashboardStatsProvider);
         },
-        child: CustomScrollView(
-          slivers: [
-            // 1. Overview Cards
-            SliverToBoxAdapter(
-              child: _buildOverviewSection(dashboardAsync),
-            ),
-
-            // 2. Personal Records
-            SliverToBoxAdapter(
-              child: prsAsync.when(
-                data: (prs) => Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 24),
-                  child: PRBannerWidget(recentPRs: prs),
-                ),
-                loading: () => const SizedBox(height: 100),
-                error: (_, __) => const SizedBox.shrink(),
+        child: dataAsync.when(
+          data: (data) => CustomScrollView(
+            slivers: [
+              // 1. Overview Cards
+              SliverToBoxAdapter(
+                child: _buildOverviewSection(data.overview),
               ),
-            ),
 
-            // 3. Trends Section (Tabbed or List)
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Performance Trends',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 16),
-                    _buildTrendSection(
-                      context, 
-                      'Volume Moved', 
-                      volumeAsync.when(
-                        data: (d) => StatsTrendChart(data: d, type: StatType.volume),
-                        loading: () => const SizedBox(height: 220),
-                        error: (e, _) => Text('Error: $e'),
+              // 2. Personal Records
+              if (data.recentPRs.isNotEmpty)
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 24),
+                    child: PRBannerWidget(recentPRs: data.recentPRs),
+                  ),
+                ),
+
+              // 3. Trends Section
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Performance Trends',
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                       ),
-                      LucideIcons.activity,
-                    ),
-                    const SizedBox(height: 24),
-                    _buildTrendSection(
-                      context, 
-                      'Avg. Workout Duration', 
-                      durationAsync.when(
-                        data: (d) => StatsTrendChart(data: d, type: StatType.duration),
-                        loading: () => const SizedBox(height: 220),
-                        error: (e, _) => Text('Error: $e'),
+                      const SizedBox(height: 16),
+                      _buildTrendSection(
+                        context, 
+                        'Volume Moved', 
+                        StatsTrendChart(data: data.volumeTrend, type: StatType.volume),
+                        LucideIcons.activity,
                       ),
-                      LucideIcons.timer,
-                    ),
-                    const SizedBox(height: 24),
-                    _buildTrendSection(
-                      context, 
-                      'Body Weight', 
-                      weightAsync.when(
-                        data: (d) => StatsTrendChart(data: d, type: StatType.weight, valueSuffix: ' kg'),
-                        loading: () => const SizedBox(height: 220),
-                        error: (e, _) => Text('Error: $e'),
+                      const SizedBox(height: 24),
+                      _buildTrendSection(
+                        context, 
+                        'Avg. Workout Duration', 
+                        StatsTrendChart(data: data.durationTrend, type: StatType.duration),
+                        LucideIcons.timer,
                       ),
-                      LucideIcons.scale,
-                    ),
-                  ],
+                      const SizedBox(height: 24),
+                      _buildTrendSection(
+                        context, 
+                        'Body Weight', 
+                        StatsTrendChart(data: data.weightTrend, type: StatType.weight, valueSuffix: ' kg'),
+                        LucideIcons.scale,
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
 
-            // 4. Heatmap
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 40),
-                child: activityAsync.when(
-                  data: (activity) => WorkoutHeatmap(activity: activity),
-                  loading: () => const SizedBox(height: 150),
-                  error: (e, _) => const SizedBox.shrink(),
+              // 4. Heatmap
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 40),
+                  child: WorkoutHeatmap(activity: data.activity),
                 ),
               ),
-            ),
 
-            // 5. Muscle Balance
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 0, 20, 40),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Muscle Work Distribution',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 16),
-                    muscleAsync.when(
-                      data: (balance) => Card(
+              // 5. Muscle Balance
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 40),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Muscle Work Distribution',
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 16),
+                      Card(
                         elevation: 0,
                         color: Theme.of(context).colorScheme.surfaceContainerLow,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                         child: Padding(
                           padding: const EdgeInsets.all(16),
-                          child: MuscleBalanceChart(balanceData: balance),
+                          child: MuscleBalanceChart(balanceData: data.muscleBalance),
                         ),
                       ),
-                      loading: () => const SizedBox(height: 250),
-                      error: (e, _) => const SizedBox.shrink(),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
+            ],
+          ),
+          loading: () => _buildDashboardSkeleton(context),
+          error: (e, st) => Center(
+            child: Padding(
+              padding: const EdgeInsets.all(32),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(LucideIcons.triangleAlert, size: 48, color: Colors.red),
+                  const SizedBox(height: 16),
+                  Text('Failed to load insights: $e', textAlign: TextAlign.center),
+                  const SizedBox(height: 24),
+                  FilledButton(
+                    onPressed: () => ref.invalidate(unifiedDashboardDataProvider),
+                    child: const Text('Try Again'),
+                  ),
+                ],
+              ),
             ),
-          ],
+          ),
         ),
       ),
     );
@@ -180,32 +172,87 @@ class AnalyticsDashboardScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildOverviewSection(AsyncValue<Map<String, dynamic>> dashboardAsync) {
-    return dashboardAsync.when(
-      data: (data) => Padding(
+  Widget _buildOverviewSection(Map<String, dynamic> data) {
+    return Padding(
+      padding: const EdgeInsets.all(20),
+      child: Row(
+        children: [
+          _StatCard(
+            label: 'Workouts',
+            value: data['workoutCount'].toString(),
+            subtitle: 'this month',
+            icon: LucideIcons.calendarCheck,
+            color: Colors.blue,
+          ),
+          const SizedBox(width: 12),
+          _StatCard(
+            label: 'Streak',
+            value: '${data['activeStreak']}d',
+            subtitle: 'current',
+            icon: LucideIcons.flame,
+            color: Colors.orange,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDashboardSkeleton(BuildContext context) {
+    return SingleChildScrollView(
+      physics: const NeverScrollableScrollPhysics(),
+      child: Padding(
         padding: const EdgeInsets.all(20),
-        child: Row(
+        child: Column(
           children: [
-            _StatCard(
-              label: 'Workouts',
-              value: data['workoutCount'].toString(),
-              subtitle: 'this month',
-              icon: LucideIcons.calendarCheck,
-              color: Colors.blue,
+            // Overview Cards Skeleton
+            Row(
+              children: [
+                Expanded(child: _buildSkeletonCard(context, height: 120)),
+                const SizedBox(width: 12),
+                Expanded(child: _buildSkeletonCard(context, height: 120)),
+              ],
             ),
-            const SizedBox(width: 12),
-            _StatCard(
-              label: 'Streak',
-              value: '${data['activeStreak']}d',
-              subtitle: 'current',
-              icon: LucideIcons.flame,
-              color: Colors.orange,
-            ),
+            const SizedBox(height: 40),
+            // PR Banner Skeleton
+            _buildSkeletonCard(context, height: 80),
+            const SizedBox(height: 40),
+            // Performance Trends Skeleton
+            _buildSkeletonHeader(context),
+            const SizedBox(height: 20),
+            _buildSkeletonCard(context, height: 220),
+            const SizedBox(height: 24),
+            _buildSkeletonCard(context, height: 220),
+            const SizedBox(height: 40),
+            // Heatmap Skeleton
+            _buildSkeletonCard(context, height: 150),
           ],
         ),
       ),
-      loading: () => const SizedBox(height: 120),
-      error: (_, __) => const SizedBox.shrink(),
+    );
+  }
+
+  Widget _buildSkeletonCard(BuildContext context, {required double height}) {
+    return Container(
+      height: height,
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+        borderRadius: BorderRadius.circular(20),
+      ),
+    );
+  }
+
+  Widget _buildSkeletonHeader(BuildContext context) {
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Container(
+        height: 24,
+        width: 200,
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+          borderRadius: BorderRadius.circular(4),
+        ),
+      ),
     );
   }
 

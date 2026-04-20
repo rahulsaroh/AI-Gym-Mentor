@@ -1073,6 +1073,35 @@ class WorkoutRepository {
       ],
     });
   }
+  Future<ExerciseTable?> findExerciseMatch(String name, {String? githubId}) async {
+    return _findExerciseMatch(name, githubId: githubId);
+  }
+
+  Future<void> addExercisesWithSets(int workoutId, List<Map<String, dynamic>> suggestions) async {
+    await _db.transaction(() async {
+      for (var i = 0; i < suggestions.length; i++) {
+        final suggestion = suggestions[i];
+        final ex = await findExerciseMatch(suggestion['exercise_name'] as String);
+        if (ex == null) continue;
+
+        final setsCount = suggestion['sets'] is int ? suggestion['sets'] as int : 3;
+        final repsStr = suggestion['reps'] as String? ?? '10';
+        final reps = int.tryParse(repsStr.replaceAll(RegExp(r'[^0-9]'), '')) ?? 10;
+
+        for (var s = 1; s <= setsCount; s++) {
+          await _db.into(_db.workoutSets).insert(WorkoutSetsCompanion.insert(
+            workoutId: workoutId,
+            exerciseId: ex.id,
+            exerciseOrder: i,
+            setNumber: s,
+            reps: reps.toDouble(),
+            weight: 0.0,
+            setType: const Value(SetType.straight),
+          ));
+        }
+      }
+    });
+  }
 }
 
 @riverpod

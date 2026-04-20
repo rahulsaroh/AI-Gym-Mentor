@@ -191,17 +191,29 @@ class StatsRepository {
     final thisMonthStart = DateTime(now.year, now.month, 1);
     final lastMonthStart = DateTime(now.year, now.month - 1, 1);
 
-    // Discover muscles dynamically
-    final muscleQuery = db.selectOnly(db.exercises)
-      ..addColumns([db.exercises.primaryMuscle])
-      ..groupBy([db.exercises.primaryMuscle]);
-    final muscleRows = await muscleQuery.get();
-    final muscles = muscleRows
-        .map((r) => r.read(db.exercises.primaryMuscle))
-        .whereType<String>()
-        .toList();
-    if (muscles.isEmpty)
-      muscles.addAll(['Chest', 'Back', 'Legs', 'Shoulders', 'Arms']);
+    // 1. Define Standardized Granular Categories
+    const standardMuscles = [
+      'Chest', 'Back', 'Shoulders', 'Biceps', 'Triceps', 
+      'Forearms', 'Abs', 'Quads', 'Hamstrings', 'Glutes', 'Calves'
+    ];
+
+    // 2. Discover which standard muscles actually have exercises in the library
+    final allExercises = await db.select(db.exercises).get();
+    final Set<String> availableMuscles = {};
+    for (final ex in allExercises) {
+      final standardized = _standardizeMuscle(ex.primaryMuscle);
+      if (standardMuscles.contains(standardized)) {
+        availableMuscles.add(standardized);
+      }
+    }
+
+    // Sort to keep chart consistent
+    final muscles = standardMuscles.where((m) => availableMuscles.contains(m)).toList();
+
+    // Fallback if library is empty
+    if (muscles.isEmpty) {
+      muscles.addAll(['Chest', 'Back', 'Quads', 'Shoulders', 'Abs']);
+    }
 
     Future<Map<String, double>> fetchVolume(
         DateTime start, DateTime end) async {
@@ -219,11 +231,13 @@ class StatsRepository {
       Map<String, double> volumes = {for (var m in muscles) m: 0.0};
 
       for (final row in results) {
-        final muscle = row.readTable(db.exercises).primaryMuscle;
+        final rawMuscle = row.readTable(db.exercises).primaryMuscle;
+        final standardized = _standardizeMuscle(rawMuscle);
         final volume = row.readTable(db.workoutSets).weight *
             row.readTable(db.workoutSets).reps;
-        if (volumes.containsKey(muscle)) {
-          volumes[muscle] = (volumes[muscle] ?? 0) + volume;
+            
+        if (volumes.containsKey(standardized)) {
+          volumes[standardized] = (volumes[standardized] ?? 0) + volume;
         }
       }
       return volumes;
@@ -239,6 +253,23 @@ class StatsRepository {
       'lastMonth': muscles.map((m) => lastMonth[m] ?? 0.0).toList(),
     };
   }
+
+  String _standardizeMuscle(String muscle) {
+    final m = muscle.toLowerCase();
+    if (m.contains('pector') || m.contains('chest')) return 'Chest';
+    if (m.contains('lat') || m.contains('rhombo') || m.contains('trape') || m.contains('back')) return 'Back';
+    if (m.contains('deltoid') || m.contains('shoulder')) return 'Shoulders';
+    if (m.contains('bicep')) return 'Biceps';
+    if (m.contains('tricep')) return 'Triceps';
+    if (m.contains('forearm')) return 'Forearms';
+    if (m.contains('abdom') || m.contains('core') || m.contains('oblique')) return 'Abs';
+    if (m.contains('quad')) return 'Quads';
+    if (m.contains('hamstr')) return 'Hamstrings';
+    if (m.contains('glute')) return 'Glutes';
+    if (m.contains('calf')) return 'Calves';
+    return 'Other';
+  }
+
 
   /// Plateau Alerts: 1RM stagnation in last 5 sessions
   Future<List<Map<String, dynamic>>> getPlateauAlerts() async {
