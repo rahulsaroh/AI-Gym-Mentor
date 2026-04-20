@@ -22,6 +22,9 @@ jobs:
       - name: Remove Windows pubspec.lock
         run: rm -f pubspec.lock
 
+      - name: Remove Windows .dart_tool
+        run: rm -rf .dart_tool
+
       - name: Install dependencies
         run: flutter pub get
 
