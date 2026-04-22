@@ -73,7 +73,7 @@ class WorkoutAutoSaveService {
           TextCellValue(workout.name),
           TextCellValue(exerciseName),
           IntCellValue(set.setNumber),
-          TextCellValue(set.type ?? 'Main'), 
+          TextCellValue(set.setType.name), 
           DoubleCellValue(set.weight ?? 0.0),
           DoubleCellValue(set.reps ?? 0.0),
           TextCellValue(set.rpe?.toString() ?? ''),

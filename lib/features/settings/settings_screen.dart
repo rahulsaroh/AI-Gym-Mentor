@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -8,6 +9,7 @@ import 'package:ai_gym_mentor/features/settings/settings_provider.dart';
 import 'package:ai_gym_mentor/services/backup_service.dart';
 import 'package:ai_gym_mentor/features/settings/excel_sync_screen.dart';
 import 'package:ai_gym_mentor/features/settings/import_wizard_screen.dart';
+import 'package:intl/intl.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -162,7 +164,7 @@ class SettingsScreen extends ConsumerWidget {
                   MaterialPageRoute(
                       builder: (_) => ImportWizardScreen())),
             ),
-            _buildDataBackupSection(context, settings),
+            _buildDataBackupSection(context, ref, settings),
             const Divider(height: 32),
             _buildSectionHeader(context, 'AI Configuration'),
             _buildTile(
@@ -741,7 +743,7 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildDataBackupSection(BuildContext context, SettingsState settings) {
+  Widget _buildDataBackupSection(BuildContext context, WidgetRef ref, SettingsState settings) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

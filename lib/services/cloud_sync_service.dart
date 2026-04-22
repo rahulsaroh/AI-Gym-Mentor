@@ -72,7 +72,7 @@ class CloudSyncService {
       await ICloudStorage.upload(
         containerId: containerId,
         filePath: localPath,
-        destinationFileName: 'gym_log.xlsx',
+        destinationRelativePath: 'gym_log.xlsx',
         onProgress: (stream) {
           stream.listen((progress) {
             debugPrint('iCloud Upload Progress: $progress');
