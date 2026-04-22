@@ -742,3 +742,45 @@ final class UnifiedDashboardDataProvider
 
 String _$unifiedDashboardDataHash() =>
     r'552cc5fb23e00cffc0c293a96a3e72536ce8b490';
+
+@ProviderFor(physiqueAchievement)
+final physiqueAchievementProvider = PhysiqueAchievementProvider._();
+
+final class PhysiqueAchievementProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<PhysiqueAchievement>,
+          PhysiqueAchievement,
+          FutureOr<PhysiqueAchievement>
+        >
+    with
+        $FutureModifier<PhysiqueAchievement>,
+        $FutureProvider<PhysiqueAchievement> {
+  PhysiqueAchievementProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'physiqueAchievementProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$physiqueAchievementHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<PhysiqueAchievement> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<PhysiqueAchievement> create(Ref ref) {
+    return physiqueAchievement(ref);
+  }
+}
+
+String _$physiqueAchievementHash() =>
+    r'65866425b448c61d32a3efe53cf5d40058907c2f';

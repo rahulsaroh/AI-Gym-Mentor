@@ -8,12 +8,14 @@ class StatsTrendChart extends StatelessWidget {
   final List<Map<String, dynamic>> data;
   final StatType type;
   final String? valueSuffix;
+  final double? targetValue;
 
   const StatsTrendChart({
     super.key,
     required this.data,
     required this.type,
     this.valueSuffix,
+    this.targetValue,
   });
 
   @override
@@ -65,6 +67,27 @@ class StatsTrendChart extends StatelessWidget {
             ),
           ),
           borderData: FlBorderData(show: false),
+          extraLinesData: ExtraLinesData(
+            horizontalLines: [
+              if (targetValue != null)
+                HorizontalLine(
+                  y: targetValue!,
+                  color: Colors.orange.withValues(alpha: 0.5),
+                  strokeWidth: 2,
+                  dashArray: [10, 5],
+                  label: HorizontalLineLabel(
+                    show: true,
+                    alignment: Alignment.topRight,
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.orange.withValues(alpha: 0.8),
+                    ),
+                    labelResolver: (line) => 'GOAL: ${targetValue!.toStringAsFixed(1)}',
+                  ),
+                ),
+            ],
+          ),
           lineBarsData: [
             LineChartBarData(
               spots: data.asMap().entries.map((e) {

@@ -3,7 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:ai_gym_mentor/features/analytics/analytics_providers.dart';
-import 'package:ai_gym_mentor/core/domain/entities/body_measurement.dart' as ent;
+import 'package:ai_gym_mentor/core/domain/entities/body_measurement.dart'
+    as ent;
 
 class BodyStatsLogScreen extends ConsumerStatefulWidget {
   const BodyStatsLogScreen({super.key});
@@ -15,33 +16,14 @@ class BodyStatsLogScreen extends ConsumerStatefulWidget {
 class _BodyStatsLogScreenState extends ConsumerState<BodyStatsLogScreen> {
   final Map<String, TextEditingController> _controllers = {};
   final Map<String, TextEditingController> _customControllers = {};
-  
-  late DateTime _date;
 
-  final List<MetricConfig> _standardMetrics = [
-    MetricConfig(id: 'weight', label: 'Weight', icon: LucideIcons.scale, unit: 'kg'),
-    MetricConfig(id: 'bodyFat', label: 'Body Fat', icon: LucideIcons.percent, unit: '%'),
-    MetricConfig(id: 'waist', label: 'Waist', icon: LucideIcons.ruler, unit: 'cm'),
-    MetricConfig(id: 'chest', label: 'Chest', icon: LucideIcons.ruler, unit: 'cm'),
-    MetricConfig(id: 'shoulders', label: 'Shoulders', icon: LucideIcons.ruler, unit: 'cm'),
-    MetricConfig(id: 'hips', label: 'Hips', icon: LucideIcons.ruler, unit: 'cm'),
-    MetricConfig(id: 'neck', label: 'Neck', icon: LucideIcons.ruler, unit: 'cm'),
-    MetricConfig(id: 'armLeft', label: 'L-Arm', icon: LucideIcons.armchair, unit: 'cm'),
-    MetricConfig(id: 'armRight', label: 'R-Arm', icon: LucideIcons.armchair, unit: 'cm'),
-    MetricConfig(id: 'forearmLeft', label: 'L-Forearm', icon: LucideIcons.armchair, unit: 'cm'),
-    MetricConfig(id: 'forearmRight', label: 'R-Forearm', icon: LucideIcons.armchair, unit: 'cm'),
-    MetricConfig(id: 'thighLeft', label: 'L-Thigh', icon: LucideIcons.ruler, unit: 'cm'),
-    MetricConfig(id: 'thighRight', label: 'R-Thigh', icon: LucideIcons.ruler, unit: 'cm'),
-    MetricConfig(id: 'calfLeft', label: 'L-Calf', icon: LucideIcons.ruler, unit: 'cm'),
-    MetricConfig(id: 'calfRight', label: 'R-Calf', icon: LucideIcons.ruler, unit: 'cm'),
-    MetricConfig(id: 'height', label: 'Height', icon: LucideIcons.ruler, unit: 'cm'),
-  ];
+  late DateTime _date;
 
   @override
   void initState() {
     super.initState();
     _date = DateTime.now();
-    for (var m in _standardMetrics) {
+    for (var m in standardMetrics) {
       _controllers[m.id] = TextEditingController();
     }
   }
@@ -86,7 +68,9 @@ class _BodyStatsLogScreenState extends ConsumerState<BodyStatsLogScreen> {
       customValues: customValues.isEmpty ? null : customValues,
     );
 
-    await ref.read(bodyMeasurementsListProvider.notifier).addMeasurement(measurement);
+    await ref
+        .read(bodyMeasurementsListProvider.notifier)
+        .addMeasurement(measurement);
     if (mounted) Navigator.pop(context);
   }
 
@@ -103,7 +87,10 @@ class _BodyStatsLogScreenState extends ConsumerState<BodyStatsLogScreen> {
             autofocus: true,
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
             ElevatedButton(
               onPressed: () {
                 if (nameC.text.isNotEmpty) {
@@ -126,16 +113,21 @@ class _BodyStatsLogScreenState extends ConsumerState<BodyStatsLogScreen> {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
-        title: Text('Body Stats', style: GoogleFonts.outfit(fontWeight: FontWeight.bold)),
+        title: Text(
+          'Body Stats',
+          style: GoogleFonts.outfit(fontWeight: FontWeight.bold),
+        ),
         actions: [
           TextButton(
             onPressed: _onSave,
-            child: Text('Save', 
+            child: Text(
+              'Save',
               style: GoogleFonts.outfit(
                 color: Theme.of(context).colorScheme.primary,
                 fontWeight: FontWeight.bold,
                 fontSize: 16,
-              )),
+              ),
+            ),
           ),
           const SizedBox(width: 8),
         ],
@@ -145,11 +137,18 @@ class _BodyStatsLogScreenState extends ConsumerState<BodyStatsLogScreen> {
           children: [
             _buildDatePicker(),
             const Divider(height: 1),
-            ..._standardMetrics.map((m) => _buildMetricRow(m)),
-            ..._customControllers.keys.map((name) => _buildMetricRow(
-              MetricConfig(id: name, label: name, icon: LucideIcons.plus, unit: 'cm'),
-              isCustom: true,
-            )),
+            ...standardMetrics.map((m) => _buildMetricRow(m)),
+            ..._customControllers.keys.map(
+              (name) => _buildMetricRow(
+                MetricConfig(
+                  id: name,
+                  label: name,
+                  icon: LucideIcons.plus,
+                  unit: 'cm',
+                ),
+                isCustom: true,
+              ),
+            ),
             const SizedBox(height: 16),
             _buildAddCustomButton(),
             const SizedBox(height: 40),
@@ -182,20 +181,39 @@ class _BodyStatsLogScreenState extends ConsumerState<BodyStatsLogScreen> {
   }
 
   Widget _buildMetricRow(MetricConfig config, {bool isCustom = false}) {
-    final controller = isCustom ? _customControllers[config.id]! : _controllers[config.id]!;
-    
+    final controller = isCustom
+        ? _customControllers[config.id]!
+        : _controllers[config.id]!;
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
       decoration: BoxDecoration(
-        border: Border(bottom: BorderSide(color: Colors.grey.withValues(alpha: 0.1))),
+        border: Border(
+          bottom: BorderSide(color: Colors.grey.withValues(alpha: 0.1)),
+        ),
       ),
       child: Row(
         children: [
-          Icon(config.icon, size: 22, color: Colors.grey[600]),
+          config.assetPath != null
+              ? ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: Image.asset(
+                    config.assetPath!,
+                    width: 32,
+                    height: 32,
+                    fit: BoxFit.cover,
+                  ),
+                )
+              : Icon(config.icon, size: 22, color: Colors.grey[600]),
           const SizedBox(width: 16),
           Expanded(
-            child: Text(config.label, 
-              style: GoogleFonts.outfit(fontSize: 16, fontWeight: FontWeight.w500)),
+            child: Text(
+              config.label,
+              style: GoogleFonts.outfit(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
           ),
           SizedBox(
             width: 120,
@@ -206,8 +224,13 @@ class _BodyStatsLogScreenState extends ConsumerState<BodyStatsLogScreen> {
                   child: TextField(
                     controller: controller,
                     textAlign: TextAlign.end,
-                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                    style: GoogleFonts.robotoMono(fontWeight: FontWeight.bold, fontSize: 18),
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
+                    style: GoogleFonts.robotoMono(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),
                     decoration: InputDecoration(
                       hintText: '--',
                       hintStyle: TextStyle(color: Colors.grey[300]),
@@ -217,9 +240,16 @@ class _BodyStatsLogScreenState extends ConsumerState<BodyStatsLogScreen> {
                   ),
                 ),
                 const SizedBox(width: 8),
-                Text(config.unit, style: GoogleFonts.outfit(color: Colors.grey, fontSize: 14)),
+                Text(
+                  config.unit,
+                  style: GoogleFonts.outfit(color: Colors.grey, fontSize: 14),
+                ),
                 const SizedBox(width: 8),
-                const Icon(LucideIcons.chevronRight, size: 16, color: Colors.grey),
+                const Icon(
+                  LucideIcons.chevronRight,
+                  size: 16,
+                  color: Colors.grey,
+                ),
               ],
             ),
           ),
@@ -237,32 +267,33 @@ class _BodyStatsLogScreenState extends ConsumerState<BodyStatsLogScreen> {
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 16),
           decoration: BoxDecoration(
-            border: Border.all(color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3)),
+            border: Border.all(
+              color: Theme.of(
+                context,
+              ).colorScheme.primary.withValues(alpha: 0.3),
+            ),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(LucideIcons.plus, size: 20, color: Theme.of(context).colorScheme.primary),
+              Icon(
+                LucideIcons.plus,
+                size: 20,
+                color: Theme.of(context).colorScheme.primary,
+              ),
               const SizedBox(width: 8),
-              Text('Add Custom Metric', 
+              Text(
+                'Add Custom Metric',
                 style: GoogleFonts.outfit(
                   color: Theme.of(context).colorScheme.primary,
                   fontWeight: FontWeight.bold,
-                )),
+                ),
+              ),
             ],
           ),
         ),
       ),
     );
   }
-}
-
-class MetricConfig {
-  final String id;
-  final String label;
-  final IconData icon;
-  final String unit;
-
-  MetricConfig({required this.id, required this.label, required this.icon, required this.unit});
 }

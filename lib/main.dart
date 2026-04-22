@@ -16,6 +16,9 @@ import 'package:ai_gym_mentor/features/exercise_database/data/datasources/exerci
 import 'package:ai_gym_mentor/features/workout/data/datasources/program_db_seeder.dart';
 import 'package:ai_gym_mentor/core/database/database.dart';
 import 'package:ai_gym_mentor/core/services/watch_sync_service.dart';
+import 'package:ai_gym_mentor/features/analytics/measurements_repository.dart' as ai_gym_mentor_repo;
+import 'package:ai_gym_mentor/core/domain/entities/body_target.dart' as ai_gym_mentor_target;
+import 'package:ai_gym_mentor/core/domain/entities/body_measurement.dart' as ai_gym_mentor_measurement;
 
 void main() async {
   // Ensure Flutter is initialized before any async code
@@ -66,6 +69,47 @@ void main() async {
     if (kDebugMode) debugPrint('Exercise and Program Database Seeded Successfully');
   } catch (e) {
     debugPrint('Exercise Database Seeding Failed: $e');
+  }
+
+  // Temporary: Add sample physique data
+  try {
+    if (kDebugMode) debugPrint('Step 5: Seeding Sample Physique Data...');
+    final repo = ai_gym_mentor_repo.MeasurementsRepository(AppDatabase()); // Need to import this
+    final targets = await repo.getAllTargets();
+    if (targets.isEmpty) {
+       await repo.addTarget(ai_gym_mentor_target.BodyTarget(
+         id: DateTime.now().millisecondsSinceEpoch,
+         metric: 'weight',
+         targetValue: 77.0,
+         deadline: DateTime.now().add(const Duration(days: 30)),
+         createdAt: DateTime.now().subtract(const Duration(days: 10))
+       ));
+       await Future.delayed(const Duration(milliseconds: 10)); // Ensure unique ID
+       await repo.addTarget(ai_gym_mentor_target.BodyTarget(
+         id: DateTime.now().millisecondsSinceEpoch,
+         metric: 'chest',
+         targetValue: 105.0,
+         deadline: DateTime.now().add(const Duration(days: 60)),
+         createdAt: DateTime.now().subtract(const Duration(days: 10))
+       ));
+       await Future.delayed(const Duration(milliseconds: 10));
+       await repo.addMeasurement(ai_gym_mentor_measurement.BodyMeasurement(
+         id: DateTime.now().millisecondsSinceEpoch,
+         date: DateTime.now().subtract(const Duration(days: 10)),
+         weight: 80.0,
+         chest: 95.0
+       ));
+       await Future.delayed(const Duration(milliseconds: 10));
+       await repo.addMeasurement(ai_gym_mentor_measurement.BodyMeasurement(
+         id: DateTime.now().millisecondsSinceEpoch,
+         date: DateTime.now(),
+         weight: 75.0,
+         chest: 100.0
+       ));
+       debugPrint('Seeded Sample Physique Data Successfully');
+    }
+  } catch (e) {
+    debugPrint('Seeding Physique Data Failed: $e');
   }
 
   // 4. Framework error catchers

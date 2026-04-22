@@ -86,7 +86,7 @@ final class ExerciseListProvider
   ExerciseList create() => ExerciseList();
 }
 
-String _$exerciseListHash() => r'cb0dfea486035165ec3b73d5ba4ad394d00420d3';
+String _$exerciseListHash() => r'62280d49f248c4b3056f6f4eec6b00af54fe0381';
 
 abstract class _$ExerciseList extends $AsyncNotifier<List<ExerciseEntity>> {
   FutureOr<List<ExerciseEntity>> build();

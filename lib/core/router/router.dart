@@ -20,7 +20,6 @@ import 'package:ai_gym_mentor/features/history/history_screen.dart';
 import 'package:ai_gym_mentor/features/history/workout_detail_screen.dart';
 import 'package:ai_gym_mentor/features/analytics/analytics_dashboard_screen.dart';
 import 'package:ai_gym_mentor/features/analytics/pr_hall_of_fame_screen.dart';
-import 'package:ai_gym_mentor/features/analytics/body_measurements_screen.dart';
 import 'package:ai_gym_mentor/features/analytics/progress_photos_screen.dart';
 import 'package:ai_gym_mentor/features/settings/settings_screen.dart';
 import 'package:ai_gym_mentor/features/settings/plates_config_screen.dart';
@@ -216,7 +215,7 @@ final router = GoRouter(
                 ),
                 GoRoute(
                   path: 'measurements',
-                  builder: (context, state) => const BodyMeasurementsScreen(),
+                  redirect: (context, state) => '/analytics',
                 ),
                 GoRoute(
                   path: 'photos',

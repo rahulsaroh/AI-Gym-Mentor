@@ -20,6 +20,9 @@ import 'package:ai_gym_mentor/features/analytics/components/volume_vs_weight_cha
 import 'package:ai_gym_mentor/features/analytics/presentation/strength_analytics_dashboard.dart';
 import 'package:ai_gym_mentor/features/analytics/presentation/strength_analytics_notifier.dart';
 import 'package:ai_gym_mentor/features/analytics/presentation/providers/year_in_review_providers.dart';
+import 'package:ai_gym_mentor/features/analytics/presentation/widgets/physique_tabs.dart';
+import 'package:ai_gym_mentor/features/analytics/presentation/body_stats_log_screen.dart';
+import 'package:ai_gym_mentor/features/analytics/presentation/body_targets_log_screen.dart';
 
 class AnalyticsDashboardScreen extends ConsumerWidget {
   const AnalyticsDashboardScreen({super.key});
@@ -32,25 +35,32 @@ class AnalyticsDashboardScreen extends ConsumerWidget {
     final alertsAsync = ref.watch(plateauAlertsProvider);
     final prsAsync = ref.watch(recentPRsProvider);
 
+    final measurementsAsync = ref.watch(bodyMeasurementsListProvider);
+
     return DefaultTabController(
-      length: 2,
+      length: 5,
       child: Scaffold(
         backgroundColor: Theme.of(context).colorScheme.surface,
         appBar: AppBar(
-          title: const Text('Analytics'),
-          actions: [
-            IconButton(
-              icon: const Icon(LucideIcons.scale),
-              onPressed: () => context.push('/analytics/measurements'),
-            ),
-          ],
+          title: Text(
+            'Stats Dashboard',
+            style: GoogleFonts.outfit(fontWeight: FontWeight.bold),
+          ),
+          elevation: 0,
+          scrolledUnderElevation: 0,
           bottom: TabBar(
+            isScrollable: true,
+            tabAlignment: TabAlignment.start,
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            labelStyle: GoogleFonts.outfit(fontWeight: FontWeight.bold),
+            unselectedLabelStyle: GoogleFonts.outfit(fontWeight: FontWeight.w500),
             tabs: const [
               Tab(text: 'Overview'),
               Tab(text: 'Strength'),
+              Tab(text: 'History'),
+              Tab(text: 'Stats'),
+              Tab(text: 'Targets'),
             ],
-            indicatorColor: Theme.of(context).colorScheme.primary,
-            labelStyle: const TextStyle(fontWeight: FontWeight.bold),
           ),
         ),
         body: TabBarView(
@@ -121,11 +131,26 @@ class AnalyticsDashboardScreen extends ConsumerWidget {
                     _SectionHeader(
                         title: 'Body Weight Trend', subtitle: 'Progress over time'),
                     _LazyChart(
-                      builder: (ref) => ref.watch(weightTrendProvider).when(
-                            data: (data) => StatsTrendChart(data: data, type: StatType.weight),
-                            loading: () => const _SkeletonChart(),
-                            error: (e, _) => Center(child: Text('Error: $e')),
+                      builder: (ref) {
+                        final weightDataAsync = ref.watch(weightTrendProvider);
+                        final targetsAsync = ref.watch(bodyTargetsListProvider);
+                        
+                        final weightTarget = targetsAsync.when(
+                          data: (targets) => targets.where((t) => t.metric == 'weight').firstOrNull?.targetValue,
+                          loading: () => null,
+                          error: (_, __) => null,
+                        );
+
+                        return weightDataAsync.when(
+                          data: (data) => StatsTrendChart(
+                            data: data, 
+                            type: StatType.weight,
+                            targetValue: weightTarget,
                           ),
+                          loading: () => const _SkeletonChart(),
+                          error: (e, _) => Center(child: Text('Error: $e')),
+                        );
+                      },
                     ),
   
                     // 3.2 Workout Duration Trend
@@ -245,7 +270,44 @@ class AnalyticsDashboardScreen extends ConsumerWidget {
               },
               child: const StrengthAnalyticsDashboard(),
             ),
+
+            // Physique Tabs
+            PhysiqueHistoryTab(measurementsAsync: measurementsAsync),
+            PhysiqueStatsTab(measurementsAsync: measurementsAsync),
+            const PhysiqueTargetsTab(),
           ],
+        ),
+        floatingActionButton: Consumer(
+          builder: (context, ref, _) {
+            return ListenableBuilder(
+              listenable: DefaultTabController.of(context),
+              builder: (context, _) {
+                final index = DefaultTabController.of(context).index;
+                if (index < 2) return const SizedBox.shrink();
+
+                return FloatingActionButton(
+                  onPressed: () {
+                    if (index == 4) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => BodyTargetsLogScreen(),
+                        ),
+                      );
+                    } else {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => BodyStatsLogScreen(),
+                        ),
+                      );
+                    }
+                  },
+                  child: const Icon(LucideIcons.plus),
+                );
+              },
+            );
+          },
         ),
       ),
     );
