@@ -44,7 +44,7 @@ class _ImportMappingScreenState extends ConsumerState<ImportMappingScreen> {
     if (_selectedRawLogSheet != null) {
       final headers = widget.schema.sheets[_selectedRawLogSheet]!;
       for (final field in _requiredRawLogFields) {
-        final index = headers.indexWhere((h) => h.toLowerCase().contains(field.toLowerCase()));
+        final index = headers.indexWhere((h) => _isMatch(h, field));
         if (index != -1) _rawLogMapping[field] = index;
       }
     }
@@ -59,15 +59,23 @@ class _ImportMappingScreenState extends ConsumerState<ImportMappingScreen> {
   }
 
   bool _isMatch(String header, String field) {
-    final h = header.toLowerCase();
-    final f = field.toLowerCase();
-    if (h.contains(f)) return true;
+    final h = header.toLowerCase().trim();
+    final f = field.toLowerCase().trim();
+    if (h == f) return true;
+    if (h.contains(f) || f.contains(h)) return true;
     
-    // Synonyms
+    // Exact variants
+    if (f == 'exercise name' && (h == 'exercise' || h == 'movement')) return true;
+    if (f == 'set number' && (h == 'set' || h == 'set #')) return true;
+    if (f == 'weight' && h.startsWith('weight')) return true;
+    if (f == 'reps' && h.startsWith('reps')) return true;
+    if (f == 'rpe' && h == 'rpe') return true;
+
+    // Synonyms for body measurements
     if (f.contains('bicep') && h.contains('arm')) return true;
     if (f.contains('body fat') && h.contains('fat')) return true;
-    if (f.contains('waist') && h.contains('waist')) return true; // redundant but safe
-    if (f == 'naval waist' && h.contains('naval')) return true;
+    if (f == 'naval waist' && (h.contains('naval') || h.contains('navel'))) return true;
+    if (f.contains('waist') && !f.contains('naval') && h.contains('waist') && !h.contains('naval') && !h.contains('navel')) return true;
     
     return false;
   }

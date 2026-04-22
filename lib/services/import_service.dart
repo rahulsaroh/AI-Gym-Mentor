@@ -272,15 +272,18 @@ class ImportService {
             notes: Value(notes),
           );
 
+          print('Saving measurement for $date: $companion');
           final existing = await (db.select(db.bodyMeasurements)
                 ..where((t) => t.date.year.equals(date.year) & t.date.month.equals(date.month) & t.date.day.equals(date.day))
                 ..limit(1))
               .getSingleOrNull();
 
           if (existing == null) {
+            print('Inserting new record for $date');
             await db.into(db.bodyMeasurements).insert(companion);
             importedMeasurements++;
           } else {
+            print('Updating existing record ID ${existing.id} for $date');
              await (db.update(db.bodyMeasurements)..where((t) => t.id.equals(existing.id))).write(companion);
              importedMeasurements++;
           }

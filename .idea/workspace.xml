@@ -5,20 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="310b61fb-298a-4d2b-8625-e9028bf4d99c" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.dart_tool/package_config.json" beforeDir="false" afterPath="$PROJECT_DIR$/.dart_tool/package_config.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.dart_tool/package_graph.json" beforeDir="false" afterPath="$PROJECT_DIR$/.dart_tool/package_graph.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.dart_tool/version" beforeDir="false" afterPath="$PROJECT_DIR$/.dart_tool/version" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.flutter-plugins-dependencies" beforeDir="false" afterPath="$PROJECT_DIR$/.flutter-plugins-dependencies" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/android/.kotlin/sessions/kotlin-compiler-7905466773203558873.salive" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/images/body_scan_3d.png" beforeDir="false" afterPath="$PROJECT_DIR$/assets/images/body_scan_3d.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/features/analytics/analytics_dashboard_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/analytics/analytics_dashboard_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/features/analytics/analytics_providers.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/analytics/analytics_providers.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/features/analytics/presentation/body_targets_log_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/analytics/presentation/body_targets_log_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/features/analytics/presentation/widgets/physique_tabs.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/analytics/presentation/widgets/physique_tabs.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/features/programs/create_edit_program_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/programs/create_edit_program_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pubspec.lock" beforeDir="false" afterPath="$PROJECT_DIR$/pubspec.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/view.xml" beforeDir="false" afterPath="$PROJECT_DIR$/view.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/features/settings/import_mapping_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/features/settings/import_mapping_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/services/import_service.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/services/import_service.dart" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
