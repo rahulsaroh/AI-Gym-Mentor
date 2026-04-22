@@ -16,8 +16,8 @@ class BodyStatsLogScreen extends ConsumerStatefulWidget {
 class _BodyStatsLogScreenState extends ConsumerState<BodyStatsLogScreen> {
   final Map<String, TextEditingController> _controllers = {};
   final Map<String, TextEditingController> _customControllers = {};
-
   late DateTime _date;
+  final _notesController = TextEditingController();
 
   @override
   void initState() {
@@ -33,6 +33,7 @@ class _BodyStatsLogScreenState extends ConsumerState<BodyStatsLogScreen> {
     for (var c in _controllers.values) {
       c.dispose();
     }
+    _notesController.dispose();
     for (var c in _customControllers.values) {
       c.dispose();
     }
@@ -66,6 +67,7 @@ class _BodyStatsLogScreenState extends ConsumerState<BodyStatsLogScreen> {
       calfRight: double.tryParse(_controllers['calfRight']!.text),
       height: double.tryParse(_controllers['height']!.text),
       customValues: customValues.isEmpty ? null : customValues,
+      notes: _notesController.text.isEmpty ? null : _notesController.text,
     );
 
     await ref
@@ -137,22 +139,75 @@ class _BodyStatsLogScreenState extends ConsumerState<BodyStatsLogScreen> {
           children: [
             _buildDatePicker(),
             const Divider(height: 1),
-            ...standardMetrics.map((m) => _buildMetricRow(m)),
-            ..._customControllers.keys.map(
-              (name) => _buildMetricRow(
-                MetricConfig(
-                  id: name,
-                  label: name,
-                  icon: LucideIcons.plus,
-                  unit: 'cm',
+            _buildSectionHeader('Body Metrics'),
+            _buildMetricRow(standardMetrics.firstWhere((m) => m.id == 'weight')),
+            _buildMetricRow(standardMetrics.firstWhere((m) => m.id == 'bodyFat')),
+            
+            _buildSectionHeader('Upper Body'),
+            _buildMetricRow(standardMetrics.firstWhere((m) => m.id == 'chest')),
+            _buildMetricRow(standardMetrics.firstWhere((m) => m.id == 'shoulders')),
+            _buildMetricRow(standardMetrics.firstWhere((m) => m.id == 'armLeft')),
+            _buildMetricRow(standardMetrics.firstWhere((m) => m.id == 'armRight')),
+            
+            _buildSectionHeader('Lower Body'),
+            _buildMetricRow(standardMetrics.firstWhere((m) => m.id == 'waist')),
+            _buildMetricRow(standardMetrics.firstWhere((m) => m.id == 'hips')),
+            _buildMetricRow(standardMetrics.firstWhere((m) => m.id == 'thighLeft')),
+            _buildMetricRow(standardMetrics.firstWhere((m) => m.id == 'thighRight')),
+            _buildMetricRow(standardMetrics.firstWhere((m) => m.id == 'calfLeft')),
+            _buildMetricRow(standardMetrics.firstWhere((m) => m.id == 'calfRight')),
+
+            _buildSectionHeader('Notes'),
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: TextField(
+                controller: _notesController,
+                maxLines: 3,
+                decoration: InputDecoration(
+                  hintText: 'Add notes about your physique...',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Colors.grey.withValues(alpha: 0.2)),
+                  ),
                 ),
-                isCustom: true,
               ),
             ),
+
+            if (_customControllers.isNotEmpty) ...[
+               _buildSectionHeader('Custom Metrics'),
+               ..._customControllers.keys.map(
+                (name) => _buildMetricRow(
+                  MetricConfig(
+                    id: name,
+                    label: name,
+                    icon: LucideIcons.plus,
+                    unit: 'cm',
+                  ),
+                  isCustom: true,
+                ),
+              ),
+            ],
             const SizedBox(height: 16),
             _buildAddCustomButton(),
             const SizedBox(height: 40),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSectionHeader(String title) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(20, 24, 20, 8),
+      color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.2),
+      child: Text(
+        title.toUpperCase(),
+        style: GoogleFonts.outfit(
+          fontSize: 12,
+          fontWeight: FontWeight.bold,
+          color: Theme.of(context).colorScheme.outline,
+          letterSpacing: 1.1,
         ),
       ),
     );

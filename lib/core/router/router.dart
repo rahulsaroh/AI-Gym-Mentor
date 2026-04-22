@@ -12,6 +12,7 @@ import 'package:ai_gym_mentor/features/shell/placeholder_screens.dart'
 import 'package:ai_gym_mentor/features/splash/splash_screen.dart';
 import 'package:ai_gym_mentor/features/onboarding/onboarding_screen.dart';
 import 'package:ai_gym_mentor/features/setup/setup_screen.dart';
+import 'package:ai_gym_mentor/features/onboarding/welcome_back_screen.dart';
 import 'package:ai_gym_mentor/features/exercise_database/presentation/screens/muscle_group_screen.dart';
 import 'package:ai_gym_mentor/features/exercise_database/presentation/screens/exercise_history_screen.dart';
 import 'package:ai_gym_mentor/features/exercise_database/presentation/screens/exercise_detail_screen.dart';
@@ -48,6 +49,13 @@ final router = GoRouter(
     GoRoute(
       path: '/setup',
       builder: (context, state) => const SetupScreen(),
+    ),
+    GoRoute(
+      path: '/welcome-back',
+      builder: (context, state) {
+        final path = state.uri.queryParameters['path'] ?? '';
+        return WelcomeBackScreen(filePath: path);
+      },
     ),
     GoRoute(
       path: '/active-workout',

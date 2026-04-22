@@ -15,6 +15,7 @@
         "csv",
         "cupertino_icons",
         "drift",
+        "excel",
         "file_picker",
         "fl_chart",
         "flutter",
@@ -31,7 +32,10 @@
         "go_router",
         "google_fonts",
         "google_generative_ai",
+        "google_sign_in",
+        "googleapis",
         "http",
+        "icloud_storage",
         "image_picker",
         "intl",
         "json_annotation",
@@ -91,7 +95,7 @@
     },
     {
       "name": "flutter_native_splash",
-      "version": "2.4.7",
+      "version": "2.4.4",
       "dependencies": [
         "ansicolor",
         "args",
@@ -376,7 +380,7 @@
     },
     {
       "name": "lottie",
-      "version": "3.3.3",
+      "version": "3.3.0",
       "dependencies": [
         "archive",
         "flutter",
@@ -540,24 +544,45 @@
       ]
     },
     {
+      "name": "excel",
+      "version": "4.0.6",
+      "dependencies": [
+        "archive",
+        "collection",
+        "equatable",
+        "xml"
+      ]
+    },
+    {
       "name": "csv",
       "version": "6.0.0",
       "dependencies": []
     },
     {
-      "name": "file_picker",
-      "version": "11.0.2",
+      "name": "icloud_storage",
+      "version": "2.2.0",
       "dependencies": [
-        "cross_file",
-        "dbus",
-        "ffi",
         "flutter",
-        "flutter_plugin_android_lifecycle",
-        "flutter_web_plugins",
-        "path",
-        "plugin_platform_interface",
-        "web",
-        "win32"
+        "plugin_platform_interface"
+      ]
+    },
+    {
+      "name": "google_sign_in",
+      "version": "6.3.0",
+      "dependencies": [
+        "flutter",
+        "google_sign_in_android",
+        "google_sign_in_ios",
+        "google_sign_in_platform_interface",
+        "google_sign_in_web"
+      ]
+    },
+    {
+      "name": "googleapis",
+      "version": "13.2.0",
+      "dependencies": [
+        "_discoveryapis_commons",
+        "http"
       ]
     },
     {
@@ -677,6 +702,21 @@
         "flutter",
         "http",
         "path_provider"
+      ]
+    },
+    {
+      "name": "file_picker",
+      "version": "8.3.7",
+      "dependencies": [
+        "cross_file",
+        "ffi",
+        "flutter",
+        "flutter_plugin_android_lifecycle",
+        "flutter_web_plugins",
+        "path",
+        "plugin_platform_interface",
+        "web",
+        "win32"
       ]
     },
     {
@@ -924,7 +964,7 @@
     },
     {
       "name": "image",
-      "version": "4.8.0",
+      "version": "4.3.0",
       "dependencies": [
         "archive",
         "meta",
@@ -1249,7 +1289,7 @@
     },
     {
       "name": "test_api",
-      "version": "0.7.10",
+      "version": "0.7.9",
       "dependencies": [
         "async",
         "boolean_selector",
@@ -1264,7 +1304,7 @@
     },
     {
       "name": "matcher",
-      "version": "0.12.19",
+      "version": "0.12.18",
       "dependencies": [
         "async",
         "meta",
@@ -1435,10 +1475,10 @@
     },
     {
       "name": "archive",
-      "version": "4.0.9",
+      "version": "3.6.1",
       "dependencies": [
-        "path",
-        "posix"
+        "crypto",
+        "path"
       ]
     },
     {
@@ -1734,28 +1774,56 @@
       ]
     },
     {
-      "name": "dbus",
-      "version": "0.7.12",
+      "name": "equatable",
+      "version": "2.0.8",
       "dependencies": [
-        "args",
-        "ffi",
-        "meta",
-        "xml"
+        "collection",
+        "meta"
       ]
     },
     {
-      "name": "cross_file",
-      "version": "0.3.5+2",
+      "name": "google_sign_in_web",
+      "version": "0.12.4+4",
       "dependencies": [
-        "meta",
+        "flutter",
+        "flutter_web_plugins",
+        "google_identity_services_web",
+        "google_sign_in_platform_interface",
+        "http",
         "web"
       ]
     },
     {
-      "name": "flutter_plugin_android_lifecycle",
-      "version": "2.0.34",
+      "name": "google_sign_in_platform_interface",
+      "version": "2.5.0",
       "dependencies": [
-        "flutter"
+        "flutter",
+        "plugin_platform_interface"
+      ]
+    },
+    {
+      "name": "google_sign_in_ios",
+      "version": "5.9.0",
+      "dependencies": [
+        "flutter",
+        "google_sign_in_platform_interface"
+      ]
+    },
+    {
+      "name": "google_sign_in_android",
+      "version": "6.2.1",
+      "dependencies": [
+        "flutter",
+        "google_sign_in_platform_interface"
+      ]
+    },
+    {
+      "name": "_discoveryapis_commons",
+      "version": "1.0.7",
+      "dependencies": [
+        "http",
+        "http_parser",
+        "meta"
       ]
     },
     {
@@ -1769,6 +1837,14 @@
         "path_provider",
         "plugin_platform_interface",
         "uuid"
+      ]
+    },
+    {
+      "name": "cross_file",
+      "version": "0.3.5+2",
+      "dependencies": [
+        "meta",
+        "web"
       ]
     },
     {
@@ -1800,14 +1876,6 @@
         "flutter_local_notifications_platform_interface",
         "path",
         "xdg_directories"
-      ]
-    },
-    {
-      "name": "equatable",
-      "version": "2.0.8",
-      "dependencies": [
-        "collection",
-        "meta"
       ]
     },
     {
@@ -1934,6 +2002,13 @@
         "flutter",
         "flutter_plugin_android_lifecycle",
         "image_picker_platform_interface"
+      ]
+    },
+    {
+      "name": "flutter_plugin_android_lifecycle",
+      "version": "2.0.34",
+      "dependencies": [
+        "flutter"
       ]
     },
     {
@@ -2195,12 +2270,13 @@
       ]
     },
     {
-      "name": "posix",
-      "version": "6.5.0",
+      "name": "dbus",
+      "version": "0.7.12",
       "dependencies": [
+        "args",
         "ffi",
         "meta",
-        "path"
+        "xml"
       ]
     },
     {
@@ -2257,6 +2333,14 @@
       ]
     },
     {
+      "name": "google_identity_services_web",
+      "version": "0.3.3+1",
+      "dependencies": [
+        "meta",
+        "web"
+      ]
+    },
+    {
       "name": "xdg_directories",
       "version": "1.1.0",
       "dependencies": [
@@ -2303,7 +2387,7 @@
     },
     {
       "name": "test",
-      "version": "1.30.0",
+      "version": "1.29.0",
       "dependencies": [
         "analyzer",
         "async",
@@ -2355,7 +2439,7 @@
     },
     {
       "name": "test_core",
-      "version": "0.6.16",
+      "version": "0.6.15",
       "dependencies": [
         "analyzer",
         "args",

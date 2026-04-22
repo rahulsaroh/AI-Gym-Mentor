@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:ai_gym_mentor/services/auto_save_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -1845,6 +1846,38 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
       final settings = await ref.read(settingsProvider.future);
       final strengthRepo = ref.read(strengthRepositoryProvider);
       await strengthRepo.processWorkout(workout.id, settings.oneRmFormula);
+
+      // Auto-Save to Persistent Excel
+      if (settings.autoSaveToDownloads) {
+        try {
+          final exercises = await repo.getAllExercises();
+          final namesMap = {for (var e in exercises) e.id: e.name};
+          final saveResult = await ref.read(autoSaveServiceProvider).appendWorkout(
+            workout: workout,
+            sets: sets,
+            exerciseNames: namesMap,
+          );
+          
+          if (saveResult.success && mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Row(children: [
+                   const Icon(Icons.save, color: Colors.green, size: 20),
+                   const SizedBox(width: 8),
+                   Text('Workout saved to Excel ✓', 
+                     style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w500)),
+                ]),
+                duration: const Duration(seconds: 2),
+                behavior: SnackBarBehavior.floating,
+                margin: const EdgeInsets.all(20),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+            );
+          }
+        } catch (e) {
+          debugPrint('AutoSave trigger failed: $e');
+        }
+      }
     });
 
     if (mounted) {

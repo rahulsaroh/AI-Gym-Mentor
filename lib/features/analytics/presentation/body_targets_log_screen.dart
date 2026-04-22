@@ -14,32 +14,68 @@ class BodyTargetsLogScreen extends ConsumerStatefulWidget {
 }
 
 class _BodyTargetsLogScreenState extends ConsumerState<BodyTargetsLogScreen> {
-  String _selectedMetric = 'weight';
-  final _targetController = TextEditingController();
+  final Map<String, TextEditingController> _controllers = {};
   DateTime _deadline = DateTime.now().add(const Duration(days: 30));
 
+  @override
+  void initState() {
+    super.initState();
+    // Pre-populate with existing targets if any
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final targets = ref.read(bodyTargetsListProvider).value ?? [];
+      for (var m in standardMetrics) {
+        final t = targets.where((target) => target.metric == m.id).firstOrNull;
+        _controllers[m.id] = TextEditingController(text: t?.targetValue.toString() ?? '');
+      }
+      setState(() {});
+    });
+    // Fallback if provider is not ready
+    for (var m in standardMetrics) {
+      if (!_controllers.containsKey(m.id)) {
+        _controllers[m.id] = TextEditingController();
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    for (var c in _controllers.values) {
+      c.dispose();
+    }
+    super.dispose();
+  }
+
   void _onSave() async {
-    final value = double.tryParse(_targetController.text);
-    if (value == null) return;
+    final List<target.BodyTarget> newTargets = [];
+    _controllers.forEach((metric, controller) {
+      final value = double.tryParse(controller.text);
+      if (value != null) {
+        newTargets.add(target.BodyTarget(
+          id: 0,
+          metric: metric,
+          targetValue: value,
+          deadline: _deadline,
+          createdAt: DateTime.now(),
+        ));
+      }
+    });
 
-    final tb = target.BodyTarget(
-      id: 0,
-      metric: _selectedMetric,
-      targetValue: value,
-      deadline: _deadline,
-      createdAt: DateTime.now(),
-    );
+    if (newTargets.isEmpty) return;
 
-    await ref.read(bodyTargetsListProvider.notifier).addTarget(tb);
+    final provider = ref.read(bodyTargetsListProvider.notifier);
+    for (var t in newTargets) {
+      await provider.addTarget(t);
+    }
+    
     if (mounted) Navigator.pop(context);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        title: Text('Set Goal', style: GoogleFonts.outfit(fontWeight: FontWeight.bold)),
+        title: Text('Body Targets', style: GoogleFonts.outfit(fontWeight: FontWeight.bold)),
         actions: [
           TextButton(
             onPressed: _onSave,
@@ -49,63 +85,107 @@ class _BodyTargetsLogScreenState extends ConsumerState<BodyTargetsLogScreen> {
         ],
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Select Metric', style: GoogleFonts.outfit(fontSize: 16, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 12),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey.withValues(alpha: 0.2)),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: DropdownButtonHideUnderline(
-                child: DropdownButton<String>(
-                  value: _selectedMetric,
-                  isExpanded: true,
-                  items: standardMetrics.map((m) => DropdownMenuItem(
-                    value: m.id,
-                    child: Text(m.label),
-                  )).toList(),
-                  onChanged: (v) => setState(() => _selectedMetric = v!),
-                ),
-              ),
-            ),
-            const SizedBox(height: 24),
-            Text('Target Value', style: GoogleFonts.outfit(fontSize: 16, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 12),
-            TextField(
-              controller: _targetController,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
-              style: GoogleFonts.robotoMono(fontSize: 24, fontWeight: FontWeight.bold),
-              decoration: InputDecoration(
-                hintText: '0.0',
-                suffixText: standardMetrics.firstWhere((m) => m.id == _selectedMetric).unit,
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-              ),
-            ),
-            const SizedBox(height: 24),
-            Text('Deadline', style: GoogleFonts.outfit(fontSize: 16, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 12),
-            ListTile(
-              contentPadding: EdgeInsets.zero,
-              leading: const Icon(LucideIcons.calendar),
-              title: Text(DateFormat('MMMM d, yyyy').format(_deadline)),
-              onTap: () async {
-                final d = await showDatePicker(
-                  context: context,
-                  initialDate: _deadline,
-                  firstDate: DateTime.now(),
-                  lastDate: DateTime.now().add(const Duration(days: 365 * 2)),
-                );
-                if (d != null) setState(() => _deadline = d);
-              },
-              trailing: const Icon(LucideIcons.chevronRight),
-            ),
+            _buildDeadlinePicker(),
+            const Divider(height: 1),
+            ...standardMetrics.map((m) => _buildTargetRow(m)),
+            const SizedBox(height: 40),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildDeadlinePicker() {
+    return ListTile(
+      leading: const Icon(LucideIcons.calendar, size: 20),
+      title: Text('Goal Deadline', style: GoogleFonts.outfit(fontSize: 16)),
+      trailing: TextButton(
+        onPressed: () async {
+          final d = await showDatePicker(
+            context: context,
+            initialDate: _deadline,
+            firstDate: DateTime.now(),
+            lastDate: DateTime.now().add(const Duration(days: 365 * 2)),
+          );
+          if (d != null) setState(() => _deadline = d);
+        },
+        child: Text(
+          DateFormat('MMM d, yyyy').format(_deadline),
+          style: GoogleFonts.outfit(fontWeight: FontWeight.bold),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTargetRow(MetricConfig config) {
+    final controller = _controllers[config.id]!;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      constraints: const BoxConstraints(minWidth: 110),
+      decoration: BoxDecoration(
+        border: Border(
+          bottom: BorderSide(color: Theme.of(context).dividerColor.withValues(alpha: 0.05)),
+        ),
+      ),
+      child: Row(
+        children: [
+          config.assetPath != null
+              ? ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: Image.asset(
+                    config.assetPath!,
+                    width: 32,
+                    height: 32,
+                    fit: BoxFit.cover,
+                  ),
+                )
+              : Icon(config.icon, size: 22, color: Colors.grey[600]),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Text(
+              config.label,
+              style: GoogleFonts.outfit(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+          SizedBox(
+            width: 100,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: controller,
+                    textAlign: TextAlign.end,
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
+                    style: GoogleFonts.robotoMono(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),
+                    decoration: InputDecoration(
+                      hintText: '--',
+                      hintStyle: TextStyle(color: Colors.grey[300]),
+                      border: InputBorder.none,
+                      contentPadding: EdgeInsets.zero,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  config.unit,
+                  style: GoogleFonts.outfit(color: Colors.grey, fontSize: 13),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -69,7 +69,7 @@ class ProgramsNotifier extends _$ProgramsNotifier {
 
   Future<void> importTemplate() async {
     print('DEBUG: importTemplate called');
-    final result = await FilePicker.pickFiles(
+    final result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
       allowedExtensions: ['json'],
     );

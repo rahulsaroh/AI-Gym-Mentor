@@ -27,6 +27,9 @@ class SettingsState {
   final bool backgroundNotification;
   final bool autoBackup;
   final bool autoStartRestTimer;
+  final bool autoSaveToDownloads;
+  final bool autoSyncGoogleDrive;
+  final bool autoSyncICloud;
 
   final double barbellWeight;
   final Map<String, int>
@@ -59,6 +62,9 @@ class SettingsState {
     this.backgroundNotification = true,
     this.autoBackup = false,
     this.autoStartRestTimer = true,
+    this.autoSaveToDownloads = true,
+    this.autoSyncGoogleDrive = false,
+    this.autoSyncICloud = false,
     this.barbellWeight = 20.0,
     this.availablePlates = const {
       '1.25': 4,
@@ -96,6 +102,9 @@ class SettingsState {
     bool? backgroundNotification,
     bool? autoBackup,
     bool? autoStartRestTimer,
+    bool? autoSaveToDownloads,
+    bool? autoSyncGoogleDrive,
+    bool? autoSyncICloud,
     double? barbellWeight,
     Map<String, int>? availablePlates,
     double? autoIncrement,
@@ -125,6 +134,9 @@ class SettingsState {
           backgroundNotification ?? this.backgroundNotification,
       autoBackup: autoBackup ?? this.autoBackup,
       autoStartRestTimer: autoStartRestTimer ?? this.autoStartRestTimer,
+      autoSaveToDownloads: autoSaveToDownloads ?? this.autoSaveToDownloads,
+      autoSyncGoogleDrive: autoSyncGoogleDrive ?? this.autoSyncGoogleDrive,
+      autoSyncICloud: autoSyncICloud ?? this.autoSyncICloud,
       barbellWeight: barbellWeight ?? this.barbellWeight,
       availablePlates: availablePlates ?? this.availablePlates,
       autoIncrement: autoIncrement ?? this.autoIncrement,

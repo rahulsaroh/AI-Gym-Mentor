@@ -171,6 +171,27 @@ class BodyMeasurementsList extends _$BodyMeasurementsList {
     await repo.deleteMeasurement(id);
     ref.invalidateSelf();
   }
+
+  Future<void> seedSampleData() async {
+    final repo = ref.read(measurementsRepositoryProvider);
+    final now = DateTime.now();
+    
+    // Generate 12 weeks of data
+    for (int i = 12; i >= 0; i--) {
+      final date = now.subtract(Duration(days: i * 7));
+      final weight = 85.0 - (10.0 * (12 - i) / 12); // Linear decrease from 85 to 75
+      final bodyFat = 25.0 - (7.0 * (12 - i) / 12); // Linear decrease from 25 to 18
+      
+      await repo.addMeasurement(ent.BodyMeasurement(
+        id: 0,
+        date: date,
+        weight: weight,
+        bodyFat: bodyFat,
+        waist: 95.0 - (5.0 * (12 - i) / 12),
+      ));
+    }
+    ref.invalidateSelf();
+  }
 }
 
 @riverpod
@@ -190,6 +211,28 @@ class BodyTargetsList extends _$BodyTargetsList {
   Future<void> deleteTarget(int id) async {
     final repo = ref.read(measurementsRepositoryProvider);
     await repo.deleteTarget(id);
+    ref.invalidateSelf();
+  }
+
+  Future<void> seedSampleTargets() async {
+    final repo = ref.read(measurementsRepositoryProvider);
+    
+    await repo.addTarget(target.BodyTarget(
+      id: 0,
+      metric: 'weight',
+      targetValue: 72.0,
+      createdAt: DateTime.now().subtract(const Duration(days: 90)),
+      deadline: DateTime.now().add(const Duration(days: 30)),
+    ));
+    
+    await repo.addTarget(target.BodyTarget(
+      id: 0,
+      metric: 'bodyFat',
+      targetValue: 15.0,
+      createdAt: DateTime.now().subtract(const Duration(days: 90)),
+      deadline: DateTime.now().add(const Duration(days: 30)),
+    ));
+    
     ref.invalidateSelf();
   }
 }

@@ -109,7 +109,7 @@ class _ImportWizardScreenState extends ConsumerState<ImportWizardScreen> {
   }
 
   Future<void> _pickFile() async {
-    final result = await FilePicker.pickFiles(
+    final result = await FilePicker.platform.pickFiles(
         type: FileType.custom, allowedExtensions: ['json']);
     if (result != null && result.files.single.path != null) {
       final file = File(result.files.single.path!);

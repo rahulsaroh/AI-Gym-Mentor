@@ -6,9 +6,8 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:ai_gym_mentor/features/settings/models/settings_state.dart';
 import 'package:ai_gym_mentor/features/settings/settings_provider.dart';
 import 'package:ai_gym_mentor/services/backup_service.dart';
-import 'package:ai_gym_mentor/features/settings/csv_export_screen.dart';
+import 'package:ai_gym_mentor/features/settings/excel_sync_screen.dart';
 import 'package:ai_gym_mentor/features/settings/import_wizard_screen.dart';
-import 'package:ai_gym_mentor/features/settings/csv_import_wizard.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -138,11 +137,11 @@ class SettingsScreen extends ConsumerWidget {
             ),
             _buildTile(
               context,
-              title: 'Export Workout Log (CSV)',
-              subtitle: 'Excel / Spreadsheet compatible',
+              title: 'Excel Data Sync',
+              subtitle: 'Export/Import logs & measurements (.xlsx)',
               icon: LucideIcons.fileSpreadsheet,
               onTap: () => Navigator.push(context,
-                  MaterialPageRoute(builder: (_) => const CsvExportScreen())),
+                  MaterialPageRoute(builder: (_) => const ExcelSyncScreen())),
             ),
             _buildSwitchTile(
               context,
@@ -161,18 +160,9 @@ class SettingsScreen extends ConsumerWidget {
               onTap: () => Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (_) => const ImportWizardScreen())),
+                      builder: (_) => ImportWizardScreen())),
             ),
-            _buildTile(
-              context,
-              title: 'Import Data (CSV)',
-              subtitle: 'Old workout logs & measurements',
-              icon: LucideIcons.fileSpreadsheet,
-              onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (_) => const CsvImportWizard())),
-            ),
+            _buildDataBackupSection(context, settings),
             const Divider(height: 32),
             _buildSectionHeader(context, 'AI Configuration'),
             _buildTile(
@@ -748,6 +738,44 @@ class SettingsScreen extends ConsumerWidget {
       subtitle: subtitle != null ? Text(subtitle) : null,
       value: value,
       onChanged: onChanged,
+    );
+  }
+
+  Widget _buildDataBackupSection(BuildContext context, SettingsState settings) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildSectionHeader(context, 'Data Backup'),
+        _buildSwitchTile(
+          context,
+          title: 'Auto-save to Downloads',
+          subtitle: 'Append workout to Excel after each session',
+          value: settings.autoSaveToDownloads,
+          onChanged: (val) => ref
+              .read(settingsProvider.notifier)
+              .updateSettings(settings.copyWith(autoSaveToDownloads: val)),
+        ),
+        _buildSwitchTile(
+          context,
+          title: 'Auto-sync to Google Drive',
+          subtitle: settings.lastDriveBackup != null
+              ? 'Last synced: ${DateFormat('MMM d, h:mm a').format(settings.lastDriveBackup!)}'
+              : 'Backup your history to the cloud',
+          value: settings.autoSyncGoogleDrive,
+          onChanged: (val) => ref
+              .read(settingsProvider.notifier)
+              .updateSettings(settings.copyWith(autoSyncGoogleDrive: val)),
+        ),
+        if (Platform.isIOS)
+          _buildSwitchTile(
+            context,
+            title: 'iCloud Drive Sync',
+            value: settings.autoSyncICloud,
+            onChanged: (val) => ref
+                .read(settingsProvider.notifier)
+                .updateSettings(settings.copyWith(autoSyncICloud: val)),
+          ),
+      ],
     );
   }
 }

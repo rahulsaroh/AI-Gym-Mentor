@@ -12,6 +12,12 @@ import 'package:ai_gym_mentor/features/programs/providers/programs_notifier.dart
 import 'package:uuid/uuid.dart';
 import 'package:drift/drift.dart' hide Column;
 
+const Map<String, ({Color color, String label})> sectionConfigs = {
+  'Warm-Up': (color: Colors.amber, label: 'Warm-Up'),
+  'Main Work': (color: Colors.blue, label: 'Main Work'),
+  'Cool-Down': (color: Colors.green, label: 'Cool-Down'),
+};
+
 class CreateEditProgramScreen extends ConsumerStatefulWidget {
   final int? templateId;
   const CreateEditProgramScreen({super.key, this.templateId});
@@ -21,21 +27,26 @@ class CreateEditProgramScreen extends ConsumerStatefulWidget {
       _CreateEditProgramScreenState();
 }
 
-class _CreateEditProgramScreenState
-    extends ConsumerState<CreateEditProgramScreen> {
+class _CreateEditProgramScreenState extends ConsumerState<CreateEditProgramScreen> {
   final _nameController = TextEditingController();
   final _descriptionController = TextEditingController();
   List<_DayData> _days = [];
-  final Set<int> _expandedIndices = {0}; // Default expand first day
   bool _isLoading = false;
   bool _isEditing = false;
+  
+  late PageController _pageController;
+  int _currentDayIndex = 0;
 
   @override
   void initState() {
     super.initState();
+    _pageController = PageController(initialPage: 0);
     _isEditing = widget.templateId != null;
     if (_isEditing) {
       _loadTemplate();
+    } else {
+      // Default to having 1 day initially
+      _days.add(_DayData(name: 'Day 1', exercises: []));
     }
   }
 
@@ -65,12 +76,14 @@ class _CreateEditProgramScreenState
 
           final exercisesData = <_ExerciseData>[];
           for (var ex in exercises) {
+            final section = (ex.notes != null && sectionConfigs.containsKey(ex.notes)) ? ex.notes! : 'Main Work';
             exercisesData.add(_ExerciseData(
               uniqueId: const Uuid().v4(),
               exerciseId: ex.exerciseId,
               sets: ex.setsJson.isNotEmpty
                   ? _parseSetsJson(ex.setsJson)
                   : [const _SetData(3, 10, 90)],
+              section: section,
             ));
           }
 
@@ -83,6 +96,9 @@ class _CreateEditProgramScreenState
 
         setState(() {
           _days = loadedDays;
+          if (_days.isEmpty) {
+            _days.add(_DayData(name: 'Day 1', exercises: []));
+          }
         });
       }
     } catch (e) {
@@ -115,210 +131,8 @@ class _CreateEditProgramScreenState
   void dispose() {
     _nameController.dispose();
     _descriptionController.dispose();
+    _pageController.dispose();
     super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final canSave = _nameController.text.trim().isNotEmpty;
-
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(_isEditing ? 'Edit Program' : 'Create Program',
-            style: GoogleFonts.outfit(fontWeight: FontWeight.bold)),
-        leading: IconButton(
-            icon: const Icon(LucideIcons.x), onPressed: () => context.pop()),
-        actions: [
-          TextButton(
-            onPressed: canSave ? _saveProgram : null,
-            child: Text('Save',
-                style: TextStyle(
-                    color: canSave
-                        ? Theme.of(context).colorScheme.primary
-                        : Colors.grey,
-                    fontWeight: FontWeight.bold)),
-          ),
-        ],
-      ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : CustomScrollView(
-              slivers: [
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.all(20),
-                    child: Column(
-                      children: [
-                        TextField(
-                          controller: _nameController,
-                          autofocus: !_isEditing,
-                          onChanged: (_) => setState(() {}),
-                          decoration: InputDecoration(
-                            labelText: 'Program Name',
-                            hintText: 'e.g., PPL Week 1',
-                            border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12)),
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        TextField(
-                          controller: _descriptionController,
-                          maxLines: 3,
-                          decoration: InputDecoration(
-                            labelText: 'Description (optional)',
-                            hintText: 'Describe your program...',
-                            border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12)),
-                          ),
-                        ),
-                        const SizedBox(height: 24),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text('Training Days',
-                                style: GoogleFonts.outfit(
-                                    fontSize: 18, fontWeight: FontWeight.bold)),
-                            TextButton.icon(
-                              onPressed: _addDay,
-                              icon: const Icon(LucideIcons.plus, size: 18),
-                              label: const Text('Add Day'),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                if (_days.isEmpty)
-                  SliverToBoxAdapter(
-                    child: Center(
-                      child: Column(
-                        children: [
-                          const SizedBox(height: 40),
-                          Icon(LucideIcons.calendar,
-                              size: 48, color: Colors.grey[400]),
-                          const SizedBox(height: 16),
-                          Text('No training days yet',
-                              style: GoogleFonts.outfit(color: Colors.grey)),
-                          const SizedBox(height: 8),
-                          ElevatedButton.icon(
-                            onPressed: _addDay,
-                            icon: const Icon(LucideIcons.plus),
-                            label: const Text('Add Training Day'),
-                          ),
-                        ],
-                      ),
-                    ),
-                  )
-                else
-                  SliverPadding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    sliver: SliverReorderableList(
-                      itemCount: _days.length,
-                      onReorder: (oldIndex, newIndex) {
-                        setState(() {
-                          if (newIndex > oldIndex) newIndex--;
-                          final item = _days.removeAt(oldIndex);
-                          _days.insert(newIndex, item);
-
-                          _expandedIndices.clear();
-                          _expandedIndices.add(newIndex);
-                        });
-                      },
-                      itemBuilder: (context, index) {
-                        return _DayCard(
-                          key: ValueKey(
-                              'day_${_days[index].id ?? index}_${_days[index].name}'),
-                          day: _days[index],
-                          index: index,
-                          isExpanded: _expandedIndices.contains(index),
-                          onToggleExpansion: () {
-                            setState(() {
-                              if (_expandedIndices.contains(index)) {
-                                _expandedIndices.remove(index);
-                              } else {
-                                _expandedIndices.add(index);
-                              }
-                            });
-                          },
-                          onNameChanged: (name) => setState(() =>
-                              _days[index] = _days[index].copyWith(name: name)),
-                          onAddExercise: () => _addExerciseToDay(index),
-                          onRemoveExercise: (exIndex) {
-                            final updatedExercises =
-                                List<_ExerciseData>.from(_days[index].exercises)
-                                  ..removeAt(exIndex);
-                            setState(() => _days[index] = _days[index]
-                                .copyWith(exercises: updatedExercises));
-                          },
-                          onUpdateExercises: (dayIndex, updated) {
-                            setState(() => _days[dayIndex] = _days[dayIndex]
-                                .copyWith(exercises: updated));
-                          },
-                          onSwapExercise: (dayIndex, exIndex) => _swapExerciseInDay(dayIndex, exIndex),
-                          onDelete: () => setState(() => _days.removeAt(index)),
-                        );
-                      },
-                    ),
-                  ),
-                const SliverToBoxAdapter(child: SizedBox(height: 120)),
-              ],
-            ),
-    );
-  }
-
-  void _addDay() {
-    setState(() {
-      _days.add(_DayData(
-        name: 'Day ${_days.length + 1}',
-        exercises: [],
-      ));
-      _expandedIndices.clear();
-      _expandedIndices.add(_days.length - 1);
-    });
-  }
-
-  void _addExerciseToDay(int dayIndex) async {
-    final exerciseId = await showModalBottomSheet<int>(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => ExercisePickerOverlay(
-        onSelect: (id) => Navigator.pop(context, id),
-      ),
-    );
-
-    if (exerciseId != null) {
-      setState(() {
-        _days[dayIndex].exercises.add(_ExerciseData(
-              uniqueId: const Uuid().v4(),
-              exerciseId: exerciseId,
-              sets: [const _SetData(3, 10, 90)],
-            ));
-      });
-    }
-  }
-
-  void _swapExerciseInDay(int dayIndex, int exIndex) async {
-    final exerciseId = await showModalBottomSheet<int>(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => ExercisePickerOverlay(
-        onSelect: (id) => Navigator.pop(context, id),
-      ),
-    );
-
-    if (exerciseId != null) {
-      setState(() {
-        final existing = _days[dayIndex].exercises[exIndex];
-        _days[dayIndex].exercises[exIndex] = _ExerciseData(
-          uniqueId: existing.uniqueId, // Keep stable key!
-          exerciseId: exerciseId,
-          sets: existing.sets, // Keep settings? Or reset?
-        );
-      });
-    }
   }
 
   Future<void> _saveProgram() async {
@@ -341,13 +155,11 @@ class _CreateEditProgramScreenState
             ),
           );
 
-          // Get all day IDs for this template to delete their exercises first
           final dayIds = await (db.select(db.templateDays)
                 ..where((t) => t.templateId.equals(widget.templateId!)))
               .map((d) => d.id)
               .get();
 
-          // Nullify workout references to these days to avoid FK constraint failure
           await (db.update(db.workouts)..where((t) => t.dayId.isIn(dayIds)))
               .write(const WorkoutsCompanion(dayId: Value(null)));
 
@@ -375,6 +187,7 @@ class _CreateEditProgramScreenState
                     dayId: dayId,
                     exerciseId: ex.exerciseId,
                     order: j,
+                    notes: Value(ex.section),
                     setsJson: jsonEncode(ex.sets
                         .map((s) => {
                               'sets': s.sets,
@@ -413,6 +226,7 @@ class _CreateEditProgramScreenState
                     dayId: dayId,
                     exerciseId: ex.exerciseId,
                     order: j,
+                    notes: Value(ex.section),
                     setsJson: jsonEncode(ex.sets
                         .map((s) => {
                               'sets': s.sets,
@@ -437,12 +251,835 @@ class _CreateEditProgramScreenState
       }
     }
   }
+
+  void _addDay() {
+    setState(() {
+      _days.add(_DayData(
+        name: 'Day ${_days.length + 1}',
+        exercises: [],
+      ));
+    });
+    // Animate to new day
+    Future.delayed(const Duration(milliseconds: 100), () {
+      if (_pageController.hasClients) {
+        _pageController.animateToPage(
+          _days.length - 1,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+        );
+      }
+    });
+  }
+
+  void _duplicateDay(int index) {
+    if (index >= 0 && index < _days.length) {
+      final source = _days[index];
+      final duplicatedExercises = source.exercises.map((e) => e.copyWith(uniqueId: const Uuid().v4())).toList();
+      setState(() {
+        _days.insert(
+          index + 1,
+          _DayData(name: '${source.name} Copy', exercises: duplicatedExercises),
+        );
+      });
+      Future.delayed(const Duration(milliseconds: 100), () {
+        if (_pageController.hasClients) {
+          _pageController.animateToPage(
+            index + 1,
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+          );
+        }
+      });
+    }
+  }
+
+  void _clearExercises(int index) {
+    setState(() {
+      _days[index] = _days[index].copyWith(exercises: []);
+    });
+  }
+
+  void _removeDay(int index) {
+    setState(() {
+      _days.removeAt(index);
+      if (_days.isEmpty) {
+        _days.add(_DayData(name: 'Day 1', exercises: [])); // enforce at least 1 day
+      }
+      if (_currentDayIndex >= _days.length) {
+        _currentDayIndex = _days.length - 1;
+      }
+    });
+  }
+
+  Future<void> _renameProgram() async {
+    final controller = TextEditingController(text: _nameController.text);
+    final descController = TextEditingController(text: _descriptionController.text);
+    
+    await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Program Details', style: GoogleFonts.outfit(fontWeight: FontWeight.bold)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: controller,
+              decoration: const InputDecoration(labelText: 'Program Name'),
+              autofocus: true,
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: descController,
+              decoration: const InputDecoration(labelText: 'Description'),
+              maxLines: 2,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+          TextButton(
+            onPressed: () {
+              setState(() {
+                _nameController.text = controller.text;
+                _descriptionController.text = descController.text;
+              });
+              Navigator.pop(context);
+            },
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final canSave = _nameController.text.trim().isNotEmpty && _days.isNotEmpty;
+    final programName = _nameController.text.trim().isEmpty ? 'Unnamed Program' : _nameController.text.trim();
+
+    return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      appBar: AppBar(
+        leading: IconButton(icon: const Icon(LucideIcons.arrowLeft), onPressed: () => context.pop()),
+        title: GestureDetector(
+          onTap: _renameProgram,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                programName,
+                style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 18),
+              ),
+              const SizedBox(width: 8),
+              Icon(LucideIcons.pencil, size: 14, color: Theme.of(context).colorScheme.primary),
+            ],
+          ),
+        ),
+        centerTitle: true,
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: FilledButton(
+              style: FilledButton.styleFrom(
+                shape: const StadiumBorder(),
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 0),
+              ),
+              onPressed: canSave ? _saveProgram : null,
+              child: const Text('Save', style: TextStyle(fontWeight: FontWeight.bold)),
+            ),
+          )
+        ],
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(60),
+          child: Container(
+            height: 60,
+            decoration: BoxDecoration(
+              border: Border(bottom: BorderSide(color: Colors.grey.withValues(alpha: 0.1))),
+            ),
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              itemCount: _days.length + 1,
+              separatorBuilder: (context, index) => const SizedBox(width: 8),
+              itemBuilder: (context, index) {
+                if (index == _days.length) {
+                  return ActionChip(
+                    label: const Text('+ Add Day', style: TextStyle(fontWeight: FontWeight.bold)),
+                    onPressed: _addDay,
+                    backgroundColor: Colors.transparent,
+                    side: BorderSide(color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.5)),
+                  );
+                }
+                
+                final isActive = index == _currentDayIndex;
+                return ChoiceChip(
+                  label: Text(
+                    _days[index].name, 
+                    style: TextStyle(
+                      fontWeight: isActive ? FontWeight.bold : FontWeight.w500,
+                      color: isActive ? Theme.of(context).colorScheme.onPrimary : null,
+                    ),
+                  ),
+                  selected: isActive,
+                  onSelected: (selected) {
+                    if (selected && _pageController.hasClients) {
+                      _pageController.animateToPage(
+                        index,
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeInOut,
+                      );
+                    }
+                  },
+                  showCheckmark: false,
+                  selectedColor: Theme.of(context).colorScheme.primary,
+                );
+              },
+            ),
+          ),
+        ),
+      ),
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : PageView.builder(
+              controller: _pageController,
+              onPageChanged: (index) => setState(() => _currentDayIndex = index),
+              itemCount: _days.length,
+              itemBuilder: (context, index) {
+                return _DayPageView(
+                  key: ValueKey('dayView_${_days[index].id ?? index}'),
+                  dayIndex: index,
+                  dayData: _days[index],
+                  onDayUpdated: (updatedDay) {
+                    setState(() => _days[index] = updatedDay);
+                  },
+                  onDeleteDay: () => _removeDay(index),
+                  onDuplicateDay: () => _duplicateDay(index),
+                  onClearExercises: () => _clearExercises(index),
+                );
+              },
+            ),
+    );
+  }
+}
+
+class _DayPageView extends ConsumerStatefulWidget {
+  final int dayIndex;
+  final _DayData dayData;
+  final Function(_DayData) onDayUpdated;
+  final VoidCallback onDeleteDay;
+  final VoidCallback onDuplicateDay;
+  final VoidCallback onClearExercises;
+
+  const _DayPageView({
+    super.key,
+    required this.dayIndex,
+    required this.dayData,
+    required this.onDayUpdated,
+    required this.onDeleteDay,
+    required this.onDuplicateDay,
+    required this.onClearExercises,
+  });
+
+  @override
+  ConsumerState<_DayPageView> createState() => _DayPageViewState();
+}
+
+class _DayPageViewState extends ConsumerState<_DayPageView> {
+  late TextEditingController _nameController;
+
+  @override
+  void initState() {
+    super.initState();
+    _nameController = TextEditingController(text: widget.dayData.name);
+  }
+
+  @override
+  void didUpdateWidget(_DayPageView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.dayData.name != widget.dayData.name &&
+        _nameController.text != widget.dayData.name) {
+      _nameController.text = widget.dayData.name;
+    }
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    super.dispose();
+  }
+
+  void _addExercise([String? initialSection]) async {
+    final exerciseId = await showModalBottomSheet<int>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => ExercisePickerOverlay(
+        onSelect: (id) => Navigator.pop(context, id),
+      ),
+    );
+
+    if (exerciseId != null) {
+      String sectionToAdd = initialSection ?? 'Main Work';
+      if (initialSection == null && mounted) {
+        final sec = await showDialog<String>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Add to which section?', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+            contentPadding: const EdgeInsets.only(top: 16, bottom: 8),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: sectionConfigs.keys.map((s) => 
+                ListTile(
+                  leading: Icon(Icons.circle, color: sectionConfigs[s]!.color, size: 12),
+                  title: Text(s, style: const TextStyle(fontWeight: FontWeight.w600)),
+                  onTap: () => Navigator.pop(context, s),
+                )
+              ).toList(),
+            ),
+          )
+        );
+        if (sec != null) sectionToAdd = sec;
+      }
+      
+      final newExercise = _ExerciseData(
+        uniqueId: const Uuid().v4(),
+        exerciseId: exerciseId,
+        sets: [const _SetData(3, 10, 90)],
+        section: sectionToAdd,
+      );
+      final updatedExercises = List<_ExerciseData>.from(widget.dayData.exercises)..add(newExercise);
+      widget.onDayUpdated(widget.dayData.copyWith(exercises: updatedExercises));
+    }
+  }
+
+  void _swapExercise(String uniqueId) async {
+    final exIndex = widget.dayData.exercises.indexWhere((e) => e.uniqueId == uniqueId);
+    if (exIndex == -1) return;
+
+    final exerciseId = await showModalBottomSheet<int>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => ExercisePickerOverlay(
+        onSelect: (id) => Navigator.pop(context, id),
+      ),
+    );
+
+    if (exerciseId != null) {
+      final existing = widget.dayData.exercises[exIndex];
+      final updatedExercises = List<_ExerciseData>.from(widget.dayData.exercises);
+      updatedExercises[exIndex] = existing.copyWith(exerciseId: exerciseId);
+      widget.onDayUpdated(widget.dayData.copyWith(exercises: updatedExercises));
+    }
+  }
+
+  void _removeExercise(String uniqueId) {
+    final updatedExercises = List<_ExerciseData>.from(widget.dayData.exercises)..removeWhere((e) => e.uniqueId == uniqueId);
+    widget.onDayUpdated(widget.dayData.copyWith(exercises: updatedExercises));
+  }
+
+  void _duplicateExercise(String uniqueId) {
+    final exIndex = widget.dayData.exercises.indexWhere((e) => e.uniqueId == uniqueId);
+    if (exIndex == -1) return;
+    
+    final existing = widget.dayData.exercises[exIndex];
+    final duplicated = existing.copyWith(uniqueId: const Uuid().v4());
+    final updatedExercises = List<_ExerciseData>.from(widget.dayData.exercises)..insert(exIndex + 1, duplicated);
+    widget.onDayUpdated(widget.dayData.copyWith(exercises: updatedExercises));
+  }
+
+  void _moveToSection(String uniqueId, String newSection) {
+    final exIndex = widget.dayData.exercises.indexWhere((e) => e.uniqueId == uniqueId);
+    if (exIndex == -1) return;
+    
+    final existing = widget.dayData.exercises[exIndex];
+    final updatedExercises = List<_ExerciseData>.from(widget.dayData.exercises);
+    updatedExercises[exIndex] = existing.copyWith(section: newSection);
+    widget.onDayUpdated(widget.dayData.copyWith(exercises: updatedExercises));
+  }
+
+  void _onReorderSection(String section, int oldIndex, int newIndex) {
+    if (newIndex > oldIndex) newIndex--;
+    
+    // Find absolute indices
+    final sectionExercises = widget.dayData.exercises.where((e) => e.section == section).toList();
+    if (oldIndex >= sectionExercises.length || newIndex >= sectionExercises.length) return;
+    
+    final itemToMove = sectionExercises[oldIndex];
+    
+    final updatedExercises = List<_ExerciseData>.from(widget.dayData.exercises);
+    updatedExercises.removeWhere((e) => e.uniqueId == itemToMove.uniqueId);
+    
+    int insertAbsoluteIndex = 0;
+    int sectionEncountered = 0;
+    
+    // Calculate new position
+    for (int i = 0; i < updatedExercises.length; i++) {
+      if (updatedExercises[i].section == section) {
+        if (sectionEncountered == newIndex) {
+          insertAbsoluteIndex = i;
+          break;
+        }
+        sectionEncountered++;
+      }
+      insertAbsoluteIndex = i + 1; // if it goes to the end
+    }
+    
+    updatedExercises.insert(insertAbsoluteIndex, itemToMove);
+    widget.onDayUpdated(widget.dayData.copyWith(exercises: updatedExercises));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => _addExercise(),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        icon: const Icon(LucideIcons.plus, color: Colors.white),
+        label: const Text('Add Exercise', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+      ),
+      body: CustomScrollView(
+        slivers: [
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Card(
+                elevation: 2,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  child: Row(
+                    children: [
+                      const Icon(LucideIcons.menu, color: Colors.grey, size: 20),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: TextField(
+                          controller: _nameController,
+                          onChanged: (val) => widget.onDayUpdated(widget.dayData.copyWith(name: val)),
+                          style: GoogleFonts.outfit(fontSize: 20, fontWeight: FontWeight.bold),
+                          decoration: const InputDecoration(
+                            border: InputBorder.none,
+                            hintText: 'Day Name (e.g. Push A)',
+                            isDense: true,
+                            contentPadding: EdgeInsets.zero,
+                          ),
+                        ),
+                      ),
+                      const Icon(LucideIcons.pencil, size: 16, color: Colors.grey),
+                      const SizedBox(width: 8),
+                      IconButton(
+                        icon: const Icon(LucideIcons.trash2, color: Colors.redAccent, size: 20),
+                        tooltip: 'Delete Day',
+                        onPressed: () async {
+                          final confirm = await showDialog<bool>(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              title: const Text('Delete Day'),
+                              content: const Text('Are you sure you want to delete this day? All exercises in it will be removed.'),
+                              actions: [
+                                TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
+                                TextButton(
+                                  onPressed: () => Navigator.pop(context, true), 
+                                  child: const Text('Delete', style: TextStyle(color: Colors.red)),
+                                ),
+                              ],
+                            )
+                          );
+                          if (confirm == true) {
+                            widget.onDeleteDay();
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+          
+          // Render Sections
+          ...sectionConfigs.keys.map((sectionKey) {
+            final sectionExercises = widget.dayData.exercises.where((e) => e.section == sectionKey).toList();
+            if (sectionExercises.isEmpty && sectionKey != 'Main Work') return const SliverToBoxAdapter(child: SizedBox.shrink());
+            
+            return SliverToBoxAdapter(
+              child: _ExerciseSection(
+                section: sectionKey,
+                exercises: sectionExercises,
+                onAddExercise: () => _addExercise(sectionKey),
+                onReorder: (oldIdx, newIdx) => _onReorderSection(sectionKey, oldIdx, newIdx),
+                onUpdateExercise: (uniqueId, sets) {
+                  final exIndex = widget.dayData.exercises.indexWhere((e) => e.uniqueId == uniqueId);
+                  if (exIndex != -1) {
+                    final updatedExercises = List<_ExerciseData>.from(widget.dayData.exercises);
+                    updatedExercises[exIndex] = updatedExercises[exIndex].copyWith(sets: sets);
+                    widget.onDayUpdated(widget.dayData.copyWith(exercises: updatedExercises));
+                  }
+                },
+                onSwap: _swapExercise,
+                onRemove: _removeExercise,
+                onDuplicate: _duplicateExercise,
+                onMoveToSection: _moveToSection,
+              ),
+            );
+          }),
+          
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 32),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  TextButton.icon(
+                    onPressed: widget.onDuplicateDay,
+                    icon: const Icon(LucideIcons.copy, size: 16),
+                    label: const Text('Duplicate Day'),
+                    style: TextButton.styleFrom(foregroundColor: Colors.grey),
+                  ),
+                  const SizedBox(width: 16),
+                  TextButton.icon(
+                    onPressed: widget.onClearExercises,
+                    icon: const Icon(LucideIcons.refreshCcw, size: 16),
+                    label: const Text('Clear All'),
+                    style: TextButton.styleFrom(foregroundColor: Colors.grey),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SliverToBoxAdapter(child: SizedBox(height: 80)), // FAB padding
+        ],
+      ),
+    );
+  }
+}
+
+class _ExerciseSection extends ConsumerWidget {
+  final String section;
+  final List<_ExerciseData> exercises;
+  final VoidCallback onAddExercise;
+  final Function(int, int) onReorder;
+  final Function(String, List<_SetData>) onUpdateExercise;
+  final Function(String) onSwap;
+  final Function(String) onRemove;
+  final Function(String) onDuplicate;
+  final Function(String, String) onMoveToSection;
+
+  const _ExerciseSection({
+    required this.section,
+    required this.exercises,
+    required this.onAddExercise,
+    required this.onReorder,
+    required this.onUpdateExercise,
+    required this.onSwap,
+    required this.onRemove,
+    required this.onDuplicate,
+    required this.onMoveToSection,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final config = sectionConfigs[section]!;
+    final exercisesAsync = ref.watch(allExercisesProvider);
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      child: Theme(
+        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+        child: ExpansionTile(
+          initiallyExpanded: true,
+          tilePadding: EdgeInsets.zero,
+          title: Row(
+            children: [
+              Icon(Icons.circle, color: config.color, size: 10),
+              const SizedBox(width: 8),
+              Text(config.label, style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 16)),
+              const SizedBox(width: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(color: Colors.grey.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12)),
+                child: Text('${exercises.length} exercises', style: const TextStyle(fontSize: 10, color: Colors.grey, fontWeight: FontWeight.bold)),
+              ),
+              const Spacer(),
+              IconButton(
+                icon: const Icon(LucideIcons.plus, size: 20),
+                onPressed: onAddExercise,
+                style: IconButton.styleFrom(foregroundColor: config.color),
+              ),
+            ],
+          ),
+          children: [
+            const SizedBox(height: 8),
+            if (exercises.isEmpty)
+               Container(
+                 width: double.infinity,
+                 margin: const EdgeInsets.only(bottom: 8),
+                 decoration: BoxDecoration(
+                   color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.1),
+                   borderRadius: BorderRadius.circular(12),
+                 ),
+                 child: CustomPaint(
+                   painter: _DashedBorderPainter(color: Colors.grey.withValues(alpha: 0.3)),
+                   child: Padding(
+                     padding: const EdgeInsets.all(24),
+                     child: Column(
+                       children: [
+                          Icon(Icons.layers_clear, color: Colors.grey.shade400, size: 32),
+                          const SizedBox(height: 8),
+                          Text('No exercises yet — tap + to add', style: TextStyle(color: Colors.grey.shade500, fontSize: 13)),
+                       ]
+                     ),
+                   )
+                 )
+               )
+            else
+              ReorderableListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: exercises.length,
+                onReorder: onReorder,
+                itemBuilder: (context, idx) {
+                  final ex = exercises[idx];
+                  return Container(
+                    key: ValueKey(ex.uniqueId),
+                    child: exercisesAsync.when(
+                      data: (exercisesList) {
+                        final exercise = exercisesList.firstWhere(
+                          (e) => e.id == ex.exerciseId,
+                          orElse: () => exercisesList.first,
+                        );
+                        return _ExerciseCard(
+                          exercise: exercise,
+                          data: ex,
+                          onUpdateSets: (sets) => onUpdateExercise(ex.uniqueId, sets),
+                          onSwap: () => onSwap(ex.uniqueId),
+                          onRemove: () => onRemove(ex.uniqueId),
+                          onDuplicate: () => onDuplicate(ex.uniqueId),
+                          onMoveSection: (sec) => onMoveToSection(ex.uniqueId, sec),
+                          idx: idx,
+                        );
+                      },
+                      loading: () => const Card(child: ListTile(title: Text('Loading...'))),
+                      error: (_, _) => const Card(child: ListTile(title: Text('Error loading exercise'))),
+                    ),
+                  );
+                },
+              ),
+              const SizedBox(height: 8),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ExerciseCard extends StatefulWidget {
+  final int idx;
+  final ExerciseEntity exercise;
+  final _ExerciseData data;
+  final Function(List<_SetData>) onUpdateSets;
+  final VoidCallback onSwap;
+  final VoidCallback onRemove;
+  final VoidCallback onDuplicate;
+  final Function(String) onMoveSection;
+
+  const _ExerciseCard({
+    required this.idx,
+    required this.exercise,
+    required this.data,
+    required this.onUpdateSets,
+    required this.onSwap,
+    required this.onRemove,
+    required this.onDuplicate,
+    required this.onMoveSection,
+  });
+
+  @override
+  State<_ExerciseCard> createState() => _ExerciseCardState();
+}
+
+class _ExerciseCardState extends State<_ExerciseCard> {
+  final ExpansibleController _controller = ExpansibleController();
+
+  @override
+  Widget build(BuildContext context) {
+    final setConfig = widget.data.sets.first; 
+    
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      clipBehavior: Clip.antiAlias,
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+      ),
+      child: IntrinsicHeight(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Container(width: 3, color: sectionConfigs[widget.data.section]!.color),
+            Expanded(
+              child: Theme(
+                data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+                child: ExpansionTile(
+                  controller: _controller,
+                  tilePadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                  childrenPadding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
+                  leading: ReorderableDragStartListener(
+                    index: widget.idx,
+                    child: const Icon(LucideIcons.gripVertical, size: 20, color: Colors.grey),
+                  ),
+                  title: Text(
+                    widget.exercise.name,
+                    style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 16),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  subtitle: Text(
+                    '${setConfig.sets} × ${setConfig.reps} · ${setConfig.type} · ${setConfig.rest}s rest',
+                    style: TextStyle(fontSize: 13, color: Colors.grey.shade500),
+                  ),
+                  trailing: PopupMenuButton<String>(
+                    icon: const Icon(Icons.more_horiz, size: 20, color: Colors.grey),
+                    onSelected: (val) {
+                      if (val == 'edit') {
+                        if (!_controller.isExpanded) _controller.expand();
+                      }
+                      if (val == 'swap') widget.onSwap();
+                      if (val == 'duplicate') widget.onDuplicate();
+                      if (val == 'delete') widget.onRemove();
+                      if (sectionConfigs.keys.contains(val)) widget.onMoveSection(val);
+                    },
+                    itemBuilder: (context) => [
+                      const PopupMenuItem(value: 'edit', child: ListTile(leading: Icon(LucideIcons.pencil, size: 18), title: Text('Edit Sets'), contentPadding: EdgeInsets.zero)),
+                      const PopupMenuDivider(),
+                      const PopupMenuItem(value: 'swap', child: ListTile(leading: Icon(LucideIcons.refreshCw, size: 18), title: Text('Swap Exercise'), contentPadding: EdgeInsets.zero)),
+                      const PopupMenuItem(value: 'duplicate', child: ListTile(leading: Icon(LucideIcons.copy, size: 18), title: Text('Duplicate'), contentPadding: EdgeInsets.zero)),
+                      const PopupMenuDivider(),
+                      ...sectionConfigs.keys.where((k) => k != widget.data.section).map((k) => PopupMenuItem(value: k, child: ListTile(leading: Icon(LucideIcons.arrowRight, size: 18), title: Text('Move to $k'), contentPadding: EdgeInsets.zero))),
+                      const PopupMenuDivider(),
+                      const PopupMenuItem(value: 'delete', child: ListTile(leading: Icon(LucideIcons.trash2, size: 18, color: Colors.red), title: Text('Delete', style: TextStyle(color: Colors.red)), contentPadding: EdgeInsets.zero)),
+                    ],
+                  ),
+                  children: [
+                    const Divider(),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _buildStepper(
+                            label: 'Sets',
+                            value: setConfig.sets,
+                            onChanged: (val) => widget.onUpdateSets([_SetData(val.clamp(1, 10), setConfig.reps, setConfig.rest, setConfig.type)]),
+                          ),
+                        ),
+                        Expanded(
+                          child: _buildStepper(
+                            label: 'Reps',
+                            value: setConfig.reps,
+                            onChanged: (val) => widget.onUpdateSets([_SetData(setConfig.sets, val.clamp(1, 50), setConfig.rest, setConfig.type)]),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _buildStepper(
+                            label: 'Rest (s)',
+                            value: setConfig.rest,
+                            step: 15,
+                            onChanged: (val) => widget.onUpdateSets([_SetData(setConfig.sets, setConfig.reps, val.clamp(0, 300), setConfig.type)]),
+                          ),
+                        ),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text('Type', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                              const SizedBox(height: 4),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 12),
+                                decoration: BoxDecoration(
+                                  color: Colors.black.withValues(alpha: 0.2),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: DropdownButtonHideUnderline(
+                                  child: DropdownButton<String>(
+                                    value: setConfig.type,
+                                    isExpanded: true,
+                                    icon: const Icon(LucideIcons.chevronDown, size: 16),
+                                    style: TextStyle(fontSize: 14, color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.w600),
+                                    items: ['Straight', 'Superset', 'Drop Set', 'AMRAP', 'Timed']
+                                        .map((t) => DropdownMenuItem(value: t, child: Text(t)))
+                                        .toList(),
+                                    onChanged: (val) => widget.onUpdateSets([_SetData(setConfig.sets, setConfig.reps, setConfig.rest, val ?? 'Straight')]),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStepper({required String label, required int value, required Function(int) onChanged, int step = 1}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: const TextStyle(fontSize: 12, color: Colors.grey)),
+        const SizedBox(height: 4),
+        Row(
+          children: [
+            InkWell(
+              onTap: () => onChanged(value - step),
+              borderRadius: BorderRadius.circular(8),
+              child: Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(color: Colors.black.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(8)),
+                child: const Icon(LucideIcons.minus, size: 16),
+              ),
+            ),
+            Expanded(
+              child: Text(
+                '$value',
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              ),
+            ),
+            InkWell(
+              onTap: () => onChanged(value + step),
+              borderRadius: BorderRadius.circular(8),
+              child: Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(color: Colors.black.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(8)),
+                child: const Icon(LucideIcons.plus, size: 16),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
 }
 
 class _DayData {
   final int? id;
   final String name;
   final List<_ExerciseData> exercises;
+  
   _DayData({this.id, required this.name, required this.exercises});
 
   _DayData copyWith({String? name, List<_ExerciseData>? exercises}) {
@@ -458,13 +1095,21 @@ class _ExerciseData {
   final String uniqueId;
   final int exerciseId;
   final List<_SetData> sets;
-  _ExerciseData({required this.uniqueId, required this.exerciseId, required this.sets});
+  final String section;
+  
+  _ExerciseData({
+    required this.uniqueId, 
+    required this.exerciseId, 
+    required this.sets,
+    this.section = 'Main Work',
+  });
 
-  _ExerciseData copyWith({List<_SetData>? sets}) {
+  _ExerciseData copyWith({List<_SetData>? sets, String? section, int? exerciseId, String? uniqueId}) {
     return _ExerciseData(
-      uniqueId: uniqueId,
-      exerciseId: exerciseId,
+      uniqueId: uniqueId ?? this.uniqueId,
+      exerciseId: exerciseId ?? this.exerciseId,
       sets: sets ?? this.sets,
+      section: section ?? this.section,
     );
   }
 }
@@ -477,360 +1122,45 @@ class _SetData {
   const _SetData(this.sets, this.reps, this.rest, [this.type = 'Straight']);
 }
 
-class _DayCard extends ConsumerStatefulWidget {
-  final _DayData day;
-  final int index;
-  final bool isExpanded;
-  final VoidCallback onToggleExpansion;
-  final Function(String) onNameChanged;
-  final VoidCallback onAddExercise;
-  final Function(int) onRemoveExercise;
-  final Function(int, List<_ExerciseData>) onUpdateExercises;
-  final Function(int, int) onSwapExercise;
-  final VoidCallback onDelete;
-
-  const _DayCard({
-    super.key,
-    required this.day,
-    required this.index,
-    required this.isExpanded,
-    required this.onToggleExpansion,
-    required this.onNameChanged,
-    required this.onAddExercise,
-    required this.onRemoveExercise,
-    required this.onUpdateExercises,
-    required this.onSwapExercise,
-    required this.onDelete,
-  });
+class _DashedBorderPainter extends CustomPainter {
+  final Color color;
+  _DashedBorderPainter({required this.color});
 
   @override
-  ConsumerState<_DayCard> createState() => _DayCardState();
-}
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = 2
+      ..style = PaintingStyle.stroke;
 
-class _DayCardState extends ConsumerState<_DayCard> {
-  late TextEditingController _nameController;
-
-  @override
-  void initState() {
-    super.initState();
-    _nameController = TextEditingController(text: widget.day.name);
+    const double dashWidth = 8;
+    const double dashSpace = 4;
+    
+    _drawDashedLine(canvas, const Offset(12, 0), Offset(size.width - 12, 0), paint, dashWidth, dashSpace); // Top
+    _drawDashedLine(canvas, Offset(size.width, 12), Offset(size.width, size.height - 12), paint, dashWidth, dashSpace); // Right
+    _drawDashedLine(canvas, Offset(size.width - 12, size.height), Offset(12, size.height), paint, dashWidth, dashSpace); // Bottom
+    _drawDashedLine(canvas, Offset(0, size.height - 12), const Offset(0, 12), paint, dashWidth, dashSpace); // Left
+    
+    canvas.drawArc(const Rect.fromLTWH(0, 0, 24, 24), 3.14159, 1.5708, false, paint);
+    canvas.drawArc(Rect.fromLTWH(size.width - 24, 0, 24, 24), -1.5708, 1.5708, false, paint);
+    canvas.drawArc(Rect.fromLTWH(size.width - 24, size.height - 24, 24, 24), 0, 1.5708, false, paint);
+    canvas.drawArc(Rect.fromLTWH(0, size.height - 24, 24, 24), 1.5708, 1.5708, false, paint);
   }
 
-  @override
-  void didUpdateWidget(_DayCard oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.day.name != widget.day.name &&
-        _nameController.text != widget.day.name) {
-      _nameController.text = widget.day.name;
+  void _drawDashedLine(Canvas canvas, Offset start, Offset end, Paint paint, double dashWidth, double dashSpace) {
+    var distance = (end - start).distance;
+    var direction = (end - start) / distance;
+    var currentDistance = 0.0;
+    while (currentDistance < distance) {
+      canvas.drawLine(
+        start + direction * currentDistance,
+        start + direction * (currentDistance + dashWidth > distance ? distance : currentDistance + dashWidth),
+        paint,
+      );
+      currentDistance += dashWidth + dashSpace;
     }
   }
 
   @override
-  void dispose() {
-    _nameController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final exercisesAsync = ref.watch(allExercisesProvider);
-
-    return Card(
-      margin: const EdgeInsets.only(bottom: 16),
-      elevation: widget.isExpanded ? 4 : 1,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: widget.isExpanded
-            ? BorderSide(color: Theme.of(context).colorScheme.primary, width: 2)
-            : BorderSide.none,
-      ),
-      child: Column(
-        children: [
-          InkWell(
-            onTap: widget.onToggleExpansion,
-            borderRadius: BorderRadius.circular(16),
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Row(
-                children: [
-                  ReorderableDragStartListener(
-                    index: widget.index,
-                    child: const Icon(LucideIcons.menu, color: Colors.grey),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: TextField(
-                      controller: _nameController,
-                      onChanged: widget.onNameChanged,
-                      style: GoogleFonts.outfit(
-                          fontWeight: FontWeight.bold, fontSize: 16),
-                      decoration: const InputDecoration(
-                        border: InputBorder.none,
-                        hintText: 'Day Name',
-                        isDense: true,
-                        contentPadding: EdgeInsets.zero,
-                      ),
-                    ),
-                  ),
-                  Icon(
-                    widget.isExpanded
-                        ? LucideIcons.chevronUp
-                        : LucideIcons.chevronDown,
-                    size: 20,
-                    color: Colors.grey,
-                  ),
-                  IconButton(
-                    icon: const Icon(LucideIcons.trash2,
-                        size: 18, color: Colors.red),
-                    onPressed: widget.onDelete,
-                  ),
-                ],
-              ),
-            ),
-          ),
-          if (widget.isExpanded) ...[
-            const Divider(height: 1),
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  if (widget.day.exercises.isEmpty)
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      child: Center(
-                        child: Text('No exercises added',
-                            style: TextStyle(color: Colors.grey[600])),
-                      ),
-                    )
-                  else
-                    ReorderableListView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: widget.day.exercises.length,
-                      onReorder: (oldIndex, newIndex) {
-                        if (newIndex > oldIndex) newIndex--;
-                        final updated = List<_ExerciseData>.from(widget.day.exercises);
-                        final item = updated.removeAt(oldIndex);
-                        updated.insert(newIndex, item);
-                        widget.onUpdateExercises(widget.index, updated);
-                      },
-                       itemBuilder: (context, exIndex) {
-                        final ex = widget.day.exercises[exIndex];
-                        return Container(
-                          key: ValueKey(ex.uniqueId),
-                          child: exercisesAsync.when(
-                            data: (exercises) {
-                              final exercise = exercises.firstWhere(
-                                (e) => e.id == ex.exerciseId,
-                                orElse: () => exercises.first,
-                              );
-                                return _ExerciseConfigRow(
-                                  index: exIndex,
-                                  exercise: exercise,
-                                  config: ex.sets.first,
-                                  onUpdate: (newConfig) {
-                                    final updated = List<_ExerciseData>.from(widget.day.exercises);
-                                    updated[exIndex] = updated[exIndex].copyWith(sets: [newConfig]);
-                                    widget.onUpdateExercises(widget.index, updated);
-                                  },
-                                  onSwap: () => widget.onSwapExercise(widget.index, exIndex),
-                                  onRemove: () => widget.onRemoveExercise(exIndex),
-                                );
-                            },
-                            loading: () =>
-                                const ListTile(title: Text('Loading...')),
-                            error: (_, _) => const ListTile(title: Text('Error')),
-                          ),
-                        );
-                      },
-                    ),
-                  const SizedBox(height: 8),
-                  SizedBox(
-                    width: double.infinity,
-                    child: OutlinedButton.icon(
-                      onPressed: widget.onAddExercise,
-                      icon: const Icon(LucideIcons.plus, size: 18),
-                      label: const Text('Add Exercise'),
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12)),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-}
-
-class _ExerciseConfigRow extends StatelessWidget {
-  final int index;
-  final ExerciseEntity exercise;
-  final _SetData config;
-  final Function(_SetData) onUpdate;
-  final VoidCallback onSwap;
-  final VoidCallback onRemove;
-
-  const _ExerciseConfigRow({
-    required this.index,
-    required this.exercise,
-    required this.config,
-    required this.onUpdate,
-    required this.onSwap,
-    required this.onRemove,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        color: Theme.of(context)
-            .colorScheme
-            .surfaceContainerHighest
-            .withOpacity(0.3),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: ExpansionTile(
-        tilePadding: const EdgeInsets.symmetric(horizontal: 12),
-        childrenPadding: const EdgeInsets.only(left: 12, right: 12, bottom: 12),
-        leading: ReorderableDragStartListener(
-          index: index,
-          child: const Icon(LucideIcons.gripVertical, size: 18, color: Colors.grey),
-        ),
-        title: GestureDetector(
-          onTap: onSwap,
-          child: Text(exercise.name,
-              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
-              overflow: TextOverflow.ellipsis,
-              maxLines: 1),
-        ),
-        subtitle: Text(
-          '${config.sets} × ${config.reps} • ${config.type} • ${config.rest}s rest',
-          style: const TextStyle(fontSize: 12, color: Colors.grey),
-        ),
-        trailing: IconButton(
-          icon: const Icon(LucideIcons.trash2, size: 16, color: Colors.grey),
-          onPressed: onRemove,
-        ),
-        children: [
-          const Divider(),
-          const SizedBox(height: 8),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: _buildStepper(
-                  label: 'Sets',
-                  value: config.sets,
-                  onChanged: (val) => onUpdate(_SetData(
-                      val.clamp(1, 10), config.reps, config.rest, config.type)),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: _buildStepper(
-                  label: 'Reps',
-                  value: config.reps,
-                  onChanged: (val) => onUpdate(_SetData(
-                      config.sets, val.clamp(1, 50), config.rest, config.type)),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: _buildStepper(
-                  label: 'Rest (s)',
-                  value: config.rest,
-                  step: 15,
-                  onChanged: (val) => onUpdate(_SetData(config.sets,
-                      config.reps, val.clamp(0, 300), config.type)),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text('Type',
-                        style: TextStyle(fontSize: 10, color: Colors.grey)),
-                    DropdownButton<String>(
-                      value: config.type,
-                      isDense: true,
-                      isExpanded: true,
-                      underline: const SizedBox(),
-                      style: TextStyle(
-                          fontSize: 13,
-                          color: Theme.of(context).colorScheme.onSurface,
-                          fontWeight: FontWeight.w600),
-                      items: [
-                        'Straight',
-                        'Superset',
-                        'Drop Set',
-                        'AMRAP',
-                        'Timed'
-                      ]
-                          .map(
-                              (t) => DropdownMenuItem(value: t, child: Text(t)))
-                          .toList(),
-                      onChanged: (val) => onUpdate(_SetData(config.sets,
-                          config.reps, config.rest, val ?? 'Straight')),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildStepper(
-      {required String label,
-      required int value,
-      required Function(int) onChanged,
-      int step = 1}) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(label, style: const TextStyle(fontSize: 10, color: Colors.grey)),
-        Row(
-          children: [
-            IconButton(
-              icon: const Icon(LucideIcons.minus, size: 16),
-              onPressed: () => onChanged(value - step),
-              constraints: const BoxConstraints(),
-              padding: const EdgeInsets.all(4),
-            ),
-            SizedBox(
-              width: 30,
-              child: Text(
-                '$value',
-                textAlign: TextAlign.center,
-                style:
-                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-              ),
-            ),
-            IconButton(
-              icon: const Icon(LucideIcons.plus, size: 16),
-              onPressed: () => onChanged(value + step),
-              constraints: const BoxConstraints(),
-              padding: const EdgeInsets.all(4),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

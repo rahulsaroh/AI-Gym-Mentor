@@ -1,3 +1,6 @@
+import 'dart:io';
+import 'package:ai_gym_mentor/core/database/database.dart' as db;
+import 'package:ai_gym_mentor/services/auto_save_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -47,6 +50,25 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
     final prefs = await SharedPreferences.getInstance();
     final hasSeenOnboarding = prefs.getBool('hasSeenOnboarding') ?? false;
     final hasCompletedSetup = prefs.getBool('hasCompletedSetup') ?? false;
+
+    // Fresh Install/Empty DB Check for Persistent Backup
+    try {
+      final database = ref.read(db.appDatabaseProvider);
+      final workoutCount = await (database.select(database.workouts)..limit(1)).get();
+      
+      if (workoutCount.isEmpty) {
+        final autoSaveService = ref.read(autoSaveServiceProvider);
+        final path = await autoSaveService.getPersistentFilePath();
+        if (await File(path).exists()) {
+          if (mounted) {
+            context.go('/welcome-back?path=${Uri.encodeComponent(path)}');
+            return;
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint('SplashScreen: Backup detection skipped: $e');
+    }
 
     if (!hasSeenOnboarding) {
       if (mounted) context.go('/onboarding');

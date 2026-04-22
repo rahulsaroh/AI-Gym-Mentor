@@ -37,65 +37,215 @@ class _PhysiqueHistoryTabState extends State<PhysiqueHistoryTab> {
 
   @override
   Widget build(BuildContext context) {
-    return CustomScrollView(
-      physics: const BouncingScrollPhysics(),
-      slivers: [
-        SliverToBoxAdapter(
-          child: Column(
-            children: [
-              _MetricSelector(
-                selected: _selectedMetric,
-                metrics: _metrics,
-                onChanged: (v) => setState(() => _selectedMetric = v),
-              ),
-              SizedBox(
-                height: 320,
-                child: widget.measurementsAsync.when(
-                  data: (data) => _MetricChart(
-                    data: data,
-                    metric: _selectedMetric,
-                    label: _metrics[_selectedMetric]!.label,
-                  ),
-                  loading: () => const Center(child: CircularProgressIndicator()),
-                  error: (e, _) => Center(child: Text('Error: $e')),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(20, 24, 20, 16),
-                child: Row(
-                  children: [
-                    Text(
-                      'Log History',
-                      style: GoogleFonts.outfit(fontSize: 22, fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
+    return widget.measurementsAsync.when(
+      data: (data) {
+        if (data.isEmpty) {
+          return const CustomScrollView(
+            slivers: [
+              SliverFillRemaining(
+                hasScrollBody: false,
+                child: _EmptyHistoryPlaceholder(),
               ),
             ],
-          ),
-        ),
-        widget.measurementsAsync.when(
-          data: (data) => SliverPadding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            sliver: SliverList(
-              delegate: SliverChildBuilderDelegate(
-                (context, index) => _MeasurementTile(
-                  measurement: data[index],
-                  all: data,
-                  selectedMetric: _selectedMetric,
+          );
+        }
+
+        final grouped = _groupDataByMonth(data, _selectedMetric);
+        
+        return CustomScrollView(
+          physics: const BouncingScrollPhysics(),
+          slivers: [
+            SliverPersistentHeader(
+              pinned: true,
+              delegate: _StickyHeaderDelegate(
+                child: _MetricSelector(
+                  selected: _selectedMetric,
+                  metrics: {
+                    'overall': _metrics['overall']!,
+                    'weight': _metrics['weight']!,
+                    'bodyFat': _metrics['bodyFat']!,
+                  },
+                  onChanged: (v) => setState(() => _selectedMetric = v),
                 ),
-                childCount: data.length,
               ),
             ),
-          ),
-          loading: () => const SliverFillRemaining(child: Center(child: CircularProgressIndicator())),
-          error: (e, _) => SliverFillRemaining(child: Center(child: Text('Error: $e'))),
+            SliverToBoxAdapter(
+              child: Column(
+                children: [
+                  AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 300),
+                    child: SizedBox(
+                      key: ValueKey(_selectedMetric),
+                      height: 220,
+                      child: _MetricChart(
+                        data: data,
+                        metric: _selectedMetric,
+                        label: _metrics[_selectedMetric]!.label,
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 24, 20, 16),
+                    child: Row(
+                      children: [
+                        Text(
+                          'Log History',
+                          style: GoogleFonts.outfit(fontSize: 22, fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            if (grouped.isEmpty)
+              const SliverToBoxAdapter(
+                child: Center(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(vertical: 60),
+                    child: Text('No history for this metric', style: TextStyle(color: Colors.grey)),
+                  ),
+                ),
+              )
+            else
+              ...grouped.entries.expand((entry) => [
+                    SliverPersistentHeader(
+                      pinned: true,
+                      delegate: _MonthHeaderDelegate(entry.key),
+                    ),
+                    SliverPadding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      sliver: SliverList(
+                        delegate: SliverChildBuilderDelegate(
+                          (context, index) => _MeasurementTile(
+                            measurement: entry.value[index],
+                            all: data,
+                            selectedMetric: _selectedMetric,
+                          ),
+                          childCount: entry.value.length,
+                        ),
+                      ),
+                    ),
+                  ]),
+            const SliverPadding(padding: EdgeInsets.only(bottom: 100)),
+          ],
+        );
+      },
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (e, stack) => Center(child: Text('Error: $e')),
+    );
+  }
+
+  Map<String, List<ent.BodyMeasurement>> _groupDataByMonth(List<ent.BodyMeasurement> data, String metric) {
+    final Map<String, List<ent.BodyMeasurement>> groups = {};
+    for (final m in data) {
+      if (metric != 'overall' && extractMetricValue(m, metric) == null) continue;
+      final dateStr = DateFormat('MMMM yyyy').format(m.date);
+      if (!groups.containsKey(dateStr)) groups[dateStr] = [];
+      groups[dateStr]!.add(m);
+    }
+    return groups;
+  }
+}
+
+class _EmptyHistoryPlaceholder extends ConsumerWidget {
+  const _EmptyHistoryPlaceholder();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
+      child: Container(
+        padding: const EdgeInsets.all(32),
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2), style: BorderStyle.none), // dashed concept
         ),
-        const SliverPadding(padding: EdgeInsets.only(bottom: 40)),
-      ],
+        child: Column(
+          children: [
+            Icon(LucideIcons.scale, size: 48, color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5)),
+            const SizedBox(height: 16),
+            const Text('No logs yet', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 8),
+            Text('Your progress log is currently empty.', style: TextStyle(color: Theme.of(context).colorScheme.outline), textAlign: TextAlign.center),
+            const SizedBox(height: 24),
+            FilledButton.icon(
+              onPressed: () {
+                // Relies on FAB for actual insertion.
+              },
+              icon: const Icon(LucideIcons.plus, size: 18),
+              label: const Text('Log your first entry'),
+              style: FilledButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                foregroundColor: Theme.of(context).colorScheme.onPrimary,
+              ),
+            ),
+            const SizedBox(height: 12),
+            TextButton.icon(
+              onPressed: () async {
+                await ref.read(bodyMeasurementsListProvider.notifier).seedSampleData();
+                if (context.mounted) {
+                   ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Sample measurement data seeded!')));
+                }
+              },
+              icon: const Icon(LucideIcons.database, size: 16),
+              label: const Text('Seed Sample Data'),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
+
+class _StickyHeaderDelegate extends SliverPersistentHeaderDelegate {
+  final Widget child;
+  _StickyHeaderDelegate({required this.child});
+
+  @override
+  double get minExtent => 90.0;
+  @override
+  double get maxExtent => 90.0;
+
+  @override
+  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
+    return Container(
+      color: Theme.of(context).scaffoldBackgroundColor,
+      child: child,
+    );
+  }
+
+  @override
+  bool shouldRebuild(covariant _StickyHeaderDelegate oldDelegate) => true;
+}
+
+class _MonthHeaderDelegate extends SliverPersistentHeaderDelegate {
+  final String title;
+  _MonthHeaderDelegate(this.title);
+
+  @override
+  double get minExtent => 40.0;
+  @override
+  double get maxExtent => 40.0;
+
+  @override
+  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
+    return Container(
+      color: Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.95),
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      alignment: Alignment.centerLeft,
+      child: Text(
+        title.toUpperCase(),
+        style: TextStyle(color: Theme.of(context).colorScheme.outline, fontWeight: FontWeight.bold, fontSize: 13, letterSpacing: 1.2),
+      ),
+    );
+  }
+
+  @override
+  bool shouldRebuild(covariant _MonthHeaderDelegate oldDelegate) => oldDelegate.title != title;
+}
+
 
 class PhysiqueStatsTab extends StatelessWidget {
   final AsyncValue<List<ent.BodyMeasurement>> measurementsAsync;
@@ -176,7 +326,7 @@ class _MetricSelector extends StatelessWidget {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       physics: const BouncingScrollPhysics(),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Row(
         children: metrics.entries.map((e) {
           final isSelected = selected == e.key;
@@ -187,14 +337,15 @@ class _MetricSelector extends StatelessWidget {
               borderRadius: BorderRadius.circular(20),
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 300),
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                constraints: const BoxConstraints(minWidth: 120),
                 decoration: BoxDecoration(
-                  color: isSelected ? e.value.color : Colors.white,
+                  color: isSelected ? e.value.color : Theme.of(context).cardColor,
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: isSelected
                       ? [BoxShadow(color: e.value.color.withValues(alpha: 0.3), blurRadius: 10, offset: const Offset(0, 4))]
                       : [],
-                  border: Border.all(color: isSelected ? e.value.color : Colors.grey.shade200, width: 1.5),
+                  border: Border.all(color: isSelected ? e.value.color : Theme.of(context).dividerColor, width: 1.5),
                 ),
                 child: Row(
                   children: [
@@ -205,7 +356,7 @@ class _MetricSelector extends StatelessWidget {
                       style: GoogleFonts.outfit(
                         fontWeight: FontWeight.bold,
                         fontSize: 14,
-                        color: isSelected ? Colors.white : Colors.grey.shade700,
+                        color: isSelected ? Colors.white : Theme.of(context).colorScheme.onSurface,
                       ),
                     ),
                   ],
@@ -368,44 +519,108 @@ class _MeasurementTile extends StatelessWidget {
     final prev = (index + 1 < all.length) ? all[index + 1] : null;
     final prevVal = prev != null ? extractMetricValue(prev, selectedMetric) : null;
 
-    Color trendColor = Colors.grey.shade400;
+    // Weight-loss = orange (down arrow is good here for weight metric)
+    // For other metrics: green up = good
+    Color trendColor = Colors.grey.shade600;
     IconData trendIcon = LucideIcons.minus;
+    String deltaText = '';
 
     if (prevVal != null && (val - prevVal).abs() > 0.01) {
-      final isUp = val > prevVal;
-      trendColor = isUp ? Colors.blue : Colors.orange;
+      final delta = val - prevVal;
+      final isUp = delta > 0;
+      // For weight and body fat, down is green; for measurements, up is green
+      final isGood = (selectedMetric == 'weight' || selectedMetric == 'bodyFat') ? !isUp : isUp;
+      trendColor = isGood ? const Color(0xFF4CAF50) : const Color(0xFFE53935);
       trendIcon = isUp ? LucideIcons.trendingUp : LucideIcons.trendingDown;
+      deltaText = '${isUp ? '+' : ''}${delta.toStringAsFixed(1)}';
     }
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.grey.shade100),
+    final unit = (selectedMetric == 'weight') ? 'kg'
+        : (selectedMetric == 'bodyFat') ? '%'
+        : 'cm';
+
+    return Dismissible(
+      key: ValueKey(measurement.date.toIso8601String() + selectedMetric),
+      direction: DismissDirection.endToStart,
+      background: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        decoration: BoxDecoration(
+          color: Colors.red.shade700,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        alignment: Alignment.centerRight,
+        padding: const EdgeInsets.only(right: 24),
+        child: const Icon(LucideIcons.trash2, color: Colors.white),
       ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(color: trendColor.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12)),
-            child: Icon(trendIcon, size: 18, color: trendColor),
-          ),
-          const SizedBox(width: 16),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(DateFormat('MMM d, yyyy').format(measurement.date),
-                  style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 16)),
-              if (measurement.notes != null)
-                Text(measurement.notes!,
-                    style: GoogleFonts.outfit(fontSize: 12, color: Colors.grey, fontStyle: FontStyle.italic)),
-            ],
-          ),
-          const Spacer(),
-          Text('$val', style: GoogleFonts.robotoMono(fontSize: 18, fontWeight: FontWeight.bold)),
-        ],
+      onDismissed: (_) {
+        // TODO: wire to repository delete
+      },
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          color: Theme.of(context).cardColor,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.1)),
+        ),
+        child: Row(
+          children: [
+            // Trend circle icon
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: trendColor.withValues(alpha: 0.15),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(trendIcon, size: 18, color: trendColor),
+            ),
+            const SizedBox(width: 14),
+            // Date + delta
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    DateFormat('MMM d, yyyy').format(measurement.date),
+                    style: GoogleFonts.outfit(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15,
+                    ),
+                  ),
+                  if (deltaText.isNotEmpty)
+                    Text(
+                      '$deltaText $unit from previous',
+                      style: GoogleFonts.outfit(
+                        fontSize: 12,
+                        color: trendColor,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    )
+                  else
+                    Text(
+                      'First entry',
+                      style: GoogleFonts.outfit(fontSize: 12, color: Theme.of(context).colorScheme.outline),
+                    ),
+                ],
+              ),
+            ),
+            // Value + unit
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  val.toStringAsFixed(1),
+                  style: GoogleFonts.robotoMono(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(unit, style: const TextStyle(fontSize: 12, color: Colors.white54)),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -472,28 +687,28 @@ class _StatRow extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
         ],
-        border: Border.all(color: Colors.grey.shade100),
+        border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.1)),
       ),
       child: Row(
         children: [
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: Colors.blue.withValues(alpha: 0.05),
+              color: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(16),
             ),
             child: config.assetPath != null
                 ? Image.asset(config.assetPath!,
-                    width: 32, height: 32, errorBuilder: (_, __, ___) => const Icon(LucideIcons.activity))
+                    width: 32, height: 32, errorBuilder: (ctx, err, st) => const Icon(LucideIcons.activity))
                 : const Icon(LucideIcons.activity, size: 32),
           ),
           const SizedBox(width: 16),
@@ -603,16 +818,16 @@ class _AchievementTile extends StatelessWidget {
     final Color barColor = const Color(0xFF66BB6A); // Lighter green for bar
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 20),
+      margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.9),
-        borderRadius: BorderRadius.circular(40),
-        border: Border.all(color: Colors.blue.withValues(alpha: 0.1), width: 1.5),
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.1), width: 1),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
@@ -621,24 +836,24 @@ class _AchievementTile extends StatelessWidget {
         children: [
           // Background Grid Pattern
           Positioned(
-            right: 40,
-            top: 20,
+            right: 20,
+            top: 10,
             child: Opacity(
-              opacity: 0.1,
+              opacity: 0.08,
               child: _DotGrid(rows: 3, cols: 6),
             ),
           ),
           Positioned(
-            left: 100,
-            bottom: 60,
+            left: 60,
+            bottom: 40,
             child: Opacity(
-              opacity: 0.1,
+              opacity: 0.08,
               child: _DotGrid(rows: 2, cols: 4),
             ),
           ),
           
           Padding(
-            padding: const EdgeInsets.all(24),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
             child: Column(
               children: [
                 // Top Row: Icon, Label, Percentage
@@ -646,52 +861,52 @@ class _AchievementTile extends StatelessWidget {
                   children: [
                     // Glassy Icon Container
                     Container(
-                      width: 64,
-                      height: 64,
+                      width: 48,
+                      height: 48,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         gradient: LinearGradient(
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                           colors: [
-                            Colors.green.withValues(alpha: 0.2),
+                            Colors.green.withValues(alpha: 0.15),
                             Colors.green.withValues(alpha: 0.05),
                           ],
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.green.withValues(alpha: 0.1),
-                            blurRadius: 15,
-                            spreadRadius: 2,
+                            color: Colors.green.withValues(alpha: 0.08),
+                            blurRadius: 8,
+                            spreadRadius: 1,
                           ),
                         ],
                       ),
                       child: Center(
-                        child: Icon(LucideIcons.target, size: 28, color: accentColor),
+                        child: Icon(LucideIcons.target, size: 22, color: accentColor),
                       ),
                     ),
-                    const SizedBox(width: 20),
+                    const SizedBox(width: 16),
                     Expanded(
                       child: Text(
                         achievement.label,
                         style: GoogleFonts.outfit(
-                          fontSize: 28,
+                          fontSize: 20,
                           fontWeight: FontWeight.bold,
-                          color: const Color(0xFF2D3142),
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
                       ),
                     ),
                     Text(
                       '${(achievement.percentage * 100).toInt()}%',
                       style: GoogleFonts.outfit(
-                        fontSize: 28,
+                        fontSize: 20,
                         fontWeight: FontWeight.bold,
                         color: accentColor,
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 16),
                 
                 // Metrics Row with Dividers
                 Row(
@@ -704,15 +919,15 @@ class _AchievementTile extends StatelessWidget {
                     Expanded(child: _MetricMiniLabel(label: 'Goal', value: '${achievement.targetValue}', isGoal: true)),
                   ],
                 ),
-                const SizedBox(height: 32),
+                const SizedBox(height: 20),
                 
                 // Custom Gradient Progress Bar
                 Container(
-                  height: 16,
+                  height: 10,
                   width: double.infinity,
                   decoration: BoxDecoration(
                     color: Colors.grey.shade100,
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(8),
                     border: Border.all(color: Colors.grey.shade200),
                   ),
                   child: Stack(
@@ -724,7 +939,7 @@ class _AchievementTile extends StatelessWidget {
                             gradient: LinearGradient(
                               colors: [barColor.withValues(alpha: 0.6), barColor],
                             ),
-                            borderRadius: BorderRadius.circular(10),
+                            borderRadius: BorderRadius.circular(8),
                             boxShadow: [
                               BoxShadow(
                                 color: barColor.withValues(alpha: 0.3),
@@ -761,7 +976,7 @@ class _DotGrid extends StatelessWidget {
         children: List.generate(cols, (c) => Container(
           width: 3,
           height: 3,
-          margin: const EdgeInsets.all(3),
+          margin: const EdgeInsets.all(2),
           decoration: const BoxDecoration(color: Colors.grey, shape: BoxShape.circle),
         )),
       )),
@@ -773,7 +988,7 @@ class _VerticalDivider extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 40,
+      height: 28,
       width: 1,
       color: Colors.grey.shade200,
     );
@@ -800,17 +1015,17 @@ class _MetricMiniLabel extends StatelessWidget {
         Text(
           label.toUpperCase(),
           style: GoogleFonts.outfit(
-            fontSize: 12,
+            fontSize: 11,
             color: Colors.blueGrey.shade300,
             fontWeight: FontWeight.bold,
-            letterSpacing: 1.0,
+            letterSpacing: 0.8,
           ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 4),
         Text(
           value,
           style: GoogleFonts.outfit(
-            fontSize: 24,
+            fontSize: 18,
             fontWeight: FontWeight.bold,
             color: isGoal ? const Color(0xFF0D47A1) : const Color(0xFF2D3142),
           ),
@@ -820,12 +1035,12 @@ class _MetricMiniLabel extends StatelessWidget {
   }
 }
 
-class _EmptyTabState extends StatelessWidget {
+class _EmptyTabState extends ConsumerWidget {
   final String type;
   const _EmptyTabState({required this.type});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final isTargets = type == 'targets';
     return Center(
       child: Column(
@@ -844,12 +1059,30 @@ class _EmptyTabState extends StatelessWidget {
             onPressed: () => Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => isTargets ? BodyTargetsLogScreen() : BodyStatsLogScreen())),
+                    builder: (context) => isTargets ? const BodyTargetsLogScreen() : const BodyStatsLogScreen())),
             style: ElevatedButton.styleFrom(
               padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
             ),
             child: Text(isTargets ? 'Set Your First Goal' : 'Start Logging'),
+          ),
+          const SizedBox(height: 12),
+          TextButton.icon(
+            onPressed: () async {
+              if (isTargets) {
+                await ref.read(bodyTargetsListProvider.notifier).seedSampleTargets();
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Sample targets seeded!')));
+                }
+              } else {
+                await ref.read(bodyMeasurementsListProvider.notifier).seedSampleData();
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Sample measurement data seeded!')));
+                }
+              }
+            },
+            icon: Icon(isTargets ? LucideIcons.target : LucideIcons.database, size: 16),
+            label: Text(isTargets ? 'Seed Sample Targets' : 'Seed Sample Measurements'),
           ),
         ],
       ),
