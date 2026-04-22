@@ -41,7 +41,7 @@ final class GeminiServiceProvider
   }
 }
 
-String _$geminiServiceHash() => r'973671704fc9e5f864fa3339da3e1ace4b34b4f0';
+String _$geminiServiceHash() => r'9afd230d62b7de4a87bfeb5a02efe8dabc94f6b7';
 
 abstract class _$GeminiService extends $Notifier<void> {
   void build();

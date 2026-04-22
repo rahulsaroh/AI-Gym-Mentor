@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -486,11 +487,16 @@ class _DayPageView extends ConsumerStatefulWidget {
 
 class _DayPageViewState extends ConsumerState<_DayPageView> {
   late TextEditingController _nameController;
+  late ScrollController _scrollController;
+  Timer? _scrollTimer;
+  Offset? _lastDragPosition;
+  bool _isDragging = false;
 
   @override
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: widget.dayData.name);
+    _scrollController = ScrollController();
   }
 
   @override
@@ -505,7 +511,40 @@ class _DayPageViewState extends ConsumerState<_DayPageView> {
   @override
   void dispose() {
     _nameController.dispose();
+    _scrollController.dispose();
+    _stopScrollTimer();
     super.dispose();
+  }
+
+  void _startScrollTimer() {
+    _scrollTimer?.cancel();
+    _scrollTimer = Timer.periodic(const Duration(milliseconds: 16), (timer) {
+      if (_lastDragPosition == null || !_isDragging) return;
+
+      final screenHeight = MediaQuery.of(context).size.height;
+      final dragY = _lastDragPosition!.dy;
+      final threshold = screenHeight * 0.15; // 15% from top/bottom
+
+      double scrollSpeed = 0;
+      if (dragY < threshold) {
+        // Dragging near top
+        scrollSpeed = -((threshold - dragY) / threshold) * 15;
+      } else if (dragY > screenHeight - threshold) {
+        // Dragging near bottom
+        scrollSpeed = ((dragY - (screenHeight - threshold)) / threshold) * 15;
+      }
+
+      if (scrollSpeed != 0) {
+        final newOffset = (_scrollController.offset + scrollSpeed)
+            .clamp(0.0, _scrollController.position.maxScrollExtent);
+        _scrollController.jumpTo(newOffset);
+      }
+    });
+  }
+
+  void _stopScrollTimer() {
+    _scrollTimer?.cancel();
+    _scrollTimer = null;
   }
 
   void _addExercise([String? initialSection]) async {
@@ -639,7 +678,18 @@ class _DayPageViewState extends ConsumerState<_DayPageView> {
         icon: const Icon(LucideIcons.plus, color: Colors.white),
         label: const Text('Add Exercise', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
       ),
-      body: CustomScrollView(
+      body: Listener(
+        onPointerMove: (event) {
+          if (_isDragging) {
+            _lastDragPosition = event.position;
+          }
+        },
+        onPointerUp: (event) {
+          _isDragging = false;
+          _stopScrollTimer();
+        },
+        child: CustomScrollView(
+          controller: _scrollController,
         slivers: [
           SliverToBoxAdapter(
             child: Padding(
@@ -710,6 +760,18 @@ class _DayPageViewState extends ConsumerState<_DayPageView> {
                 exercises: sectionExercises,
                 onAddExercise: () => _addExercise(sectionKey),
                 onReorder: (oldIdx, newIdx) => _onReorderSection(sectionKey, oldIdx, newIdx),
+                onReorderStart: (_) {
+                  setState(() {
+                    _isDragging = true;
+                  });
+                  _startScrollTimer();
+                },
+                onReorderEnd: (_) {
+                  setState(() {
+                    _isDragging = false;
+                  });
+                  _stopScrollTimer();
+                },
                 onUpdateExercise: (uniqueId, sets) {
                   final exIndex = widget.dayData.exercises.indexWhere((e) => e.uniqueId == uniqueId);
                   if (exIndex != -1) {
@@ -752,6 +814,7 @@ class _DayPageViewState extends ConsumerState<_DayPageView> {
           const SliverToBoxAdapter(child: SizedBox(height: 80)), // FAB padding
         ],
       ),
+    ),
     );
   }
 }
@@ -761,6 +824,8 @@ class _ExerciseSection extends ConsumerWidget {
   final List<_ExerciseData> exercises;
   final VoidCallback onAddExercise;
   final Function(int, int) onReorder;
+  final Function(int)? onReorderStart;
+  final Function(int)? onReorderEnd;
   final Function(String, List<_SetData>) onUpdateExercise;
   final Function(String) onSwap;
   final Function(String) onRemove;
@@ -772,6 +837,8 @@ class _ExerciseSection extends ConsumerWidget {
     required this.exercises,
     required this.onAddExercise,
     required this.onReorder,
+    this.onReorderStart,
+    this.onReorderEnd,
     required this.onUpdateExercise,
     required this.onSwap,
     required this.onRemove,
@@ -840,6 +907,8 @@ class _ExerciseSection extends ConsumerWidget {
                 physics: const NeverScrollableScrollPhysics(),
                 itemCount: exercises.length,
                 onReorder: onReorder,
+                onReorderStart: onReorderStart,
+                onReorderEnd: onReorderEnd,
                 itemBuilder: (context, idx) {
                   final ex = exercises[idx];
                   return Container(

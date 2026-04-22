@@ -86,6 +86,9 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
 
   late PageController _pageController;
   late ScrollController _scrollController;
+  Timer? _scrollTimer;
+  Offset? _lastDragPosition;
+  bool _isDragging = false;
 
   // Fix #7: Cache the sets stream to avoid creating 3 duplicate Drift watchers per build()
   late Stream<List<db.WorkoutSet>> _setsStream;
@@ -184,7 +187,39 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
     }
     _scrollController.dispose();
     _pageController.dispose();
+    _stopScrollTimer();
     super.dispose();
+  }
+
+  void _startScrollTimer() {
+    _scrollTimer?.cancel();
+    _scrollTimer = Timer.periodic(const Duration(milliseconds: 16), (timer) {
+      if (_lastDragPosition == null || !_isDragging) return;
+
+      final screenHeight = MediaQuery.of(context).size.height;
+      final dragY = _lastDragPosition!.dy;
+      final threshold = screenHeight * 0.15; // 15% from top/bottom
+
+      double scrollSpeed = 0;
+      if (dragY < threshold) {
+        // Dragging near top
+        scrollSpeed = -((threshold - dragY) / threshold) * 15;
+      } else if (dragY > screenHeight - threshold) {
+        // Dragging near bottom
+        scrollSpeed = ((dragY - (screenHeight - threshold)) / threshold) * 15;
+      }
+
+      if (scrollSpeed != 0) {
+        final newOffset = (_scrollController.offset + scrollSpeed)
+            .clamp(0.0, _scrollController.position.maxScrollExtent);
+        _scrollController.jumpTo(newOffset);
+      }
+    });
+  }
+
+  void _stopScrollTimer() {
+    _scrollTimer?.cancel();
+    _scrollTimer = null;
   }
 
   TextEditingController _getController(
@@ -588,8 +623,18 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
               // Fallback to discard confirmation if no specific program to return to
               _discardWorkout(showConfirm: true);
             },
-            child: Stack(
-              children: [
+            child: Listener(
+              onPointerMove: (event) {
+                if (_isDragging) {
+                  _lastDragPosition = event.position;
+                }
+              },
+              onPointerUp: (event) {
+                _isDragging = false;
+                _stopScrollTimer();
+              },
+              child: Stack(
+                children: [
                 StreamBuilder<List<db.WorkoutSet>>(
                   stream: _watchSets(),
                   builder: (context, setsSnapshot) {
@@ -630,6 +675,18 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
                       itemCount: exerciseBlocks.length + 1,
                       onReorder: (oldIndex, newIndex) =>
                           _reorderExercises(exerciseBlocks, oldIndex, newIndex),
+                      onReorderStart: (_) {
+                        setState(() {
+                          _isDragging = true;
+                        });
+                        _startScrollTimer();
+                      },
+                      onReorderEnd: (_) {
+                        setState(() {
+                          _isDragging = false;
+                        });
+                        _stopScrollTimer();
+                      },
                       itemBuilder: (context, index) {
                         if (index == exerciseBlocks.length) {
                           return const SizedBox(
@@ -725,6 +782,7 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
               ],
             ),
           ),
+        ),
           bottomNavigationBar: StreamBuilder<List<db.WorkoutSet>>(
             stream: _watchSets(),
             builder: (context, snapshot) {

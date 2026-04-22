@@ -6029,6 +6029,17 @@ class $BodyMeasurementsTable extends BodyMeasurements
     type: DriftSqlType.double,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _waistNavalMeta = const VerificationMeta(
+    'waistNaval',
+  );
+  @override
+  late final GeneratedColumn<double> waistNaval = GeneratedColumn<double>(
+    'waist_naval',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _hipsMeta = const VerificationMeta('hips');
   @override
   late final GeneratedColumn<double> hips = GeneratedColumn<double>(
@@ -6091,6 +6102,28 @@ class $BodyMeasurementsTable extends BodyMeasurements
     type: DriftSqlType.double,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _subcutaneousFatMeta = const VerificationMeta(
+    'subcutaneousFat',
+  );
+  @override
+  late final GeneratedColumn<double> subcutaneousFat = GeneratedColumn<double>(
+    'subcutaneous_fat',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _visceralFatMeta = const VerificationMeta(
+    'visceralFat',
+  );
+  @override
+  late final GeneratedColumn<double> visceralFat = GeneratedColumn<double>(
+    'visceral_fat',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _customValuesMeta = const VerificationMeta(
     'customValues',
   );
@@ -6125,12 +6158,15 @@ class $BodyMeasurementsTable extends BodyMeasurements
     forearmLeft,
     forearmRight,
     waist,
+    waistNaval,
     hips,
     thighLeft,
     thighRight,
     calfLeft,
     calfRight,
     height,
+    subcutaneousFat,
+    visceralFat,
     customValues,
     notes,
   ];
@@ -6223,6 +6259,12 @@ class $BodyMeasurementsTable extends BodyMeasurements
         waist.isAcceptableOrUnknown(data['waist']!, _waistMeta),
       );
     }
+    if (data.containsKey('waist_naval')) {
+      context.handle(
+        _waistNavalMeta,
+        waistNaval.isAcceptableOrUnknown(data['waist_naval']!, _waistNavalMeta),
+      );
+    }
     if (data.containsKey('hips')) {
       context.handle(
         _hipsMeta,
@@ -6257,6 +6299,24 @@ class $BodyMeasurementsTable extends BodyMeasurements
       context.handle(
         _heightMeta,
         height.isAcceptableOrUnknown(data['height']!, _heightMeta),
+      );
+    }
+    if (data.containsKey('subcutaneous_fat')) {
+      context.handle(
+        _subcutaneousFatMeta,
+        subcutaneousFat.isAcceptableOrUnknown(
+          data['subcutaneous_fat']!,
+          _subcutaneousFatMeta,
+        ),
+      );
+    }
+    if (data.containsKey('visceral_fat')) {
+      context.handle(
+        _visceralFatMeta,
+        visceralFat.isAcceptableOrUnknown(
+          data['visceral_fat']!,
+          _visceralFatMeta,
+        ),
       );
     }
     if (data.containsKey('custom_values')) {
@@ -6331,6 +6391,10 @@ class $BodyMeasurementsTable extends BodyMeasurements
         DriftSqlType.double,
         data['${effectivePrefix}waist'],
       ),
+      waistNaval: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}waist_naval'],
+      ),
       hips: attachedDatabase.typeMapping.read(
         DriftSqlType.double,
         data['${effectivePrefix}hips'],
@@ -6354,6 +6418,14 @@ class $BodyMeasurementsTable extends BodyMeasurements
       height: attachedDatabase.typeMapping.read(
         DriftSqlType.double,
         data['${effectivePrefix}height'],
+      ),
+      subcutaneousFat: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}subcutaneous_fat'],
+      ),
+      visceralFat: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}visceral_fat'],
       ),
       customValues: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
@@ -6386,12 +6458,15 @@ class BodyMeasurementTable extends DataClass
   final double? forearmLeft;
   final double? forearmRight;
   final double? waist;
+  final double? waistNaval;
   final double? hips;
   final double? thighLeft;
   final double? thighRight;
   final double? calfLeft;
   final double? calfRight;
   final double? height;
+  final double? subcutaneousFat;
+  final double? visceralFat;
   final String? customValues;
   final String? notes;
   const BodyMeasurementTable({
@@ -6407,12 +6482,15 @@ class BodyMeasurementTable extends DataClass
     this.forearmLeft,
     this.forearmRight,
     this.waist,
+    this.waistNaval,
     this.hips,
     this.thighLeft,
     this.thighRight,
     this.calfLeft,
     this.calfRight,
     this.height,
+    this.subcutaneousFat,
+    this.visceralFat,
     this.customValues,
     this.notes,
   });
@@ -6451,6 +6529,9 @@ class BodyMeasurementTable extends DataClass
     if (!nullToAbsent || waist != null) {
       map['waist'] = Variable<double>(waist);
     }
+    if (!nullToAbsent || waistNaval != null) {
+      map['waist_naval'] = Variable<double>(waistNaval);
+    }
     if (!nullToAbsent || hips != null) {
       map['hips'] = Variable<double>(hips);
     }
@@ -6468,6 +6549,12 @@ class BodyMeasurementTable extends DataClass
     }
     if (!nullToAbsent || height != null) {
       map['height'] = Variable<double>(height);
+    }
+    if (!nullToAbsent || subcutaneousFat != null) {
+      map['subcutaneous_fat'] = Variable<double>(subcutaneousFat);
+    }
+    if (!nullToAbsent || visceralFat != null) {
+      map['visceral_fat'] = Variable<double>(visceralFat);
     }
     if (!nullToAbsent || customValues != null) {
       map['custom_values'] = Variable<String>(customValues);
@@ -6510,6 +6597,9 @@ class BodyMeasurementTable extends DataClass
       waist: waist == null && nullToAbsent
           ? const Value.absent()
           : Value(waist),
+      waistNaval: waistNaval == null && nullToAbsent
+          ? const Value.absent()
+          : Value(waistNaval),
       hips: hips == null && nullToAbsent ? const Value.absent() : Value(hips),
       thighLeft: thighLeft == null && nullToAbsent
           ? const Value.absent()
@@ -6526,6 +6616,12 @@ class BodyMeasurementTable extends DataClass
       height: height == null && nullToAbsent
           ? const Value.absent()
           : Value(height),
+      subcutaneousFat: subcutaneousFat == null && nullToAbsent
+          ? const Value.absent()
+          : Value(subcutaneousFat),
+      visceralFat: visceralFat == null && nullToAbsent
+          ? const Value.absent()
+          : Value(visceralFat),
       customValues: customValues == null && nullToAbsent
           ? const Value.absent()
           : Value(customValues),
@@ -6553,12 +6649,15 @@ class BodyMeasurementTable extends DataClass
       forearmLeft: serializer.fromJson<double?>(json['forearmLeft']),
       forearmRight: serializer.fromJson<double?>(json['forearmRight']),
       waist: serializer.fromJson<double?>(json['waist']),
+      waistNaval: serializer.fromJson<double?>(json['waistNaval']),
       hips: serializer.fromJson<double?>(json['hips']),
       thighLeft: serializer.fromJson<double?>(json['thighLeft']),
       thighRight: serializer.fromJson<double?>(json['thighRight']),
       calfLeft: serializer.fromJson<double?>(json['calfLeft']),
       calfRight: serializer.fromJson<double?>(json['calfRight']),
       height: serializer.fromJson<double?>(json['height']),
+      subcutaneousFat: serializer.fromJson<double?>(json['subcutaneousFat']),
+      visceralFat: serializer.fromJson<double?>(json['visceralFat']),
       customValues: serializer.fromJson<String?>(json['customValues']),
       notes: serializer.fromJson<String?>(json['notes']),
     );
@@ -6579,12 +6678,15 @@ class BodyMeasurementTable extends DataClass
       'forearmLeft': serializer.toJson<double?>(forearmLeft),
       'forearmRight': serializer.toJson<double?>(forearmRight),
       'waist': serializer.toJson<double?>(waist),
+      'waistNaval': serializer.toJson<double?>(waistNaval),
       'hips': serializer.toJson<double?>(hips),
       'thighLeft': serializer.toJson<double?>(thighLeft),
       'thighRight': serializer.toJson<double?>(thighRight),
       'calfLeft': serializer.toJson<double?>(calfLeft),
       'calfRight': serializer.toJson<double?>(calfRight),
       'height': serializer.toJson<double?>(height),
+      'subcutaneousFat': serializer.toJson<double?>(subcutaneousFat),
+      'visceralFat': serializer.toJson<double?>(visceralFat),
       'customValues': serializer.toJson<String?>(customValues),
       'notes': serializer.toJson<String?>(notes),
     };
@@ -6603,12 +6705,15 @@ class BodyMeasurementTable extends DataClass
     Value<double?> forearmLeft = const Value.absent(),
     Value<double?> forearmRight = const Value.absent(),
     Value<double?> waist = const Value.absent(),
+    Value<double?> waistNaval = const Value.absent(),
     Value<double?> hips = const Value.absent(),
     Value<double?> thighLeft = const Value.absent(),
     Value<double?> thighRight = const Value.absent(),
     Value<double?> calfLeft = const Value.absent(),
     Value<double?> calfRight = const Value.absent(),
     Value<double?> height = const Value.absent(),
+    Value<double?> subcutaneousFat = const Value.absent(),
+    Value<double?> visceralFat = const Value.absent(),
     Value<String?> customValues = const Value.absent(),
     Value<String?> notes = const Value.absent(),
   }) => BodyMeasurementTable(
@@ -6624,12 +6729,17 @@ class BodyMeasurementTable extends DataClass
     forearmLeft: forearmLeft.present ? forearmLeft.value : this.forearmLeft,
     forearmRight: forearmRight.present ? forearmRight.value : this.forearmRight,
     waist: waist.present ? waist.value : this.waist,
+    waistNaval: waistNaval.present ? waistNaval.value : this.waistNaval,
     hips: hips.present ? hips.value : this.hips,
     thighLeft: thighLeft.present ? thighLeft.value : this.thighLeft,
     thighRight: thighRight.present ? thighRight.value : this.thighRight,
     calfLeft: calfLeft.present ? calfLeft.value : this.calfLeft,
     calfRight: calfRight.present ? calfRight.value : this.calfRight,
     height: height.present ? height.value : this.height,
+    subcutaneousFat: subcutaneousFat.present
+        ? subcutaneousFat.value
+        : this.subcutaneousFat,
+    visceralFat: visceralFat.present ? visceralFat.value : this.visceralFat,
     customValues: customValues.present ? customValues.value : this.customValues,
     notes: notes.present ? notes.value : this.notes,
   );
@@ -6651,6 +6761,9 @@ class BodyMeasurementTable extends DataClass
           ? data.forearmRight.value
           : this.forearmRight,
       waist: data.waist.present ? data.waist.value : this.waist,
+      waistNaval: data.waistNaval.present
+          ? data.waistNaval.value
+          : this.waistNaval,
       hips: data.hips.present ? data.hips.value : this.hips,
       thighLeft: data.thighLeft.present ? data.thighLeft.value : this.thighLeft,
       thighRight: data.thighRight.present
@@ -6659,6 +6772,12 @@ class BodyMeasurementTable extends DataClass
       calfLeft: data.calfLeft.present ? data.calfLeft.value : this.calfLeft,
       calfRight: data.calfRight.present ? data.calfRight.value : this.calfRight,
       height: data.height.present ? data.height.value : this.height,
+      subcutaneousFat: data.subcutaneousFat.present
+          ? data.subcutaneousFat.value
+          : this.subcutaneousFat,
+      visceralFat: data.visceralFat.present
+          ? data.visceralFat.value
+          : this.visceralFat,
       customValues: data.customValues.present
           ? data.customValues.value
           : this.customValues,
@@ -6681,12 +6800,15 @@ class BodyMeasurementTable extends DataClass
           ..write('forearmLeft: $forearmLeft, ')
           ..write('forearmRight: $forearmRight, ')
           ..write('waist: $waist, ')
+          ..write('waistNaval: $waistNaval, ')
           ..write('hips: $hips, ')
           ..write('thighLeft: $thighLeft, ')
           ..write('thighRight: $thighRight, ')
           ..write('calfLeft: $calfLeft, ')
           ..write('calfRight: $calfRight, ')
           ..write('height: $height, ')
+          ..write('subcutaneousFat: $subcutaneousFat, ')
+          ..write('visceralFat: $visceralFat, ')
           ..write('customValues: $customValues, ')
           ..write('notes: $notes')
           ..write(')'))
@@ -6694,7 +6816,7 @@ class BodyMeasurementTable extends DataClass
   }
 
   @override
-  int get hashCode => Object.hash(
+  int get hashCode => Object.hashAll([
     id,
     date,
     weight,
@@ -6707,15 +6829,18 @@ class BodyMeasurementTable extends DataClass
     forearmLeft,
     forearmRight,
     waist,
+    waistNaval,
     hips,
     thighLeft,
     thighRight,
     calfLeft,
     calfRight,
     height,
+    subcutaneousFat,
+    visceralFat,
     customValues,
     notes,
-  );
+  ]);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -6732,12 +6857,15 @@ class BodyMeasurementTable extends DataClass
           other.forearmLeft == this.forearmLeft &&
           other.forearmRight == this.forearmRight &&
           other.waist == this.waist &&
+          other.waistNaval == this.waistNaval &&
           other.hips == this.hips &&
           other.thighLeft == this.thighLeft &&
           other.thighRight == this.thighRight &&
           other.calfLeft == this.calfLeft &&
           other.calfRight == this.calfRight &&
           other.height == this.height &&
+          other.subcutaneousFat == this.subcutaneousFat &&
+          other.visceralFat == this.visceralFat &&
           other.customValues == this.customValues &&
           other.notes == this.notes);
 }
@@ -6755,12 +6883,15 @@ class BodyMeasurementsCompanion extends UpdateCompanion<BodyMeasurementTable> {
   final Value<double?> forearmLeft;
   final Value<double?> forearmRight;
   final Value<double?> waist;
+  final Value<double?> waistNaval;
   final Value<double?> hips;
   final Value<double?> thighLeft;
   final Value<double?> thighRight;
   final Value<double?> calfLeft;
   final Value<double?> calfRight;
   final Value<double?> height;
+  final Value<double?> subcutaneousFat;
+  final Value<double?> visceralFat;
   final Value<String?> customValues;
   final Value<String?> notes;
   const BodyMeasurementsCompanion({
@@ -6776,12 +6907,15 @@ class BodyMeasurementsCompanion extends UpdateCompanion<BodyMeasurementTable> {
     this.forearmLeft = const Value.absent(),
     this.forearmRight = const Value.absent(),
     this.waist = const Value.absent(),
+    this.waistNaval = const Value.absent(),
     this.hips = const Value.absent(),
     this.thighLeft = const Value.absent(),
     this.thighRight = const Value.absent(),
     this.calfLeft = const Value.absent(),
     this.calfRight = const Value.absent(),
     this.height = const Value.absent(),
+    this.subcutaneousFat = const Value.absent(),
+    this.visceralFat = const Value.absent(),
     this.customValues = const Value.absent(),
     this.notes = const Value.absent(),
   });
@@ -6798,12 +6932,15 @@ class BodyMeasurementsCompanion extends UpdateCompanion<BodyMeasurementTable> {
     this.forearmLeft = const Value.absent(),
     this.forearmRight = const Value.absent(),
     this.waist = const Value.absent(),
+    this.waistNaval = const Value.absent(),
     this.hips = const Value.absent(),
     this.thighLeft = const Value.absent(),
     this.thighRight = const Value.absent(),
     this.calfLeft = const Value.absent(),
     this.calfRight = const Value.absent(),
     this.height = const Value.absent(),
+    this.subcutaneousFat = const Value.absent(),
+    this.visceralFat = const Value.absent(),
     this.customValues = const Value.absent(),
     this.notes = const Value.absent(),
   }) : date = Value(date);
@@ -6820,12 +6957,15 @@ class BodyMeasurementsCompanion extends UpdateCompanion<BodyMeasurementTable> {
     Expression<double>? forearmLeft,
     Expression<double>? forearmRight,
     Expression<double>? waist,
+    Expression<double>? waistNaval,
     Expression<double>? hips,
     Expression<double>? thighLeft,
     Expression<double>? thighRight,
     Expression<double>? calfLeft,
     Expression<double>? calfRight,
     Expression<double>? height,
+    Expression<double>? subcutaneousFat,
+    Expression<double>? visceralFat,
     Expression<String>? customValues,
     Expression<String>? notes,
   }) {
@@ -6842,12 +6982,15 @@ class BodyMeasurementsCompanion extends UpdateCompanion<BodyMeasurementTable> {
       if (forearmLeft != null) 'forearm_left': forearmLeft,
       if (forearmRight != null) 'forearm_right': forearmRight,
       if (waist != null) 'waist': waist,
+      if (waistNaval != null) 'waist_naval': waistNaval,
       if (hips != null) 'hips': hips,
       if (thighLeft != null) 'thigh_left': thighLeft,
       if (thighRight != null) 'thigh_right': thighRight,
       if (calfLeft != null) 'calf_left': calfLeft,
       if (calfRight != null) 'calf_right': calfRight,
       if (height != null) 'height': height,
+      if (subcutaneousFat != null) 'subcutaneous_fat': subcutaneousFat,
+      if (visceralFat != null) 'visceral_fat': visceralFat,
       if (customValues != null) 'custom_values': customValues,
       if (notes != null) 'notes': notes,
     });
@@ -6866,12 +7009,15 @@ class BodyMeasurementsCompanion extends UpdateCompanion<BodyMeasurementTable> {
     Value<double?>? forearmLeft,
     Value<double?>? forearmRight,
     Value<double?>? waist,
+    Value<double?>? waistNaval,
     Value<double?>? hips,
     Value<double?>? thighLeft,
     Value<double?>? thighRight,
     Value<double?>? calfLeft,
     Value<double?>? calfRight,
     Value<double?>? height,
+    Value<double?>? subcutaneousFat,
+    Value<double?>? visceralFat,
     Value<String?>? customValues,
     Value<String?>? notes,
   }) {
@@ -6888,12 +7034,15 @@ class BodyMeasurementsCompanion extends UpdateCompanion<BodyMeasurementTable> {
       forearmLeft: forearmLeft ?? this.forearmLeft,
       forearmRight: forearmRight ?? this.forearmRight,
       waist: waist ?? this.waist,
+      waistNaval: waistNaval ?? this.waistNaval,
       hips: hips ?? this.hips,
       thighLeft: thighLeft ?? this.thighLeft,
       thighRight: thighRight ?? this.thighRight,
       calfLeft: calfLeft ?? this.calfLeft,
       calfRight: calfRight ?? this.calfRight,
       height: height ?? this.height,
+      subcutaneousFat: subcutaneousFat ?? this.subcutaneousFat,
+      visceralFat: visceralFat ?? this.visceralFat,
       customValues: customValues ?? this.customValues,
       notes: notes ?? this.notes,
     );
@@ -6938,6 +7087,9 @@ class BodyMeasurementsCompanion extends UpdateCompanion<BodyMeasurementTable> {
     if (waist.present) {
       map['waist'] = Variable<double>(waist.value);
     }
+    if (waistNaval.present) {
+      map['waist_naval'] = Variable<double>(waistNaval.value);
+    }
     if (hips.present) {
       map['hips'] = Variable<double>(hips.value);
     }
@@ -6955,6 +7107,12 @@ class BodyMeasurementsCompanion extends UpdateCompanion<BodyMeasurementTable> {
     }
     if (height.present) {
       map['height'] = Variable<double>(height.value);
+    }
+    if (subcutaneousFat.present) {
+      map['subcutaneous_fat'] = Variable<double>(subcutaneousFat.value);
+    }
+    if (visceralFat.present) {
+      map['visceral_fat'] = Variable<double>(visceralFat.value);
     }
     if (customValues.present) {
       map['custom_values'] = Variable<String>(customValues.value);
@@ -6980,12 +7138,15 @@ class BodyMeasurementsCompanion extends UpdateCompanion<BodyMeasurementTable> {
           ..write('forearmLeft: $forearmLeft, ')
           ..write('forearmRight: $forearmRight, ')
           ..write('waist: $waist, ')
+          ..write('waistNaval: $waistNaval, ')
           ..write('hips: $hips, ')
           ..write('thighLeft: $thighLeft, ')
           ..write('thighRight: $thighRight, ')
           ..write('calfLeft: $calfLeft, ')
           ..write('calfRight: $calfRight, ')
           ..write('height: $height, ')
+          ..write('subcutaneousFat: $subcutaneousFat, ')
+          ..write('visceralFat: $visceralFat, ')
           ..write('customValues: $customValues, ')
           ..write('notes: $notes')
           ..write(')'))
@@ -18761,12 +18922,15 @@ typedef $$BodyMeasurementsTableCreateCompanionBuilder =
       Value<double?> forearmLeft,
       Value<double?> forearmRight,
       Value<double?> waist,
+      Value<double?> waistNaval,
       Value<double?> hips,
       Value<double?> thighLeft,
       Value<double?> thighRight,
       Value<double?> calfLeft,
       Value<double?> calfRight,
       Value<double?> height,
+      Value<double?> subcutaneousFat,
+      Value<double?> visceralFat,
       Value<String?> customValues,
       Value<String?> notes,
     });
@@ -18784,12 +18948,15 @@ typedef $$BodyMeasurementsTableUpdateCompanionBuilder =
       Value<double?> forearmLeft,
       Value<double?> forearmRight,
       Value<double?> waist,
+      Value<double?> waistNaval,
       Value<double?> hips,
       Value<double?> thighLeft,
       Value<double?> thighRight,
       Value<double?> calfLeft,
       Value<double?> calfRight,
       Value<double?> height,
+      Value<double?> subcutaneousFat,
+      Value<double?> visceralFat,
       Value<String?> customValues,
       Value<String?> notes,
     });
@@ -18898,6 +19065,11 @@ class $$BodyMeasurementsTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<double> get waistNaval => $composableBuilder(
+    column: $table.waistNaval,
+    builder: (column) => ColumnFilters(column),
+  );
+
   ColumnFilters<double> get hips => $composableBuilder(
     column: $table.hips,
     builder: (column) => ColumnFilters(column),
@@ -18925,6 +19097,16 @@ class $$BodyMeasurementsTableFilterComposer
 
   ColumnFilters<double> get height => $composableBuilder(
     column: $table.height,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get subcutaneousFat => $composableBuilder(
+    column: $table.subcutaneousFat,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get visceralFat => $composableBuilder(
+    column: $table.visceralFat,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -19033,6 +19215,11 @@ class $$BodyMeasurementsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<double> get waistNaval => $composableBuilder(
+    column: $table.waistNaval,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<double> get hips => $composableBuilder(
     column: $table.hips,
     builder: (column) => ColumnOrderings(column),
@@ -19060,6 +19247,16 @@ class $$BodyMeasurementsTableOrderingComposer
 
   ColumnOrderings<double> get height => $composableBuilder(
     column: $table.height,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get subcutaneousFat => $composableBuilder(
+    column: $table.subcutaneousFat,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get visceralFat => $composableBuilder(
+    column: $table.visceralFat,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -19123,6 +19320,11 @@ class $$BodyMeasurementsTableAnnotationComposer
   GeneratedColumn<double> get waist =>
       $composableBuilder(column: $table.waist, builder: (column) => column);
 
+  GeneratedColumn<double> get waistNaval => $composableBuilder(
+    column: $table.waistNaval,
+    builder: (column) => column,
+  );
+
   GeneratedColumn<double> get hips =>
       $composableBuilder(column: $table.hips, builder: (column) => column);
 
@@ -19142,6 +19344,16 @@ class $$BodyMeasurementsTableAnnotationComposer
 
   GeneratedColumn<double> get height =>
       $composableBuilder(column: $table.height, builder: (column) => column);
+
+  GeneratedColumn<double> get subcutaneousFat => $composableBuilder(
+    column: $table.subcutaneousFat,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<double> get visceralFat => $composableBuilder(
+    column: $table.visceralFat,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<String> get customValues => $composableBuilder(
     column: $table.customValues,
@@ -19219,12 +19431,15 @@ class $$BodyMeasurementsTableTableManager
                 Value<double?> forearmLeft = const Value.absent(),
                 Value<double?> forearmRight = const Value.absent(),
                 Value<double?> waist = const Value.absent(),
+                Value<double?> waistNaval = const Value.absent(),
                 Value<double?> hips = const Value.absent(),
                 Value<double?> thighLeft = const Value.absent(),
                 Value<double?> thighRight = const Value.absent(),
                 Value<double?> calfLeft = const Value.absent(),
                 Value<double?> calfRight = const Value.absent(),
                 Value<double?> height = const Value.absent(),
+                Value<double?> subcutaneousFat = const Value.absent(),
+                Value<double?> visceralFat = const Value.absent(),
                 Value<String?> customValues = const Value.absent(),
                 Value<String?> notes = const Value.absent(),
               }) => BodyMeasurementsCompanion(
@@ -19240,12 +19455,15 @@ class $$BodyMeasurementsTableTableManager
                 forearmLeft: forearmLeft,
                 forearmRight: forearmRight,
                 waist: waist,
+                waistNaval: waistNaval,
                 hips: hips,
                 thighLeft: thighLeft,
                 thighRight: thighRight,
                 calfLeft: calfLeft,
                 calfRight: calfRight,
                 height: height,
+                subcutaneousFat: subcutaneousFat,
+                visceralFat: visceralFat,
                 customValues: customValues,
                 notes: notes,
               ),
@@ -19263,12 +19481,15 @@ class $$BodyMeasurementsTableTableManager
                 Value<double?> forearmLeft = const Value.absent(),
                 Value<double?> forearmRight = const Value.absent(),
                 Value<double?> waist = const Value.absent(),
+                Value<double?> waistNaval = const Value.absent(),
                 Value<double?> hips = const Value.absent(),
                 Value<double?> thighLeft = const Value.absent(),
                 Value<double?> thighRight = const Value.absent(),
                 Value<double?> calfLeft = const Value.absent(),
                 Value<double?> calfRight = const Value.absent(),
                 Value<double?> height = const Value.absent(),
+                Value<double?> subcutaneousFat = const Value.absent(),
+                Value<double?> visceralFat = const Value.absent(),
                 Value<String?> customValues = const Value.absent(),
                 Value<String?> notes = const Value.absent(),
               }) => BodyMeasurementsCompanion.insert(
@@ -19284,12 +19505,15 @@ class $$BodyMeasurementsTableTableManager
                 forearmLeft: forearmLeft,
                 forearmRight: forearmRight,
                 waist: waist,
+                waistNaval: waistNaval,
                 hips: hips,
                 thighLeft: thighLeft,
                 thighRight: thighRight,
                 calfLeft: calfLeft,
                 calfRight: calfRight,
                 height: height,
+                subcutaneousFat: subcutaneousFat,
+                visceralFat: visceralFat,
                 customValues: customValues,
                 notes: notes,
               ),

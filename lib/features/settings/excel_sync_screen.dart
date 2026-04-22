@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ai_gym_mentor/services/export_service.dart';
 import 'package:ai_gym_mentor/services/import_service.dart';
+import 'package:ai_gym_mentor/features/settings/import_mapping_screen.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -38,30 +39,30 @@ class _ExcelSyncScreenState extends ConsumerState<ExcelSyncScreen> {
   Future<void> _handleImport() async {
     setState(() => _isProcessing = true);
     try {
-      final results = await ref.read(importServiceProvider).importFromXlsx();
+      final schema = await ref.read(importServiceProvider).getExcelSchema();
       if (mounted) {
-        if (results.isEmpty) {
+        setState(() => _isProcessing = false);
+        if (schema == null) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Import cancelled or failed.')),
           );
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                'Imported ${results['workouts']} workouts and ${results['measurements']} measurements!',
-              ),
+          // Navigate to mapping screen
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ImportMappingScreen(schema: schema),
             ),
           );
         }
       }
     } catch (e) {
       if (mounted) {
+        setState(() => _isProcessing = false);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Import failed: $e')),
         );
       }
-    } finally {
-      if (mounted) setState(() => _isProcessing = false);
     }
   }
 

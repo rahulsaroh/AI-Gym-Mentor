@@ -389,18 +389,20 @@ double? extractMetricValue(ent.BodyMeasurement m, String metric) {
       return m.chest;
     case 'shoulders':
       return m.shoulders;
-    case 'armLeft':
-    case 'leftArm':
-      return m.armLeft;
     case 'armRight':
     case 'rightArm':
       return m.armRight;
+    case 'armLeft':
+    case 'leftArm':
+      return m.armLeft;
     case 'forearmLeft':
       return m.forearmLeft;
     case 'forearmRight':
       return m.forearmRight;
     case 'waist':
       return m.waist;
+    case 'waistNaval':
+      return m.waistNaval;
     case 'hips':
       return m.hips;
     case 'thighLeft':
@@ -416,6 +418,10 @@ double? extractMetricValue(ent.BodyMeasurement m, String metric) {
       return m.calfRight;
     case 'height':
       return m.height;
+    case 'subcutaneousFat':
+      return m.subcutaneousFat;
+    case 'visceralFat':
+      return m.visceralFat;
   }
 
   // Custom values
@@ -440,16 +446,18 @@ String getMetricLabel(String metric) {
       return 'Shoulders';
     case 'armLeft':
     case 'leftArm':
-      return 'L-Arm';
+      return 'Left Bicep';
     case 'armRight':
     case 'rightArm':
-      return 'R-Arm';
+      return 'Right Bicep';
     case 'forearmLeft':
       return 'L-Forearm';
     case 'forearmRight':
       return 'R-Forearm';
     case 'waist':
       return 'Waist';
+    case 'waistNaval':
+      return 'Naval Waist';
     case 'hips':
       return 'Hips';
     case 'thighLeft':
@@ -465,6 +473,10 @@ String getMetricLabel(String metric) {
       return 'R-Calf';
     case 'height':
       return 'Height';
+    case 'subcutaneousFat':
+      return 'Subcutaneous Fat';
+    case 'visceralFat':
+      return 'Visceral Fat';
     default:
       return metric;
   }
@@ -514,6 +526,14 @@ final List<MetricConfig> standardMetrics = [
     lowerIsBetter: true,
   ),
   const MetricConfig(
+    id: 'waistNaval',
+    label: 'Naval Waist',
+    icon: LucideIcons.ruler,
+    unit: 'cm',
+    assetPath: 'assets/images/measurements/waist.png',
+    lowerIsBetter: true,
+  ),
+  const MetricConfig(
     id: 'chest',
     label: 'Chest',
     icon: LucideIcons.ruler,
@@ -544,14 +564,14 @@ final List<MetricConfig> standardMetrics = [
   ),
   const MetricConfig(
     id: 'armLeft',
-    label: 'L-Arm',
+    label: 'Left Bicep',
     icon: LucideIcons.armchair,
     unit: 'cm',
     assetPath: 'assets/images/measurements/arms.png',
   ),
   const MetricConfig(
     id: 'armRight',
-    label: 'R-Arm',
+    label: 'Right Bicep',
     icon: LucideIcons.armchair,
     unit: 'cm',
     assetPath: 'assets/images/measurements/arms.png',
@@ -604,5 +624,19 @@ final List<MetricConfig> standardMetrics = [
     icon: LucideIcons.ruler,
     unit: 'cm',
     assetPath: 'assets/images/measurements/height.png',
+  ),
+  const MetricConfig(
+    id: 'subcutaneousFat',
+    label: 'Subcutaneous Fat',
+    icon: LucideIcons.percent,
+    unit: '%',
+    lowerIsBetter: true,
+  ),
+  const MetricConfig(
+    id: 'visceralFat',
+    label: 'Visceral Fat',
+    icon: LucideIcons.percent,
+    unit: '',
+    lowerIsBetter: true,
   ),
 ];

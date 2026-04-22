@@ -564,7 +564,7 @@ final class BodyMeasurementsListProvider
 }
 
 String _$bodyMeasurementsListHash() =>
-    r'c28d4395516e2b2ed3b78ea519f6a4111338bb55';
+    r'345767473605a090769e875cf433d2cc947448a0';
 
 abstract class _$BodyMeasurementsList
     extends $AsyncNotifier<List<ent.BodyMeasurement>> {
@@ -617,7 +617,7 @@ final class BodyTargetsListProvider
   BodyTargetsList create() => BodyTargetsList();
 }
 
-String _$bodyTargetsListHash() => r'51c692e8e60f16383576dd395f7b906b71ed8de6';
+String _$bodyTargetsListHash() => r'da7fb90127a5f714ff54e146de108a600d577fcf';
 
 abstract class _$BodyTargetsList
     extends $AsyncNotifier<List<target.BodyTarget>> {
@@ -783,4 +783,4 @@ final class PhysiqueAchievementProvider
 }
 
 String _$physiqueAchievementHash() =>
-    r'65866425b448c61d32a3efe53cf5d40058907c2f';
+    r'48763992d694895132dbfef2b85e26abc7bb67e0';

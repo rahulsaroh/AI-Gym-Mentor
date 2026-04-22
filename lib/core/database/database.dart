@@ -135,12 +135,15 @@ class BodyMeasurements extends Table {
   RealColumn get forearmLeft => real().nullable()();
   RealColumn get forearmRight => real().nullable()();
   RealColumn get waist => real().nullable()();
+  RealColumn get waistNaval => real().nullable()();
   RealColumn get hips => real().nullable()();
   RealColumn get thighLeft => real().nullable()();
   RealColumn get thighRight => real().nullable()();
   RealColumn get calfLeft => real().nullable()();
   RealColumn get calfRight => real().nullable()();
   RealColumn get height => real().nullable()();
+  RealColumn get subcutaneousFat => real().nullable()();
+  RealColumn get visceralFat => real().nullable()();
   TextColumn get customValues => text().nullable()(); // JSON Map<String, double>
   TextColumn get notes => text().nullable()();
 }
@@ -344,7 +347,7 @@ class AppDatabase extends _$AppDatabase {
   }
 
   @override
-  int get schemaVersion => 26;
+  int get schemaVersion => 27;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -555,6 +558,17 @@ class AppDatabase extends _$AppDatabase {
             }
             if (!await hasColumn('body_measurements', 'custom_values')) {
               await m.addColumn(bodyMeasurements, bodyMeasurements.customValues);
+            }
+          }
+          if (from < 27) {
+            if (!await hasColumn('body_measurements', 'waist_naval')) {
+              await m.addColumn(bodyMeasurements, bodyMeasurements.waistNaval);
+            }
+            if (!await hasColumn('body_measurements', 'subcutaneous_fat')) {
+              await m.addColumn(bodyMeasurements, bodyMeasurements.subcutaneousFat);
+            }
+            if (!await hasColumn('body_measurements', 'visceral_fat')) {
+              await m.addColumn(bodyMeasurements, bodyMeasurements.visceralFat);
             }
           }
         },

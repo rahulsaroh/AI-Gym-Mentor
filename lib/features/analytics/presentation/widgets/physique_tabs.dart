@@ -25,14 +25,22 @@ class _PhysiqueHistoryTabState extends State<PhysiqueHistoryTab> {
     'overall': (label: 'Overall', icon: LucideIcons.award, color: Colors.amber),
     'weight': (label: 'Weight', icon: LucideIcons.scale, color: Colors.blue),
     'bodyFat': (label: 'Body Fat', icon: LucideIcons.percent, color: Colors.orange),
+    'subcutaneousFat': (label: 'Sub Fat', icon: LucideIcons.percent, color: Colors.orangeAccent),
+    'visceralFat': (label: 'Visc Fat', icon: LucideIcons.percent, color: Colors.deepOrange),
+    'neck': (label: 'Neck', icon: LucideIcons.ruler, color: Colors.blueGrey),
     'chest': (label: 'Chest', icon: LucideIcons.ruler, color: Colors.teal),
+    'shoulders': (label: 'Shoulders', icon: LucideIcons.ruler, color: Colors.cyan),
+    'armLeft': (label: 'Left Bicep', icon: LucideIcons.armchair, color: Colors.indigo),
+    'armRight': (label: 'Right Bicep', icon: LucideIcons.armchair, color: Colors.indigo),
+    'forearmLeft': (label: 'L-Forearm', icon: LucideIcons.ruler, color: Colors.lightBlue),
+    'forearmRight': (label: 'R-Forearm', icon: LucideIcons.ruler, color: Colors.lightBlue),
     'waist': (label: 'Waist', icon: LucideIcons.ruler, color: Colors.red),
+    'waistNaval': (label: 'Naval Waist', icon: LucideIcons.ruler, color: Colors.redAccent),
     'hips': (label: 'Hips', icon: LucideIcons.ruler, color: Colors.purple),
-    'armLeft': (label: 'L-Arm', icon: LucideIcons.armchair, color: Colors.indigo),
-    'armRight': (label: 'R-Arm', icon: LucideIcons.armchair, color: Colors.indigo),
     'thighLeft': (label: 'L-Thigh', icon: LucideIcons.footprints, color: Colors.green),
     'thighRight': (label: 'R-Thigh', icon: LucideIcons.footprints, color: Colors.green),
     'calfLeft': (label: 'L-Calf', icon: LucideIcons.footprints, color: Colors.brown),
+    'calfRight': (label: 'R-Calf', icon: LucideIcons.footprints, color: Colors.brown),
   };
 
   @override
@@ -61,9 +69,8 @@ class _PhysiqueHistoryTabState extends State<PhysiqueHistoryTab> {
                 child: _MetricSelector(
                   selected: _selectedMetric,
                   metrics: {
-                    'overall': _metrics['overall']!,
-                    'weight': _metrics['weight']!,
-                    'bodyFat': _metrics['bodyFat']!,
+                    for (var key in _metrics.keys)
+                      key: _metrics[key]!,
                   },
                   onChanged: (v) => setState(() => _selectedMetric = v),
                 ),

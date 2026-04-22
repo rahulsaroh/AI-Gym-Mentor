@@ -258,7 +258,7 @@ class ExportService {
     );
 
     final rawHeaders = [
-      'Date', 'Day', 'Workout Name', 'Exercise', 'Set#', 'Set Type',
+      'Date', 'Day', 'Workout Name', 'Exercise', 'Exercise ID', 'Set#', 'Set Type',
       'Weight(kg)', 'Reps', 'RPE', 'Volume(kg)', 'Is PR', 'Notes'
     ];
 
@@ -287,6 +287,7 @@ class ExportService {
           TextCellValue(dayName),
           TextCellValue(w.name),
           TextCellValue(ex?.name ?? 'Unknown'),
+          IntCellValue(s.exerciseId),
           IntCellValue(s.setNumber),
           TextCellValue(s.setType.name),
           DoubleCellValue(s.weight),
@@ -475,8 +476,9 @@ class ExportService {
     );
 
     final measureHeaders = [
-      'Date', 'Weight (kg)', 'Δ Weight', 'Body Fat (%)', 'Chest', 'Shoulders', 
-      'Waist', 'Hips', 'Left Arm', 'Right Arm', 'Left Thigh', 'Right Thigh', 
+      'Date', 'Weight (kg)', 'Δ Weight', 'Body Fat (%)', 'Subcutaneous Fat (%)', 'Visceral Fat', 
+      'Neck', 'Chest', 'Shoulders', 'Left Bicep', 'Right Bicep', 'Left Forearm', 'Right Forearm',
+      'Waist', 'Naval Waist', 'Hips', 'Left Thigh', 'Right Thigh', 
       'Left Calf', 'Right Calf', 'Notes'
     ];
     for (var i = 0; i < measureHeaders.length; i++) {
@@ -497,12 +499,18 @@ class ExportService {
         m.weight != null ? DoubleCellValue(m.weight!) : null,
         TextCellValue(deltaStr),
         m.bodyFat != null ? DoubleCellValue(m.bodyFat!) : null,
+        m.subcutaneousFat != null ? DoubleCellValue(m.subcutaneousFat!) : null,
+        m.visceralFat != null ? DoubleCellValue(m.visceralFat!) : null,
+        m.neck != null ? DoubleCellValue(m.neck!) : null,
         m.chest != null ? DoubleCellValue(m.chest!) : null,
         m.shoulders != null ? DoubleCellValue(m.shoulders!) : null,
-        m.waist != null ? DoubleCellValue(m.waist!) : null,
-        m.hips != null ? DoubleCellValue(m.hips!) : null,
         m.armLeft != null ? DoubleCellValue(m.armLeft!) : null,
         m.armRight != null ? DoubleCellValue(m.armRight!) : null,
+        m.forearmLeft != null ? DoubleCellValue(m.forearmLeft!) : null,
+        m.forearmRight != null ? DoubleCellValue(m.forearmRight!) : null,
+        m.waist != null ? DoubleCellValue(m.waist!) : null,
+        m.waistNaval != null ? DoubleCellValue(m.waistNaval!) : null,
+        m.hips != null ? DoubleCellValue(m.hips!) : null,
         m.thighLeft != null ? DoubleCellValue(m.thighLeft!) : null,
         m.thighRight != null ? DoubleCellValue(m.thighRight!) : null,
         m.calfLeft != null ? DoubleCellValue(m.calfLeft!) : null,
