@@ -1469,7 +1469,7 @@
       "name": "ai_gym_mentor",
       "rootUri": "../",
       "packageUri": "lib/",
-      "languageVersion": "3.8"
+      "languageVersion": "3.10"
     }
   ],
   "generator": "pub",
