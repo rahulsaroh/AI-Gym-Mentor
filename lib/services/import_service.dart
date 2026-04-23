@@ -226,76 +226,81 @@ class ImportService {
     final measurementSheet = excel.tables[measurementSheetName];
     
     if (measurementSheet != null && measurementSheet.maxRows > 1) {
-      final measMapping = mapping?.bodyMeasurementsMapping?.fieldToColumnIndex;
+      // ── Build a header→columnIndex map from the actual first row ──────────
+      // Normalise: strip units like "(kg)", "(%)", "Δ ", leading/trailing spaces,
+      // and lowercase for fuzzy matching.
+      String _norm(String s) => s
+          .replaceAll(RegExp(r'\([^)]*\)'), '') // strip (…)
+          .replaceAll('Δ', '')
+          .trim()
+          .toLowerCase();
+
+      final headerRow = measurementSheet.row(0);
+      final Map<String, int> hIdx = {};
+      for (var ci = 0; ci < headerRow.length; ci++) {
+        final raw = headerRow[ci]?.value?.toString() ?? '';
+        if (raw.isEmpty) continue;
+        hIdx[_norm(raw)] = ci;
+      }
+
+      // Helper: get a double value by normalised header name
+      double? col(List<Data?> row, String header) {
+        final idx = hIdx[header.toLowerCase()];
+        if (idx == null || idx >= row.length) return null;
+        return double.tryParse(row[idx]?.value?.toString() ?? '');
+      }
+      String? colStr(List<Data?> row, String header) {
+        final idx = hIdx[header.toLowerCase()];
+        if (idx == null || idx >= row.length) return null;
+        final v = row[idx]?.value?.toString();
+        return (v == null || v.isEmpty) ? null : v;
+      }
 
       for (var i = 1; i < measurementSheet.maxRows; i++) {
         final row = measurementSheet.row(i);
         if (row.isEmpty) continue;
 
         try {
-          final dateIdx = measMapping?['Date'] ?? 0;
-          final dateStr = row[dateIdx]?.value?.toString() ?? '';
+          // Date — always column 0 (or mapped)
+          final dateColIdx = hIdx['date'] ?? (mapping?.bodyMeasurementsMapping?.getIndex('Date') ?? 0);
+          final dateStr = row.length > dateColIdx ? row[dateColIdx]?.value?.toString() ?? '' : '';
           final date = _parseDate(dateStr);
           if (date == null) continue;
-          
-          final weight = double.tryParse(row.length > (measMapping?['Weight'] ?? 1) ? row[measMapping?['Weight'] ?? 1]?.value?.toString() ?? '' : '');
-          final bodyFat = double.tryParse(row.length > (measMapping?['Body Fat'] ?? 3) ? row[measMapping?['Body Fat'] ?? 3]?.value?.toString() ?? '' : '');
-          final subFat = double.tryParse(row.length > (measMapping?['Subcutaneous Fat'] ?? -1) ? row[measMapping?['Subcutaneous Fat'] ?? -1]?.value?.toString() ?? '' : '');
-          final visFat = double.tryParse(row.length > (measMapping?['Visceral Fat'] ?? -1) ? row[measMapping?['Visceral Fat'] ?? -1]?.value?.toString() ?? '' : '');
-          final neck = double.tryParse(row.length > (measMapping?['Neck'] ?? -1) ? row[measMapping?['Neck'] ?? -1]?.value?.toString() ?? '' : '');
-          final chest = double.tryParse(row.length > (measMapping?['Chest'] ?? 4) ? row[measMapping?['Chest'] ?? 4]?.value?.toString() ?? '' : '');
-          final shoulders = double.tryParse(row.length > (measMapping?['Shoulders'] ?? 5) ? row[measMapping?['Shoulders'] ?? 5]?.value?.toString() ?? '' : '');
-          final waist = double.tryParse(row.length > (measMapping?['Waist'] ?? 6) ? row[measMapping?['Waist'] ?? 6]?.value?.toString() ?? '' : '');
-          final waistNaval = double.tryParse(row.length > (measMapping?['Naval Waist'] ?? -1) ? row[measMapping?['Naval Waist'] ?? -1]?.value?.toString() ?? '' : '');
-          final hips = double.tryParse(row.length > (measMapping?['Hips'] ?? 7) ? row[measMapping?['Hips'] ?? 7]?.value?.toString() ?? '' : '');
-          final armL = double.tryParse(row.length > (measMapping?['Left Bicep'] ?? 8) ? row[measMapping?['Left Bicep'] ?? 8]?.value?.toString() ?? '' : '');
-          final armR = double.tryParse(row.length > (measMapping?['Right Bicep'] ?? 9) ? row[measMapping?['Right Bicep'] ?? 9]?.value?.toString() ?? '' : '');
-          final forearmL = double.tryParse(row.length > (measMapping?['Left Forearm'] ?? -1) ? row[measMapping?['Left Forearm'] ?? -1]?.value?.toString() ?? '' : '');
-          final forearmR = double.tryParse(row.length > (measMapping?['Right Forearm'] ?? -1) ? row[measMapping?['Right Forearm'] ?? -1]?.value?.toString() ?? '' : '');
-          final thighL = double.tryParse(row.length > (measMapping?['Left Thigh'] ?? 10) ? row[measMapping?['Left Thigh'] ?? 10]?.value?.toString() ?? '' : '');
-          final thighR = double.tryParse(row.length > (measMapping?['Right Thigh'] ?? 11) ? row[measMapping?['Right Thigh'] ?? 11]?.value?.toString() ?? '' : '');
-          final calfL = double.tryParse(row.length > (measMapping?['Left Calf'] ?? 12) ? row[measMapping?['Left Calf'] ?? 12]?.value?.toString() ?? '' : '');
-          final calfR = double.tryParse(row.length > (measMapping?['Right Calf'] ?? 13) ? row[measMapping?['Right Calf'] ?? 13]?.value?.toString() ?? '' : '');
-          final notes = row.length > (measMapping?['Notes'] ?? 14) ? row[measMapping?['Notes'] ?? 14]?.value?.toString() : null;
 
           final companion = BodyMeasurementsCompanion.insert(
             date: date,
-            weight: Value(weight),
-            bodyFat: Value(bodyFat),
-            subcutaneousFat: Value(subFat),
-            visceralFat: Value(visFat),
-            neck: Value(neck),
-            chest: Value(chest),
-            shoulders: Value(shoulders),
-            waist: Value(waist),
-            waistNaval: Value(waistNaval),
-            hips: Value(hips),
-            armLeft: Value(armL),
-            armRight: Value(armR),
-            forearmLeft: Value(forearmL),
-            forearmRight: Value(forearmR),
-            thighLeft: Value(thighL),
-            thighRight: Value(thighR),
-            calfLeft: Value(calfL),
-            calfRight: Value(calfR),
-            notes: Value(notes),
+            weight:          Value(col(row, 'weight')),
+            bodyFat:         Value(col(row, 'body fat')),
+            subcutaneousFat: Value(col(row, 'subcutaneous fat')),
+            visceralFat:     Value(col(row, 'visceral fat')),
+            neck:            Value(col(row, 'neck')),
+            chest:           Value(col(row, 'chest')),
+            shoulders:       Value(col(row, 'shoulders')),
+            waist:           Value(col(row, 'waist')),
+            waistNaval:      Value(col(row, 'naval waist')),
+            hips:            Value(col(row, 'hips')),
+            armLeft:         Value(col(row, 'left bicep')),
+            armRight:        Value(col(row, 'right bicep')),
+            forearmLeft:     Value(col(row, 'left forearm')),
+            forearmRight:    Value(col(row, 'right forearm')),
+            thighLeft:       Value(col(row, 'left thigh')),
+            thighRight:      Value(col(row, 'right thigh')),
+            calfLeft:        Value(col(row, 'left calf')),
+            calfRight:       Value(col(row, 'right calf')),
+            notes:           Value(colStr(row, 'notes')),
           );
 
-          print('Saving measurement for $date: $companion');
           final existing = await (db.select(db.bodyMeasurements)
                 ..where((t) => t.date.year.equals(date.year) & t.date.month.equals(date.month) & t.date.day.equals(date.day))
                 ..limit(1))
               .getSingleOrNull();
 
           if (existing == null) {
-            print('Inserting new record for $date');
             await db.into(db.bodyMeasurements).insert(companion);
-            importedMeasurements++;
           } else {
-            print('Updating existing record ID ${existing.id} for $date');
-             await (db.update(db.bodyMeasurements)..where((t) => t.id.equals(existing.id))).write(companion);
-             importedMeasurements++;
+            await (db.update(db.bodyMeasurements)..where((t) => t.id.equals(existing.id))).write(companion);
           }
+          importedMeasurements++;
         } catch (e) {
           print('Error parsing measurement row $i: $e');
         }

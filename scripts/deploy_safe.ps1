@@ -2,8 +2,8 @@
 # This script ensures that the database is backed up and the app is updated without data loss.
 
 $flutterPath = "C:\flutter\bin\flutter.bat"
-$adbPath = "C:\Users\rahul\AppData\Local\Android\Sdk\platform-tools\adb.exe"
-$javaPath = "D:\Apps\jdk17\jdk-17.0.2"
+$adbPath = "C:\Users\Neha\AppData\Local\Android\Sdk\platform-tools\adb.exe"
+$javaPath = "C:\Program Files\Android\Android Studio\jbr"
 $packageName = "com.aigymmentor.app"
 $dbName = "gym_log.sqlite"
 
