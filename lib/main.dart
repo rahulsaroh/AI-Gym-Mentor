@@ -59,6 +59,7 @@ void main() async {
   }
 
   // 4. Exercise Database Seeding
+  /*
   try {
     if (kDebugMode) debugPrint('Step 4: Seeding Exercise Database...');
     await ExerciseDbSeeder.instance.seed();
@@ -70,6 +71,7 @@ void main() async {
   } catch (e) {
     debugPrint('Exercise Database Seeding Failed: $e');
   }
+  */
 
   // Temporary: Add sample physique data
   try {

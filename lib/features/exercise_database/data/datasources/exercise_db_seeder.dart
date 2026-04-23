@@ -48,49 +48,58 @@ class ExerciseDbSeeder {
       final Map<String, int> sourceIdToDbId = {};
 
       // Pass 1: Exercises (Upsert Logic)
-      for (final item in jsonList) {
-        final extId = item['id'].toString();
-        final rawPrimary = item['primaryMuscles'];
-        final List<dynamic> primaryMuscles = rawPrimary is List
-            ? rawPrimary
-            : (rawPrimary != null ? [rawPrimary] : []);
-        final primaryMuscle = primaryMuscles.isNotEmpty
-            ? primaryMuscles.first.toString()
-            : 'Other';
+      await database.batch((batch) {
+        for (final item in jsonList) {
+          final extId = item['id'].toString();
+          final rawPrimary = item['primaryMuscles'];
+          final List<dynamic> primaryMuscles = rawPrimary is List
+              ? rawPrimary
+              : (rawPrimary != null ? [rawPrimary] : []);
+          final primaryMuscle = primaryMuscles.isNotEmpty
+              ? primaryMuscles.first.toString()
+              : 'Other';
 
-        final companion = schema.ExercisesCompanion(
-          exerciseId: Value(extId),
-          name: Value(item['name'] ?? 'Unknown'),
-          category: Value(item['category'] ?? 'strength'),
-          difficulty: Value(item['difficulty'] ?? 'beginner'),
-          primaryMuscle: Value(primaryMuscle),
-          equipment: Value(item['equipment'] ?? 'None'),
-          setType: const Value('Straight'),
-          force: Value(item['force']),
-          mechanic: Value(item['mechanic']),
-          imageUrl: Value(item['imageUrl']),
-          gifUrl: Value(item['gifUrl']),
-          source: Value(item['source'] ?? 'local'),
-          nameHi: Value(item['nameHindi']),
-          nameMr: Value(item['nameMarathi']),
-          isEnriched: Value(item['safetyTips'] != null),
-        );
+          final companion = schema.ExercisesCompanion(
+            exerciseId: Value(extId),
+            name: Value(item['name'] ?? 'Unknown'),
+            category: Value(item['category'] ?? 'strength'),
+            difficulty: Value(item['difficulty'] ?? 'beginner'),
+            primaryMuscle: Value(primaryMuscle),
+            equipment: Value(item['equipment'] ?? 'None'),
+            setType: const Value('Straight'),
+            force: Value(item['force']),
+            mechanic: Value(item['mechanic']),
+            imageUrl: Value(item['imageUrl']),
+            gifUrl: Value(item['gifUrl']),
+            source: Value(item['source'] ?? 'local'),
+            nameHi: Value(item['nameHindi']),
+            nameMr: Value(item['nameMarathi']),
+            isEnriched: Value(item['safetyTips'] != null),
+          );
 
-        int dbId;
-        if (existingIdMap.containsKey(extId)) {
-          dbId = existingIdMap[extId]!;
-          await (database.update(database.exercises)
-                ..where((t) => t.id.equals(dbId)))
-              .write(companion);
-        } else if (existingIdMap.containsKey(item['name'])) {
-          dbId = existingIdMap[item['name']]!;
-          await (database.update(database.exercises)
-                ..where((t) => t.id.equals(dbId)))
-              .write(companion);
-        } else {
-          dbId = await database.into(database.exercises).insert(companion);
+          if (existingIdMap.containsKey(extId)) {
+            final dbId = existingIdMap[extId]!;
+            batch.update(database.exercises, companion, where: (t) => t.id.equals(dbId));
+            sourceIdToDbId[extId] = dbId;
+          } else if (existingIdMap.containsKey(item['name'])) {
+            final dbId = existingIdMap[item['name']]!;
+            batch.update(database.exercises, companion, where: (t) => t.id.equals(dbId));
+            sourceIdToDbId[extId] = dbId;
+          } else {
+            // Since batch.insert doesn't return the ID immediately, 
+            // we'll need to handle the mapping after Pass 1 or use a different approach.
+            // For now, let's just insert and we'll re-fetch IDs if needed for Pass 2.
+            batch.insert(database.exercises, companion);
+          }
         }
-        sourceIdToDbId[extId] = dbId;
+      });
+
+      // If we did insertions, we MUST re-populate sourceIdToDbId for Pass 2
+      final updatedRows = await database.select(database.exercises).get();
+      for (var row in updatedRows) {
+        if (row.exerciseId != null) {
+          sourceIdToDbId[row.exerciseId!] = row.id;
+        }
       }
 
       // Pass 2: Related Data

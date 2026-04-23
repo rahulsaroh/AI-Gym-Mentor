@@ -167,8 +167,18 @@ class MeasurementsRepository {
           metric: tb.metric,
           targetValue: tb.targetValue,
           deadline: Value(tb.deadline),
-          createdAt: DateTime.now(),
+          createdAt: tb.createdAt,
         ));
+  }
+
+  /// Delete all existing targets for a metric, then add the new one (upsert).
+  Future<void> upsertTarget(ent_t.BodyTarget tb) async {
+    await deleteTargetsForMetric(tb.metric);
+    await addTarget(tb);
+  }
+
+  Future<void> deleteTargetsForMetric(String metric) async {
+    await (db.delete(db.bodyTargets)..where((t) => t.metric.equals(metric))).go();
   }
 
   Future<void> deleteTarget(int id) async {

@@ -19,6 +19,8 @@ class ExportService {
   final Ref ref;
   ExportService(this.ref);
 
+  static String? testExportPath;
+
   Future<void> exportToCsv() async {
     final db = ref.read(appDatabaseProvider);
     final workouts = await db.select(db.workouts).get();

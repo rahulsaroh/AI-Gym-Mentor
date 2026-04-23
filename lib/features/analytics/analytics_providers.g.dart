@@ -8,6 +8,74 @@ part of 'analytics_providers.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
+/// Global date-range filter for the Measurements tab.
+/// When null: each target uses its own createdAt/deadline.
+/// When set: ALL cards compute progress within this window.
+
+@ProviderFor(MeasurementDateRange)
+final measurementDateRangeProvider = MeasurementDateRangeProvider._();
+
+/// Global date-range filter for the Measurements tab.
+/// When null: each target uses its own createdAt/deadline.
+/// When set: ALL cards compute progress within this window.
+final class MeasurementDateRangeProvider
+    extends $NotifierProvider<MeasurementDateRange, DateTimeRange<DateTime>?> {
+  /// Global date-range filter for the Measurements tab.
+  /// When null: each target uses its own createdAt/deadline.
+  /// When set: ALL cards compute progress within this window.
+  MeasurementDateRangeProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'measurementDateRangeProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$measurementDateRangeHash();
+
+  @$internal
+  @override
+  MeasurementDateRange create() => MeasurementDateRange();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(DateTimeRange<DateTime>? value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<DateTimeRange<DateTime>?>(value),
+    );
+  }
+}
+
+String _$measurementDateRangeHash() =>
+    r'2a8f1b32401acc356e36a4c6f43e72be45c4de51';
+
+/// Global date-range filter for the Measurements tab.
+/// When null: each target uses its own createdAt/deadline.
+/// When set: ALL cards compute progress within this window.
+
+abstract class _$MeasurementDateRange
+    extends $Notifier<DateTimeRange<DateTime>?> {
+  DateTimeRange<DateTime>? build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref =
+        this.ref as $Ref<DateTimeRange<DateTime>?, DateTimeRange<DateTime>?>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<DateTimeRange<DateTime>?, DateTimeRange<DateTime>?>,
+              DateTimeRange<DateTime>?,
+              Object?,
+              Object?
+            >;
+    element.handleCreate(ref, build);
+  }
+}
 
 @ProviderFor(dashboardStats)
 final dashboardStatsProvider = DashboardStatsProvider._();
@@ -783,4 +851,4 @@ final class PhysiqueAchievementProvider
 }
 
 String _$physiqueAchievementHash() =>
-    r'48763992d694895132dbfef2b85e26abc7bb67e0';
+    r'2879681a590bd8314cc46db3383207e5dd971a56';

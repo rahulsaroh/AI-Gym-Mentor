@@ -36,14 +36,23 @@ class ImportService {
   final Ref ref;
   ImportService(this.ref);
 
-  Future<ExcelSchema?> getExcelSchema() async {
-    final result = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: ['xlsx'],
-    );
-    if (result == null || result.files.single.path == null) return null;
+  static String? testImportPath;
 
-    final file = File(result.files.single.path!);
+  Future<ExcelSchema?> getExcelSchema() async {
+    String? path;
+    if (testImportPath != null) {
+      path = testImportPath;
+    } else {
+      final result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['xlsx'],
+      );
+      if (result == null || result.files.single.path == null) return null;
+      path = result.files.single.path!;
+    }
+    final pathChecked = testImportPath ?? path;
+    if (pathChecked == null) return null;
+    final file = File(pathChecked);
     final bytes = file.readAsBytesSync();
     final excel = Excel.decodeBytes(bytes);
     

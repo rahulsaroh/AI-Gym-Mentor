@@ -20,10 +20,9 @@ import 'package:ai_gym_mentor/features/analytics/components/volume_vs_weight_cha
 import 'package:ai_gym_mentor/features/analytics/presentation/strength_analytics_dashboard.dart';
 import 'package:ai_gym_mentor/features/analytics/presentation/strength_analytics_notifier.dart';
 import 'package:ai_gym_mentor/features/analytics/presentation/providers/year_in_review_providers.dart';
-import 'package:ai_gym_mentor/features/analytics/presentation/widgets/physique_tabs.dart';
+import 'package:ai_gym_mentor/features/analytics/presentation/widgets/measurements_tab.dart';
 
-import 'package:ai_gym_mentor/features/analytics/presentation/body_targets_log_screen.dart';
-import 'package:ai_gym_mentor/features/analytics/presentation/body_stats_log_screen.dart';
+import 'package:ai_gym_mentor/features/analytics/presentation/body_measurements_log_screen.dart';
 
 class AnalyticsDashboardScreen extends ConsumerWidget {
   const AnalyticsDashboardScreen({super.key});
@@ -36,43 +35,43 @@ class AnalyticsDashboardScreen extends ConsumerWidget {
     final alertsAsync = ref.watch(plateauAlertsProvider);
     final prsAsync = ref.watch(recentPRsProvider);
 
-    final measurementsAsync = ref.watch(bodyMeasurementsListProvider);
 
     return DefaultTabController(
-      length: 5,
+      length: 3,
       child: Scaffold(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         body: NestedScrollView(
           headerSliverBuilder: (context, innerBoxIsScrolled) {
             return [
-              SliverAppBar(
-                expandedHeight: 120, // Increased to accommodate toolbar (64) + TabBar (~48) + padding
-                pinned: true,
-                floating: true,
-                forceElevated: innerBoxIsScrolled,
-                backgroundColor: Theme.of(context).appBarTheme.backgroundColor ?? Theme.of(context).scaffoldBackgroundColor,
-                title: Text(
-                  'Stats Dashboard',
-                  style: GoogleFonts.outfit(fontWeight: FontWeight.bold),
-                ),
-                elevation: 0,
-                scrolledUnderElevation: 0,
-                centerTitle: false,
-                toolbarHeight: 64, // Added more breathing room
-                bottom: TabBar(
-                  isScrollable: true,
-                  tabAlignment: TabAlignment.start,
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  labelStyle: GoogleFonts.outfit(fontWeight: FontWeight.bold),
-                  unselectedLabelStyle: GoogleFonts.outfit(fontWeight: FontWeight.w500),
-                  indicatorColor: Theme.of(context).colorScheme.primary,
-                  tabs: const [
-                    Tab(text: 'Glance'),
-                    Tab(text: 'Strength'),
-                    Tab(text: 'Growth'),
-                    Tab(text: 'Current'),
-                    Tab(text: 'Target'),
-                  ],
+              SliverOverlapAbsorber(
+                handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
+                sliver: SliverAppBar(
+                  expandedHeight: 120, // Increased to accommodate toolbar (64) + TabBar (~48) + padding
+                  pinned: true,
+                  floating: true,
+                  forceElevated: innerBoxIsScrolled,
+                  backgroundColor: Theme.of(context).appBarTheme.backgroundColor ?? Theme.of(context).scaffoldBackgroundColor,
+                  title: Text(
+                    'Stats Dashboard',
+                    style: GoogleFonts.outfit(fontWeight: FontWeight.bold),
+                  ),
+                  elevation: 0,
+                  scrolledUnderElevation: 0,
+                  centerTitle: false,
+                  toolbarHeight: 64, // Added more breathing room
+                  bottom: TabBar(
+                    isScrollable: true,
+                    tabAlignment: TabAlignment.start,
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    labelStyle: GoogleFonts.outfit(fontWeight: FontWeight.bold),
+                    unselectedLabelStyle: GoogleFonts.outfit(fontWeight: FontWeight.w500),
+                    indicatorColor: Theme.of(context).colorScheme.primary,
+                    tabs: const [
+                      Tab(text: 'Glance'),
+                      Tab(text: 'Strength'),
+                      Tab(text: 'Measurements'),
+                    ],
+                  ),
                 ),
               ),
             ];
@@ -293,10 +292,8 @@ class AnalyticsDashboardScreen extends ConsumerWidget {
                 child: const StrengthAnalyticsDashboard(),
               ),
   
-              // Physique Tabs
-              PhysiqueHistoryTab(measurementsAsync: measurementsAsync),
-              PhysiqueStatsTab(measurementsAsync: measurementsAsync),
-              const PhysiqueTargetsTab(),
+              // Measurements Tab
+              const MeasurementsTab(),
             ],
           ),
         ),
@@ -306,25 +303,16 @@ class AnalyticsDashboardScreen extends ConsumerWidget {
               listenable: DefaultTabController.of(context),
               builder: (context, _) {
                 final index = DefaultTabController.of(context).index;
-                if (index < 2) return const SizedBox.shrink();
+                if (index != 2) return const SizedBox.shrink();
   
                 return FloatingActionButton.extended(
                   onPressed: () {
-                    if (index == 4) {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const BodyTargetsLogScreen(),
-                        ),
-                      );
-                    } else if (index >= 2) {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const BodyStatsLogScreen(),
-                        ),
-                      );
-                    }
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const BodyMeasurementsLogScreen(),
+                      ),
+                    );
                   },
                   icon: const Icon(LucideIcons.plus),
                   label: const Text('+ Log Entry', style: TextStyle(fontWeight: FontWeight.bold)),

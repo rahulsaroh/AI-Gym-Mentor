@@ -13,6 +13,18 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'analytics_providers.g.dart';
 
+/// Global date-range filter for the Measurements tab.
+/// When null: each target uses its own createdAt/deadline.
+/// When set: ALL cards compute progress within this window.
+@riverpod
+class MeasurementDateRange extends _$MeasurementDateRange {
+  @override
+  DateTimeRange? build() => null;
+
+  void set(DateTimeRange? range) => state = range;
+  void clear() => state = null;
+}
+
 class AnalyticsDashboardData {
   final Map<String, dynamic> overview;
   final List<Map<String, dynamic>> recentPRs;
@@ -286,93 +298,182 @@ Future<AnalyticsDashboardData> unifiedDashboardData(Ref ref) async {
 Future<PhysiqueAchievement> physiqueAchievement(Ref ref) async {
   final targets = await ref.watch(bodyTargetsListProvider.future);
   final measurements = await ref.watch(bodyMeasurementsListProvider.future);
+  final dateRange = ref.watch(measurementDateRangeProvider);
 
-  return calculatePhysiqueScore(measurements.first, targets, measurements);
+  // Show empty state only when there is truly nothing at all
+  if (measurements.isEmpty && targets.isEmpty) {
+    return PhysiqueAchievement(overallScore: 0, achievements: []);
+  }
+
+  return calculatePhysiqueScore(
+    measurements.isEmpty ? null : measurements.first,
+    targets,
+    measurements,
+    dateRange: dateRange,
+  );
 }
 
 PhysiqueAchievement calculatePhysiqueScore(
-  ent.BodyMeasurement current,
+  ent.BodyMeasurement? current,
   List<target.BodyTarget> targets,
-  List<ent.BodyMeasurement> allMeasurements,
-) {
+  List<ent.BodyMeasurement> allMeasurements, {
+  DateTimeRange? dateRange,
+}) {
   final achievements = <MetricAchievement>[];
 
+  // ── Deduplicate targets: keep only the LATEST per metric ─────────────────
+  final latestTargetMap = <String, target.BodyTarget>{};
   for (final t in targets) {
-    double? currentVal;
-    for (var m in allMeasurements) {
-      final val = extractMetricValue(m, t.metric);
-      if (val != null) {
-        currentVal = val;
-        break;
-      }
+    final existing = latestTargetMap[t.metric];
+    if (existing == null || t.createdAt.isAfter(existing.createdAt)) {
+      latestTargetMap[t.metric] = t;
     }
-    
-    // If no measurement exists yet, default to 0.0 so the card still shows
-    final actualCurrentVal = currentVal ?? 0.0;
-
-    // Find start value: measurement closest to target.createdAt
-    ent.BodyMeasurement? startMeasurement;
-    double? startVal;
-    for (var m in allMeasurements) {
-      if (m.date.isAfter(t.createdAt) || m.date.isAtSameMomentAs(t.createdAt)) {
-        startMeasurement = m;
-        // Keep going backward in time to find the one closest to createdAt
-      } else {
-        break; // allMeasurements is sorted descending (newest first)
-      }
-    }
-    
-    // If we found a measurement around createdAt, extract its value
-    if (startMeasurement != null) {
-      startVal = extractMetricValue(startMeasurement, t.metric);
-    }
-    
-    // If no start value was found at createdAt, try to find the earliest recorded value, 
-    // or fallback to actualCurrentVal, or 0.0
-    if (startVal == null) {
-       for (var m in allMeasurements.reversed) {
-          final val = extractMetricValue(m, t.metric);
-          if (val != null) {
-             startVal = val;
-             break;
-          }
-       }
-    }
-    
-    final actualStartVal = startVal ?? actualCurrentVal;
-
-    double percentage = 0;
-    if ((t.targetValue - actualStartVal).abs() > 0.001) {
-      percentage = (actualCurrentVal - actualStartVal) / (t.targetValue - actualStartVal);
-    } else if ((actualCurrentVal - t.targetValue).abs() < 0.001) {
-      percentage = 1.0;
-    }
-
-    percentage = percentage.clamp(0.0, 1.25);
-
-    achievements.add(
-      MetricAchievement(
-        id: t.id,
-        metric: t.metric,
-        label: getMetricLabel(t.metric),
-        targetValue: t.targetValue,
-        startValue: actualStartVal,
-        currentValue: actualCurrentVal,
-        percentage: percentage,
-        deadline: t.deadline,
-      ),
-    );
   }
 
-  double overallScore = 0;
-  if (achievements.isNotEmpty) {
-    overallScore =
-        achievements.fold(0.0, (sum, a) => sum + a.percentage.clamp(0.0, 1.0)) /
-        achievements.length;
+  // ── Local helpers ─────────────────────────────────────────────────────────
+  double? findCurrent(String metric) {
+    if (dateRange != null) {
+      int minDiff = 999999999;
+      double? found;
+      for (var m in allMeasurements) {
+        final v = extractMetricValue(m, metric);
+        if (v == null) continue;
+        final diff = m.date.difference(dateRange.end).inSeconds.abs();
+        if (diff < minDiff) { minDiff = diff; found = v; }
+      }
+      return found;
+    } else {
+      for (var m in allMeasurements) {
+        final v = extractMetricValue(m, metric);
+        if (v != null) return v;
+      }
+      return null;
+    }
+  }
+
+  (double?, DateTime?) findStart(String metric, DateTime lookup) {
+    double? val; DateTime? date; int best = 999999999;
+    for (var m in allMeasurements) {
+      final v = extractMetricValue(m, metric);
+      if (v == null) continue;
+      final diff = m.date.difference(lookup).inSeconds.abs();
+      if (diff < best) { best = diff; val = v; date = m.date; }
+    }
+    return (val, date);
+  }
+
+  // ── Emit a card for EVERY standard metric ────────────────────────────────
+  for (final cfg in standardMetrics) {
+    final t = latestTargetMap[cfg.id]; // may be null → no target set yet
+    final currentVal = findCurrent(cfg.id); // may be null → no measurement yet
+
+    // Skip only when there is absolutely nothing to show
+    if (currentVal == null && t == null) continue;
+
+    final startLookup = dateRange?.start ?? t?.createdAt ?? DateTime.now();
+    final (startRaw, startDate) = findStart(cfg.id, startLookup);
+    final startVal = startRaw ?? currentVal ?? 0.0;
+
+    double percentage = 0;
+    if (t != null && t.targetValue > 0 && currentVal != null) {
+      // Universal formula: works for both gain (target > start) and
+      // loss (target < start) goals — direction auto-detected from target vs start.
+      // e.g. weight gain: start=74, target=77, current=76 → (76-74)/(77-74) = 67%
+      // e.g. weight loss: start=85, target=75, current=78 → (78-85)/(75-85) = 70%
+      // e.g. regression:  start=85, target=75, current=87 → (87-85)/(75-85) = -20%
+      final journeyLen = t.targetValue - startVal; // signed: positive = gain goal, negative = loss goal
+      if (journeyLen.abs() < 0.001) {
+        percentage = 1.0; // start == target, already done
+      } else {
+        percentage = (currentVal - startVal) / journeyLen;
+        percentage = percentage.clamp(-1.0, 1.5);
+      }
+    }
+
+    // Achievement ratio: how close current is to target RIGHT NOW.
+    // For gain goal (target > current): current/target
+    // For loss goal (target < current): target/current
+    // e.g. current=90, target=100 → 90/100 = 90% (already 90% there)
+    // e.g. current=78, target=75  → 75/78 = 96% (close to loss target)
+    double achievementRatio = 0;
+    if (t != null && t.targetValue > 0) {
+      final cv = currentVal ?? 0.0;
+      if (cv == 0 || t.targetValue == 0) {
+        achievementRatio = 0;
+      } else {
+        achievementRatio = (cv <= t.targetValue)
+            ? cv / t.targetValue   // gain goal: approaching from below
+            : t.targetValue / cv;  // loss goal: approaching from above
+        achievementRatio = achievementRatio.clamp(0.0, 1.0);
+      }
+    }
+
+    achievements.add(MetricAchievement(
+      id: t?.id ?? 0,
+      metric: cfg.id,
+      label: cfg.label,
+      targetValue: t?.targetValue ?? 0,
+      startValue: startVal,
+      currentValue: currentVal ?? 0,
+      percentage: percentage,
+      achievementRatio: achievementRatio,
+      deadline: dateRange?.end ?? t?.deadline,
+      startDate: startDate,
+    ));
+  }
+
+  // ── Also emit cards for custom targets (not in standardMetrics) ───────────
+  for (final t in latestTargetMap.values) {
+    if (standardMetrics.any((m) => m.id == t.metric)) continue;
+    if (t.targetValue <= 0) continue;
+    final currentVal = findCurrent(t.metric);
+    final startLookup = dateRange?.start ?? t.createdAt;
+    final (startRaw, startDate) = findStart(t.metric, startLookup);
+    final startVal = startRaw ?? currentVal ?? 0.0;
+    double percentage = 0;
+    if (currentVal != null) {
+      final journeyLen = (t.targetValue - startVal).abs();
+      if (journeyLen >= 0.001) {
+        percentage = (currentVal - startVal) / (t.targetValue - startVal);
+        percentage = percentage.clamp(-1.0, 1.5);
+      } else {
+        percentage = 1.0;
+      }
+    }
+    double achievementRatio = 0;
+    if (currentVal != null && t.targetValue > 0) {
+      achievementRatio = (currentVal <= t.targetValue)
+          ? currentVal / t.targetValue
+          : t.targetValue / currentVal;
+      achievementRatio = achievementRatio.clamp(0.0, 1.0);
+    }
+    achievements.add(MetricAchievement(
+      id: t.id,
+      metric: t.metric,
+      label: getMetricLabel(t.metric),
+      targetValue: t.targetValue,
+      startValue: startVal,
+      currentValue: currentVal ?? 0,
+      percentage: percentage,
+      achievementRatio: achievementRatio,
+      deadline: dateRange?.end ?? t.deadline,
+      startDate: startDate,
+    ));
+  }
+
+  // ── Overall score: average achievementRatio of metrics with a target ──────────
+  // achievementRatio = how close current is to target (not journey-based).
+  // rawScore uses journey percentages to detect if overall improving or regressing.
+  final withTarget = achievements.where((a) => a.targetValue > 0).toList();
+  double rawScore = 0, overallScore = 0;
+  if (withTarget.isNotEmpty) {
+    rawScore = withTarget.fold(0.0, (s, a) => s + a.percentage) / withTarget.length;
+    overallScore = withTarget.fold(0.0, (s, a) => s + a.achievementRatio) / withTarget.length;
   }
 
   return PhysiqueAchievement(
     overallScore: overallScore,
+    rawOverallScore: rawScore,
     achievements: achievements,
   );
 }
