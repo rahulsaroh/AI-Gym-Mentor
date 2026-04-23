@@ -6,7 +6,10 @@
   <component name="ChangeListManager">
     <list default="true" id="310b61fb-298a-4d2b-8625-e9028bf4d99c" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+<<<<<<< HEAD
       <change beforePath="$PROJECT_DIR$/android/gradle/wrapper/gradle-wrapper.properties" beforeDir="false" afterPath="$PROJECT_DIR$/android/gradle/wrapper/gradle-wrapper.properties" afterDir="false" />
+=======
+>>>>>>> 5a55d7abcdc8f62f36e894f7d9024a589b55247e
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -46,7 +49,7 @@
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
     &quot;url&quot;: &quot;https://github.com/rahulsaroh/AI-Gym-Mentor.git&quot;,
-    &quot;accountId&quot;: &quot;590fe7aa-f741-449d-91eb-36dc3c5e7bf3&quot;
+    &quot;accountId&quot;: &quot;a59d7193-8d6c-4698-9d12-582d860b157f&quot;
   }
 }</component>
   <component name="ProjectColorInfo">{
@@ -83,7 +86,11 @@
     &quot;io.flutter.project.isFirstOpen&quot;: &quot;true&quot;,
     &quot;io.flutter.reload.alreadyRun&quot;: &quot;true&quot;,
     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+<<<<<<< HEAD
     &quot;last_opened_file_path&quot;: &quot;E:/Rahul/Softwares/AI Gym Mentor/AI Gym Mentor&quot;,
+=======
+    &quot;last_opened_file_path&quot;: &quot;C:/Apps/AI-Gym-Mentor&quot;,
+>>>>>>> 5a55d7abcdc8f62f36e894f7d9024a589b55247e
     &quot;show.migrate.to.gradle.popup&quot;: &quot;false&quot;
   }
 }</component>
