@@ -5,6 +5,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:ai_gym_mentor/features/analytics/analytics_providers.dart';
 import 'package:ai_gym_mentor/core/domain/entities/body_achievement.dart';
 import 'package:ai_gym_mentor/features/analytics/presentation/body_measurements_log_screen.dart';
+import 'package:ai_gym_mentor/features/analytics/presentation/metric_detail_screen.dart';
 import 'package:intl/intl.dart';
 import 'dart:math' as math;
 
@@ -17,9 +18,6 @@ class MeasurementsTab extends ConsumerWidget {
 
     return achievementAsync.when(
       data: (physique) {
-        if (physique.achievements.isEmpty) {
-          return _EmptyState(onTap: () => _openLogScreen(context));
-        }
         return CustomScrollView(
           physics: const BouncingScrollPhysics(),
           slivers: [
@@ -40,20 +38,55 @@ class MeasurementsTab extends ConsumerWidget {
                               fontSize: 14,
                               fontWeight: FontWeight.bold,
                               letterSpacing: 1.2)),
-                      InkWell(
-                        onTap: () => _openLogScreen(context),
-                        borderRadius: BorderRadius.circular(8),
-                        child: Padding(
-                          padding: const EdgeInsets.all(6),
-                          child: Icon(LucideIcons.pencil,
-                              size: 20,
-                              color: Theme.of(context).colorScheme.primary),
-                        ),
+                      Row(
+                        children: [
+                          IconButton(
+                            icon: Icon(LucideIcons.trash2, 
+                              size: 20, 
+                              color: Colors.red.withValues(alpha: 0.7)),
+                            onPressed: () => _confirmReset(context, ref),
+                            tooltip: 'Reset All Data',
+                          ),
+                          InkWell(
+                            onTap: () => _openLogScreen(context),
+                            borderRadius: BorderRadius.circular(8),
+                            child: Padding(
+                              padding: const EdgeInsets.all(6),
+                              child: Icon(LucideIcons.pencil,
+                                  size: 20,
+                                  color: Theme.of(context).colorScheme.primary),
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
                   const SizedBox(height: 16),
-                  ...physique.achievements.map((a) => _MeasurementItem(achievement: a)),
+                  // Always show all standard metrics
+                  ...physique.achievements
+                      .where((a) => standardMetrics.any((m) => m.id == a.metric))
+                      .map((a) => _MeasurementItem(
+                            achievement: a,
+                            onTap: () => _openDetailScreen(context, a),
+                          )),
+                  // Custom metric cards
+                  if (physique.achievements.any((a) => !standardMetrics.any((m) => m.id == a.metric))) ...[
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8, bottom: 8),
+                      child: Text('CUSTOM MEASUREMENTS',
+                          style: GoogleFonts.outfit(
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 1.2,
+                              color: Theme.of(context).colorScheme.outline)),
+                    ),
+                    ...physique.achievements
+                        .where((a) => !standardMetrics.any((m) => m.id == a.metric))
+                        .map((a) => _MeasurementItem(
+                              achievement: a,
+                              onTap: () => _openDetailScreen(context, a),
+                            )),
+                  ],
                   const SizedBox(height: 80),
                 ]),
               ),
@@ -70,6 +103,63 @@ class MeasurementsTab extends ConsumerWidget {
     Navigator.push(context,
         MaterialPageRoute(builder: (_) => const BodyMeasurementsLogScreen()));
   }
+
+  void _openDetailScreen(BuildContext context, MetricAchievement a) {
+    // Find config for icon/unit
+    final cfg = standardMetrics.where((m) => m.id == a.metric).firstOrNull;
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => MetricDetailScreen(
+          metricId: a.metric,
+          metricLabel: a.label,
+          unit: cfg?.unit ?? _unitFor(a.metric),
+          lowerIsBetter: cfg?.lowerIsBetter ?? false,
+        ),
+      ),
+    );
+  }
+
+  String _unitFor(String m) {
+    if (m == 'weight') return 'kg';
+    if (m == 'bodyFat' || m == 'subcutaneousFat' || m == 'visceralFat') return '%';
+    return 'cm';
+  }
+
+  Future<void> _confirmReset(BuildContext context, WidgetRef ref) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('Reset Measurements?',
+            style: GoogleFonts.outfit(fontWeight: FontWeight.bold)),
+        content: Text(
+            'This will delete ALL history logs and targets for body measurements. This cannot be undone.',
+            style: GoogleFonts.outfit()),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(backgroundColor: Colors.red),
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Reset Everything'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      await ref.read(bodyMeasurementsListProvider.notifier).clearAllHistory();
+      await ref.read(bodyTargetsListProvider.notifier).clearAllTargets();
+      ref.invalidate(physiqueAchievementProvider);
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('All measurement data has been cleared.')),
+        );
+      }
+    }
+  }
 }
 
 // ─── Overall Progress Card ─────────────────────────────────────────────────
@@ -83,7 +173,27 @@ class _OverallProgressCard extends ConsumerWidget {
     final dateRange = ref.watch(measurementDateRangeProvider);
     final pct = (physique.overallScore.clamp(0.0, 1.0) * 100).toInt();
     final isImproving = physique.rawOverallScore >= 0;
-    final gaugeColor = isImproving ? Colors.green : Colors.red;
+    final progressColor = isImproving ? Colors.green : Colors.red;
+
+    // For 3-color gauge:
+    // Blue portion = "starting" ratio = first measurement achievement ratio
+    // We use the average starting achievement across all metrics that have targets
+    final withTarget = physique.achievements.where((a) => a.targetValue > 0).toList();
+    double startRatio = 0;
+    if (withTarget.isNotEmpty) {
+      // starting achievement: how much of the target was already covered at start
+      // = startValue / targetValue (for gain) or targetValue/startValue (for loss)
+      double totalStart = 0;
+      for (final a in withTarget) {
+        if (a.targetValue > 0 && a.startValue > 0) {
+          final r = (a.startValue <= a.targetValue)
+              ? a.startValue / a.targetValue
+              : a.targetValue / a.startValue;
+          totalStart += r.clamp(0.0, 1.0);
+        }
+      }
+      startRatio = (totalStart / withTarget.length).clamp(0.0, 1.0);
+    }
 
     return Container(
       padding: const EdgeInsets.all(24),
@@ -103,52 +213,64 @@ class _OverallProgressCard extends ConsumerWidget {
           Text('OVERALL PROGRESS',
               style: GoogleFonts.outfit(
                   fontSize: 16, fontWeight: FontWeight.bold)),
-          // Calendar icon → date range picker
-          InkWell(
-            borderRadius: BorderRadius.circular(8),
-            onTap: () => _pickDateRange(context, ref, dateRange),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
-              ),
-              child: Row(mainAxisSize: MainAxisSize.min, children: [
-                Icon(LucideIcons.calendar, size: 16,
-                    color: Theme.of(context).colorScheme.primary),
-                if (dateRange != null) ...[
-                  const SizedBox(width: 6),
-                  Text(
-                    '${DateFormat('d MMM').format(dateRange.start)} – ${DateFormat('d MMM').format(dateRange.end)}',
-                    style: GoogleFonts.outfit(
-                        fontSize: 11,
-                        fontWeight: FontWeight.bold,
-                        color: Theme.of(context).colorScheme.primary),
-                  ),
-                ],
-              ]),
-            ),
-          ),
+          // Interval selector
+          const SizedBox(height: 12),
+          const _IntervalSelector(),
         ]),
+      ),
+    );
+  }
+}
 
-        if (dateRange == null)
-          Padding(
-            padding: const EdgeInsets.only(top: 8),
-            child: Text('Tap 📅 to set a tracking period',
-                style: GoogleFonts.outfit(fontSize: 11, color: Colors.grey)),
-          ),
+class _IntervalSelector extends ConsumerWidget {
+  const _IntervalSelector();
 
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final selected = ref.watch(selectedMeasurementIntervalProvider);
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: MeasurementInterval.values.map((interval) {
+          final isSelected = selected == interval;
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+            child: ChoiceChip(
+              label: Text(interval.label, 
+                style: GoogleFonts.outfit(
+                  fontSize: 12, 
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                  color: isSelected ? Colors.white : null,
+                )),
+              selected: isSelected,
+              onSelected: (_) => ref.read(selectedMeasurementIntervalProvider.notifier).set(interval),
+              selectedColor: Theme.of(context).colorScheme.primary,
+              backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              showCheckmark: false,
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
+          );
+        }).toList(),
+      ),
+    );
+  }
+}
         const SizedBox(height: 24),
 
-        // Gauge
+        // 3-color Gauge
         SizedBox(
           height: 120,
           child: Stack(alignment: Alignment.bottomCenter, children: [
             CustomPaint(
               size: const Size(220, 110),
               painter: _GaugePainter(
-                progress: physique.overallScore.clamp(0.0, 1.0),
-                activeColor: gaugeColor,
+                startRatio: startRatio,
+                currentRatio: physique.overallScore.clamp(0.0, 1.0),
+                isImproving: isImproving,
+                hasTarget: withTarget.isNotEmpty,
                 backgroundColor: Colors.grey.withValues(alpha: 0.15),
               ),
             ),
@@ -159,20 +281,41 @@ class _OverallProgressCard extends ConsumerWidget {
                     style: GoogleFonts.outfit(
                         fontSize: 44,
                         fontWeight: FontWeight.bold,
-                        color: gaugeColor)),
+                        color: withTarget.isEmpty ? Colors.grey : progressColor)),
                 Text(
-                  isImproving ? '▲ Improving' : '▼ Regressing',
+                  withTarget.isEmpty
+                      ? 'Set targets to track'
+                      : isImproving ? '▲ Improving' : '▼ Regressing',
                   style: GoogleFonts.outfit(
                       fontSize: 11,
                       fontWeight: FontWeight.bold,
-                      color: gaugeColor.withValues(alpha: 0.8)),
+                      color: (withTarget.isEmpty ? Colors.grey : progressColor)
+                          .withValues(alpha: 0.8)),
                 ),
               ]),
             ),
           ]),
         ),
 
+        const SizedBox(height: 16),
+        // Mini Trendline
+        const SizedBox(
+          height: 30,
+          width: 200,
+          child: _OverallMiniTrendline(),
+        ),
+        const SizedBox(height: 8),
         const SizedBox(height: 12),
+        // Legend row
+        Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+          _LegendDot(color: const Color(0xFF3B82F6), label: 'Start'),
+          const SizedBox(width: 12),
+          _LegendDot(color: Colors.green, label: 'Growth'),
+          const SizedBox(width: 12),
+          _LegendDot(color: Colors.red, label: 'Decline'),
+        ]),
+
+        const SizedBox(height: 8),
         Text('BODY ACHIEVEMENT SCORE',
             style: GoogleFonts.outfit(
                 fontSize: 12,
@@ -182,7 +325,6 @@ class _OverallProgressCard extends ConsumerWidget {
 
         if (dateRange != null) ...[
           const SizedBox(height: 8),
-          // Clear button
           TextButton.icon(
             onPressed: () =>
                 ref.read(measurementDateRangeProvider.notifier).clear(),
@@ -220,23 +362,49 @@ class _OverallProgressCard extends ConsumerWidget {
   }
 }
 
-// ─── Gauge Painter ─────────────────────────────────────────────────────────
+class _LegendDot extends StatelessWidget {
+  final Color color;
+  final String label;
+  const _LegendDot({required this.color, required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(mainAxisSize: MainAxisSize.min, children: [
+      Container(
+        width: 8, height: 8,
+        decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+      ),
+      const SizedBox(width: 4),
+      Text(label,
+          style: GoogleFonts.outfit(fontSize: 10, color: Colors.grey)),
+    ]);
+  }
+}
+
+// ─── 3-color Gauge Painter ─────────────────────────────────────────────────
+// [BLUE = start portion] [GREEN/RED = progress from start] [GREY = remaining]
 
 class _GaugePainter extends CustomPainter {
-  final double progress;
-  final Color activeColor;
+  final double startRatio;    // 0..1 — where the user started (blue end)
+  final double currentRatio;  // 0..1 — where the user is now (green/red end)
+  final bool isImproving;
+  final bool hasTarget;
   final Color backgroundColor;
 
-  _GaugePainter(
-      {required this.progress,
-      required this.activeColor,
-      required this.backgroundColor});
+  _GaugePainter({
+    required this.startRatio,
+    required this.currentRatio,
+    required this.isImproving,
+    required this.hasTarget,
+    required this.backgroundColor,
+  });
 
   @override
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height);
     final radius = size.width / 2;
 
+    // Grey background full arc
     canvas.drawArc(
       Rect.fromCircle(center: center, radius: radius),
       math.pi, math.pi, false,
@@ -247,20 +415,57 @@ class _GaugePainter extends CustomPainter {
         ..strokeCap = StrokeCap.round,
     );
 
-    if (progress > 0) {
-      canvas.drawArc(
-        Rect.fromCircle(center: center, radius: radius),
-        math.pi, math.pi * progress, false,
-        Paint()
-          ..shader = SweepGradient(
-            colors: [activeColor.withValues(alpha: 0.5), activeColor],
-            startAngle: math.pi,
-            endAngle: math.pi * 2,
-          ).createShader(Rect.fromCircle(center: center, radius: radius))
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 16
-          ..strokeCap = StrokeCap.round,
-      );
+    if (hasTarget) {
+      final blueEnd = startRatio.clamp(0.0, 1.0);
+      final greenEnd = currentRatio.clamp(0.0, 1.0);
+      final activeColor = isImproving ? Colors.green : Colors.red;
+
+      // Blue segment: 0 → startRatio
+      if (blueEnd > 0.001) {
+        canvas.drawArc(
+          Rect.fromCircle(center: center, radius: radius),
+          math.pi,
+          math.pi * blueEnd,
+          false,
+          Paint()
+            ..color = const Color(0xFF3B82F6)
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = 16
+            ..strokeCap = StrokeCap.round,
+        );
+      }
+
+      // Green / Red segment: startRatio → currentRatio
+      if (greenEnd > blueEnd + 0.001) {
+        canvas.drawArc(
+          Rect.fromCircle(center: center, radius: radius),
+          math.pi + math.pi * blueEnd,
+          math.pi * (greenEnd - blueEnd),
+          false,
+          Paint()
+            ..shader = SweepGradient(
+              colors: [activeColor.withValues(alpha: 0.6), activeColor],
+              startAngle: math.pi,
+              endAngle: math.pi * 2,
+            ).createShader(Rect.fromCircle(center: center, radius: radius))
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = 16
+            ..strokeCap = StrokeCap.round,
+        );
+      } else if (greenEnd < blueEnd - 0.001) {
+        // Regression: current < start → red from currentRatio → startRatio
+        canvas.drawArc(
+          Rect.fromCircle(center: center, radius: radius),
+          math.pi + math.pi * greenEnd,
+          math.pi * (blueEnd - greenEnd),
+          false,
+          Paint()
+            ..color = Colors.red
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = 16
+            ..strokeCap = StrokeCap.round,
+        );
+      }
     }
 
     // Tick marks
@@ -282,14 +487,17 @@ class _GaugePainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _GaugePainter old) =>
-      old.progress != progress || old.activeColor != activeColor;
+      old.startRatio != startRatio ||
+      old.currentRatio != currentRatio ||
+      old.isImproving != isImproving;
 }
 
 // ─── Measurement Item Card ─────────────────────────────────────────────────
 
 class _MeasurementItem extends StatelessWidget {
   final MetricAchievement achievement;
-  const _MeasurementItem({required this.achievement});
+  final VoidCallback onTap;
+  const _MeasurementItem({required this.achievement, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -298,50 +506,65 @@ class _MeasurementItem extends StatelessWidget {
     final badgePct = (achRatio * 100).toInt();
     final unit = _unitFor(achievement.metric);
     final fmt = DateFormat('d MMM yy');
+    final hasData = achievement.currentValue > 0;
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(color: Colors.black.withValues(alpha: 0.03),
-              blurRadius: 10, offset: const Offset(0, 4)),
-        ],
-        border: Border.all(
-            color: Theme.of(context).dividerColor.withValues(alpha: 0.05)),
-      ),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Row(children: [
-          // Icon
-          Container(
-            width: 40, height: 40,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
-            ),
-            child: Icon(_iconFor(achievement.metric),
-                color: Theme.of(context).colorScheme.primary, size: 20),
-          ),
-          const SizedBox(width: 14),
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Theme.of(context).cardColor,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(color: Colors.black.withValues(alpha: 0.03),
+                blurRadius: 10, offset: const Offset(0, 4)),
+          ],
+          border: Border.all(
+              color: Theme.of(context).dividerColor.withValues(alpha: 0.05)),
+        ),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Row(children: [
+            // Icon
+            // Icon
+            Builder(builder: (context) {
+              final cfg = standardMetrics.where((m) => m.id == achievement.metric).firstOrNull;
+              return Container(
+                width: 40, height: 40,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                ),
+                child: (cfg?.assetPath != null)
+                    ? Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Image.asset(cfg!.assetPath!, color: Theme.of(context).colorScheme.primary),
+                      )
+                    : Icon(_iconFor(achievement.metric),
+                        color: Theme.of(context).colorScheme.primary, size: 20),
+              );
+            }),
+            const SizedBox(width: 14),
 
-          // Label + values
-          Expanded(child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start, children: [
+            // Label + values
+            Expanded(child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(achievement.label,
                   style: GoogleFonts.outfit(
                       fontSize: 15, fontWeight: FontWeight.bold)),
               const SizedBox(height: 2),
               Text(
-                achievement.targetValue > 0
-                    ? '${achievement.startValue.toStringAsFixed(1)} → '
-                      '${achievement.currentValue.toStringAsFixed(1)} $unit'
-                      '  ·  Goal: ${achievement.targetValue.toStringAsFixed(1)} $unit'
-                    : achievement.currentValue > 0
-                        ? 'Current: ${achievement.currentValue.toStringAsFixed(1)} $unit  ·  No target set'
-                        : 'No data logged yet',
-                style: GoogleFonts.outfit(fontSize: 11, color: Colors.grey),
+                !hasData
+                    ? 'No data logged yet — tap to log'
+                    : achievement.targetValue > 0
+                        ? '${achievement.startValue.toStringAsFixed(1)} → '
+                          '${achievement.currentValue.toStringAsFixed(1)} $unit'
+                          '  ·  Goal: ${achievement.targetValue.toStringAsFixed(1)} $unit'
+                        : 'Current: ${achievement.currentValue.toStringAsFixed(1)} $unit  ·  No target set',
+                style: GoogleFonts.outfit(
+                    fontSize: 11,
+                    color: !hasData ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.7) : Colors.grey),
               ),
               if (achievement.startDate != null && achievement.deadline != null)
                 Text(
@@ -351,52 +574,55 @@ class _MeasurementItem extends StatelessWidget {
                       color: Theme.of(context).colorScheme.primary
                           .withValues(alpha: 0.7)),
                 ),
-            ],
-          )),
+            ])),
 
-          // % badge  — achievementRatio: how close to target right now
-          Builder(builder: (context) {
-            if (achievement.targetValue <= 0) {
+            // % badge
+            Builder(builder: (context) {
+              if (!hasData || achievement.targetValue <= 0) {
+                return Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    color: Colors.grey.withValues(alpha: 0.1),
+                    border: Border.all(color: Colors.grey, width: 1.5),
+                  ),
+                  child: Text('--',
+                      style: GoogleFonts.outfit(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.grey)),
+                );
+              }
+              final color = badgePct >= 100
+                  ? Colors.green
+                  : Theme.of(context).colorScheme.primary;
               return Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20),
-                  color: Colors.grey.withValues(alpha: 0.1),
-                  border: Border.all(color: Colors.grey, width: 1.5),
+                  color: color.withValues(alpha: 0.1),
+                  border: Border.all(color: color, width: 1.5),
                 ),
-                child: Text('--',
+                child: Text('$badgePct%',
                     style: GoogleFonts.outfit(
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
-                        color: Colors.grey)),
+                        color: color)),
               );
-            }
-            // Badge is always themed green (achieved %) — no red here
-            // Red/green logic lives in the progress bar below
-            final color = badgePct >= 100
-                ? Colors.green
-                : Theme.of(context).colorScheme.primary;
-            return Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20),
-                color: color.withValues(alpha: 0.1),
-                border: Border.all(color: color, width: 1.5),
-              ),
-              child: Text('$badgePct%',
-                  style: GoogleFonts.outfit(
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                      color: color)),
-            );
-          }),
-        ]),
+            }),
 
-        const SizedBox(height: 14),
-        _SegmentedBar(
-            percentage: pct,
-            hasTarget: achievement.targetValue > 0),
-      ]),
+            // Chevron indicator
+            const SizedBox(width: 6),
+            Icon(LucideIcons.chevronRight, size: 16,
+                color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5)),
+          ]),
+
+          const SizedBox(height: 14),
+          _SegmentedBar(
+              percentage: pct,
+              hasTarget: achievement.targetValue > 0 && hasData),
+        ]),
+      ),
     );
   }
 
@@ -413,7 +639,7 @@ class _MeasurementItem extends StatelessWidget {
       case 'chest': return LucideIcons.square;
       case 'shoulders': return LucideIcons.moveHorizontal;
       case 'armLeft': case 'armRight': return LucideIcons.armchair;
-      case 'waist': return LucideIcons.minimize2;
+      case 'waist': case 'waistNaval': return LucideIcons.minimize2;
       case 'hips': return LucideIcons.circle;
       case 'neck': return LucideIcons.user;
       default: return LucideIcons.activity;
@@ -437,7 +663,7 @@ class _SegmentedBar extends StatelessWidget {
     final clamped = percentage.clamp(-1.0, 1.0);
     final isRegression = clamped < 0;
     final abs = clamped.abs();
-    final primary = Theme.of(context).colorScheme.primary;
+    final primary = const Color(0xFF3B82F6); // blue
 
     return LayoutBuilder(builder: (context, constraints) {
       final total = constraints.maxWidth;
@@ -474,7 +700,94 @@ class _SegmentedBar extends StatelessWidget {
   }
 }
 
-// ─── Empty State ───────────────────────────────────────────────────────────
+// ─── Empty State (kept for legacy fallback) ────────────────────────────────
+
+class _OverallMiniTrendline extends ConsumerWidget {
+  const _OverallMiniTrendline();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final trendAsync = ref.watch(overallAchievementTrendProvider);
+
+    return trendAsync.when(
+      data: (spots) {
+        if (spots.length < 2) return const SizedBox.shrink();
+
+        return LineChart(
+          LineChartData(
+            gridData: const FlGridData(show: false),
+            titlesData: const FlTitlesData(show: false),
+            borderData: const FlBorderData(show: false),
+            minX: spots.first.x,
+            maxX: spots.last.x,
+            minY: -0.1, 
+            maxY: 1.1,  
+            lineBarsData: [
+              LineChartBarData(
+                spots: spots,
+                isCurved: true,
+                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.5),
+                barWidth: 2,
+                isStrokeCapRound: true,
+                dotData: const FlDotData(show: false),
+                belowBarData: BarAreaData(
+                  show: true,
+                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.05),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+      loading: () => const SizedBox.shrink(),
+      error: (_, __) => const SizedBox.shrink(),
+    );
+  }
+}
+
+class _MetricMiniTrendline extends ConsumerWidget {
+  final String metricId;
+  const _MetricMiniTrendline({required this.metricId});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final trendAsync = ref.watch(metricAchievementTrendProvider(metricId: metricId));
+
+    return trendAsync.when(
+      data: (spots) {
+        if (spots.length < 2) return const SizedBox.shrink();
+
+        return LineChart(
+          LineChartData(
+            gridData: const FlGridData(show: false),
+            titlesData: const FlTitlesData(show: false),
+            borderData: const FlBorderData(show: false),
+            minX: spots.first.x,
+            maxX: spots.last.x,
+            minY: -0.1,
+            maxY: 1.1,
+            lineBarsData: [
+              LineChartBarData(
+                spots: spots,
+                isCurved: true,
+                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.5),
+                barWidth: 2,
+                isStrokeCapRound: true,
+                dotData: const FlDotData(show: false),
+                belowBarData: BarAreaData(
+                  show: true,
+                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.05),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+      loading: () => const SizedBox.shrink(),
+      error: (_, __) => const SizedBox.shrink(),
+    );
+  }
+}
 
 class _EmptyState extends StatelessWidget {
   final VoidCallback onTap;

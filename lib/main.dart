@@ -59,7 +59,6 @@ void main() async {
   }
 
   // 4. Exercise Database Seeding
-  /*
   try {
     if (kDebugMode) debugPrint('Step 4: Seeding Exercise Database...');
     await ExerciseDbSeeder.instance.seed();
@@ -71,48 +70,8 @@ void main() async {
   } catch (e) {
     debugPrint('Exercise Database Seeding Failed: $e');
   }
-  */
 
-  // Temporary: Add sample physique data
-  try {
-    if (kDebugMode) debugPrint('Step 5: Seeding Sample Physique Data...');
-    final repo = ai_gym_mentor_repo.MeasurementsRepository(AppDatabase()); // Need to import this
-    final targets = await repo.getAllTargets();
-    if (targets.isEmpty) {
-       await repo.addTarget(ai_gym_mentor_target.BodyTarget(
-         id: DateTime.now().millisecondsSinceEpoch,
-         metric: 'weight',
-         targetValue: 77.0,
-         deadline: DateTime.now().add(const Duration(days: 30)),
-         createdAt: DateTime.now().subtract(const Duration(days: 10))
-       ));
-       await Future.delayed(const Duration(milliseconds: 10)); // Ensure unique ID
-       await repo.addTarget(ai_gym_mentor_target.BodyTarget(
-         id: DateTime.now().millisecondsSinceEpoch,
-         metric: 'chest',
-         targetValue: 105.0,
-         deadline: DateTime.now().add(const Duration(days: 60)),
-         createdAt: DateTime.now().subtract(const Duration(days: 10))
-       ));
-       await Future.delayed(const Duration(milliseconds: 10));
-       await repo.addMeasurement(ai_gym_mentor_measurement.BodyMeasurement(
-         id: DateTime.now().millisecondsSinceEpoch,
-         date: DateTime.now().subtract(const Duration(days: 10)),
-         weight: 80.0,
-         chest: 95.0
-       ));
-       await Future.delayed(const Duration(milliseconds: 10));
-       await repo.addMeasurement(ai_gym_mentor_measurement.BodyMeasurement(
-         id: DateTime.now().millisecondsSinceEpoch,
-         date: DateTime.now(),
-         weight: 75.0,
-         chest: 100.0
-       ));
-       debugPrint('Seeded Sample Physique Data Successfully');
-    }
-  } catch (e) {
-    debugPrint('Seeding Physique Data Failed: $e');
-  }
+
 
   // 4. Framework error catchers
   FlutterError.onError = (details) {

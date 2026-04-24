@@ -138,17 +138,21 @@ class _FitnessWrappedCardState extends ConsumerState<FitnessWrappedCard> {
                   bottom: 24,
                   left: 24,
                   right: 24,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  child: Stack(
+                    alignment: Alignment.center,
                     children: [
                       Row(
+                        mainAxisSize: MainAxisSize.min,
                         children: List.generate(3, (index) => _buildDot(index == _currentPage)),
                       ),
-                      IconButton(
-                        onPressed: _shareWrapped,
-                        icon: const Icon(LucideIcons.share2, color: Colors.white, size: 20),
-                        style: IconButton.styleFrom(
-                          backgroundColor: Colors.white.withValues(alpha: 0.2),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: IconButton(
+                          onPressed: _shareWrapped,
+                          icon: const Icon(LucideIcons.share2, color: Colors.white, size: 20),
+                          style: IconButton.styleFrom(
+                            backgroundColor: Colors.white.withValues(alpha: 0.2),
+                          ),
                         ),
                       ),
                     ],
@@ -188,7 +192,10 @@ class _FitnessWrappedCardState extends ConsumerState<FitnessWrappedCard> {
           const SizedBox(height: 32),
           ...stats.map((s) => Padding(padding: const EdgeInsets.only(bottom: 20), child: s)),
           const Spacer(),
-          Text(footerValue, style: GoogleFonts.outfit(color: Colors.white.withValues(alpha: 0.9), fontSize: 16, fontWeight: FontWeight.w700)),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 24), // Add padding to avoid dots
+            child: Text(footerValue, style: GoogleFonts.outfit(color: Colors.white.withValues(alpha: 0.9), fontSize: 16, fontWeight: FontWeight.w700)),
+          ),
         ],
       ),
     );
@@ -252,18 +259,24 @@ class _WrappedStat extends StatelessWidget {
           child: Icon(icon, color: Colors.white, size: 20),
         ),
         const SizedBox(width: 16),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(label,
-                style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.6), fontSize: 12)),
-            Text(value,
-                style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold)),
-          ],
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(label,
+                  style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.6), fontSize: 12),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis),
+              Text(value,
+                  style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis),
+            ],
+          ),
         ),
       ],
     );

@@ -69,7 +69,7 @@ class _HeatmapContent extends StatelessWidget {
           ),
         ),
         Container(
-          height: 130,
+          height: 150,
           margin: const EdgeInsets.symmetric(horizontal: 16),
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(

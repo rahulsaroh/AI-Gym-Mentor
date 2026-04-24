@@ -197,12 +197,19 @@ class StatsRepository {
     ];
 
     // 2. Discover which standard muscles actually have exercises in the library
-    final allExercises = await db.select(db.exercises).get();
+    // Optimization: Use distinct query instead of fetching all exercises
+    final muscleQuery = db.selectOnly(db.exercises, distinct: true)
+      ..addColumns([db.exercises.primaryMuscle]);
+    final muscleRows = await muscleQuery.get();
+    
     final Set<String> availableMuscles = {};
-    for (final ex in allExercises) {
-      final standardized = _standardizeMuscle(ex.primaryMuscle);
-      if (standardMuscles.contains(standardized)) {
-        availableMuscles.add(standardized);
+    for (final row in muscleRows) {
+      final rawMuscle = row.read(db.exercises.primaryMuscle);
+      if (rawMuscle != null) {
+        final standardized = _standardizeMuscle(rawMuscle);
+        if (standardMuscles.contains(standardized)) {
+          availableMuscles.add(standardized);
+        }
       }
     }
 
@@ -216,24 +223,30 @@ class StatsRepository {
 
     Future<Map<String, double>> fetchVolume(
         DateTime start, DateTime end) async {
-      final query = db.select(db.workoutSets).join([
+      final volumeExpr = db.workoutSets.weight * db.workoutSets.reps;
+      final sumVolume = volumeExpr.sum();
+
+      final query = db.selectOnly(db.workoutSets).join([
         innerJoin(
             db.workouts, db.workouts.id.equalsExp(db.workoutSets.workoutId)),
         innerJoin(
             db.exercises, db.exercises.id.equalsExp(db.workoutSets.exerciseId)),
       ])
+        ..addColumns([db.exercises.primaryMuscle, sumVolume])
         ..where(db.workouts.date.isBiggerOrEqualValue(start) &
             db.workouts.date.isSmallerThanValue(end) &
-            db.workouts.status.equals('completed'));
+            db.workouts.status.equals('completed'))
+        ..groupBy([db.exercises.primaryMuscle]);
 
       final results = await query.get();
       Map<String, double> volumes = {for (var m in muscles) m: 0.0};
 
       for (final row in results) {
-        final rawMuscle = row.readTable(db.exercises).primaryMuscle;
+        final rawMuscle = row.read(db.exercises.primaryMuscle);
+        if (rawMuscle == null) continue;
+        
         final standardized = _standardizeMuscle(rawMuscle);
-        final volume = row.readTable(db.workoutSets).weight *
-            row.readTable(db.workoutSets).reps;
+        final volume = row.read(sumVolume) ?? 0.0;
             
         if (volumes.containsKey(standardized)) {
           volumes[standardized] = (volumes[standardized] ?? 0) + volume;
@@ -242,9 +255,14 @@ class StatsRepository {
       return volumes;
     }
 
-    final thisMonth =
-        await fetchVolume(thisMonthStart, now.add(const Duration(days: 1)));
-    final lastMonth = await fetchVolume(lastMonthStart, thisMonthStart);
+    // Optimization: Parallelize fetching
+    final results = await Future.wait([
+      fetchVolume(thisMonthStart, now.add(const Duration(days: 1))),
+      fetchVolume(lastMonthStart, thisMonthStart),
+    ]);
+
+    final thisMonth = results[0];
+    final lastMonth = results[1];
 
     return {
       'labels': muscles,

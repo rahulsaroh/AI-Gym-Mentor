@@ -16,10 +16,69 @@ part 'analytics_providers.g.dart';
 /// Global date-range filter for the Measurements tab.
 /// When null: each target uses its own createdAt/deadline.
 /// When set: ALL cards compute progress within this window.
+enum MeasurementInterval {
+  d14('14d'),
+  m1('1M'),
+  m3('3M'),
+  m6('6M'),
+  m12('12M'),
+  all('All');
+
+  final String label;
+  const MeasurementInterval(this.label);
+}
+
+@riverpod
+class SelectedMeasurementInterval extends _$SelectedMeasurementInterval {
+  @override
+  MeasurementInterval build() => MeasurementInterval.m1;
+
+  void set(MeasurementInterval interval) {
+    state = interval;
+    // Also update the date range
+    final now = DateTime.now();
+    DateTime? start;
+    switch (interval) {
+      case MeasurementInterval.d14:
+        start = now.subtract(const Duration(days: 14));
+        break;
+      case MeasurementInterval.m1:
+        start = DateTime(now.year, now.month - 1, now.day);
+        break;
+      case MeasurementInterval.m3:
+        start = DateTime(now.year, now.month - 3, now.day);
+        break;
+      case MeasurementInterval.m6:
+        start = DateTime(now.year, now.month - 6, now.day);
+        break;
+      case MeasurementInterval.m12:
+        start = DateTime(now.year - 1, now.month, now.day);
+        break;
+      case MeasurementInterval.all:
+        start = null;
+        break;
+    }
+    
+    if (start != null) {
+      ref.read(measurementDateRangeProvider.notifier).set(
+        DateTimeRange(start: start, end: now.add(const Duration(days: 1)))
+      );
+    } else {
+      ref.read(measurementDateRangeProvider.notifier).clear();
+    }
+  }
+}
+
+/// Global date-range filter for the Measurements tab.
+/// When null: each target uses its own createdAt/deadline.
+/// When set: ALL cards compute progress within this window.
 @riverpod
 class MeasurementDateRange extends _$MeasurementDateRange {
   @override
-  DateTimeRange? build() => null;
+  DateTimeRange? build() => DateTimeRange(
+    start: DateTime.now().subtract(const Duration(days: 30)),
+    end: DateTime.now().add(const Duration(days: 1)),
+  );
 
   void set(DateTimeRange? range) => state = range;
   void clear() => state = null;
@@ -132,9 +191,92 @@ Future<List<Map<String, dynamic>>> plateauAlerts(Ref ref) async {
 }
 
 @riverpod
-Future<List<Map<String, dynamic>>> recentPRs(Ref ref) async {
-  final repo = ref.watch(statsRepositoryProvider);
-  return await repo.getRecentPRs();
+Future<List<FlSpot>> overallAchievementTrend(Ref ref) async {
+  final measurements = await ref.watch(bodyMeasurementsListProvider.future);
+  final targets = await ref.watch(bodyTargetsListProvider.future);
+  final dateRange = ref.watch(measurementDateRangeProvider);
+
+  if (targets.isEmpty) return [];
+
+  // 1. Filter and sort measurements
+  final filtered = measurements.where((m) {
+    if (dateRange == null) return true;
+    return m.date.isAfter(dateRange.start) && m.date.isBefore(dateRange.end);
+  }).toList();
+  filtered.sort((a, b) => a.date.compareTo(b.date));
+
+  // 2. For each measurement date, calculate average achievement
+  final List<FlSpot> spots = [];
+  for (final m in filtered) {
+    double totalAchievement = 0;
+    int count = 0;
+    for (final t in targets) {
+      final currentVal = extractMetricValue(m, t.metric);
+      if (currentVal == null || currentVal == 0) continue;
+
+      // Find first measurement ever for this metric to be the "start"
+      final firstM = measurements
+          .where((m2) => extractMetricValue(m2, t.metric) != null)
+          .toList()
+        ..sort((a, b) => a.date.compareTo(b.date));
+
+      if (firstM.isEmpty) continue;
+      final startVal = extractMetricValue(firstM.first, t.metric)!;
+      final targetVal = t.targetValue;
+
+      if ((targetVal - startVal).abs() > 0.001) {
+        final ratio = (currentVal - startVal) / (targetVal - startVal);
+        totalAchievement += ratio.clamp(-1.0, 2.0);
+        count++;
+      }
+    }
+    if (count > 0) {
+      spots.add(FlSpot(
+          m.date.millisecondsSinceEpoch.toDouble(), totalAchievement / count));
+    }
+  }
+  return spots;
+}
+
+@riverpod
+Future<List<FlSpot>> metricAchievementTrend(Ref ref,
+    {required String metricId}) async {
+  final measurements = await ref.watch(bodyMeasurementsListProvider.future);
+  final targets = await ref.watch(bodyTargetsListProvider.future);
+  final dateRange = ref.watch(measurementDateRangeProvider);
+
+  final target = targets.where((t) => t.metric == metricId).firstOrNull;
+  if (target == null) return [];
+
+  final filtered = measurements.where((m) {
+    if (dateRange == null) return true;
+    return m.date.isAfter(dateRange.start) && m.date.isBefore(dateRange.end);
+  }).toList();
+  filtered.sort((a, b) => a.date.compareTo(b.date));
+
+  final firstM = measurements
+      .where((m2) => extractMetricValue(m2, metricId) != null)
+      .toList()
+    ..sort((a, b) => a.date.compareTo(b.date));
+
+  if (firstM.isEmpty) return [];
+  final startVal = extractMetricValue(firstM.first, metricId)!;
+  final targetVal = target.targetValue;
+
+  return filtered
+      .map((m) {
+        final currentVal = extractMetricValue(m, metricId);
+        if (currentVal == null || currentVal == 0) return null;
+
+        double ratio = 0;
+        if ((targetVal - startVal).abs() > 0.001) {
+          ratio = (currentVal - startVal) / (targetVal - startVal);
+        }
+        return FlSpot(
+            m.date.millisecondsSinceEpoch.toDouble(), ratio.clamp(-1.0, 2.0));
+      })
+      .whereType<FlSpot>()
+      .toList();
 }
 
 @riverpod
@@ -184,24 +326,15 @@ class BodyMeasurementsList extends _$BodyMeasurementsList {
     ref.invalidateSelf();
   }
 
-  Future<void> seedSampleData() async {
+  Future<void> clearAllHistory() async {
     final repo = ref.read(measurementsRepositoryProvider);
-    final now = DateTime.now();
-    
-    // Generate 12 weeks of data
-    for (int i = 12; i >= 0; i--) {
-      final date = now.subtract(Duration(days: i * 7));
-      final weight = 85.0 - (10.0 * (12 - i) / 12); // Linear decrease from 85 to 75
-      final bodyFat = 25.0 - (7.0 * (12 - i) / 12); // Linear decrease from 25 to 18
-      
-      await repo.addMeasurement(ent.BodyMeasurement(
-        id: 0,
-        date: date,
-        weight: weight,
-        bodyFat: bodyFat,
-        waist: 95.0 - (5.0 * (12 - i) / 12),
-      ));
-    }
+    await repo.deleteAllMeasurements();
+    ref.invalidateSelf();
+  }
+
+  Future<void> seedSampleData() async {
+    // Hardcoded seeding disabled to ensure data integrity.
+    // In the future, this could be replaced with a real demo-data generator if needed.
     ref.invalidateSelf();
   }
 }
@@ -223,6 +356,12 @@ class BodyTargetsList extends _$BodyTargetsList {
   Future<void> deleteTarget(int id) async {
     final repo = ref.read(measurementsRepositoryProvider);
     await repo.deleteTarget(id);
+    ref.invalidateSelf();
+  }
+
+  Future<void> clearAllTargets() async {
+    final repo = ref.read(measurementsRepositoryProvider);
+    await repo.deleteAllTargets();
     ref.invalidateSelf();
   }
 
@@ -300,11 +439,6 @@ Future<PhysiqueAchievement> physiqueAchievement(Ref ref) async {
   final measurements = await ref.watch(bodyMeasurementsListProvider.future);
   final dateRange = ref.watch(measurementDateRangeProvider);
 
-  // Show empty state only when there is truly nothing at all
-  if (measurements.isEmpty && targets.isEmpty) {
-    return PhysiqueAchievement(overallScore: 0, achievements: []);
-  }
-
   return calculatePhysiqueScore(
     measurements.isEmpty ? null : measurements.first,
     targets,
@@ -362,13 +496,11 @@ PhysiqueAchievement calculatePhysiqueScore(
     return (val, date);
   }
 
-  // ── Emit a card for EVERY standard metric ────────────────────────────────
+  // ── Emit a card for EVERY standard metric — always, even if no data yet ──
   for (final cfg in standardMetrics) {
     final t = latestTargetMap[cfg.id]; // may be null → no target set yet
     final currentVal = findCurrent(cfg.id); // may be null → no measurement yet
-
-    // Skip only when there is absolutely nothing to show
-    if (currentVal == null && t == null) continue;
+    // Always show card; state 'No data logged yet' handled in UI
 
     final startLookup = dateRange?.start ?? t?.createdAt ?? DateTime.now();
     final (startRaw, startDate) = findStart(cfg.id, startLookup);

@@ -21,6 +21,7 @@ import 'package:ai_gym_mentor/features/analytics/presentation/strength_analytics
 import 'package:ai_gym_mentor/features/analytics/presentation/strength_analytics_notifier.dart';
 import 'package:ai_gym_mentor/features/analytics/presentation/providers/year_in_review_providers.dart';
 import 'package:ai_gym_mentor/features/analytics/presentation/widgets/measurements_tab.dart';
+import 'package:ai_gym_mentor/features/bodymap/screens/body_scan_screen.dart';
 
 import 'package:ai_gym_mentor/features/analytics/presentation/body_measurements_log_screen.dart';
 
@@ -37,7 +38,7 @@ class AnalyticsDashboardScreen extends ConsumerWidget {
 
 
     return DefaultTabController(
-      length: 3,
+      length: 5,
       child: Scaffold(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         body: NestedScrollView(
@@ -70,6 +71,8 @@ class AnalyticsDashboardScreen extends ConsumerWidget {
                       Tab(text: 'Glance'),
                       Tab(text: 'Strength'),
                       Tab(text: 'Measurements'),
+                      Tab(text: 'Muscle Map'),
+                      Tab(text: 'Heatmap'),
                     ],
                   ),
                 ),
@@ -79,209 +82,149 @@ class AnalyticsDashboardScreen extends ConsumerWidget {
           body: TabBarView(
             children: [
               // Overview Tab
-              RefreshIndicator(
-                onRefresh: () async {
-                  ref.invalidate(dashboardStatsProvider);
-                  ref.invalidate(volumeTrendProvider);
-                  ref.invalidate(frequencyTrendProvider);
-                  ref.invalidate(muscleBalanceProvider);
-                  ref.invalidate(plateauAlertsProvider);
-                  ref.invalidate(recentPRsProvider);
-                },
-                child: SingleChildScrollView(
-                  physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
-                  padding: const EdgeInsets.only(bottom: 50),
-                  child: Theme(
-                    data: Theme.of(context).copyWith(
-                      colorScheme: Theme.of(context).colorScheme.copyWith(
-                        surface: Theme.of(context).scaffoldBackgroundColor,
-                      ),
-                      textTheme: Theme.of(context).textTheme.apply(bodyColor: Colors.white, displayColor: Colors.white),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const FitnessWrappedCard(),
-                        _buildYearInReviewPromo(context, ref),
-                        // 1. Overview Stats Row
-                        statsAsync.when(
-                          data: (stats) {
-                            if (stats['totalWorkouts'] == 0) {
-                              return const _EmptyAnalyticsState();
-                            }
-                            return _OverviewRow(stats: stats, unit: unit);
-                          },
-                          loading: () => const _SkeletonRow(),
-                          error: (e, _) => const SizedBox.shrink(),
+              Builder(
+                builder: (context) {
+                  return RefreshIndicator(
+                    onRefresh: () async {
+                      ref.invalidate(dashboardStatsProvider);
+                      ref.invalidate(volumeTrendProvider);
+                      ref.invalidate(frequencyTrendProvider);
+                      ref.invalidate(muscleBalanceProvider);
+                      ref.invalidate(plateauAlertsProvider);
+                      ref.invalidate(recentPRsProvider);
+                    },
+                    child: CustomScrollView(
+                      physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+                      slivers: [
+                        SliverOverlapInjector(
+                          handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
                         ),
-      
-                        const SizedBox(height: 16),
-                        const TrainingHeatmap(),
-      
-                        // 2. Weekly Volume vs Body Weight (Dual Axis) - Beat Hevy Feature
-                        const _SectionHeader(
-                            title: 'Volume vs Body Weight', subtitle: 'Strength vs mass trend'),
-                        VolumeVsWeightChart(unit: unit),
-      
-                        // 3. Weekly Volume Trend (Detailed Bar)
-                        const _SectionHeader(
-                            title: 'Weekly Volume Trend', subtitle: 'Last 12 weeks'),
-                        _LazyChart(
-                          builder: (ref) => ref.watch(volumeTrendProvider).when(
-                                data: (data) => _VolumeChart(data: data, unit: unit),
-                                loading: () => const _SkeletonChart(),
-                                error: (e, _) => Center(child: Text('Error: $e', style: const TextStyle(color: Colors.white))),
+                        SliverToBoxAdapter(
+                          child: Theme(
+                            data: Theme.of(context).copyWith(
+                              colorScheme: Theme.of(context).colorScheme.copyWith(
+                                surface: Theme.of(context).scaffoldBackgroundColor,
                               ),
-                        ),
-      
-                        // 3. Workout Frequency
-                        const _SectionHeader(
-                            title: 'Workout Frequency',
-                            subtitle: 'Target: 4 sessions/week'),
-                        _LazyChart(
-                          builder: (ref) => ref.watch(frequencyTrendProvider).when(
-                                data: (data) => _FrequencyChart(data: data, target: 4),
-                                loading: () => const _SkeletonChart(),
-                                error: (e, _) => Center(child: Text('Error: $e', style: const TextStyle(color: Colors.white))),
-                              ),
-                        ),
-      
-                        // 3.1 Body Weight Trend
-                        const _SectionHeader(
-                            title: 'Body Weight Trend', subtitle: 'Progress over time'),
-                        _LazyChart(
-                          builder: (ref) {
-                            final weightDataAsync = ref.watch(weightTrendProvider);
-                            final targetsAsync = ref.watch(bodyTargetsListProvider);
-                            
-                            final weightTarget = targetsAsync.when(
-                              data: (targets) => targets.where((t) => t.metric == 'weight').firstOrNull?.targetValue,
-                              loading: () => null,
-                              error: (_, _) => null,
-                            );
-    
-                            return weightDataAsync.when(
-                              data: (data) => StatsTrendChart(
-                                data: data, 
-                                type: StatType.weight,
-                                targetValue: weightTarget,
-                              ),
-                              loading: () => const _SkeletonChart(),
-                              error: (e, _) => Center(child: Text('Error: $e', style: const TextStyle(color: Colors.white))),
-                            );
-                          },
-                        ),
-      
-                        // 3.2 Workout Duration Trend
-                        const _SectionHeader(
-                            title: 'Duration Trend', subtitle: 'Average workout length'),
-                        _LazyChart(
-                          builder: (ref) => ref.watch(durationTrendProvider).when(
-                                data: (data) => StatsTrendChart(data: data, type: StatType.duration),
-                                loading: () => const _SkeletonChart(),
-                                error: (e, _) => Center(child: Text('Error: $e', style: const TextStyle(color: Colors.white))),
-                              ),
-                        ),
-      
-                        // 4. Muscle Group Balance
-                        const _SectionHeader(
-                            title: 'Muscle Balance',
-                            subtitle: 'This month vs Last month'),
-                        _LazyChart(
-                          height: 350,
-                          builder: (ref) => ref.watch(muscleBalanceProvider).when(
-                                data: (data) => _MuscleBarChart(data: data),
-                                loading: () => const _SkeletonChart(height: 350),
-                                error: (e, _) => Center(child: Text('Error: $e', style: const TextStyle(color: Colors.white))),
-                              ),
-                        ),
-      
-                        // 4.1 BodyMap Heatmap Entry
-                        _SectionHeader(
-                          title: 'Muscle Heatmap',
-                          subtitle: 'Visualize your training & recovery',
-                          onTrailingTap: () => context.push('/analytics/bodymap'),
-                          trailingLabel: 'View Full Map',
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          child: InkWell(
-                            onTap: () => context.push('/analytics/bodymap'),
-                            child: Container(
-                              padding: const EdgeInsets.all(16),
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: [
-                                    Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
-                                    Theme.of(context).colorScheme.primary.withValues(alpha: 0.05),
-                                  ],
+                              textTheme: Theme.of(context).textTheme.apply(bodyColor: Colors.white, displayColor: Colors.white),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const FitnessWrappedCard(),
+                                _buildYearInReviewPromo(context, ref),
+                                // 1. Overview Stats Row
+                                statsAsync.when(
+                                  data: (stats) {
+                                    if (stats['totalWorkouts'] == 0) {
+                                      return const _EmptyAnalyticsState();
+                                    }
+                                    return _OverviewRow(stats: stats, unit: unit);
+                                  },
+                                  loading: () => const _SkeletonRow(),
+                                  error: (e, _) => const SizedBox.shrink(),
                                 ),
-                                borderRadius: BorderRadius.circular(16),
-                                border: Border.all(
-                                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
+              
+                                const SizedBox(height: 16),
+                                const TrainingHeatmap(),
+              
+                                // 2. Weekly Volume vs Body Weight (Dual Axis) - Beat Hevy Feature
+                                const _SectionHeader(
+                                    title: 'Volume vs Body Weight', subtitle: 'Strength vs mass trend'),
+                                VolumeVsWeightChart(unit: unit),
+              
+                                // 3. Weekly Volume Trend (Detailed Bar)
+                                const _SectionHeader(
+                                    title: 'Weekly Volume Trend', subtitle: 'Last 12 weeks'),
+                                _LazyChart(
+                                  builder: (ref) => ref.watch(volumeTrendProvider).when(
+                                        data: (data) => _VolumeChart(data: data, unit: unit),
+                                        loading: () => const _SkeletonChart(),
+                                        error: (e, _) => Center(child: Text('Error: $e', style: const TextStyle(color: Colors.white))),
+                                      ),
                                 ),
-                              ),
-                              child: Row(
-                                children: [
-                                  const Icon(LucideIcons.accessibility, size: 40, color: Colors.white),
-                                  const SizedBox(width: 16),
-                                  const Expanded(
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          'Interactive Body Map',
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 16,
-                                            color: Colors.white,
-                                          ),
-                                        ),
-                                        Text(
-                                          'Track volume distribution and predict soreness across all muscle groups.',
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            color: Colors.white70,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  Icon(
-                                    LucideIcons.chevronRight,
-                                    color: Theme.of(context).colorScheme.primary,
-                                  ),
-                                ],
-                              ),
+              
+                                // 3. Workout Frequency
+                                const _SectionHeader(
+                                    title: 'Workout Frequency',
+                                    subtitle: 'Target: 4 sessions/week'),
+                                _LazyChart(
+                                  builder: (ref) => ref.watch(frequencyTrendProvider).when(
+                                        data: (data) => _FrequencyChart(data: data, target: 4),
+                                        loading: () => const _SkeletonChart(),
+                                        error: (e, _) => Center(child: Text('Error: $e', style: const TextStyle(color: Colors.white))),
+                                      ),
+                                ),
+              
+                                // 3.1 Body Weight Trend
+                                const _SectionHeader(
+                                    title: 'Body Weight Trend', subtitle: 'Progress over time'),
+                                _LazyChart(
+                                  builder: (ref) {
+                                    final weightDataAsync = ref.watch(weightTrendProvider);
+                                    final targetsAsync = ref.watch(bodyTargetsListProvider);
+                                    
+                                    final weightTarget = targetsAsync.when(
+                                      data: (targets) => targets.where((t) => t.metric == 'weight').firstOrNull?.targetValue,
+                                      loading: () => null,
+                                      error: (_, _) => null,
+                                    );
+            
+                                    return weightDataAsync.when(
+                                      data: (data) => StatsTrendChart(
+                                        data: data, 
+                                        type: StatType.weight,
+                                        targetValue: weightTarget,
+                                      ),
+                                      loading: () => const _SkeletonChart(),
+                                      error: (e, _) => Center(child: Text('Error: $e', style: const TextStyle(color: Colors.white))),
+                                    );
+                                  },
+                                ),
+              
+                                // 3.2 Workout Duration Trend
+                                const _SectionHeader(
+                                    title: 'Duration Trend', subtitle: 'Average workout length'),
+                                _LazyChart(
+                                  builder: (ref) => ref.watch(durationTrendProvider).when(
+                                        data: (data) => StatsTrendChart(data: data, type: StatType.duration),
+                                        loading: () => const _SkeletonChart(),
+                                        error: (e, _) => Center(child: Text('Error: $e', style: const TextStyle(color: Colors.white))),
+                                      ),
+                                ),
+              
+                                // Muscle Group Balance section removed from here (moved to Muscle Map tab)
+              
+        
+                                // 5. Plateau Alerts
+                                alertsAsync.when(
+                                  data: (alerts) => alerts.isNotEmpty
+                                      ? _PlateauSection(alerts: alerts)
+                                      : const SizedBox.shrink(),
+                                  loading: () => const SizedBox.shrink(),
+                                  error: (_, _) => const SizedBox.shrink(),
+                                ),
+              
+                                // 6. Recent PRs
+                                _SectionHeader(
+                                  title: 'Recent Records',
+                                  subtitle: 'Last 30 days',
+                                  onTrailingTap: () => context.push('/analytics/prs'),
+                                  trailingLabel: 'View All',
+                                ),
+                                prsAsync.when(
+                                  data: (prs) => _RecentPRsCarousel(prs: prs),
+                                  loading: () => const _SkeletonRow(),
+                                  error: (_, _) => const SizedBox.shrink(),
+                                ),
+                                const SizedBox(height: 50),
+                              ],
                             ),
                           ),
                         ),
-      
-                        // 5. Plateau Alerts
-                        alertsAsync.when(
-                          data: (alerts) => alerts.isNotEmpty
-                              ? _PlateauSection(alerts: alerts)
-                              : const SizedBox.shrink(),
-                          loading: () => const SizedBox.shrink(),
-                          error: (_, _) => const SizedBox.shrink(),
-                        ),
-      
-                        // 6. Recent PRs
-                        _SectionHeader(
-                          title: 'Recent Records',
-                          subtitle: 'Last 30 days',
-                          onTrailingTap: () => context.push('/analytics/prs'),
-                          trailingLabel: 'View All',
-                        ),
-                        prsAsync.when(
-                          data: (prs) => _RecentPRsCarousel(prs: prs),
-                          loading: () => const _SkeletonRow(),
-                          error: (_, _) => const SizedBox.shrink(),
-                        ),
                       ],
                     ),
-                  ),
-                ),
+                  );
+                }
               ),
               
               // Strength Tab
@@ -294,6 +237,45 @@ class AnalyticsDashboardScreen extends ConsumerWidget {
   
               // Measurements Tab
               const MeasurementsTab(),
+
+              // Muscle Map Tab
+              Builder(
+                builder: (context) {
+                  return RefreshIndicator(
+                    onRefresh: () async => ref.invalidate(muscleBalanceProvider),
+                    child: CustomScrollView(
+                      slivers: [
+                        SliverOverlapInjector(
+                          handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
+                        ),
+                        SliverToBoxAdapter(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 24),
+                            child: Column(
+                              children: [
+                                const _SectionHeader(
+                                    title: 'Muscle Distribution',
+                                    subtitle: 'Workload balance by group'),
+                                _LazyChart(
+                                  height: 350,
+                                  builder: (ref) => ref.watch(muscleBalanceProvider).when(
+                                        data: (data) => _MuscleBarChart(data: data),
+                                        loading: () => const _SkeletonChart(height: 350),
+                                        error: (e, _) => Center(child: Text('Error: $e')),
+                                      ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+              ),
+
+              // Heatmap Tab
+              const BodyScanScreen(embedded: true),
             ],
           ),
         ),
@@ -303,7 +285,7 @@ class AnalyticsDashboardScreen extends ConsumerWidget {
               listenable: DefaultTabController.of(context),
               builder: (context, _) {
                 final index = DefaultTabController.of(context).index;
-                if (index != 2) return const SizedBox.shrink();
+                if (index != 3) return const SizedBox.shrink();
   
                 return FloatingActionButton.extended(
                   onPressed: () {

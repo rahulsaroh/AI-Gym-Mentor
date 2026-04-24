@@ -13,6 +13,7 @@ part 'database.g.dart';
 enum SetType {
   straight,
   warmup,
+  cooldown,
   superset,
   dropSet,
   amrap,

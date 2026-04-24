@@ -1,25 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:ai_gym_mentor/features/analytics/analytics_providers.dart';
 
-class BodyScanScreen extends StatefulWidget {
-  const BodyScanScreen({super.key});
+class BodyScanScreen extends ConsumerStatefulWidget {
+  /// When [embedded] is true the widget renders without a Scaffold/AppBar,
+  /// suitable for embedding inside a TabBarView. Defaults to false (full screen).
+  final bool embedded;
+  const BodyScanScreen({super.key, this.embedded = false});
 
   @override
-  State<BodyScanScreen> createState() => _BodyScanScreenState();
+  ConsumerState<BodyScanScreen> createState() => _BodyScanScreenState();
 }
 
-class _BodyScanScreenState extends State<BodyScanScreen> with SingleTickerProviderStateMixin {
+class _BodyScanScreenState extends ConsumerState<BodyScanScreen> with SingleTickerProviderStateMixin {
   bool _isHeatmap = false;
   late AnimationController _fadeController;
   late Animation<double> _fadeAnimation;
-
-  final Map<String, String> _measurements = {
-    'Chest': '98 cm',
-    'Waist': '82 cm',
-    'Hips': '94 cm',
-    'Thighs': '58 cm',
-    'Arms': '34 cm',
-  };
 
   @override
   void initState() {
@@ -32,12 +29,8 @@ class _BodyScanScreenState extends State<BodyScanScreen> with SingleTickerProvid
       parent: _fadeController,
       curve: Curves.easeIn,
     );
-    
-    // Start initial fade-in animation
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) {
-        _fadeController.forward();
-      }
+      if (mounted) _fadeController.forward();
     });
   }
 
@@ -49,16 +42,72 @@ class _BodyScanScreenState extends State<BodyScanScreen> with SingleTickerProvid
 
   void _toggleView(bool heatmap) {
     if (_isHeatmap == heatmap) return;
-    setState(() {
-      _isHeatmap = heatmap;
-    });
+    setState(() => _isHeatmap = heatmap);
   }
 
   @override
   Widget build(BuildContext context) {
-    // Respect accessibility settings for animations
     final bool animationsDisabled = MediaQuery.of(context).disableAnimations;
-    final Duration crossFadeDuration = animationsDisabled ? Duration.zero : const Duration(milliseconds: 400);
+    final Duration crossFadeDuration =
+        animationsDisabled ? Duration.zero : const Duration(milliseconds: 400);
+
+    final physiqueAsync = ref.watch(physiqueAchievementProvider);
+
+    final bodyContent = physiqueAsync.when(
+      data: (physique) {
+        // Map of metric ID to its latest value
+        final latestValues = <String, String>{};
+        for (var a in physique.achievements) {
+          if (a.currentValue > 0) {
+            latestValues[a.metric] = '${a.currentValue.toStringAsFixed(1)}';
+          }
+        }
+
+        // Define which metrics to show in the chips below the scan
+        final displayMetrics = [
+          {'label': 'Chest', 'id': 'chest'},
+          {'label': 'Waist', 'id': 'waist'},
+          {'label': 'Hips', 'id': 'hips'},
+          {'label': 'Thighs', 'id': 'thighLeft'}, // using thighLeft as representative
+          {'label': 'Arms', 'id': 'armLeft'},    // using armLeft as representative
+        ];
+
+        return Container(
+          color: const Color(0xFF0E0E12),
+          child: FadeTransition(
+            opacity: _fadeAnimation,
+            child: Column(
+              children: [
+                const SizedBox(height: 20),
+                _buildToggle(),
+                Expanded(
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      _buildTealGlow(),
+                      _buildInteractiveBody(crossFadeDuration),
+                    ],
+                  ),
+                ),
+                _buildMeasurementChips(displayMetrics, latestValues),
+                const SizedBox(height: 40),
+              ],
+            ),
+          ),
+        );
+      },
+      loading: () => Container(
+        color: const Color(0xFF0E0E12),
+        child: const Center(child: CircularProgressIndicator()),
+      ),
+      error: (e, _) => Container(
+        color: const Color(0xFF0E0E12),
+        child: Center(child: Text('Error: $e', style: const TextStyle(color: Colors.white))),
+      ),
+    );
+
+    // Embedded mode: no Scaffold/AppBar — used inside TabBarView
+    if (widget.embedded) return bodyContent;
 
     return Scaffold(
       backgroundColor: const Color(0xFF0E0E12),
@@ -75,32 +124,11 @@ class _BodyScanScreenState extends State<BodyScanScreen> with SingleTickerProvid
         ),
         centerTitle: true,
       ),
-      body: FadeTransition(
-        opacity: _fadeAnimation,
-        child: Column(
-          children: [
-            const SizedBox(height: 20),
-            _buildToggle(),
-            Expanded(
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  _buildTealGlow(),
-                  _buildInteractiveBody(crossFadeDuration),
-                ],
-              ),
-            ),
-            _buildMeasurementChips(),
-            const SizedBox(height: 40),
-          ],
-        ),
-      ),
+      body: bodyContent,
     );
   }
 
   Widget _buildToggle() {
-    final accentColor = const Color(0xFF01696F);
-    
     return Container(
       width: 240,
       height: 44,
@@ -198,8 +226,8 @@ class _BodyScanScreenState extends State<BodyScanScreen> with SingleTickerProvid
       },
       child: InteractiveViewer(
         key: ValueKey(_isHeatmap),
-        minScale: 0.8,
-        maxScale: 3.0,
+        scaleEnabled: false,
+        panEnabled: false,
         boundaryMargin: const EdgeInsets.all(20),
         child: LayoutBuilder(
           builder: (context, constraints) {
@@ -282,15 +310,17 @@ class _BodyScanScreenState extends State<BodyScanScreen> with SingleTickerProvid
     );
   }
 
-  Widget _buildMeasurementChips() {
+  Widget _buildMeasurementChips(List<Map<String, String>> metrics, Map<String, String> values) {
     return SizedBox(
       height: 80,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 16),
-        itemCount: _measurements.length,
+        itemCount: metrics.length,
         itemBuilder: (context, index) {
-          final entry = _measurements.entries.elementAt(index);
+          final metric = metrics[index];
+          final value = values[metric['id']!] ?? '--';
+          
           return Container(
             width: 110,
             margin: const EdgeInsets.only(right: 12),
@@ -306,7 +336,7 @@ class _BodyScanScreenState extends State<BodyScanScreen> with SingleTickerProvid
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  entry.key,
+                  metric['label']!,
                   style: GoogleFonts.dmSans(
                     color: Colors.white60,
                     fontSize: 12,
@@ -314,7 +344,7 @@ class _BodyScanScreenState extends State<BodyScanScreen> with SingleTickerProvid
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  entry.value,
+                  value != '--' ? '$value cm' : value,
                   style: GoogleFonts.rajdhani(
                     color: Colors.white,
                     fontSize: 18,
@@ -343,4 +373,3 @@ class _HeatmapCallout {
     required this.color,
   });
 }
-

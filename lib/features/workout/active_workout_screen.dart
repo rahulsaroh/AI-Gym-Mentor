@@ -1820,6 +1820,10 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
         text = 'F';
         color = Colors.red.shade700;
         break;
+      case db.SetType.cooldown:
+        text = 'CD';
+        color = Colors.green;
+        break;
     }
 
     return Container(

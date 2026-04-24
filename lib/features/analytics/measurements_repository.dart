@@ -184,6 +184,17 @@ class MeasurementsRepository {
   Future<void> deleteTarget(int id) async {
     await (db.delete(db.bodyTargets)..where((t) => t.id.equals(id))).go();
   }
+
+  Future<void> deleteAllMeasurements() async {
+    await db.transaction(() async {
+      await db.delete(db.bodyMeasurements).go();
+      await (db.delete(db.syncQueue)..where((t) => t.type.equals('measurement'))).go();
+    });
+  }
+
+  Future<void> deleteAllTargets() async {
+    await db.delete(db.bodyTargets).go();
+  }
 }
 
 @riverpod
