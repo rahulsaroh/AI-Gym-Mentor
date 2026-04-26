@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fl_chart/fl_chart.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:intl/intl.dart';
@@ -39,12 +40,6 @@ class MetricDetailScreen extends ConsumerWidget {
         ),
         elevation: 0,
         backgroundColor: Colors.transparent,
-      ),
-      bottomNavigationBar: const SafeArea(
-        child: Padding(
-          padding: EdgeInsets.only(bottom: 8),
-          child: _IntervalSelector(),
-        ),
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => Navigator.push(
@@ -96,7 +91,7 @@ class MetricDetailScreen extends ConsumerWidget {
                     child: SizedBox(
                       height: 40,
                       width: 250,
-                      child: _MetricMiniTrendline(metricId: metricId),
+                      child: _MiniTrendline(metricId: metricId),
                     ),
                   ),
                 ),
@@ -643,6 +638,52 @@ class _LogEntryCard extends StatelessWidget {
           ),
         ]),
       ),
+    );
+  }
+}
+
+// ─── Mini Trendline ──────────────────────────────────────────────────────────
+
+class _MiniTrendline extends ConsumerWidget {
+  final String metricId;
+  const _MiniTrendline({required this.metricId});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final trendAsync = ref.watch(metricAchievementTrendProvider(metricId: metricId));
+
+    return trendAsync.when(
+      data: (spots) {
+        if (spots.length < 2) return const SizedBox.shrink();
+
+        return LineChart(
+          LineChartData(
+            gridData: FlGridData(show: false),
+            titlesData: FlTitlesData(show: false),
+            borderData: FlBorderData(show: false),
+            minX: spots.first.x,
+            maxX: spots.last.x,
+            minY: -0.1,
+            maxY: 1.1,
+            lineBarsData: [
+              LineChartBarData(
+                spots: spots,
+                isCurved: true,
+                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.5),
+                barWidth: 2,
+                isStrokeCapRound: true,
+                dotData: FlDotData(show: false),
+                belowBarData: BarAreaData(
+                  show: true,
+                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.05),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+      loading: () => const SizedBox.shrink(),
+      error: (_, __) => const SizedBox.shrink(),
     );
   }
 }

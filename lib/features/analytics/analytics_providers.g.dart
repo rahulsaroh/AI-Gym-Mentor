@@ -8,6 +8,63 @@ part of 'analytics_providers.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
+
+@ProviderFor(SelectedMeasurementInterval)
+final selectedMeasurementIntervalProvider =
+    SelectedMeasurementIntervalProvider._();
+
+final class SelectedMeasurementIntervalProvider
+    extends
+        $NotifierProvider<SelectedMeasurementInterval, MeasurementInterval> {
+  SelectedMeasurementIntervalProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'selectedMeasurementIntervalProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$selectedMeasurementIntervalHash();
+
+  @$internal
+  @override
+  SelectedMeasurementInterval create() => SelectedMeasurementInterval();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(MeasurementInterval value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<MeasurementInterval>(value),
+    );
+  }
+}
+
+String _$selectedMeasurementIntervalHash() =>
+    r'd9aee215b0e0e67ec2de59cf4d673dc398434ca8';
+
+abstract class _$SelectedMeasurementInterval
+    extends $Notifier<MeasurementInterval> {
+  MeasurementInterval build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<MeasurementInterval, MeasurementInterval>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<MeasurementInterval, MeasurementInterval>,
+              MeasurementInterval,
+              Object?,
+              Object?
+            >;
+    element.handleCreate(ref, build);
+  }
+}
+
 /// Global date-range filter for the Measurements tab.
 /// When null: each target uses its own createdAt/deadline.
 /// When set: ALL cards compute progress within this window.
@@ -51,7 +108,7 @@ final class MeasurementDateRangeProvider
 }
 
 String _$measurementDateRangeHash() =>
-    r'2a8f1b32401acc356e36a4c6f43e72be45c4de51';
+    r'bcf67781ae99f9e914b611fa49147864d29dbe45';
 
 /// Global date-range filter for the Measurements tab.
 /// When null: each target uses its own createdAt/deadline.
@@ -447,6 +504,123 @@ final class PlateauAlertsProvider
 
 String _$plateauAlertsHash() => r'd73aa8790884bff04ee1f39639dd3c3f331bac6f';
 
+@ProviderFor(overallAchievementTrend)
+final overallAchievementTrendProvider = OverallAchievementTrendProvider._();
+
+final class OverallAchievementTrendProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<FlSpot>>,
+          List<FlSpot>,
+          FutureOr<List<FlSpot>>
+        >
+    with $FutureModifier<List<FlSpot>>, $FutureProvider<List<FlSpot>> {
+  OverallAchievementTrendProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'overallAchievementTrendProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$overallAchievementTrendHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<List<FlSpot>> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<List<FlSpot>> create(Ref ref) {
+    return overallAchievementTrend(ref);
+  }
+}
+
+String _$overallAchievementTrendHash() =>
+    r'52da5c267f8af25142f6ed99835878a80e87fb61';
+
+@ProviderFor(metricAchievementTrend)
+final metricAchievementTrendProvider = MetricAchievementTrendFamily._();
+
+final class MetricAchievementTrendProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<FlSpot>>,
+          List<FlSpot>,
+          FutureOr<List<FlSpot>>
+        >
+    with $FutureModifier<List<FlSpot>>, $FutureProvider<List<FlSpot>> {
+  MetricAchievementTrendProvider._({
+    required MetricAchievementTrendFamily super.from,
+    required String super.argument,
+  }) : super(
+         retry: null,
+         name: r'metricAchievementTrendProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
+
+  @override
+  String debugGetCreateSourceHash() => _$metricAchievementTrendHash();
+
+  @override
+  String toString() {
+    return r'metricAchievementTrendProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $FutureProviderElement<List<FlSpot>> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<List<FlSpot>> create(Ref ref) {
+    final argument = this.argument as String;
+    return metricAchievementTrend(ref, metricId: argument);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is MetricAchievementTrendProvider &&
+        other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$metricAchievementTrendHash() =>
+    r'84dd7a377b1055f6899ce558f25c325e4abd73de';
+
+final class MetricAchievementTrendFamily extends $Family
+    with $FunctionalFamilyOverride<FutureOr<List<FlSpot>>, String> {
+  MetricAchievementTrendFamily._()
+    : super(
+        retry: null,
+        name: r'metricAchievementTrendProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  MetricAchievementTrendProvider call({required String metricId}) =>
+      MetricAchievementTrendProvider._(argument: metricId, from: this);
+
+  @override
+  String toString() => r'metricAchievementTrendProvider';
+}
+
 @ProviderFor(recentPRs)
 final recentPRsProvider = RecentPRsProvider._();
 
@@ -632,7 +806,7 @@ final class BodyMeasurementsListProvider
 }
 
 String _$bodyMeasurementsListHash() =>
-    r'345767473605a090769e875cf433d2cc947448a0';
+    r'670ee9d91203ba4747ac9e39be2fee1174de27f5';
 
 abstract class _$BodyMeasurementsList
     extends $AsyncNotifier<List<ent.BodyMeasurement>> {
@@ -685,7 +859,7 @@ final class BodyTargetsListProvider
   BodyTargetsList create() => BodyTargetsList();
 }
 
-String _$bodyTargetsListHash() => r'da7fb90127a5f714ff54e146de108a600d577fcf';
+String _$bodyTargetsListHash() => r'c9f46fb94fa6d217796e47846c83a639dbf4d62c';
 
 abstract class _$BodyTargetsList
     extends $AsyncNotifier<List<target.BodyTarget>> {
@@ -851,4 +1025,4 @@ final class PhysiqueAchievementProvider
 }
 
 String _$physiqueAchievementHash() =>
-    r'2879681a590bd8314cc46db3383207e5dd971a56';
+    r'c20a983984a211c21728978c7a821b0cc02d841c';

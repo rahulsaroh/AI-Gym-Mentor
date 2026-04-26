@@ -8,6 +8,7 @@ import 'package:ai_gym_mentor/core/domain/entities/progress_photo.dart'
     as photo;
 import 'package:ai_gym_mentor/core/domain/entities/body_achievement.dart';
 import 'package:flutter/material.dart';
+import 'package:fl_chart/fl_chart.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -277,6 +278,12 @@ Future<List<FlSpot>> metricAchievementTrend(Ref ref,
       })
       .whereType<FlSpot>()
       .toList();
+}
+
+@riverpod
+Future<List<Map<String, dynamic>>> recentPRs(Ref ref) async {
+  final repo = ref.watch(statsRepositoryProvider);
+  return await repo.getRecentPRs();
 }
 
 @riverpod

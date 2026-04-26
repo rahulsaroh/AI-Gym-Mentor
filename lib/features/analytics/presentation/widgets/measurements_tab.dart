@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fl_chart/fl_chart.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:ai_gym_mentor/features/analytics/analytics_providers.dart';
@@ -217,47 +218,6 @@ class _OverallProgressCard extends ConsumerWidget {
           const SizedBox(height: 12),
           const _IntervalSelector(),
         ]),
-      ),
-    );
-  }
-}
-
-class _IntervalSelector extends ConsumerWidget {
-  const _IntervalSelector();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final selected = ref.watch(selectedMeasurementIntervalProvider);
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: MeasurementInterval.values.map((interval) {
-          final isSelected = selected == interval;
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4),
-            child: ChoiceChip(
-              label: Text(interval.label, 
-                style: GoogleFonts.outfit(
-                  fontSize: 12, 
-                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                  color: isSelected ? Colors.white : null,
-                )),
-              selected: isSelected,
-              onSelected: (_) => ref.read(selectedMeasurementIntervalProvider.notifier).set(interval),
-              selectedColor: Theme.of(context).colorScheme.primary,
-              backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-              showCheckmark: false,
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            ),
-          );
-        }).toList(),
-      ),
-    );
-  }
-}
         const SizedBox(height: 24),
 
         // 3-color Gauge
@@ -359,6 +319,43 @@ class _IntervalSelector extends ConsumerWidget {
     if (picked != null) {
       ref.read(measurementDateRangeProvider.notifier).set(picked);
     }
+  }
+}
+
+class _IntervalSelector extends ConsumerWidget {
+  const _IntervalSelector();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final selected = ref.watch(selectedMeasurementIntervalProvider);
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: MeasurementInterval.values.map((interval) {
+          final isSelected = selected == interval;
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+            child: ChoiceChip(
+              label: Text(interval.label, 
+                style: GoogleFonts.outfit(
+                  fontSize: 12, 
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                  color: isSelected ? Colors.white : null,
+                )),
+              selected: isSelected,
+              onSelected: (_) => ref.read(selectedMeasurementIntervalProvider.notifier).set(interval),
+              selectedColor: Theme.of(context).colorScheme.primary,
+              backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              showCheckmark: false,
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
+          );
+        }).toList(),
+      ),
+    );
   }
 }
 
@@ -715,9 +712,9 @@ class _OverallMiniTrendline extends ConsumerWidget {
 
         return LineChart(
           LineChartData(
-            gridData: const FlGridData(show: false),
-            titlesData: const FlTitlesData(show: false),
-            borderData: const FlBorderData(show: false),
+            gridData: FlGridData(show: false),
+            titlesData: FlTitlesData(show: false),
+            borderData: FlBorderData(show: false),
             minX: spots.first.x,
             maxX: spots.last.x,
             minY: -0.1, 
@@ -729,7 +726,7 @@ class _OverallMiniTrendline extends ConsumerWidget {
                 color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.5),
                 barWidth: 2,
                 isStrokeCapRound: true,
-                dotData: const FlDotData(show: false),
+                dotData: FlDotData(show: false),
                 belowBarData: BarAreaData(
                   show: true,
                   color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.05),
@@ -759,9 +756,9 @@ class _MetricMiniTrendline extends ConsumerWidget {
 
         return LineChart(
           LineChartData(
-            gridData: const FlGridData(show: false),
-            titlesData: const FlTitlesData(show: false),
-            borderData: const FlBorderData(show: false),
+            gridData: FlGridData(show: false),
+            titlesData: FlTitlesData(show: false),
+            borderData: FlBorderData(show: false),
             minX: spots.first.x,
             maxX: spots.last.x,
             minY: -0.1,
@@ -773,7 +770,7 @@ class _MetricMiniTrendline extends ConsumerWidget {
                 color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.5),
                 barWidth: 2,
                 isStrokeCapRound: true,
-                dotData: const FlDotData(show: false),
+                dotData: FlDotData(show: false),
                 belowBarData: BarAreaData(
                   show: true,
                   color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.05),
