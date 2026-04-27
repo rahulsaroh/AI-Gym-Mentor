@@ -1205,7 +1205,7 @@ final elitePPLProgram = SampleProgram(
           notes: 'back on wall and slide hands on wall 2x10 reps',
         ),
         SampleProgramExercise(
-          name: 'Band face pull',
+          name: 'Band pull-apart',
           setType: 'warmup',
           notes: '2x15 reps',
         ),
@@ -1333,7 +1333,7 @@ final elitePPLProgram = SampleProgram(
       exercises: [
         SampleProgramExercise(name: 'Band pull-apart', notes: '2x15 reps'),
         SampleProgramExercise(
-          name: 'Rotator cuff internal/external rotation',
+          name: 'Wall shoulder CARs',
           notes: 'each 2x12 reps',
         ),
         SampleProgramExercise(
