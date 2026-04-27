@@ -66,6 +66,24 @@ class _ExcelSyncScreenState extends ConsumerState<ExcelSyncScreen> {
     }
   }
 
+  Future<void> _handleQuickSave() async {
+    setState(() => _isProcessing = true);
+    try {
+      final result = await ref.read(exportServiceProvider).saveExcelToDownloads();
+      if (mounted && result != null) {
+        _showExportResultSheet(result, isQuickSave: true);
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Quick save failed: $e')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isProcessing = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -93,6 +111,14 @@ class _ExcelSyncScreenState extends ConsumerState<ExcelSyncScreen> {
                   icon: LucideIcons.fileDown,
                   iconColor: Colors.green,
                   onTap: _isProcessing ? null : _handleImport,
+                ),
+                const SizedBox(height: 20),
+                _buildSyncCard(
+                  title: 'Save excel file',
+                  subtitle: 'Auto-save to /Download/GymLog/gym_log.xlsx',
+                  icon: LucideIcons.save,
+                  iconColor: Colors.blue,
+                  onTap: _isProcessing ? null : _handleQuickSave,
                 ),
                 const Spacer(),
                 const Center(
@@ -173,7 +199,7 @@ class _ExcelSyncScreenState extends ConsumerState<ExcelSyncScreen> {
     );
   }
 
-  void _showExportResultSheet(Map<String, dynamic> result) {
+  void _showExportResultSheet(Map<String, dynamic> result, {bool isQuickSave = false}) {
     final double sizeInKb = (result['fileSize'] as int) / 1024;
     final String sizeStr = sizeInKb > 1024 
         ? '${(sizeInKb / 1024).toStringAsFixed(1)} MB'
@@ -209,12 +235,14 @@ class _ExcelSyncScreenState extends ConsumerState<ExcelSyncScreen> {
             ),
             const SizedBox(height: 16),
             Text(
-              'Data Export Ready',
+              isQuickSave ? 'Data Saved Successfully' : 'Data Export Ready',
               style: GoogleFonts.outfit(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             Text(
-              'Your training and physique logs have been compiled.',
+              isQuickSave 
+                ? 'Your logs have been saved to /Download/GymLog/gym_log.xlsx'
+                : 'Your training and physique logs have been compiled.',
               style: TextStyle(color: Colors.grey.shade600),
               textAlign: TextAlign.center,
             ),
@@ -241,12 +269,22 @@ class _ExcelSyncScreenState extends ConsumerState<ExcelSyncScreen> {
                 const SizedBox(width: 12),
                 Expanded(
                   child: FilledButton.icon(
-                    onPressed: () {
+                    onPressed: () async {
                       Navigator.pop(context);
-                      Share.shareXFiles([XFile(result['path'])], text: 'My Gym Log Export');
+                      if (isQuickSave) {
+                        // Already saved, maybe offer to share anyway?
+                        Share.shareXFiles([XFile(result['path'])], text: 'My Gym Log Export');
+                      } else {
+                        // For manual export, save it first then share or just share
+                        // User specifically asked for "save option" instead of "share option"
+                        await ref.read(exportServiceProvider).saveExcelToDownloads();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('File saved to Downloads/GymLog')),
+                        );
+                      }
                     },
-                    icon: const Icon(LucideIcons.share2, size: 18),
-                    label: const Text('Share File'),
+                    icon: Icon(isQuickSave ? LucideIcons.share2 : LucideIcons.save, size: 18),
+                    label: Text(isQuickSave ? 'Share Anyway' : 'Save File'),
                     style: FilledButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),

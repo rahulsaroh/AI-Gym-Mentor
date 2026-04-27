@@ -77,8 +77,9 @@ class StatsRepository {
       final volume = row.readTable(db.workoutSets).weight *
           row.readTable(db.workoutSets).reps;
 
-      // Calculate week start for the key
-      final weekStart = date.subtract(Duration(days: date.weekday - 1));
+      // Calculate week start for the key using local time to be consistent with user's perspective
+      final localDate = date.toLocal();
+      final weekStart = localDate.subtract(Duration(days: localDate.weekday - 1));
       final key = DateTime(weekStart.year, weekStart.month, weekStart.day)
           .millisecondsSinceEpoch;
 
@@ -108,7 +109,8 @@ class StatsRepository {
     final Map<int, int> frequency = {};
 
     for (final w in workouts) {
-      final weekStart = w.date.subtract(Duration(days: w.date.weekday - 1));
+      final localDate = w.date.toLocal();
+      final weekStart = localDate.subtract(Duration(days: localDate.weekday - 1));
       final key = DateTime(weekStart.year, weekStart.month, weekStart.day)
           .millisecondsSinceEpoch;
       frequency[key] = (frequency[key] ?? 0) + 1;
@@ -165,7 +167,8 @@ class StatsRepository {
     final Map<int, List<int>> weeklyDurations = {};
 
     for (final w in workouts) {
-      final weekStart = w.date.subtract(Duration(days: w.date.weekday - 1));
+      final localDate = w.date.toLocal();
+      final weekStart = localDate.subtract(Duration(days: localDate.weekday - 1));
       final key = DateTime(weekStart.year, weekStart.month, weekStart.day)
           .millisecondsSinceEpoch;
       

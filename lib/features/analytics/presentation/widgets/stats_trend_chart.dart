@@ -45,8 +45,9 @@ class StatsTrendChart extends StatelessWidget {
             rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
             bottomTitles: AxisTitles(
               sideTitles: SideTitles(
-                showTitles: true,
+                interval: 1,
                 getTitlesWidget: (value, meta) {
+                  if (value % 1 != 0) return const SizedBox.shrink();
                   int index = value.toInt();
                   if (index < 0 || index >= data.length || index % 4 != 0) {
                     return const SizedBox.shrink();

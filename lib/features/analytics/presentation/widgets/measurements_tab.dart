@@ -669,7 +669,7 @@ class _MeasurementItem extends StatelessWidget {
                     ),
                   ),
 
-                  // Achievement percentage or + button
+                  // Achievement percentage or Change percentage
                   Container(
                     width: 38,
                     height: 38,
@@ -680,17 +680,20 @@ class _MeasurementItem extends StatelessWidget {
                     child: Center(
                       child: achievement.targetValue > 0
                           ? Text(
-                              '${(achievement.percentage.clamp(0.0, 2.0) * 100).toInt()}%',
+                              '${(achievement.achievementRatio.clamp(0.0, 1.0) * 100).toInt()}%',
                               style: GoogleFonts.outfit(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w900,
                                 color: const Color(0xFF3D6FE8),
                               ),
                             )
-                          : const Icon(
-                              LucideIcons.plus,
-                              size: 18,
-                              color: Color(0xFF3D6FE8),
+                          : Text(
+                              _getChangeLabel(achievement),
+                              style: GoogleFonts.outfit(
+                                fontSize: achievement.startValue == 0 ? 11 : 10,
+                                fontWeight: FontWeight.w800,
+                                color: const Color(0xFF3D6FE8),
+                              ),
                             ),
                     ),
                   ),
@@ -735,6 +738,14 @@ class _MeasurementItem extends StatelessWidget {
     if (cfg != null) return cfg.unit;
     if (m == 'bodyFat' || m == 'subcutaneousFat' || m == 'visceralFat') return '%';
     return 'cm';
+  }
+
+  String _getChangeLabel(MetricAchievement a) {
+    if (a.startValue == 0 || a.currentValue == 0) return 'NEW';
+    final change = ((a.currentValue - a.startValue) / a.startValue) * 100;
+    if (change.abs() < 0.1) return '0%';
+    final sign = change > 0 ? '+' : '';
+    return '$sign${change.toStringAsFixed(1)}%';
   }
 }
 
