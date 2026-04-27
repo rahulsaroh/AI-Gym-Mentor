@@ -409,7 +409,7 @@ class ExportService {
         TextCellValue(sets.first['dateStr']),
         TextCellValue(sets.first['dayName']),
         TextCellValue(sets.first['workoutName']),
-        IntCellValue(sets.first['duration']),
+        sets.first['duration'] != null ? IntCellValue(sets.first['duration'] as int) : null,
         IntCellValue(uniqueExCount),
         IntCellValue(sets.length),
         DoubleCellValue(totalVol),

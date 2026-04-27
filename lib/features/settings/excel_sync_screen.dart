@@ -200,7 +200,8 @@ class _ExcelSyncScreenState extends ConsumerState<ExcelSyncScreen> {
   }
 
   void _showExportResultSheet(Map<String, dynamic> result, {bool isQuickSave = false}) {
-    final double sizeInKb = (result['fileSize'] as int) / 1024;
+    final int fileSize = result['fileSize'] as int? ?? 0;
+    final double sizeInKb = fileSize / 1024;
     final String sizeStr = sizeInKb > 1024 
         ? '${(sizeInKb / 1024).toStringAsFixed(1)} MB'
         : '${sizeInKb.toStringAsFixed(1)} KB';
