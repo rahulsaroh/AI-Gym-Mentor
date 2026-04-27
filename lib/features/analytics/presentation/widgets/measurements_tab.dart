@@ -206,12 +206,12 @@ class _IconActionButton extends StatelessWidget {
 
 // ─── Overall Progress Card ────────────────────────────────────────────────────
 
-class _OverallProgressCard extends ConsumerWidget {
+class _OverallProgressCard extends StatelessWidget {
   final PhysiqueAchievement physique;
   const _OverallProgressCard({required this.physique});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final pct = (physique.overallScore.clamp(0.0, 1.0) * 100).toInt();
 
     return Container(
@@ -239,7 +239,10 @@ class _OverallProgressCard extends ConsumerWidget {
           // Gauge
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: _GaugeWidget(score: physique.overallScore.clamp(0.0, 1.0) * 100, pct: pct),
+            child: _GaugeWidget(
+              score: physique.overallScore.clamp(0.0, 1.0) * 100,
+              pct: pct,
+            ),
           ),
 
           const SizedBox(height: 16),
@@ -258,25 +261,16 @@ class _OverallProgressCard extends ConsumerWidget {
 
           const SizedBox(height: 16),
 
-          Text(
-            'BODY ACHIEVEMENT SCORE',
-            style: GoogleFonts.outfit(
-              fontSize: 12,
-              fontWeight: FontWeight.w900,
-              letterSpacing: 1.8,
-              color: const Color(0xFF1A1A2E),
-            ),
-          ),
-
-          const SizedBox(height: 16),
-
-          // Clear period button
           Padding(
-            padding: const EdgeInsets.only(bottom: 20),
-            child: _StadiumButton(
-              label: 'Clear period',
-              icon: LucideIcons.x,
-              onTap: () => ref.read(measurementDateRangeProvider.notifier).clear(),
+            padding: const EdgeInsets.only(bottom: 24),
+            child: Text(
+              'BODY ACHIEVEMENT SCORE',
+              style: GoogleFonts.outfit(
+                fontSize: 12,
+                fontWeight: FontWeight.w900,
+                letterSpacing: 1.8,
+                color: const Color(0xFF1A1A2E),
+              ),
             ),
           ),
         ],
@@ -287,14 +281,14 @@ class _OverallProgressCard extends ConsumerWidget {
 
 // ─── Gauge Widget ─────────────────────────────────────────────────────────────
 
-class _GaugeWidget extends ConsumerWidget {
+class _GaugeWidget extends StatelessWidget {
   final double score;
   final int pct;
 
   const _GaugeWidget({required this.score, required this.pct});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     return SizedBox(
       height: 190,
       child: Stack(
