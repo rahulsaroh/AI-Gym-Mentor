@@ -25,50 +25,22 @@ class MeasurementsTab extends ConsumerWidget {
         return CustomScrollView(
           physics: const BouncingScrollPhysics(),
           slivers: [
-            Builder(builder: (context) => SliverOverlapInjector(
-              handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
-            )),
+            Builder(
+              builder: (context) => SliverOverlapInjector(
+                handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
+              ),
+            ),
             SliverPadding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
               sliver: SliverList(
                 delegate: SliverChildListDelegate([
                   _OverallProgressCard(physique: physique),
-                  const SizedBox(height: 32),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text('MY MEASUREMENTS',
-                            style: GoogleFonts.outfit(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w900,
-                                letterSpacing: 1.2)),
-                        Row(
-                          children: [
-                            IconButton(
-                              icon: Icon(LucideIcons.notebookText, 
-                                size: 22, 
-                                color: Theme.of(context).colorScheme.primary),
-                              onPressed: () => _openManageMeasurementsScreen(context),
-                              tooltip: 'Manage Logs',
-                            ),
-                            InkWell(
-                              onTap: () => _openLogScreen(context),
-                              borderRadius: BorderRadius.circular(8),
-                              child: Padding(
-                                padding: const EdgeInsets.all(6),
-                                child: Icon(LucideIcons.pencil,
-                                    size: 22,
-                                    color: Theme.of(context).colorScheme.primary),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
+                  const SizedBox(height: 20),
+                  _MeasurementsSectionHeader(
+                    onManage: () => _openManageMeasurementsScreen(context),
+                    onLog: () => _openLogScreen(context),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 12),
                   ...physique.achievements
                       .where((a) => standardMetrics.any((m) => m.id == a.metric))
                       .map((a) => _MeasurementItem(
@@ -77,13 +49,16 @@ class MeasurementsTab extends ConsumerWidget {
                           )),
                   if (physique.achievements.any((a) => !standardMetrics.any((m) => m.id == a.metric))) ...[
                     Padding(
-                      padding: const EdgeInsets.only(top: 16, bottom: 8, left: 8),
-                      child: Text('CUSTOM MEASUREMENTS',
-                          style: GoogleFonts.outfit(
-                              fontSize: 13,
-                              fontWeight: FontWeight.bold,
-                              letterSpacing: 1.2,
-                              color: Theme.of(context).colorScheme.outline)),
+                      padding: const EdgeInsets.only(top: 16, bottom: 8, left: 4),
+                      child: Text(
+                        'CUSTOM MEASUREMENTS',
+                        style: GoogleFonts.outfit(
+                          fontSize: 13,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 1.2,
+                          color: Theme.of(context).colorScheme.outline,
+                        ),
+                      ),
                     ),
                     ...physique.achievements
                         .where((a) => !standardMetrics.any((m) => m.id == a.metric))
@@ -137,118 +112,241 @@ class MeasurementsTab extends ConsumerWidget {
   }
 }
 
+// ─── Section Header ──────────────────────────────────────────────────────────
+
+class _MeasurementsSectionHeader extends StatelessWidget {
+  final VoidCallback onManage;
+  final VoidCallback onLog;
+
+  const _MeasurementsSectionHeader({
+    required this.onManage,
+    required this.onLog,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            'MY MEASUREMENTS',
+            style: GoogleFonts.outfit(
+              fontSize: 15,
+              fontWeight: FontWeight.w900,
+              letterSpacing: 1.2,
+              color: const Color(0xFF1A1A2E),
+            ),
+          ),
+          Row(
+            children: [
+              _IconActionButton(
+                icon: LucideIcons.notebookText,
+                tooltip: 'Manage Logs',
+                onTap: onManage,
+              ),
+              const SizedBox(width: 4),
+              _IconActionButton(
+                icon: LucideIcons.pencil,
+                tooltip: 'Log Measurement',
+                onTap: onLog,
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _IconActionButton extends StatelessWidget {
+  final IconData icon;
+  final String tooltip;
+  final VoidCallback onTap;
+
+  const _IconActionButton({
+    required this.icon,
+    required this.tooltip,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final primary = Theme.of(context).colorScheme.primary;
+    return Tooltip(
+      message: tooltip,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(10),
+        child: Container(
+          width: 36,
+          height: 36,
+          decoration: BoxDecoration(
+            color: primary.withValues(alpha: 0.08),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Icon(icon, size: 18, color: primary),
+        ),
+      ),
+    );
+  }
+}
+
+// ─── Overall Progress Card ────────────────────────────────────────────────────
+
 class _OverallProgressCard extends ConsumerWidget {
   final PhysiqueAchievement physique;
   const _OverallProgressCard({required this.physique});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final dateRange = ref.watch(measurementDateRangeProvider);
     final pct = (physique.overallScore.clamp(0.0, 1.0) * 100).toInt();
-    final isImproving = physique.rawOverallScore >= 0;
-    final theme = Theme.of(context);
-
-    final withTarget = physique.achievements.where((a) => a.targetValue > 0).toList();
-    double startRatio = 0;
-    if (withTarget.isNotEmpty) {
-      double totalStart = 0;
-      for (final a in withTarget) {
-        if (a.targetValue > 0 && a.startValue > 0) {
-          final r = (a.startValue <= a.targetValue)
-              ? a.startValue / a.targetValue
-              : a.targetValue / a.startValue;
-          totalStart += r.clamp(0.0, 1.0);
-        }
-      }
-      startRatio = (totalStart / withTarget.length).clamp(0.0, 1.0);
-    }
 
     return Container(
-      padding: const EdgeInsets.fromLTRB(16, 24, 16, 24),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 15,
-            offset: const Offset(0, 10),
+            color: Colors.black.withValues(alpha: 0.06),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
           ),
         ],
       ),
-      child: Column(children: [
-        const MeasurementIntervalSelector(),
-        const SizedBox(height: 32),
+      child: Column(
+        children: [
+          // Period selector
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
+            child: const MeasurementIntervalSelector(),
+          ),
 
-        SizedBox(
-          height: 180,
-          child: Stack(alignment: Alignment.bottomCenter, children: [
-            CustomPaint(
-              size: const Size(280, 140),
-              painter: _GaugePainter(
-                score: physique.overallScore.clamp(0.0, 1.0) * 100,
-              ),
+          const SizedBox(height: 8),
+
+          // Gauge
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: _GaugeWidget(score: physique.overallScore.clamp(0.0, 1.0) * 100, pct: pct),
+          ),
+
+          const SizedBox(height: 16),
+
+          // Legend row
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: const [
+              _LegendDot(color: Color(0xFF3D6FE8), label: 'Start'),
+              SizedBox(width: 20),
+              _LegendDot(color: Color(0xFF2ECC71), label: 'Growth'),
+              SizedBox(width: 20),
+              _LegendDot(color: Color(0xFFE74C3C), label: 'Decline'),
+            ],
+          ),
+
+          const SizedBox(height: 16),
+
+          Text(
+            'BODY ACHIEVEMENT SCORE',
+            style: GoogleFonts.outfit(
+              fontSize: 12,
+              fontWeight: FontWeight.w900,
+              letterSpacing: 1.8,
+              color: const Color(0xFF1A1A2E),
             ),
-            Positioned(
-              bottom: 40,
-              child: Column(mainAxisSize: MainAxisSize.min, children: [
-                Text('$pct%',
-                    style: GoogleFonts.outfit(
-                        fontSize: 40,
-                        fontWeight: FontWeight.w900,
-                        color: const Color(0xFF1A1A2E))),
-                const SizedBox(height: 4),
+          ),
+
+          const SizedBox(height: 16),
+
+          // Clear period button
+          Padding(
+            padding: const EdgeInsets.only(bottom: 20),
+            child: _StadiumButton(
+              label: 'Clear period',
+              icon: LucideIcons.x,
+              onTap: () => ref.read(measurementDateRangeProvider.notifier).clear(),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ─── Gauge Widget ─────────────────────────────────────────────────────────────
+
+class _GaugeWidget extends ConsumerWidget {
+  final double score;
+  final int pct;
+
+  const _GaugeWidget({required this.score, required this.pct});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return SizedBox(
+      height: 190,
+      child: Stack(
+        alignment: Alignment.bottomCenter,
+        children: [
+          // Gauge painter
+          Center(
+            child: CustomPaint(
+              size: const Size(280, 145),
+              painter: _GaugePainter(score: score),
+            ),
+          ),
+
+          // Content inside gauge
+          Positioned(
+            bottom: 30,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  '$pct%',
+                  style: GoogleFonts.outfit(
+                    fontSize: 42,
+                    fontWeight: FontWeight.w900,
+                    color: const Color(0xFF1A1A2E),
+                    height: 1,
+                  ),
+                ),
+                const SizedBox(height: 6),
                 Text(
                   'Log to view score!',
                   style: GoogleFonts.outfit(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: const Color(0xFF9098A3)),
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: const Color(0xFF9098A3),
+                  ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 14),
                 _StadiumButton(
                   label: 'Set your target',
                   onTap: () => context.push('/analytics/manage-measurements'),
                 ),
-              ]),
+              ],
             ),
-          ]),
-        ),
-
-        const SizedBox(height: 24),
-        Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-          _LegendDot(color: const Color(0xFF3D6FE8), label: 'Start'),
-          const SizedBox(width: 20),
-          _LegendDot(color: const Color(0xFF2ECC71), label: 'Growth'),
-          const SizedBox(width: 20),
-          _LegendDot(color: const Color(0xFFE74C3C), label: 'Decline'),
-        ]),
-
-        const SizedBox(height: 24),
-        Text(
-          'BODY ACHIEVEMENT SCORE',
-          style: GoogleFonts.outfit(
-              fontSize: 13,
-              fontWeight: FontWeight.w900,
-              letterSpacing: 1.5,
-              color: const Color(0xFF1A1A2E)),
-        ),
-        const SizedBox(height: 20),
-        _StadiumButton(
-          label: 'Clear period',
-          icon: LucideIcons.x,
-          onTap: () => ref.read(measurementDateRangeProvider.notifier).clear(),
-        ),
-
-          _StadiumButton(
-            label: 'Clear period',
-            icon: LucideIcons.x,
-            onTap: () => ref.read(measurementDateRangeProvider.notifier).clear(),
           ),
-      ]),
+        ],
+      ),
     );
   }
 }
+
+// ─── Stadium Button ───────────────────────────────────────────────────────────
 
 class _StadiumButton extends StatelessWidget {
   final String label;
@@ -267,24 +365,31 @@ class _StadiumButton extends StatelessWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(20),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 7),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: const Color(0xFFE0E3EB)),
           color: Colors.white,
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: const Color(0xFFDDE1EA), width: 1.2),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.03),
+              blurRadius: 4,
+              offset: const Offset(0, 1),
+            ),
+          ],
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             if (icon != null) ...[
-              Icon(icon, size: 14, color: const Color(0xFF9098A3)),
+              Icon(icon, size: 13, color: const Color(0xFF9098A3)),
               const SizedBox(width: 6),
             ],
             Text(
               label,
               style: GoogleFonts.outfit(
                 fontSize: 12,
-                fontWeight: FontWeight.bold,
+                fontWeight: FontWeight.w700,
                 color: const Color(0xFF9098A3),
               ),
             ),
@@ -295,6 +400,8 @@ class _StadiumButton extends StatelessWidget {
   }
 }
 
+// ─── Interval Selector ───────────────────────────────────────────────────────
+
 class MeasurementIntervalSelector extends ConsumerWidget {
   const MeasurementIntervalSelector({super.key});
 
@@ -302,7 +409,7 @@ class MeasurementIntervalSelector extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final selected = ref.watch(selectedMeasurementIntervalProvider);
     return SizedBox(
-      height: 52,
+      height: 44,
       child: Center(
         child: SingleChildScrollView(
           scrollDirection: Axis.horizontal,
@@ -312,7 +419,7 @@ class MeasurementIntervalSelector extends ConsumerWidget {
             children: MeasurementInterval.values.map((interval) {
               final isSelected = selected == interval;
               return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8),
+                padding: const EdgeInsets.symmetric(horizontal: 4),
                 child: _IntervalPill(
                   label: interval.label,
                   isSelected: isSelected,
@@ -342,15 +449,12 @@ class _IntervalPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final primary = theme.colorScheme.primary;
-    
     return BouncingCard(
       onTap: onTap,
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 250),
-        constraints: const BoxConstraints(minWidth: 60),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        duration: const Duration(milliseconds: 200),
+        constraints: const BoxConstraints(minWidth: 52),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
         alignment: Alignment.center,
         decoration: BoxDecoration(
           color: isSelected ? const Color(0xFF3D6FE8) : const Color(0xFFF1F5F9),
@@ -359,12 +463,21 @@ class _IntervalPill extends StatelessWidget {
             color: isSelected ? Colors.transparent : const Color(0xFFE0E3EB),
             width: 1,
           ),
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: const Color(0xFF3D6FE8).withValues(alpha: 0.3),
+                    blurRadius: 8,
+                    offset: const Offset(0, 3),
+                  ),
+                ]
+              : null,
         ),
         child: Text(
           label,
           style: GoogleFonts.outfit(
             fontSize: 13,
-            fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
+            fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
             color: isSelected ? Colors.white : const Color(0xFF9098A3),
           ),
         ),
@@ -372,6 +485,8 @@ class _IntervalPill extends StatelessWidget {
     );
   }
 }
+
+// ─── Legend Dot ──────────────────────────────────────────────────────────────
 
 class _LegendDot extends StatelessWidget {
   final Color color;
@@ -382,15 +497,24 @@ class _LegendDot extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(mainAxisSize: MainAxisSize.min, children: [
       Container(
-        width: 10, height: 10,
+        width: 9,
+        height: 9,
         decoration: BoxDecoration(color: color, shape: BoxShape.circle),
       ),
-      const SizedBox(width: 8),
-      Text(label,
-          style: GoogleFonts.outfit(fontSize: 13, fontWeight: FontWeight.w700, color: Colors.black.withValues(alpha: 0.6))),
+      const SizedBox(width: 6),
+      Text(
+        label,
+        style: GoogleFonts.outfit(
+          fontSize: 12,
+          fontWeight: FontWeight.w700,
+          color: const Color(0xFF6B7280),
+        ),
+      ),
     ]);
   }
 }
+
+// ─── Gauge Painter ───────────────────────────────────────────────────────────
 
 class _GaugePainter extends CustomPainter {
   final double score;
@@ -401,18 +525,18 @@ class _GaugePainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height);
     final radius = size.width / 2;
-    const strokeWidth = 20.0;
+    const strokeWidth = 22.0;
 
-    // 1. Ticks outside the arc
+    // 1. Tick marks outside arc
     final tickPaint = Paint()
-      ..color = const Color(0xFF9098A3).withValues(alpha: 0.3)
+      ..color = const Color(0xFF9098A3).withValues(alpha: 0.25)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.5;
 
     for (int i = 0; i <= 20; i++) {
       final angle = math.pi + (i * math.pi / 20);
-      final innerR = radius + 4;
-      final outerR = radius + 14;
+      final innerR = radius + 5;
+      final outerR = radius + 16;
       canvas.drawLine(
         Offset(center.dx + innerR * math.cos(angle), center.dy + innerR * math.sin(angle)),
         Offset(center.dx + outerR * math.cos(angle), center.dy + outerR * math.sin(angle)),
@@ -420,52 +544,51 @@ class _GaugePainter extends CustomPainter {
       );
     }
 
-    // 2. Main Metallic Arc
-    final rect = Rect.fromCircle(center: center, radius: radius - strokeWidth / 2);
-    
-    // Background arc with 3D inset effect
+    final arcRect = Rect.fromCircle(center: center, radius: radius - strokeWidth / 2);
+
+    // 2. Background arc — light grey groove
     final bgPaint = Paint()
-      ..color = const Color(0xFFE0E3EB)
+      ..color = const Color(0xFFE2E5ED)
       ..style = PaintingStyle.stroke
       ..strokeWidth = strokeWidth
       ..strokeCap = StrokeCap.round;
-    canvas.drawArc(rect, math.pi, math.pi, false, bgPaint);
+    canvas.drawArc(arcRect, math.pi, math.pi, false, bgPaint);
 
-    // Metallic gradient arc
+    // 3. Metallic sheen overlay
     final metallicPaint = Paint()
       ..shader = SweepGradient(
         colors: const [
-          Color(0xFFC8CDD6),
-          Color(0xFFE8EAF0),
-          Color(0xFFB0B5C0),
-          Color(0xFFE8EAF0),
-          Color(0xFFC8CDD6),
+          Color(0xFFCAD0DC),
+          Color(0xFFECEFF6),
+          Color(0xFFB8BEC9),
+          Color(0xFFECEFF6),
+          Color(0xFFCAD0DC),
         ],
         stops: const [0.0, 0.25, 0.5, 0.75, 1.0],
         startAngle: math.pi,
         endAngle: math.pi * 2,
-      ).createShader(rect)
+      ).createShader(arcRect)
       ..style = PaintingStyle.stroke
-      ..strokeWidth = strokeWidth - 2 // Slightly thinner for inset look
+      ..strokeWidth = strokeWidth - 4
       ..strokeCap = StrokeCap.round;
+    canvas.drawArc(arcRect, math.pi, math.pi, false, metallicPaint);
 
-    canvas.drawArc(rect, math.pi, math.pi, false, metallicPaint);
-
-    // 3. Progress Fill (if needed, though prompt implies 0% initially)
+    // 4. Progress fill
     if (score > 0) {
       final progressPaint = Paint()
-        ..color = const Color(0xFF3D6FE8).withValues(alpha: 0.8)
+        ..color = const Color(0xFF3D6FE8).withValues(alpha: 0.85)
         ..style = PaintingStyle.stroke
         ..strokeWidth = strokeWidth
         ..strokeCap = StrokeCap.round;
-
-      canvas.drawArc(rect, math.pi, math.pi * (score / 100), false, progressPaint);
+      canvas.drawArc(arcRect, math.pi, math.pi * (score / 100), false, progressPaint);
     }
   }
 
   @override
   bool shouldRepaint(covariant _GaugePainter old) => old.score != score;
 }
+
+// ─── Measurement Item Card ────────────────────────────────────────────────────
 
 class _MeasurementItem extends StatelessWidget {
   final MetricAchievement achievement;
@@ -477,20 +600,19 @@ class _MeasurementItem extends StatelessWidget {
     final achRatio = achievement.achievementRatio;
     final unit = _unitFor(achievement.metric);
     final hasData = achievement.currentValue > 0;
-    final theme = Theme.of(context);
 
     return BouncingCard(
       onTap: onTap,
       child: Container(
-        margin: const EdgeInsets.only(bottom: 16),
+        margin: const EdgeInsets.only(bottom: 12),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(18),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.03),
+              color: Colors.black.withValues(alpha: 0.04),
               blurRadius: 10,
-              offset: const Offset(0, 4),
+              offset: const Offset(0, 3),
             ),
           ],
         ),
@@ -498,32 +620,36 @@ class _MeasurementItem extends StatelessWidget {
         child: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.fromLTRB(14, 14, 14, 12),
               child: Row(
                 children: [
-                  // Icon placeholder (48x48)
+                  // Icon container
                   Builder(builder: (context) {
                     final cfg = standardMetrics.where((m) => m.id == achievement.metric).firstOrNull;
                     return Container(
                       width: 48,
                       height: 48,
                       decoration: BoxDecoration(
-                        color: const Color(0xFFF2F3F5),
-                        borderRadius: BorderRadius.circular(12),
+                        color: const Color(0xFFF2F4F8),
+                        borderRadius: BorderRadius.circular(14),
                       ),
                       child: Center(
                         child: (cfg?.assetPath != null)
                             ? Padding(
-                                padding: const EdgeInsets.all(12.0),
+                                padding: const EdgeInsets.all(11.0),
                                 child: Image.asset(cfg!.assetPath!, fit: BoxFit.contain),
                               )
-                            : Icon(cfg?.icon ?? LucideIcons.activity,
-                                color: const Color(0xFF3D6FE8), size: 24),
+                            : Icon(
+                                cfg?.icon ?? LucideIcons.activity,
+                                color: const Color(0xFF3D6FE8),
+                                size: 22,
+                              ),
                       ),
                     );
                   }),
-                  const SizedBox(width: 16),
+                  const SizedBox(width: 14),
 
+                  // Text
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -531,8 +657,8 @@ class _MeasurementItem extends StatelessWidget {
                         Text(
                           achievement.label,
                           style: GoogleFonts.outfit(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w700,
                             color: const Color(0xFF1A1A2E),
                           ),
                         ),
@@ -542,7 +668,7 @@ class _MeasurementItem extends StatelessWidget {
                               ? 'No records logged. Tap to add.'
                               : 'Current: ${achievement.currentValue.toStringAsFixed(1)} $unit',
                           style: GoogleFonts.outfit(
-                            fontSize: 13,
+                            fontSize: 12,
                             color: const Color(0xFF9098A3),
                           ),
                         ),
@@ -550,43 +676,46 @@ class _MeasurementItem extends StatelessWidget {
                     ),
                   ),
 
-                  // Circular + button
+                  // + button
                   Container(
-                    width: 36,
-                    height: 36,
+                    width: 32,
+                    height: 32,
                     decoration: BoxDecoration(
                       color: const Color(0xFF3D6FE8).withValues(alpha: 0.1),
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(
                       LucideIcons.plus,
-                      size: 20,
+                      size: 17,
                       color: Color(0xFF3D6FE8),
                     ),
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: 6),
                   const Icon(
                     LucideIcons.chevronRight,
-                    size: 20,
-                    color: Color(0xFF9098A3),
+                    size: 18,
+                    color: Color(0xFFBCC1CC),
                   ),
                 ],
               ),
             ),
 
-            // Progress bar at the very bottom edge
+            // Progress bar at bottom
             Container(
               height: 4,
               width: double.infinity,
-              decoration: const BoxDecoration(color: Color(0xFFE0E3EB)),
+              color: const Color(0xFFEDF0F7),
               child: FractionallySizedBox(
                 alignment: Alignment.centerLeft,
-                widthFactor: hasData && achievement.targetValue > 0 
-                    ? achRatio.clamp(0.0, 1.0) 
-                    : 0.05, // Subtle fill for "no data" look
+                widthFactor: hasData && achievement.targetValue > 0
+                    ? achRatio.clamp(0.0, 1.0)
+                    : 0.04,
                 child: Container(
-                  decoration: const BoxDecoration(
-                    color: Color(0xFF3D6FE8),
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFF5B87F0), Color(0xFF3D6FE8)],
+                    ),
+                    borderRadius: BorderRadius.circular(2),
                   ),
                 ),
               ),
@@ -603,29 +732,42 @@ class _MeasurementItem extends StatelessWidget {
     if (m == 'bodyFat' || m == 'subcutaneousFat' || m == 'visceralFat') return '%';
     return 'cm';
   }
-
-  IconData _iconFor(String m) {
-    final cfg = standardMetrics.where((cfg) => cfg.id == m).firstOrNull;
-    if (cfg != null) return cfg.icon;
-    switch (m) {
-      case 'weight': return LucideIcons.scale;
-      case 'bodyFat': return LucideIcons.percent;
-      default: return LucideIcons.activity;
-    }
-  }
 }
 
-// ─── Extracted Widgets ──────────────────────────────────────────────────
+// ─── Extracted Trendline Widget ──────────────────────────────────────────────
 
 class _OverallMiniTrendline extends ConsumerWidget {
   const _OverallMiniTrendline();
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final trendAsync = ref.watch(overallAchievementTrendProvider);
     return trendAsync.when(
       data: (spots) {
         if (spots.length < 2) return const SizedBox.shrink();
-        return LineChart(LineChartData(gridData: const FlGridData(show: false), titlesData: const FlTitlesData(show: false), borderData: FlBorderData(show: false), minX: spots.first.x, maxX: spots.last.x, minY: -0.1, maxY: 1.1, lineBarsData: [LineChartBarData(spots: spots, isCurved: true, color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.5), barWidth: 2, isStrokeCapRound: true, dotData: const FlDotData(show: false), belowBarData: BarAreaData(show: true, color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.05)))]));
+        return LineChart(LineChartData(
+          gridData: const FlGridData(show: false),
+          titlesData: const FlTitlesData(show: false),
+          borderData: FlBorderData(show: false),
+          minX: spots.first.x,
+          maxX: spots.last.x,
+          minY: -0.1,
+          maxY: 1.1,
+          lineBarsData: [
+            LineChartBarData(
+              spots: spots,
+              isCurved: true,
+              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.5),
+              barWidth: 2,
+              isStrokeCapRound: true,
+              dotData: const FlDotData(show: false),
+              belowBarData: BarAreaData(
+                show: true,
+                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.05),
+              ),
+            ),
+          ],
+        ));
       },
       loading: () => const SizedBox.shrink(),
       error: (_, __) => const SizedBox.shrink(),
