@@ -186,9 +186,6 @@ class _BodyMeasurementsLogScreenState
 
       ref.invalidate(bodyMeasurementsListProvider);
       ref.invalidate(bodyTargetsListProvider);
-      ref.invalidate(physiqueAchievementProvider);
-      ref.invalidate(overallAchievementTrendProvider);
-      ref.invalidate(measurementDateRangeProvider);
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

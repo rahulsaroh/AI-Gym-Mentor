@@ -77,7 +77,6 @@ class _ManageMeasurementsScreenState extends ConsumerState<ManageMeasurementsScr
       try {
         await ref.read(bodyMeasurementsListProvider.notifier).clearAllHistory();
         await ref.read(bodyTargetsListProvider.notifier).clearAllTargets();
-        ref.invalidate(physiqueAchievementProvider);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('All data has been cleared.')),

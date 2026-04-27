@@ -166,7 +166,6 @@ class _MetricDetailView extends ConsumerWidget {
                             await ref
                                 .read(bodyMeasurementsListProvider.notifier)
                                 .deleteMeasurement(entry.id);
-                            ref.invalidate(physiqueAchievementProvider);
                           }
                         },
                       );

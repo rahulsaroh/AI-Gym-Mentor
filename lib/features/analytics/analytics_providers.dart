@@ -328,14 +328,12 @@ class BodyMeasurementsList extends _$BodyMeasurementsList {
     final repo = ref.read(measurementsRepositoryProvider);
     await repo.addMeasurement(measurement);
     ref.invalidateSelf();
-    ref.invalidate(physiqueAchievementProvider);
   }
 
   Future<void> deleteMeasurement(int id) async {
     final repo = ref.read(measurementsRepositoryProvider);
     await repo.deleteMeasurement(id);
     ref.invalidateSelf();
-    ref.invalidate(physiqueAchievementProvider);
   }
 
   Future<void> deleteMeasurements(Iterable<int> ids) async {
@@ -344,14 +342,12 @@ class BodyMeasurementsList extends _$BodyMeasurementsList {
       await repo.deleteMeasurement(id);
     }
     ref.invalidateSelf();
-    ref.invalidate(physiqueAchievementProvider);
   }
 
   Future<void> clearAllHistory() async {
     final repo = ref.read(measurementsRepositoryProvider);
     await repo.deleteAllMeasurements();
     ref.invalidateSelf();
-    ref.invalidate(physiqueAchievementProvider);
   }
 
   Future<void> seedSampleData() async {
