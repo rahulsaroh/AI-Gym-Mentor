@@ -22,6 +22,7 @@ class _BodyMeasurementsLogScreenState
   final Map<String, TextEditingController> _targetCtrl = {};
   final _notesCtrl = TextEditingController();
   late DateTime _measurementDate;
+  bool _isSaving = false;
 
   // Custom metrics list: {name, currentCtrl, targetCtrl}
   final List<Map<String, dynamic>> _customMetrics = [];
@@ -105,87 +106,114 @@ class _BodyMeasurementsLogScreenState
   }
 
   Future<void> _onSave() async {
-    // Build customValues map for measurement
-    final customValues = <String, double>{};
-    for (final row in _customMetrics) {
-      final name = (row['nameCtrl'] as TextEditingController).text.trim();
-      final val = double.tryParse(
-          (row['currentCtrl'] as TextEditingController).text);
-      if (name.isNotEmpty && val != null) customValues[name] = val;
-    }
+    if (_isSaving) return;
+    setState(() => _isSaving = true);
 
-    final measurement = ent.BodyMeasurement(
-      id: 0,
-      date: _measurementDate,
-      weight: double.tryParse(_currentCtrl['weight']!.text),
-      bodyFat: double.tryParse(_currentCtrl['bodyFat']!.text),
-      neck: double.tryParse(_currentCtrl['neck']!.text),
-      chest: double.tryParse(_currentCtrl['chest']!.text),
-      shoulders: double.tryParse(_currentCtrl['shoulders']!.text),
-      armLeft: double.tryParse(_currentCtrl['armLeft']!.text),
-      armRight: double.tryParse(_currentCtrl['armRight']!.text),
-      forearmLeft: double.tryParse(_currentCtrl['forearmLeft']!.text),
-      forearmRight: double.tryParse(_currentCtrl['forearmRight']!.text),
-      waist: double.tryParse(_currentCtrl['waist']!.text),
-      waistNaval: double.tryParse(_currentCtrl['waistNaval']!.text),
-      hips: double.tryParse(_currentCtrl['hips']!.text),
-      thighLeft: double.tryParse(_currentCtrl['thighLeft']!.text),
-      thighRight: double.tryParse(_currentCtrl['thighRight']!.text),
-      calfLeft: double.tryParse(_currentCtrl['calfLeft']!.text),
-      calfRight: double.tryParse(_currentCtrl['calfRight']!.text),
-      height: double.tryParse(_currentCtrl['height']!.text),
-      subcutaneousFat: double.tryParse(_currentCtrl['subcutaneousFat']!.text),
-      visceralFat: double.tryParse(_currentCtrl['visceralFat']!.text),
-      notes: _notesCtrl.text.isEmpty ? null : _notesCtrl.text,
-      customValues: customValues.isEmpty ? null : customValues,
-    );
+    try {
+      // Build customValues map for measurement
+      final customValues = <String, double>{};
+      for (final row in _customMetrics) {
+        final name = (row['nameCtrl'] as TextEditingController).text.trim();
+        final val = double.tryParse(
+            (row['currentCtrl'] as TextEditingController).text);
+        if (name.isNotEmpty && val != null) customValues[name] = val;
+      }
 
-    final hasCurrent = _currentCtrl.values.any((c) => c.text.isNotEmpty) ||
-        customValues.isNotEmpty;
-    if (hasCurrent) {
-      await ref
-          .read(bodyMeasurementsListProvider.notifier)
-          .addMeasurement(measurement);
-    }
+      final measurement = ent.BodyMeasurement(
+        id: 0,
+        date: _measurementDate,
+        weight: double.tryParse(_currentCtrl['weight']!.text),
+        bodyFat: double.tryParse(_currentCtrl['bodyFat']!.text),
+        neck: double.tryParse(_currentCtrl['neck']!.text),
+        chest: double.tryParse(_currentCtrl['chest']!.text),
+        shoulders: double.tryParse(_currentCtrl['shoulders']!.text),
+        armLeft: double.tryParse(_currentCtrl['armLeft']!.text),
+        armRight: double.tryParse(_currentCtrl['armRight']!.text),
+        forearmLeft: double.tryParse(_currentCtrl['forearmLeft']!.text),
+        forearmRight: double.tryParse(_currentCtrl['forearmRight']!.text),
+        waist: double.tryParse(_currentCtrl['waist']!.text),
+        waistNaval: double.tryParse(_currentCtrl['waistNaval']!.text),
+        hips: double.tryParse(_currentCtrl['hips']!.text),
+        thighLeft: double.tryParse(_currentCtrl['thighLeft']!.text),
+        thighRight: double.tryParse(_currentCtrl['thighRight']!.text),
+        calfLeft: double.tryParse(_currentCtrl['calfLeft']!.text),
+        calfRight: double.tryParse(_currentCtrl['calfRight']!.text),
+        height: double.tryParse(_currentCtrl['height']!.text),
+        subcutaneousFat: double.tryParse(_currentCtrl['subcutaneousFat']!.text),
+        visceralFat: double.tryParse(_currentCtrl['visceralFat']!.text),
+        notes: _notesCtrl.text.isEmpty ? null : _notesCtrl.text,
+        customValues: customValues.isEmpty ? null : customValues,
+      );
 
-    // Upsert standard targets
-    final repo = ref.read(measurementsRepositoryProvider);
-    for (var m in standardMetrics) {
-      final val = double.tryParse(_targetCtrl[m.id]!.text);
-      if (val != null && val > 0) {
-        await repo.upsertTarget(target_ent.BodyTarget(
-          id: 0,
-          metric: m.id,
-          targetValue: val,
-          deadline: _measurementDate.add(const Duration(days: 30)),
-          createdAt: _measurementDate,
-        ));
+      final hasCurrent = _currentCtrl.values.any((c) => c.text.isNotEmpty) ||
+          customValues.isNotEmpty;
+      if (hasCurrent) {
+        await ref
+            .read(bodyMeasurementsListProvider.notifier)
+            .addMeasurement(measurement);
+      }
+
+      // Upsert standard targets
+      final repo = ref.read(measurementsRepositoryProvider);
+      for (var m in standardMetrics) {
+        final val = double.tryParse(_targetCtrl[m.id]!.text);
+        if (val != null && val > 0) {
+          await repo.upsertTarget(target_ent.BodyTarget(
+            id: 0,
+            metric: m.id,
+            targetValue: val,
+            deadline: _measurementDate.add(const Duration(days: 30)),
+            createdAt: _measurementDate,
+          ));
+        }
+      }
+
+      // Upsert custom targets
+      for (final row in _customMetrics) {
+        final name = (row['nameCtrl'] as TextEditingController).text.trim();
+        final val = double.tryParse(
+            (row['targetCtrl'] as TextEditingController).text);
+        if (name.isNotEmpty && val != null && val > 0) {
+          await repo.upsertTarget(target_ent.BodyTarget(
+            id: 0,
+            metric: name,
+            targetValue: val,
+            deadline: _measurementDate.add(const Duration(days: 30)),
+            createdAt: _measurementDate,
+          ));
+        }
+      }
+
+      ref.invalidate(bodyMeasurementsListProvider);
+      ref.invalidate(bodyTargetsListProvider);
+      ref.invalidate(physiqueAchievementProvider);
+      ref.invalidate(overallAchievementTrendProvider);
+      ref.invalidate(measurementDateRangeProvider);
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Measurements saved successfully!'),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+        Navigator.pop(context);
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to save measurements: $e'),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isSaving = false);
       }
     }
-
-    // Upsert custom targets
-    for (final row in _customMetrics) {
-      final name = (row['nameCtrl'] as TextEditingController).text.trim();
-      final val = double.tryParse(
-          (row['targetCtrl'] as TextEditingController).text);
-      if (name.isNotEmpty && val != null && val > 0) {
-        await repo.upsertTarget(target_ent.BodyTarget(
-          id: 0,
-          metric: name,
-          targetValue: val,
-          deadline: _measurementDate.add(const Duration(days: 30)),
-          createdAt: _measurementDate,
-        ));
-      }
-    }
-
-    ref.invalidate(bodyMeasurementsListProvider);
-    ref.invalidate(bodyTargetsListProvider);
-    ref.invalidate(physiqueAchievementProvider);
-    ref.invalidate(overallAchievementTrendProvider);
-    ref.invalidate(measurementDateRangeProvider);
-
-    if (mounted) Navigator.pop(context);
   }
 
   @override
@@ -196,14 +224,27 @@ class _BodyMeasurementsLogScreenState
         title: Text('Log Measurements',
             style: GoogleFonts.outfit(fontWeight: FontWeight.bold)),
         actions: [
-          TextButton(
-            onPressed: _onSave,
-            child: Text('Save',
-                style: GoogleFonts.outfit(
-                    color: Theme.of(context).colorScheme.primary,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16)),
-          ),
+          _isSaving
+              ? const Padding(
+                  padding: EdgeInsets.only(right: 16),
+                  child: Center(
+                    child: SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                      ),
+                    ),
+                  ),
+                )
+              : TextButton(
+                  onPressed: _onSave,
+                  child: Text('Save',
+                      style: GoogleFonts.outfit(
+                          color: Theme.of(context).colorScheme.primary,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16)),
+                ),
           const SizedBox(width: 8),
         ],
       ),
