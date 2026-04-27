@@ -662,6 +662,47 @@ final class MetricAchievementTrendFamily extends $Family
   String toString() => r'metricAchievementTrendProvider';
 }
 
+@ProviderFor(recentPRs)
+final recentPRsProvider = RecentPRsProvider._();
+
+final class RecentPRsProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<Map<String, dynamic>>>,
+          List<Map<String, dynamic>>,
+          FutureOr<List<Map<String, dynamic>>>
+        >
+    with
+        $FutureModifier<List<Map<String, dynamic>>>,
+        $FutureProvider<List<Map<String, dynamic>>> {
+  RecentPRsProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'recentPRsProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$recentPRsHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<List<Map<String, dynamic>>> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<List<Map<String, dynamic>>> create(Ref ref) {
+    return recentPRs(ref);
+  }
+}
+
+String _$recentPRsHash() => r'd130b371b2a845a632292098586dd4184211b1c5';
+
 @ProviderFor(fullPRHistory)
 final fullPRHistoryProvider = FullPRHistoryProvider._();
 
@@ -806,7 +847,7 @@ final class BodyMeasurementsListProvider
 }
 
 String _$bodyMeasurementsListHash() =>
-    r'670ee9d91203ba4747ac9e39be2fee1174de27f5';
+    r'98b95ac46d2af98823b402a6f3d9d3589a0100dc';
 
 abstract class _$BodyMeasurementsList
     extends $AsyncNotifier<List<ent.BodyMeasurement>> {
@@ -859,7 +900,7 @@ final class BodyTargetsListProvider
   BodyTargetsList create() => BodyTargetsList();
 }
 
-String _$bodyTargetsListHash() => r'c9f46fb94fa6d217796e47846c83a639dbf4d62c';
+String _$bodyTargetsListHash() => r'82bc94243adcaf2609795cb03b34f3ba4317f927';
 
 abstract class _$BodyTargetsList
     extends $AsyncNotifier<List<target.BodyTarget>> {
@@ -914,7 +955,7 @@ final class ProgressPhotosListProvider
 }
 
 String _$progressPhotosListHash() =>
-    r'0e2fc2385b0d68681a896ec78a55549be71f4c8b';
+    r'1fb5bc7e4f27be3d0cdf7efad8fd99442f18e9f7';
 
 abstract class _$ProgressPhotosList
     extends $AsyncNotifier<List<photo.ProgressPhoto>> {
@@ -1025,4 +1066,4 @@ final class PhysiqueAchievementProvider
 }
 
 String _$physiqueAchievementHash() =>
-    r'c20a983984a211c21728978c7a821b0cc02d841c';
+    r'fd3e4e3a926825d796c169fc3b2ef1e0b7b323e0';

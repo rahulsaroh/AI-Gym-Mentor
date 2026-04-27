@@ -7881,7 +7881,7 @@ class $SyncQueueTable extends SyncQueue
     type: DriftSqlType.int,
     requiredDuringInsert: false,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES workouts (id)',
+      'REFERENCES workouts (id) ON DELETE CASCADE',
     ),
   );
   static const VerificationMeta _measurementIdMeta = const VerificationMeta(
@@ -7895,7 +7895,7 @@ class $SyncQueueTable extends SyncQueue
     type: DriftSqlType.int,
     requiredDuringInsert: false,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES body_measurements (id)',
+      'REFERENCES body_measurements (id) ON DELETE CASCADE',
     ),
   );
   static const VerificationMeta _typeMeta = const VerificationMeta('type');
@@ -12354,6 +12354,23 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     mesocycleExercises,
     exercise1RmSnapshots,
   ];
+  @override
+  StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'workouts',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('sync_queue', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'body_measurements',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('sync_queue', kind: UpdateKind.delete)],
+    ),
+  ]);
 }
 
 typedef $$ExercisesTableCreateCompanionBuilder =
