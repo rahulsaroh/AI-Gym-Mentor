@@ -464,47 +464,34 @@ PhysiqueAchievement calculatePhysiqueScore(
   }
 
   // ── Local helpers ─────────────────────────────────────────────────────────
-  double? findCurrent(String metric) {
-    if (dateRange != null) {
-      int minDiff = 999999999;
-      double? found;
-      for (var m in allMeasurements) {
-        final v = extractMetricValue(m, metric);
-        if (v == null) continue;
-        final diff = m.date.difference(dateRange.end).inSeconds.abs();
-        if (diff < minDiff) { minDiff = diff; found = v; }
-      }
-      return found;
-    } else {
-      for (var m in allMeasurements) {
-        final v = extractMetricValue(m, metric);
-        if (v != null) return v;
-      }
-      return null;
-    }
-  }
+  (double? current, double? start, DateTime? startDate) getMetricRangeValues(String metric) {
+    final filtered = allMeasurements
+        .where((m) {
+          final v = extractMetricValue(m, metric);
+          if (v == null || v == 0) return false;
+          if (dateRange == null) return true;
+          return m.date.isAfter(dateRange.start.subtract(const Duration(seconds: 1))) && 
+                 m.date.isBefore(dateRange.end.add(const Duration(seconds: 1)));
+        })
+        .toList()
+      ..sort((a, b) => a.date.compareTo(b.date));
 
-  (double?, DateTime?) findStart(String metric, DateTime lookup) {
-    double? val; DateTime? date; int best = 999999999;
-    for (var m in allMeasurements) {
-      final v = extractMetricValue(m, metric);
-      if (v == null) continue;
-      final diff = m.date.difference(lookup).inSeconds.abs();
-      if (diff < best) { best = diff; val = v; date = m.date; }
-    }
-    return (val, date);
+    if (filtered.isEmpty) return (null, null, null);
+
+    final startVal = extractMetricValue(filtered.first, metric);
+    final currentVal = extractMetricValue(filtered.last, metric);
+    final startDate = filtered.first.date;
+
+    return (currentVal, startVal, startDate);
   }
 
   // 1. Process Standard Metrics (Always show these)
   for (final cfg in standardMetrics) {
     final t = latestTargetMap[cfg.id];
-    final currentVal = findCurrent(cfg.id);
-    final startLookup = dateRange?.start ?? t?.createdAt ?? DateTime.now();
-    final (startRaw, startDate) = findStart(cfg.id, startLookup);
-    final startVal = startRaw ?? currentVal ?? 0.0;
+    final (currentVal, startVal, startDate) = getMetricRangeValues(cfg.id);
 
     double percentage = 0;
-    if (t != null && t.targetValue > 0 && currentVal != null) {
+    if (t != null && t.targetValue > 0 && currentVal != null && startVal != null) {
       final journeyLen = t.targetValue - startVal;
       if (journeyLen.abs() < 0.001) {
         percentage = 1.0;
@@ -530,7 +517,7 @@ PhysiqueAchievement calculatePhysiqueScore(
       metric: cfg.id,
       label: cfg.label,
       targetValue: t?.targetValue ?? 0,
-      startValue: startVal,
+      startValue: startVal ?? 0.0,
       currentValue: currentVal ?? 0,
       percentage: percentage,
       achievementRatio: achievementRatio,
@@ -551,17 +538,13 @@ PhysiqueAchievement calculatePhysiqueScore(
 
   for (final metricId in allCustomKeys) {
     final t = latestTargetMap[metricId];
-    final currentVal = findCurrent(metricId);
+    final (currentVal, startVal, startDate) = getMetricRangeValues(metricId);
     
     // If it's a custom metric and we have NO data and NO target, we skip it
     if (currentVal == null && (t == null || t.targetValue <= 0)) continue;
 
-    final startLookup = dateRange?.start ?? t?.createdAt ?? DateTime.now();
-    final (startRaw, startDate) = findStart(metricId, startLookup);
-    final startVal = startRaw ?? currentVal ?? 0.0;
-
     double percentage = 0;
-    if (t != null && t.targetValue > 0 && currentVal != null) {
+    if (t != null && t.targetValue > 0 && currentVal != null && startVal != null) {
       final journeyLen = t.targetValue - startVal;
       if (journeyLen.abs() < 0.001) {
         percentage = 1.0;
@@ -587,7 +570,7 @@ PhysiqueAchievement calculatePhysiqueScore(
       metric: metricId,
       label: getMetricLabel(metricId),
       targetValue: t?.targetValue ?? 0,
-      startValue: startVal,
+      startValue: startVal ?? 0.0,
       currentValue: currentVal ?? 0,
       percentage: percentage,
       achievementRatio: achievementRatio,

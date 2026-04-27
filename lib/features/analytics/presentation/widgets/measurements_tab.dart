@@ -242,6 +242,11 @@ class _OverallProgressCard extends StatelessWidget {
             child: _GaugeWidget(
               score: physique.overallScore.clamp(0.0, 1.0) * 100,
               pct: pct,
+              progressColor: physique.rawOverallScore > 0.001
+                  ? const Color(0xFF2ECC71)
+                  : (physique.rawOverallScore < -0.001
+                      ? const Color(0xFFE74C3C)
+                      : const Color(0xFF3D6FE8)),
             ),
           ),
 
@@ -284,13 +289,18 @@ class _OverallProgressCard extends StatelessWidget {
 class _GaugeWidget extends StatelessWidget {
   final double score;
   final int pct;
+  final Color progressColor;
 
-  const _GaugeWidget({required this.score, required this.pct});
+  const _GaugeWidget({
+    required this.score,
+    required this.pct,
+    required this.progressColor,
+  });
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 190,
+      height: 170, // Reduced height since we removed buttons
       child: Stack(
         alignment: Alignment.bottomCenter,
         children: [
@@ -298,40 +308,21 @@ class _GaugeWidget extends StatelessWidget {
           Center(
             child: CustomPaint(
               size: const Size(280, 145),
-              painter: _GaugePainter(score: score),
+              painter: _GaugePainter(score: score, progressColor: progressColor),
             ),
           ),
 
-          // Content inside gauge
+          // Content inside gauge - repositioned to lower middle
           Positioned(
-            bottom: 30,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  '$pct%',
-                  style: GoogleFonts.outfit(
-                    fontSize: 42,
-                    fontWeight: FontWeight.w900,
-                    color: const Color(0xFF1A1A2E),
-                    height: 1,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  'Log to view score!',
-                  style: GoogleFonts.outfit(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: const Color(0xFF9098A3),
-                  ),
-                ),
-                const SizedBox(height: 14),
-                _StadiumButton(
-                  label: 'Set your target',
-                  onTap: () => context.push('/analytics/manage-measurements'),
-                ),
-              ],
+            bottom: 25,
+            child: Text(
+              '$pct%',
+              style: GoogleFonts.outfit(
+                fontSize: 48,
+                fontWeight: FontWeight.w900,
+                color: const Color(0xFF1A1A2E),
+                height: 1,
+              ),
             ),
           ),
         ],
@@ -512,8 +503,12 @@ class _LegendDot extends StatelessWidget {
 
 class _GaugePainter extends CustomPainter {
   final double score;
+  final Color progressColor;
 
-  _GaugePainter({required this.score});
+  _GaugePainter({
+    required this.score,
+    this.progressColor = const Color(0xFF3D6FE8),
+  });
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -570,7 +565,7 @@ class _GaugePainter extends CustomPainter {
     // 4. Progress fill
     if (score > 0) {
       final progressPaint = Paint()
-        ..color = const Color(0xFF3D6FE8).withValues(alpha: 0.85)
+        ..color = progressColor.withValues(alpha: 0.85)
         ..style = PaintingStyle.stroke
         ..strokeWidth = strokeWidth
         ..strokeCap = StrokeCap.round;
@@ -579,7 +574,8 @@ class _GaugePainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant _GaugePainter old) => old.score != score;
+  bool shouldRepaint(covariant _GaugePainter old) => 
+      old.score != score || old.progressColor != progressColor;
 }
 
 // ─── Measurement Item Card ────────────────────────────────────────────────────

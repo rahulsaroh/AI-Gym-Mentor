@@ -295,6 +295,7 @@ class ExportService {
     final allSets = await db.select(db.workoutSets).get();
     final exercises = await ref.read(exerciseRepositoryProvider).getAllExercises();
     final measurements = await db.select(db.bodyMeasurements).get();
+    final targets = await db.select(db.bodyTargets).get();
 
     final excel = Excel.createExcel();
     if (excel.tables.containsKey('Sheet1')) excel.delete('Sheet1');
@@ -331,17 +332,21 @@ class ExportService {
       final dateStr = DateFormat('yyyy-MM-dd').format(w.startTime ?? w.date);
       final dayName = DateFormat('EEEE').format(w.startTime ?? w.date);
 
+      final exerciseSetCounts = <int, int>{};
       for (var s in wSets) {
         final ex = exerciseById[s.exerciseId];
         final vol = s.weight * s.reps;
         
+        final currentSetNum = (exerciseSetCounts[s.exerciseId] ?? 0) + 1;
+        exerciseSetCounts[s.exerciseId] = currentSetNum;
+
         rawSheet.appendRow([
           TextCellValue(dateStr),
           TextCellValue(dayName),
           TextCellValue(w.name),
           TextCellValue(ex?.name ?? 'Unknown'),
           IntCellValue(s.exerciseId),
-          IntCellValue(s.setNumber),
+          IntCellValue(currentSetNum),
           TextCellValue(s.setType.name),
           DoubleCellValue(s.weight),
           DoubleCellValue(s.reps),
@@ -356,6 +361,7 @@ class ExportService {
           'dateStr': dateStr,
           'dayName': dayName,
           'workoutName': w.name,
+          'duration': w.duration,
           'exercise': ex?.name ?? 'Unknown',
           'weight': s.weight,
           'reps': s.reps,
@@ -376,7 +382,7 @@ class ExportService {
     final prRowStyle = CellStyle(backgroundColorHex: ExcelColor.fromHexString('#FFD700')); // Gold for PR
 
     final summaryHeaders = [
-      'Date', 'Day', 'Workout Name', 'Total Exercises', 'Total Sets', 
+      'Date', 'Day', 'Workout Name', 'Duration (mins)', 'Total Exercises', 'Total Sets', 
       'Total Volume (kg)', 'Top Exercise', 'Is PR Session', 'Notes'
     ];
     for (var i = 0; i < summaryHeaders.length; i++) {
@@ -403,6 +409,7 @@ class ExportService {
         TextCellValue(sets.first['dateStr']),
         TextCellValue(sets.first['dayName']),
         TextCellValue(sets.first['workoutName']),
+        IntCellValue(sets.first['duration']),
         IntCellValue(uniqueExCount),
         IntCellValue(sets.length),
         DoubleCellValue(totalVol),
@@ -413,7 +420,7 @@ class ExportService {
 
       if (hasPR) {
         final lastRowIdx = summarySheet.maxRows - 1;
-        summarySheet.cell(CellIndex.indexByColumnRow(columnIndex: 7, rowIndex: lastRowIdx)).cellStyle = prRowStyle;
+        summarySheet.cell(CellIndex.indexByColumnRow(columnIndex: 8, rowIndex: lastRowIdx)).cellStyle = prRowStyle;
       }
     }
 
@@ -568,12 +575,37 @@ class ExportService {
        }
     }
 
+    // ─── 6. TARGETS SHEET ───
+    final targetSheet = excel['Measurement Targets'];
+    final targetHeaderStyle = CellStyle(
+      bold: true,
+      fontColorHex: ExcelColor.white,
+      backgroundColorHex: ExcelColor.fromHexString('#BF360C'),
+    );
+
+    final targetHeaders = ['Metric', 'Target Value', 'Created At', 'Deadline'];
+    for (var i = 0; i < targetHeaders.length; i++) {
+      var cell = targetSheet.cell(CellIndex.indexByColumnRow(columnIndex: i, rowIndex: 0));
+      cell.value = TextCellValue(targetHeaders[i]);
+      cell.cellStyle = targetHeaderStyle;
+    }
+
+    for (var t in targets) {
+      targetSheet.appendRow([
+        TextCellValue(t.metric),
+        DoubleCellValue(t.targetValue),
+        TextCellValue(DateFormat('yyyy-MM-dd').format(t.createdAt)),
+        t.deadline != null ? TextCellValue(DateFormat('yyyy-MM-dd').format(t.deadline!)) : null,
+      ]);
+    }
+
     final fileBytes = excel.save();
     if (fileBytes != null) {
       return {
         'bytes': fileBytes,
         'exerciseRows': rawSheet.maxRows - 1,
         'measurementRows': measureSheet.maxRows - 1,
+        'targetRows': targetSheet.maxRows - 1,
       };
     }
     return null;
