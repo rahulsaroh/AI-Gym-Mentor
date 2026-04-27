@@ -287,11 +287,7 @@ Future<List<FlSpot>> metricAchievementTrend(Ref ref,
       .toList();
 }
 
-@riverpod
-Future<List<Map<String, dynamic>>> recentPRs(Ref ref) async {
-  final repo = ref.watch(statsRepositoryProvider);
-  return await repo.getRecentPRs();
-}
+
 
 @riverpod
 Future<List<Map<String, dynamic>>> fullPRHistory(Ref ref) async {

@@ -170,24 +170,35 @@ class StrengthAnalyticsDashboard extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 10, offset: const Offset(0, 4))],
-        border: Border.all(color: Colors.grey[100]!),
+        color: const Color(0xFFF1F5F9),
+        borderRadius: BorderRadius.circular(28),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.1),
+            blurRadius: 15,
+            offset: const Offset(6, 6),
+          ),
+          const BoxShadow(
+            color: Colors.white,
+            blurRadius: 15,
+            offset: Offset(-6, -6),
+          ),
+        ],
+        border: Border.all(color: Colors.white, width: 1.5),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           CircleAvatar(
-            backgroundColor: color.withOpacity(0.1),
-            radius: 18,
-            child: Icon(icon, color: color, size: 20),
+            backgroundColor: color.withValues(alpha: 0.1),
+            radius: 20,
+            child: Icon(icon, color: color, size: 22),
           ),
-          const SizedBox(height: 16),
-          Text(value, style: GoogleFonts.outfit(fontSize: 28, fontWeight: FontWeight.bold)),
-          Text(label, style: GoogleFonts.outfit(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.black87)),
+          const SizedBox(height: 18),
+          Text(value, style: GoogleFonts.outfit(fontSize: 32, fontWeight: FontWeight.w900)),
+          Text(label, style: GoogleFonts.outfit(fontSize: 14, fontWeight: FontWeight.w700, color: Colors.black87)),
           if (subtitle != null)
-            Text(subtitle, style: GoogleFonts.outfit(fontSize: 10, color: Colors.grey[500])),
+            Text(subtitle, style: GoogleFonts.outfit(fontSize: 11, color: Colors.grey[500], fontWeight: FontWeight.w500)),
         ],
       ),
     );
@@ -355,12 +366,24 @@ class StrengthAnalyticsDashboard extends ConsumerWidget {
             final s = e['snapshot'] as Exercise1RmSnapshot;
             final name = e['exerciseName'] as String;
             final metrics = state.exerciseMetrics[s.exerciseId];
-            return Card(
-              margin: const EdgeInsets.only(bottom: 12),
-              elevation: 0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-                side: BorderSide(color: Colors.grey[100]!),
+            return Container(
+              margin: const EdgeInsets.only(bottom: 16),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF8FAFC),
+                borderRadius: BorderRadius.circular(24),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.08),
+                    blurRadius: 10,
+                    offset: const Offset(5, 5),
+                  ),
+                  const BoxShadow(
+                    color: Colors.white,
+                    blurRadius: 10,
+                    offset: Offset(-5, -5),
+                  ),
+                ],
+                border: Border.all(color: Colors.white, width: 1.5),
               ),
               child: ListTile(
                 onTap: () => Navigator.push(
@@ -368,15 +391,15 @@ class StrengthAnalyticsDashboard extends ConsumerWidget {
                   MaterialPageRoute(builder: (context) => ExerciseStrengthDetailScreen(exerciseId: s.exerciseId, exerciseName: name)),
                 ),
                 contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                title: Text(name, style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 16)),
-                subtitle: Text('Trained ${DateFormat.yMMMd().format(s.date)}', style: GoogleFonts.outfit(fontSize: 12, color: Colors.grey[500])),
+                title: Text(name, style: GoogleFonts.outfit(fontWeight: FontWeight.w900, fontSize: 17)),
+                subtitle: Text('Trained ${DateFormat.yMMMd().format(s.date)}', style: GoogleFonts.outfit(fontSize: 12, color: Colors.grey[500], fontWeight: FontWeight.w600)),
                 trailing: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Text(
                       '${s.estimated1Rm.toInt()}${unit == WeightUnit.kg ? 'kg' : 'lbs'}',
-                      style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.blue[700]),
+                      style: GoogleFonts.outfit(fontWeight: FontWeight.w900, fontSize: 20, color: Colors.blue[700]),
                     ),
                     if (metrics != null && (metrics['changePercent'] as double) != 0)
                       _buildTrendIndicator(metrics['changePercent']),

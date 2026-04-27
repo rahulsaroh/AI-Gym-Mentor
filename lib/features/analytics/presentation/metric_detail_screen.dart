@@ -30,38 +30,56 @@ class MetricDetailScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    return _MetricDetailView(
+      metricId: metricId,
+      metricLabel: metricLabel,
+      unit: unit,
+      lowerIsBetter: lowerIsBetter,
+    );
+  }
+}
+
+class _MetricDetailView extends ConsumerWidget {
+  final String metricId;
+  final String metricLabel;
+  final String unit;
+  final bool lowerIsBetter;
+
+  const _MetricDetailView({
+    required this.metricId,
+    required this.metricLabel,
+    required this.unit,
+    required this.lowerIsBetter,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
     final achievementAsync = ref.watch(physiqueAchievementProvider);
     final measurementsAsync = ref.watch(bodyMeasurementsListProvider);
+    final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
+      backgroundColor: const Color(0xFFF8FAFC),
       appBar: AppBar(
         title: Text(
           metricLabel,
-          style: GoogleFonts.outfit(fontWeight: FontWeight.bold),
+          style: GoogleFonts.outfit(fontWeight: FontWeight.w900),
         ),
         elevation: 0,
         backgroundColor: Colors.transparent,
+        centerTitle: true,
       ),
       bottomNavigationBar: const SafeArea(
         child: Padding(
-          padding: EdgeInsets.only(bottom: 8),
+          padding: EdgeInsets.only(bottom: 12),
           child: MeasurementIntervalSelector(),
         ),
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => const BodyMeasurementsLogScreen()),
-        ),
-        icon: const Icon(LucideIcons.plus),
-        label: Text('Log Entry', style: GoogleFonts.outfit(fontWeight: FontWeight.bold)),
-      ),
+      // FAB removed as per user request
       body: measurementsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text('Error: $e')),
         data: (allMeasurements) {
-          // Extract all entries for this metric in chronological order (oldest first)
           final entries = <_LogEntry>[];
           for (final m in allMeasurements.reversed) {
             final val = extractMetricValue(m, metricId);
@@ -69,10 +87,8 @@ class MetricDetailScreen extends ConsumerWidget {
               entries.add(_LogEntry(id: m.id, date: m.date, value: val));
             }
           }
-          // Reverse so newest is first in display
           final displayEntries = entries.reversed.toList();
 
-          // Find the achievement for this metric
           final MetricAchievement? achievement = achievementAsync.asData?.value
               .achievements
               .where((a) => a.metric == metricId)
@@ -83,7 +99,7 @@ class MetricDetailScreen extends ConsumerWidget {
             slivers: [
               SliverToBoxAdapter(
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
                   child: _MetricGaugeCard(
                     achievement: achievement,
                     metricLabel: metricLabel,
@@ -94,13 +110,13 @@ class MetricDetailScreen extends ConsumerWidget {
               ),
               SliverToBoxAdapter(
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
+                  padding: const EdgeInsets.fromLTRB(16, 32, 16, 0),
                   child: _MetricHistoryChart(entries: entries),
                 ),
               ),
               SliverToBoxAdapter(
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 32, 20, 16),
+                  padding: const EdgeInsets.fromLTRB(20, 40, 20, 16),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -110,15 +126,15 @@ class MetricDetailScreen extends ConsumerWidget {
                           fontSize: 14,
                           fontWeight: FontWeight.w900,
                           letterSpacing: 1.5,
-                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+                          color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
                         ),
                       ),
                       Text(
                         '${displayEntries.length} entries',
                         style: GoogleFonts.outfit(
                           fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.6),
+                          fontWeight: FontWeight.w700,
+                          color: theme.colorScheme.primary.withValues(alpha: 0.6),
                         ),
                       ),
                     ],
@@ -134,7 +150,6 @@ class MetricDetailScreen extends ConsumerWidget {
                   delegate: SliverChildBuilderDelegate(
                     (context, index) {
                       final entry = displayEntries[index];
-                      // Previous entry is the one after in the displayEntries list (older)
                       final prevVal = index + 1 < displayEntries.length
                           ? displayEntries[index + 1].value
                           : null;
@@ -159,7 +174,7 @@ class MetricDetailScreen extends ConsumerWidget {
                     childCount: displayEntries.length,
                   ),
                 ),
-              const SliverToBoxAdapter(child: SizedBox(height: 100)),
+              const SliverToBoxAdapter(child: SizedBox(height: 120)),
             ],
           );
         },
@@ -194,8 +209,6 @@ class MetricDetailScreen extends ConsumerWidget {
   }
 }
 
-// ─── Gauge Card ────────────────────────────────────────────────────────────────
-
 class _MetricGaugeCard extends StatelessWidget {
   final MetricAchievement? achievement;
   final String metricLabel;
@@ -214,14 +227,14 @@ class _MetricGaugeCard extends StatelessWidget {
     final a = achievement;
     final hasData = a != null && a.currentValue > 0;
     final hasTarget = a != null && a.targetValue > 0;
+    final theme = Theme.of(context);
 
-    // Compute start ratio and current ratio for gauge (relative to target)
     double startRatio = 0;
     double currentRatio = 0;
     bool isImproving = true;
 
     if (hasData && hasTarget && a != null) {
-      final pct = a.percentage; // journey percentage
+      final pct = a.percentage; 
       isImproving = pct >= 0;
       startRatio = 0;
       currentRatio = pct.clamp(-1.0, 1.0).abs();
@@ -229,117 +242,152 @@ class _MetricGaugeCard extends StatelessWidget {
 
     final pct = a != null ? (a.percentage.clamp(-1.0, 1.5) * 100) : 0.0;
     final pctDisplay = pct.toInt();
-    final isPositive = pct >= 0;
-
-    String subtitle = 'No data logged yet';
-    if (hasData && hasTarget && a != null) {
-      subtitle = isPositive ? '▲ Improving' : '▼ Regressing';
-    } else if (hasData && !hasTarget && a != null) {
-      subtitle = 'No target set';
-    }
 
     final gaugeColor = !hasData
         ? Colors.grey
         : isImproving
-            ? Colors.green
-            : Colors.red;
+            ? const Color(0xFF2ECC71)
+            : const Color(0xFFE74C3C);
 
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.fromLTRB(16, 32, 16, 24),
       decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(24),
+        color: const Color(0xFFF8FAFC),
+        borderRadius: BorderRadius.circular(40),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.06),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 20,
-            offset: const Offset(0, 8),
+            offset: const Offset(10, 10),
+          ),
+          BoxShadow(
+            color: Colors.white,
+            blurRadius: 20,
+            offset: const Offset(-10, -10),
           ),
         ],
         border: Border.all(
-          color: Theme.of(context).dividerColor.withValues(alpha: 0.1),
+          color: Colors.white,
+          width: 2,
         ),
       ),
       child: Column(children: [
         Text(
           'OVERALL PROGRESS',
-          style: GoogleFonts.outfit(fontSize: 14, fontWeight: FontWeight.bold, letterSpacing: 1.1),
+          style: GoogleFonts.outfit(fontSize: 14, fontWeight: FontWeight.w900, letterSpacing: 1.2),
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 32),
 
-        // Gauge
         SizedBox(
-          height: 130,
+          height: 180,
           child: Stack(alignment: Alignment.bottomCenter, children: [
             CustomPaint(
-              size: const Size(230, 115),
-              painter: _MetricGaugePainter(
+              size: const Size(280, 140),
+              painter: _MetallicGaugePainter(
                 startProgress: startRatio,
                 currentProgress: hasData && hasTarget ? a!.percentage.clamp(-1.0, 1.0) : 0.0,
                 isImproving: isImproving,
                 hasData: hasData && hasTarget,
-                backgroundColor: Colors.grey.withValues(alpha: 0.15),
+                backgroundColor: const Color(0xFFF1F4F8),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 6),
+            Positioned(
+              bottom: 12,
               child: Column(mainAxisSize: MainAxisSize.min, children: [
                 if (hasData && hasTarget)
                   Text(
                     '$pctDisplay%',
                     style: GoogleFonts.outfit(
-                      fontSize: 42,
-                      fontWeight: FontWeight.bold,
-                      color: gaugeColor,
+                      fontSize: 52,
+                      fontWeight: FontWeight.w900,
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
                     ),
                   )
                 else
                   Text(
-                    '--',
+                    '0%',
                     style: GoogleFonts.outfit(
-                      fontSize: 42,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.grey,
+                      fontSize: 52,
+                      fontWeight: FontWeight.w900,
+                      color: Colors.grey.withValues(alpha: 0.3),
                     ),
                   ),
+                const SizedBox(height: 4),
                 Text(
-                  subtitle,
+                   !hasData 
+                    ? 'Log to view score!'
+                    : hasTarget 
+                      ? (isImproving ? 'Improving' : 'Regressing')
+                      : 'No target set',
                   style: GoogleFonts.outfit(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: gaugeColor.withValues(alpha: 0.8),
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
                   ),
                 ),
+                if (!hasTarget && hasData)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 12),
+                    child: _PillAction(
+                      label: 'Set your target',
+                      onTap: () {}, 
+                    ),
+                  ),
               ]),
             ),
           ]),
         ),
 
-        const SizedBox(height: 16),
+        const SizedBox(height: 32),
 
-        // Stats row
         if (hasData && a != null)
           Row(children: [
             _StatChip(
               label: 'Start',
               value: '${a.startValue.toStringAsFixed(1)} $unit',
-              color: const Color(0xFF3B82F6), // blue
+              color: const Color(0xFF3B82F6),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: 12),
             _StatChip(
               label: 'Current',
               value: '${a.currentValue.toStringAsFixed(1)} $unit',
               color: gaugeColor,
             ),
-            const SizedBox(width: 8),
-            if (hasTarget)
+            if (hasTarget) ...[
+              const SizedBox(width: 12),
               _StatChip(
                 label: 'Target',
                 value: '${a.targetValue.toStringAsFixed(1)} $unit',
-                color: Theme.of(context).colorScheme.primary,
+                color: theme.colorScheme.primary,
               ),
+            ],
           ]),
       ]),
+    );
+  }
+}
+
+class _PillAction extends StatelessWidget {
+  final String label;
+  final VoidCallback onTap;
+  const _PillAction({required this.label, required this.onTap});
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: Colors.black.withValues(alpha: 0.1)),
+          color: const Color(0xFFF1F5F9),
+        ),
+        child: Text(
+          label,
+          style: GoogleFonts.outfit(fontSize: 13, fontWeight: FontWeight.w700, color: Colors.black.withValues(alpha: 0.7)),
+        ),
+      ),
     );
   }
 }
@@ -354,18 +402,18 @@ class _StatChip extends StatelessWidget {
   Widget build(BuildContext context) {
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        padding: const EdgeInsets.symmetric(vertical: 12),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          color: color.withValues(alpha: 0.1),
-          border: Border.all(color: color.withValues(alpha: 0.3)),
+          borderRadius: BorderRadius.circular(20),
+          color: color.withValues(alpha: 0.05),
+          border: Border.all(color: color.withValues(alpha: 0.15)),
         ),
         child: Column(children: [
           Text(label,
-              style: GoogleFonts.outfit(fontSize: 10, color: color, fontWeight: FontWeight.w600)),
-          const SizedBox(height: 2),
+              style: GoogleFonts.outfit(fontSize: 11, color: color, fontWeight: FontWeight.w900, letterSpacing: 0.5)),
+          const SizedBox(height: 4),
           Text(value,
-              style: GoogleFonts.outfit(fontSize: 13, fontWeight: FontWeight.bold, color: color),
+              style: GoogleFonts.outfit(fontSize: 15, fontWeight: FontWeight.bold, color: color),
               overflow: TextOverflow.ellipsis),
         ]),
       ),
@@ -373,14 +421,14 @@ class _StatChip extends StatelessWidget {
   }
 }
 
-class _MetricGaugePainter extends CustomPainter {
+class _MetallicGaugePainter extends CustomPainter {
   final double startProgress;
   final double currentProgress;
   final bool isImproving;
   final bool hasData;
   final Color backgroundColor;
 
-  _MetricGaugePainter({
+  _MetallicGaugePainter({
     required this.startProgress,
     required this.currentProgress,
     required this.isImproving,
@@ -393,81 +441,75 @@ class _MetricGaugePainter extends CustomPainter {
     final center = Offset(size.width / 2, size.height);
     final radius = size.width / 2;
 
+    // Tick Marks
+    final tickPaint = Paint()
+      ..color = Colors.black.withValues(alpha: 0.1)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2;
+    for (double i = math.pi; i <= math.pi * 2; i += (math.pi / 12)) {
+      final innerR = radius + 20;
+      final outerR = radius + 30;
+      canvas.drawLine(
+        Offset(center.dx + innerR * math.cos(i), center.dy + innerR * math.sin(i)),
+        Offset(center.dx + outerR * math.cos(i), center.dy + outerR * math.sin(i)),
+        tickPaint,
+      );
+    }
+
+    // Outer Track
     canvas.drawArc(
       Rect.fromCircle(center: center, radius: radius),
       math.pi, math.pi, false,
       Paint()
         ..color = backgroundColor
         ..style = PaintingStyle.stroke
-        ..strokeWidth = 16
+        ..strokeWidth = 24
         ..strokeCap = StrokeCap.round,
+    );
+
+    // Metallic Inner Background
+    final metallicRect = Rect.fromCircle(center: center, radius: radius - 15);
+    final metallicPaint = Paint()
+      ..shader = RadialGradient(
+        colors: [
+          const Color(0xFFF1F5F9),
+          const Color(0xFFE2E8F0),
+          const Color(0xFFCBD5E1),
+        ],
+        stops: const [0.0, 0.6, 1.0],
+      ).createShader(metallicRect)
+      ..style = PaintingStyle.fill;
+    
+    canvas.drawArc(
+      metallicRect,
+      math.pi, math.pi, true,
+      metallicPaint,
     );
 
     if (hasData && currentProgress.abs() > 0.001) {
       final abs = currentProgress.abs();
       final sweepAngle = math.pi * abs;
-      final activeColor = isImproving ? Colors.green : Colors.red;
+      final activeColor = isImproving ? const Color(0xFF2ECC71) : const Color(0xFFE74C3C);
 
-      if (isImproving) {
-        canvas.drawArc(
-          Rect.fromCircle(center: center, radius: radius),
-          math.pi, sweepAngle, false,
-          Paint()
-            ..shader = SweepGradient(
-              colors: [activeColor.withValues(alpha: 0.5), activeColor],
-              startAngle: math.pi,
-              endAngle: math.pi * 2,
-            ).createShader(Rect.fromCircle(center: center, radius: radius))
-            ..style = PaintingStyle.stroke
-            ..strokeWidth = 16
-            ..strokeCap = StrokeCap.round,
-        );
-      } else {
-        canvas.drawArc(
-          Rect.fromCircle(center: center, radius: radius),
-          math.pi, sweepAngle, false,
-          Paint()
-            ..color = activeColor
-            ..style = PaintingStyle.stroke
-            ..strokeWidth = 16
-            ..strokeCap = StrokeCap.round,
-        );
-      }
-    }
-
-    final blueMarkerPaint = Paint()
-      ..color = const Color(0xFF3B82F6)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 4
-      ..strokeCap = StrokeCap.round;
-
-    final startAngle = math.pi;
-    final innerR = radius - 12.0;
-    final outerR = radius + 4.0;
-    canvas.drawLine(
-      Offset(center.dx + innerR * math.cos(startAngle),
-          center.dy + innerR * math.sin(startAngle)),
-      Offset(center.dx + outerR * math.cos(startAngle),
-          center.dy + outerR * math.sin(startAngle)),
-      blueMarkerPaint,
-    );
-
-    final tickPaint = Paint()
-      ..color = Colors.grey.withValues(alpha: 0.2)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.5;
-    for (double i = math.pi; i <= math.pi * 2; i += 0.18) {
-      final outerTick = radius + 20;
-      canvas.drawLine(
-        Offset(center.dx + outerTick * math.cos(i), center.dy + outerTick * math.sin(i)),
-        Offset(center.dx + (outerTick + 5) * math.cos(i), center.dy + (outerTick + 5) * math.sin(i)),
-        tickPaint,
+      canvas.drawArc(
+        Rect.fromCircle(center: center, radius: radius),
+        math.pi, sweepAngle, false,
+        Paint()
+          ..shader = SweepGradient(
+            colors: [activeColor.withValues(alpha: 0.4), activeColor],
+            startAngle: math.pi,
+            endAngle: math.pi * 2,
+          ).createShader(Rect.fromCircle(center: center, radius: radius))
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 26
+          ..strokeCap = StrokeCap.round
+          ..maskFilter = const MaskFilter.blur(BlurStyle.solid, 4),
       );
     }
   }
 
   @override
-  bool shouldRepaint(covariant _MetricGaugePainter old) =>
+  bool shouldRepaint(covariant _MetallicGaugePainter old) =>
       old.currentProgress != currentProgress || old.isImproving != isImproving;
 }
 
@@ -479,6 +521,7 @@ class _MetricHistoryChart extends StatelessWidget {
   Widget build(BuildContext context) {
     if (entries.length < 2) return const SizedBox.shrink();
 
+    final theme = Theme.of(context);
     final spots = entries.asMap().entries.map((e) => FlSpot(e.key.toDouble(), e.value.value)).toList();
     final values = entries.map((e) => e.value).toList();
     final minVal = values.reduce((a, b) => a < b ? a : b);
@@ -487,121 +530,109 @@ class _MetricHistoryChart extends StatelessWidget {
     final minY = (minVal - padding).clamp(0.0, double.infinity);
     final maxY = maxVal + padding;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'HISTORY TREND',
-          style: GoogleFonts.outfit(
-            fontSize: 13,
-            fontWeight: FontWeight.bold,
-            letterSpacing: 1.2,
-            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF8FAFC),
+        borderRadius: BorderRadius.circular(32),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.08),
+            blurRadius: 15,
+            offset: const Offset(6, 6),
           ),
-        ),
-        const SizedBox(height: 12),
-        Container(
-          height: 220,
-          padding: const EdgeInsets.fromLTRB(8, 16, 16, 8),
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surfaceContainerLow,
-            borderRadius: BorderRadius.circular(20),
+          const BoxShadow(
+            color: Colors.white,
+            blurRadius: 15,
+            offset: Offset(-6, -6),
           ),
-          child: LineChart(
-            LineChartData(
-              gridData: const FlGridData(show: false),
-              titlesData: FlTitlesData(
-                leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                rightTitles: AxisTitles(
-                  sideTitles: SideTitles(
-                    showTitles: true,
-                    reservedSize: 44,
-                    getTitlesWidget: (val, meta) => Text(
-                      val.toStringAsFixed(1),
-                      style: GoogleFonts.robotoMono(
-                        fontSize: 10,
-                        color: Theme.of(context).colorScheme.outline,
+        ],
+        border: Border.all(color: Colors.white, width: 1.5),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'HISTORY TREND',
+            style: GoogleFonts.outfit(
+              fontSize: 13,
+              fontWeight: FontWeight.w900,
+              letterSpacing: 1.2,
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
+            ),
+          ),
+          const SizedBox(height: 24),
+          SizedBox(
+            height: 200,
+            child: LineChart(
+              LineChartData(
+                gridData: const FlGridData(show: false),
+                titlesData: FlTitlesData(
+                  leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  rightTitles: AxisTitles(
+                    sideTitles: SideTitles(
+                      showTitles: true,
+                      reservedSize: 40,
+                      getTitlesWidget: (val, meta) => Text(
+                        val.toStringAsFixed(1),
+                        style: GoogleFonts.robotoMono(fontSize: 10, color: theme.colorScheme.outline),
                       ),
                     ),
                   ),
+                  bottomTitles: AxisTitles(
+                    sideTitles: SideTitles(
+                      showTitles: true,
+                      getTitlesWidget: (val, meta) {
+                        final idx = val.toInt();
+                        if (idx < 0 || idx >= entries.length) return const SizedBox.shrink();
+                        if (entries.length > 6 && idx % (entries.length ~/ 3) != 0) return const SizedBox.shrink();
+                        return Padding(
+                          padding: const EdgeInsets.only(top: 10),
+                          child: Text(DateFormat('MMM d').format(entries[idx].date), style: TextStyle(fontSize: 9, color: theme.colorScheme.outline)),
+                        );
+                      },
+                    ),
+                  ),
                 ),
-                bottomTitles: AxisTitles(
-                  sideTitles: SideTitles(
-                    showTitles: true,
-                    getTitlesWidget: (val, meta) {
-                      final idx = val.toInt();
-                      if (idx < 0 || idx >= entries.length) return const SizedBox.shrink();
-                      if (entries.length > 6 && idx % (entries.length ~/ 3) != 0) {
-                        return const SizedBox.shrink();
-                      }
-                      final date = entries[idx].date;
-                      return Padding(
-                        padding: const EdgeInsets.only(top: 8),
-                        child: Text(
-                          DateFormat('MMM d').format(date),
-                          style: TextStyle(
-                            fontSize: 10,
-                            color: Theme.of(context).colorScheme.outline,
-                          ),
-                        ),
+                borderData: FlBorderData(show: false),
+                minY: minY,
+                maxY: maxY,
+                lineBarsData: [
+                  LineChartBarData(
+                    spots: spots,
+                    isCurved: true,
+                    color: theme.colorScheme.primary,
+                    barWidth: 5,
+                    isStrokeCapRound: true,
+                    dotData: FlDotData(show: true, getDotPainter: (spot, percent, barData, index) => FlDotCirclePainter(radius: 5, color: Colors.white, strokeWidth: 2.5, strokeColor: theme.colorScheme.primary)),
+                    belowBarData: BarAreaData(
+                      show: true,
+                      gradient: LinearGradient(
+                        colors: [theme.colorScheme.primary.withValues(alpha: 0.2), theme.colorScheme.primary.withValues(alpha: 0.0)],
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                      ),
+                    ),
+                  ),
+                ],
+                lineTouchData: LineTouchData(
+                  touchTooltipData: LineTouchTooltipData(
+                    getTooltipColor: (_) => theme.colorScheme.surfaceContainerHighest,
+                    getTooltipItems: (touchedSpots) => touchedSpots.map((spot) {
+                      final entry = entries[spot.x.toInt()];
+                      return LineTooltipItem(
+                        '${entry.value.toStringAsFixed(1)}\n${DateFormat('MMM d').format(entry.date)}',
+                        TextStyle(color: theme.colorScheme.onSurface, fontWeight: FontWeight.bold, fontSize: 11),
                       );
-                    },
+                    }).toList(),
                   ),
-                ),
-              ),
-              borderData: FlBorderData(show: false),
-              minY: minY,
-              maxY: maxY,
-              lineBarsData: [
-                LineChartBarData(
-                  spots: spots,
-                  isCurved: true,
-                  color: Theme.of(context).colorScheme.primary,
-                  barWidth: 4,
-                  isStrokeCapRound: true,
-                  dotData: FlDotData(
-                    show: true,
-                    getDotPainter: (spot, percent, barData, index) => FlDotCirclePainter(
-                      radius: 4,
-                      color: Colors.white,
-                      strokeWidth: 2,
-                      strokeColor: Theme.of(context).colorScheme.primary,
-                    ),
-                  ),
-                  belowBarData: BarAreaData(
-                    show: true,
-                    gradient: LinearGradient(
-                      colors: [
-                        Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
-                        Theme.of(context).colorScheme.primary.withValues(alpha: 0.0),
-                      ],
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                    ),
-                  ),
-                ),
-              ],
-              lineTouchData: LineTouchData(
-                touchTooltipData: LineTouchTooltipData(
-                  getTooltipColor: (_) => Theme.of(context).colorScheme.surfaceContainerHighest,
-                  getTooltipItems: (touchedSpots) => touchedSpots.map((spot) {
-                    final entry = entries[spot.x.toInt()];
-                    return LineTooltipItem(
-                      '${entry.value.toStringAsFixed(1)}\n${DateFormat('MMM d, yyyy').format(entry.date)}',
-                      TextStyle(
-                        color: Theme.of(context).colorScheme.onSurface,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 12,
-                      ),
-                    );
-                  }).toList(),
                 ),
               ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
@@ -638,11 +669,7 @@ class _LogEntryCard extends StatelessWidget {
     bool? isImproving;
     if (prevValue != null && prevValue! > 0) {
       changePct = ((entry.value - prevValue!) / prevValue!) * 100;
-      if (lowerIsBetter) {
-        isImproving = changePct <= 0;
-      } else {
-        isImproving = changePct >= 0;
-      }
+      isImproving = lowerIsBetter ? changePct <= 0 : changePct >= 0;
     }
 
     final theme = Theme.of(context);
@@ -651,36 +678,44 @@ class _LogEntryCard extends StatelessWidget {
     return BouncingCard(
       onTap: () {}, 
       child: Container(
-        margin: const EdgeInsets.fromLTRB(20, 0, 20, 16),
+        margin: const EdgeInsets.fromLTRB(16, 0, 16, 20),
         decoration: BoxDecoration(
-          color: theme.colorScheme.surfaceContainerLow.withValues(alpha: 0.8),
-          borderRadius: BorderRadius.circular(24),
+          color: const Color(0xFFF8FAFC),
+          borderRadius: BorderRadius.circular(28),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.04),
-              blurRadius: 20,
-              offset: const Offset(0, 8),
+              color: Colors.black.withValues(alpha: 0.06),
+              blurRadius: 10,
+              offset: const Offset(5, 5),
+            ),
+            const BoxShadow(
+              color: Colors.white,
+              blurRadius: 10,
+              offset: Offset(-5, -5),
             ),
           ],
-          border: Border.all(
-            color: theme.dividerColor.withValues(alpha: 0.05),
-          ),
+          border: Border.all(color: Colors.white, width: 1.5),
         ),
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(20),
           child: Row(
             children: [
               Container(
-                width: 56,
-                height: 56,
+                width: 58,
+                height: 58,
                 decoration: BoxDecoration(
-                  color: theme.colorScheme.surface,
+                  color: const Color(0xFFF1F5F9),
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.08),
-                      blurRadius: 12,
-                      offset: const Offset(0, 4),
+                      color: Colors.black.withValues(alpha: 0.05),
+                      blurRadius: 5,
+                      offset: const Offset(2, 2),
+                    ),
+                    const BoxShadow(
+                      color: Colors.white,
+                      blurRadius: 5,
+                      offset: Offset(-1, -1),
                     ),
                   ],
                 ),
@@ -691,10 +726,10 @@ class _LogEntryCard extends StatelessWidget {
                   color: isFirst 
                     ? const Color(0xFFD4AF37) 
                     : onSurface.withValues(alpha: 0.4),
-                  size: 26,
+                  size: 28,
                 ),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: 20),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -710,22 +745,22 @@ class _LogEntryCard extends StatelessWidget {
                           ),
                         ),
                         if (isFirst) ...[
-                          const SizedBox(width: 8),
+                          const SizedBox(width: 10),
                           _BadgePill(
                             label: 'Latest',
-                            color: theme.colorScheme.primary.withValues(alpha: 0.2),
+                            color: theme.colorScheme.primary.withValues(alpha: 0.1),
                             textColor: theme.colorScheme.primary,
                           ),
                         ],
                       ],
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 6),
                     Text(
-                      '${DateFormat('EEE, d MMM yyyy').format(entry.date)} · ${DateFormat('h:mm a').format(entry.date)}',
+                      '${DateFormat('EEE, d MMM yyyy').format(entry.date)}',
                       style: GoogleFonts.outfit(
                         fontSize: 13,
-                        color: onSurface.withValues(alpha: 0.5),
-                        height: 1.2,
+                        color: onSurface.withValues(alpha: 0.4),
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ],
@@ -739,17 +774,12 @@ class _LogEntryCard extends StatelessWidget {
                       changePct: changePct,
                       isImproving: isImproving ?? false,
                     ),
-                  const SizedBox(height: 12),
-                  GestureDetector(
-                    onTap: onDelete,
-                    child: Container(
-                      padding: const EdgeInsets.all(4),
-                      child: Icon(
-                        LucideIcons.trash2,
-                        color: Colors.red[400]?.withValues(alpha: 0.8),
-                        size: 20,
-                      ),
-                    ),
+                  const SizedBox(height: 10),
+                  IconButton(
+                    onPressed: onDelete,
+                    icon: Icon(LucideIcons.trash2, color: Colors.red[400]?.withValues(alpha: 0.7), size: 20),
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
                   ),
                 ],
               ),
@@ -769,9 +799,9 @@ class _BadgePill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-      decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(8)),
-      child: Text(label, style: GoogleFonts.outfit(fontSize: 11, fontWeight: FontWeight.bold, color: textColor)),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 3),
+      decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(10)),
+      child: Text(label, style: GoogleFonts.outfit(fontSize: 11, fontWeight: FontWeight.w900, color: textColor)),
     );
   }
 }
@@ -782,17 +812,17 @@ class _ChangePill extends StatelessWidget {
   const _ChangePill({required this.changePct, required this.isImproving});
   @override
   Widget build(BuildContext context) {
-    final color = isImproving ? Colors.green : Colors.red;
+    final color = isImproving ? const Color(0xFF2ECC71) : const Color(0xFFE74C3C);
     final sign = changePct >= 0 ? '+' : '';
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-      decoration: BoxDecoration(color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12), border: Border.all(color: color.withValues(alpha: 0.3))),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(color: color.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(16), border: Border.all(color: color.withValues(alpha: 0.2))),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(isImproving ? LucideIcons.trendingUp : LucideIcons.trendingDown, size: 12, color: color),
-          const SizedBox(width: 4),
-          Text('$sign${changePct.toStringAsFixed(1)}%', style: GoogleFonts.robotoMono(fontSize: 11, fontWeight: FontWeight.bold, color: color)),
+          Icon(isImproving ? LucideIcons.trendingUp : LucideIcons.trendingDown, size: 14, color: color),
+          const SizedBox(width: 6),
+          Text('$sign${changePct.toStringAsFixed(1)}%', style: GoogleFonts.robotoMono(fontSize: 12, fontWeight: FontWeight.bold, color: color)),
         ],
       ),
     );
@@ -804,7 +834,7 @@ class _EmptyLogState extends StatelessWidget {
   const _EmptyLogState({required this.metricLabel});
   @override
   Widget build(BuildContext context) {
-    return Center(child: Padding(padding: const EdgeInsets.symmetric(vertical: 48), child: Column(children: [Icon(LucideIcons.notebookText, size: 48, color: Colors.grey.withValues(alpha: 0.3)), const SizedBox(height: 16), Text('No $metricLabel logs yet', style: GoogleFonts.outfit(fontSize: 16, color: Colors.grey))])));
+    return Center(child: Padding(padding: const EdgeInsets.symmetric(vertical: 80), child: Column(children: [Icon(LucideIcons.notebookText, size: 60, color: Colors.grey.withValues(alpha: 0.2)), const SizedBox(height: 20), Text('No $metricLabel logs yet', style: GoogleFonts.outfit(fontSize: 18, color: Colors.grey, fontWeight: FontWeight.w600))])));
   }
 }
 
@@ -828,49 +858,4 @@ double? extractMetricValue(dynamic m, String id) {
   if (id == 'subcutaneousFat') return m.subcutaneousFat;
   if (id == 'visceralFat') return m.visceralFat;
   return null;
-}
-
-// ─── Mini Trendline ──────────────────────────────────────────────────────────
-// Kept from remote for potential future use
-
-class _MiniTrendline extends ConsumerWidget {
-  final String metricId;
-  const _MiniTrendline({required this.metricId});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final trendAsync = ref.watch(metricAchievementTrendProvider(metricId: metricId));
-
-    return trendAsync.when(
-      data: (spots) {
-        if (spots.length < 2) return const SizedBox.shrink();
-
-        return LineChart(
-          LineChartData(
-            gridData: const FlGridData(show: false),
-            titlesData: const FlTitlesData(show: false),
-            borderData: FlBorderData(show: false),
-            minX: spots.first.x,
-            maxX: spots.last.x,
-            lineBarsData: [
-              LineChartBarData(
-                spots: spots,
-                isCurved: true,
-                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.5),
-                barWidth: 2,
-                isStrokeCapRound: true,
-                dotData: const FlDotData(show: false),
-                belowBarData: BarAreaData(
-                  show: true,
-                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.05),
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-      loading: () => const SizedBox.shrink(),
-      error: (_, __) => const SizedBox.shrink(),
-    );
-  }
 }

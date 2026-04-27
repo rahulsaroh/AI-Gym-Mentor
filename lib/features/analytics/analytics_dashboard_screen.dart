@@ -40,7 +40,7 @@ class AnalyticsDashboardScreen extends ConsumerWidget {
     return DefaultTabController(
       length: 5,
       child: Scaffold(
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        backgroundColor: const Color(0xFFEDEEF2),
         body: NestedScrollView(
           headerSliverBuilder: (context, innerBoxIsScrolled) {
             return [
@@ -51,28 +51,43 @@ class AnalyticsDashboardScreen extends ConsumerWidget {
                   pinned: true,
                   floating: true,
                   forceElevated: innerBoxIsScrolled,
-                  backgroundColor: Theme.of(context).appBarTheme.backgroundColor ?? Theme.of(context).scaffoldBackgroundColor,
+                  backgroundColor: Colors.white,
+                  surfaceTintColor: Colors.white,
                   title: Text(
                     'Stats Dashboard',
-                    style: GoogleFonts.outfit(fontWeight: FontWeight.bold),
+                    style: GoogleFonts.outfit(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w900,
+                      color: const Color(0xFF1A1A2E),
+                    ),
                   ),
                   elevation: 0,
                   scrolledUnderElevation: 0,
                   centerTitle: false,
-                  toolbarHeight: 64, // Added more breathing room
+                  toolbarHeight: 64,
                   bottom: TabBar(
                     isScrollable: true,
                     tabAlignment: TabAlignment.start,
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                    labelStyle: GoogleFonts.outfit(fontWeight: FontWeight.bold),
-                    unselectedLabelStyle: GoogleFonts.outfit(fontWeight: FontWeight.w500),
-                    indicatorColor: Theme.of(context).colorScheme.primary,
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    labelStyle: GoogleFonts.outfit(
+                      fontWeight: FontWeight.w900,
+                      fontSize: 15,
+                    ),
+                    unselectedLabelStyle: GoogleFonts.outfit(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 15,
+                    ),
+                    labelColor: const Color(0xFF1A1A2E),
+                    unselectedLabelColor: const Color(0xFF9098A3),
+                    indicatorColor: const Color(0xFF3D6FE8),
+                    indicatorWeight: 4,
+                    indicatorSize: TabBarIndicatorSize.label,
                     tabs: const [
-                      Tab(text: 'Glance'),
+                      Tab(text: 'At a Glance'),
                       Tab(text: 'Strength'),
                       Tab(text: 'Measurements'),
                       Tab(text: 'Muscle Map'),
-                      Tab(text: 'Heatmap'),
+                      Tab(text: 'Health'),
                     ],
                   ),
                 ),
@@ -279,23 +294,7 @@ class AnalyticsDashboardScreen extends ConsumerWidget {
             ],
           ),
         ),
-        floatingActionButton: Consumer(
-          builder: (context, ref, _) {
-            return ListenableBuilder(
-              listenable: DefaultTabController.of(context),
-              builder: (context, _) {
-                final index = DefaultTabController.of(context).index;
-                if (index != 2) return const SizedBox.shrink();
-  
-                return FloatingActionButton.extended(
-                  onPressed: () => context.push('/analytics/log-measurements'),
-                  icon: const Icon(LucideIcons.plus),
-                  label: const Text('+ Log Entry', style: TextStyle(fontWeight: FontWeight.bold)),
-                );
-              },
-            );
-          },
-        ),
+        floatingActionButton: null,
       ),
     );
   }
@@ -477,25 +476,51 @@ class _StatCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 120,
-      margin: const EdgeInsets.only(right: 12),
-      padding: const EdgeInsets.all(16),
+      width: 130,
+      margin: const EdgeInsets.only(right: 16),
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.05),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: color.withValues(alpha: 0.1)),
+        color: const Color(0xFFF1F5F9),
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.1),
+            blurRadius: 12,
+            offset: const Offset(6, 6),
+          ),
+          const BoxShadow(
+            color: Colors.white,
+            blurRadius: 12,
+            offset: Offset(-6, -6),
+          ),
+        ],
+        border: Border.all(color: Colors.white, width: 1.5),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, size: 20, color: color),
-          const SizedBox(height: 12),
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icon, size: 18, color: color),
+          ),
+          const SizedBox(height: 14),
           NumberTicker(
             value: numericValue,
             suffix: suffix,
-            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            style: GoogleFonts.outfit(fontSize: 22, fontWeight: FontWeight.w900),
           ),
-          Text(label, style: const TextStyle(fontSize: 10, color: Colors.grey)),
+          Text(
+            label, 
+            style: GoogleFonts.outfit(
+              fontSize: 11, 
+              fontWeight: FontWeight.w700,
+              color: Colors.grey[600],
+            )
+          ),
         ],
       ),
     );

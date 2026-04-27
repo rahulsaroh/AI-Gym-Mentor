@@ -662,47 +662,6 @@ final class MetricAchievementTrendFamily extends $Family
   String toString() => r'metricAchievementTrendProvider';
 }
 
-@ProviderFor(recentPRs)
-final recentPRsProvider = RecentPRsProvider._();
-
-final class RecentPRsProvider
-    extends
-        $FunctionalProvider<
-          AsyncValue<List<Map<String, dynamic>>>,
-          List<Map<String, dynamic>>,
-          FutureOr<List<Map<String, dynamic>>>
-        >
-    with
-        $FutureModifier<List<Map<String, dynamic>>>,
-        $FutureProvider<List<Map<String, dynamic>>> {
-  RecentPRsProvider._()
-    : super(
-        from: null,
-        argument: null,
-        retry: null,
-        name: r'recentPRsProvider',
-        isAutoDispose: true,
-        dependencies: null,
-        $allTransitiveDependencies: null,
-      );
-
-  @override
-  String debugGetCreateSourceHash() => _$recentPRsHash();
-
-  @$internal
-  @override
-  $FutureProviderElement<List<Map<String, dynamic>>> $createElement(
-    $ProviderPointer pointer,
-  ) => $FutureProviderElement(pointer);
-
-  @override
-  FutureOr<List<Map<String, dynamic>>> create(Ref ref) {
-    return recentPRs(ref);
-  }
-}
-
-String _$recentPRsHash() => r'd130b371b2a845a632292098586dd4184211b1c5';
-
 @ProviderFor(fullPRHistory)
 final fullPRHistoryProvider = FullPRHistoryProvider._();
 
