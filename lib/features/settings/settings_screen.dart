@@ -165,25 +165,7 @@ class SettingsScreen extends ConsumerWidget {
                       builder: (_) => ImportWizardScreen())),
             ),
             _buildDataBackupSection(context, ref, settings),
-            const Divider(height: 32),
-            _buildSectionHeader(context, 'AI Configuration'),
-            _buildTile(
-              context,
-              title: 'Gemini API Key',
-              subtitle: settings.geminiApiKey == null || settings.geminiApiKey!.isEmpty
-                  ? 'Not set (AI features will fail)'
-                  : '••••••••${settings.geminiApiKey!.substring(settings.geminiApiKey!.length > 4 ? settings.geminiApiKey!.length - 4 : 0)}',
-              icon: LucideIcons.bot,
-              onTap: () => _showGeminiApiKeyDialog(context, ref, settings.geminiApiKey),
-            ),
-            _buildTile(
-              context,
-              title: 'How to get a key?',
-              subtitle: 'Get a free key from Google AI Studio',
-              icon: LucideIcons.externalLink,
-              onTap: () => _launchUrl('https://aistudio.google.com/app/apikey'),
-            ),
-            const Divider(height: 32),
+
             _buildSectionHeader(context, 'Privacy & Security'),
             _buildPrivacyCard(context),
             const Divider(height: 32),
@@ -642,50 +624,7 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 
-  void _showGeminiApiKeyDialog(
-      BuildContext context, WidgetRef ref, String? currentKey) {
-    final controller = TextEditingController(text: currentKey);
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Gemini API Key'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Used for AI workout generation and exercise enrichment.',
-              style: TextStyle(fontSize: 13),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: controller,
-              decoration: const InputDecoration(
-                hintText: 'Enter AIza...',
-                border: OutlineInputBorder(),
-              ),
-              obscureText: true,
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          FilledButton(
-            onPressed: () {
-              ref
-                  .read(settingsProvider.notifier)
-                  .updateGeminiApiKey(controller.text.trim());
-              Navigator.pop(context);
-            },
-            child: const Text('Save'),
-          ),
-        ],
-      ),
-    );
-  }
+
 
   Future<void> _launchUrl(String url) async {
     final uri = Uri.parse(url);

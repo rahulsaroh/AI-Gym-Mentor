@@ -53,10 +53,22 @@ class CsvImportService extends _$CsvImportService {
       else if (l.contains('time') || l.contains('duration')) mapping[h] = 'time';
       // Body Metrics
       else if (l.contains('body fat')) mapping[h] = 'body_fat';
+      else if (l.contains('subcutaneous')) mapping[h] = 'subcutaneous_fat';
+      else if (l.contains('visceral')) mapping[h] = 'visceral_fat';
       else if (l.contains('neck')) mapping[h] = 'neck';
       else if (l.contains('chest')) mapping[h] = 'chest';
-      else if (l.contains('waist')) mapping[h] = 'waist';
+      else if (l.contains('shoulder')) mapping[h] = 'shoulders';
+      else if (l.contains('left bicep') || l.contains('arm left')) mapping[h] = 'arm_left';
+      else if (l.contains('right bicep') || l.contains('arm right')) mapping[h] = 'arm_right';
+      else if (l.contains('left forearm')) mapping[h] = 'forearm_left';
+      else if (l.contains('right forearm')) mapping[h] = 'forearm_right';
+      else if (l.contains('waist') && !l.contains('naval')) mapping[h] = 'waist';
+      else if (l.contains('naval')) mapping[h] = 'waist_naval';
       else if (l.contains('hips')) mapping[h] = 'hips';
+      else if (l.contains('left thigh')) mapping[h] = 'thigh_left';
+      else if (l.contains('right thigh')) mapping[h] = 'thigh_right';
+      else if (l.contains('left calf')) mapping[h] = 'calf_left';
+      else if (l.contains('right calf')) mapping[h] = 'calf_right';
     }
     return mapping;
   }

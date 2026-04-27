@@ -241,6 +241,7 @@ class _ProgramsScreenState extends ConsumerState<ProgramsScreen> {
                 ),
               ),
               const SizedBox(height: 20),
+
               ListTile(
                 leading: const Icon(LucideIcons.file),
                 title: const Text('Choose JSON File'),
@@ -273,7 +274,7 @@ class _ProgramsScreenState extends ConsumerState<ProgramsScreen> {
               ListTile(
                 leading: const Icon(LucideIcons.code),
                 title: const Text('View Sample JSON Template'),
-                subtitle: const Text('Copy format to use with your own AI'),
+                subtitle: const Text('Copy format to use for custom imports'),
                 onTap: () {
                   Navigator.pop(context);
                   _showSampleJsonDialog(context, ref);
@@ -395,7 +396,7 @@ class _ProgramsScreenState extends ConsumerState<ProgramsScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text(
-                'Use this format to ask your AI (ChatGPT/Gemini) to generate new plans for you.',
+                'Use this format to structure your custom plans for import.',
                 style: TextStyle(fontSize: 12, color: Colors.grey),
               ),
               const SizedBox(height: 12),

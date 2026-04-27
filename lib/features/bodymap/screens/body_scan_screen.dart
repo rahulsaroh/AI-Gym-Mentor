@@ -234,7 +234,7 @@ class _BodyScanScreenState extends ConsumerState<BodyScanScreen> with SingleTick
             final image = Image.asset(
               _isHeatmap
                   ? 'assets/images/body_heatmap_3d.png'
-                  : 'assets/images/body_scan_3d with data.png',
+                  : 'assets/images/body_scan_3d_with_data.png',
               fit: BoxFit.contain,
               width: constraints.maxWidth,
               height: constraints.maxHeight,

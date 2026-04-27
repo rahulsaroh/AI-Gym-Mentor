@@ -13,6 +13,8 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:ai_gym_mentor/features/settings/models/settings_state.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ai_gym_mentor/services/export_service.dart';
+import 'package:ai_gym_mentor/core/widgets/bouncing_card.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class HistoryScreen extends ConsumerStatefulWidget {
   const HistoryScreen({super.key});
@@ -639,8 +641,10 @@ class _WorkoutCard extends ConsumerWidget {
     final workout = item.workout;
     final settings = ref.watch(settingsProvider).value ?? const SettingsState();
     final unit = settings.weightUnit;
+    final theme = Theme.of(context);
+
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Slidable(
         key: ValueKey('history_slide_${workout.id}'),
         endActionPane: ActionPane(
@@ -651,9 +655,7 @@ class _WorkoutCard extends ConsumerWidget {
               onPressed: (_) async {
                 final confirm = await _showDeleteConfirmation(context);
                 if (confirm == true) {
-                  ref
-                      .read(historyListProvider.notifier)
-                      .deleteWorkout(workout.id);
+                  ref.read(historyListProvider.notifier).deleteWorkout(workout.id);
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('Workout deleted')),
@@ -665,8 +667,7 @@ class _WorkoutCard extends ConsumerWidget {
               foregroundColor: Colors.white,
               icon: LucideIcons.trash2,
               label: 'Delete',
-              borderRadius:
-                  const BorderRadius.horizontal(right: Radius.circular(16)),
+              borderRadius: const BorderRadius.horizontal(right: Radius.circular(16)),
             ),
           ],
         ),
@@ -711,7 +712,7 @@ class _WorkoutCard extends ConsumerWidget {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Session duplicated to draft')),
                   );
-                  context.go('/'); // Go to home to see draft
+                  context.go('/'); 
                 }
               },
               backgroundColor: Colors.blue,
@@ -721,60 +722,87 @@ class _WorkoutCard extends ConsumerWidget {
             ),
           ],
         ),
-        child: Card(
-          child: InkWell(
-            onTap: () => context.push('/history/workout/${workout.id}'),
-            borderRadius: BorderRadius.circular(16),
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              DateFormat('EEE, MMM d').format(workout.date),
-                              style:
-                                  const TextStyle(fontWeight: FontWeight.bold),
+        child: BouncingCard(
+          onTap: () => context.push('/history/workout/${workout.id}'),
+          child: Container(
+            padding: const EdgeInsets.all(16.0),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.surfaceContainerLow.withValues(alpha: 0.8),
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.04),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+              border: Border.all(
+                color: theme.dividerColor.withValues(alpha: 0.05),
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            DateFormat('EEEE, MMM d').format(workout.date),
+                            style: GoogleFonts.outfit(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
                             ),
-                            Hero(
-                              tag: 'workout_${workout.id}',
-                              child: Material(
-                                color: Colors.transparent,
-                                child: Text(
-                                  workout.name,
-                                  style: TextStyle(
-                                      fontSize: 12,
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .outline),
+                          ),
+                          const SizedBox(height: 2),
+                          Hero(
+                            tag: 'workout_${workout.id}',
+                            child: Material(
+                              color: Colors.transparent,
+                              child: Text(
+                                workout.name,
+                                style: GoogleFonts.outfit(
+                                  fontSize: 13,
+                                  color: theme.colorScheme.primary,
+                                  fontWeight: FontWeight.w600,
                                 ),
                               ),
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
-                      const Icon(LucideIcons.chevronRight, size: 16),
-                    ],
+                    ),
+                    Icon(
+                      LucideIcons.chevronRight, 
+                      size: 16, 
+                      color: theme.colorScheme.outline.withValues(alpha: 0.5)
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.surface.withValues(alpha: 0.5),
+                    borderRadius: BorderRadius.circular(12),
                   ),
-                  const Divider(height: 24),
-                  Row(
+                  child: Row(
                     children: [
                       Expanded(
                           child: _CompactStat(
                               icon: LucideIcons.clock,
                               label: _formatDuration(workout.duration ?? 0))),
+                      Container(width: 1, height: 16, color: theme.dividerColor.withValues(alpha: 0.1)),
                       const SizedBox(width: 8),
                       Expanded(
                           child: _CompactStat(
                               icon: LucideIcons.trendingUp,
                               label: WeightConverter.format(item.volume, unit,
                                   decimals: 0))),
+                      Container(width: 1, height: 16, color: theme.dividerColor.withValues(alpha: 0.1)),
                       const SizedBox(width: 8),
                       Expanded(
                           child: _CompactStat(
@@ -782,8 +810,8 @@ class _WorkoutCard extends ConsumerWidget {
                               label: '${item.setCount} sets')),
                     ],
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),

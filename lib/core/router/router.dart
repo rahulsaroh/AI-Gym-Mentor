@@ -207,6 +207,7 @@ final router = GoRouter(
                     return MesocycleDetailsScreen(mesocycleId: id);
                   },
                 ),
+
               ],
             ),
           ],

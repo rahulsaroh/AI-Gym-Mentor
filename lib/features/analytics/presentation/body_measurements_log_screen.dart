@@ -41,10 +41,10 @@ class _BodyMeasurementsLogScreenState
     // Pre-fill latest measurement values
     final measurements = ref.read(bodyMeasurementsListProvider).value ?? [];
     if (measurements.isNotEmpty) {
-      for (var m in standardMetrics) {
-        final val = extractMetricValue(measurements.first, m.id);
-        if (val != null && val > 0) _currentCtrl[m.id]!.text = val.toString();
-      }
+      // for (var m in standardMetrics) {
+      //   final val = extractMetricValue(measurements.first, m.id);
+      //   if (val != null && val > 0) _currentCtrl[m.id]!.text = val.toString();
+      // }
       // Custom values from latest measurement
       final custom = measurements.first.customValues;
       if (custom != null) {
@@ -179,8 +179,12 @@ class _BodyMeasurementsLogScreenState
       }
     }
 
+    ref.invalidate(bodyMeasurementsListProvider);
     ref.invalidate(bodyTargetsListProvider);
     ref.invalidate(physiqueAchievementProvider);
+    ref.invalidate(overallAchievementTrendProvider);
+    ref.invalidate(measurementDateRangeProvider);
+
     if (mounted) Navigator.pop(context);
   }
 
@@ -357,14 +361,27 @@ class _BodyMeasurementsLogScreenState
                         Icon(config.icon, size: 20, color: Colors.grey[600])))
             : Icon(config.icon, size: 20, color: Colors.grey[600]),
         const SizedBox(width: 12),
-        Expanded(child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(config.label,
-              style: GoogleFonts.outfit(
-                  fontSize: 14, fontWeight: FontWeight.w500)),
-          Text(config.unit,
-              style: GoogleFonts.outfit(fontSize: 10, color: Colors.grey)),
-        ])),
+        Expanded(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                config.label,
+                style: GoogleFonts.outfit(
+                    fontSize: 14, fontWeight: FontWeight.w500),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+              ),
+              Text(
+                config.unit,
+                style: GoogleFonts.outfit(fontSize: 10, color: Colors.grey),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+              ),
+            ],
+          ),
+        ),
         _numField(_currentCtrl[config.id]!, isTarget: false),
         const SizedBox(width: 16),
         _numField(_targetCtrl[config.id]!, isTarget: true),

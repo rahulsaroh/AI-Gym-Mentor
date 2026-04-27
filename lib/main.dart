@@ -28,7 +28,7 @@ void main() async {
   try {
     await dotenv.load(fileName: ".env");
   } catch (e) {
-    debugPrint('Warning: .env file not found. AI features may require an API key.');
+    debugPrint('Warning: .env file not found.');
   }
 
   // 1. Notification Service Initialization
@@ -92,13 +92,13 @@ void main() async {
 
   runApp(
     ProviderScope(
-      child: const GymGeminiApp(),
+      child: const GymMentorApp(),
     ),
   );
 }
 
-class GymGeminiApp extends ConsumerWidget {
-  const GymGeminiApp({super.key});
+class GymMentorApp extends ConsumerWidget {
+  const GymMentorApp({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

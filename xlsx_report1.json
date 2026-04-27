@@ -1,0 +1,300 @@
+{
+  "Sheet1": {
+    "headers": [
+      ""
+    ],
+    "sample_rows": [],
+    "total_rows": 0
+  },
+  "Raw Log": {
+    "headers": [
+      "Date",
+      "Day",
+      "Workout Name",
+      "Exercise",
+      "Set#",
+      "Set Type",
+      "Weight(kg)",
+      "Reps",
+      "RPE",
+      "Volume(kg)",
+      "Is PR",
+      "Notes"
+    ],
+    "sample_rows": [
+      [
+        "2026-04-18",
+        "Saturday",
+        "Imported Workout",
+        "band hip lift",
+        "1",
+        "straight",
+        "0",
+        "20",
+        "",
+        "0",
+        "",
+        ""
+      ],
+      [
+        "2026-04-18",
+        "Saturday",
+        "Imported Workout",
+        "inchworm v. 2",
+        "2",
+        "straight",
+        "0",
+        "6",
+        "",
+        "0",
+        "",
+        ""
+      ],
+      [
+        "2026-04-18",
+        "Saturday",
+        "Imported Workout",
+        "ankle circles",
+        "3",
+        "straight",
+        "0",
+        "10",
+        "",
+        "0",
+        "",
+        ""
+      ],
+      [
+        "2026-04-18",
+        "Saturday",
+        "Imported Workout",
+        "ankle circles",
+        "4",
+        "straight",
+        "0",
+        "10",
+        "",
+        "0",
+        "",
+        ""
+      ],
+      [
+        "2026-04-18",
+        "Saturday",
+        "Imported Workout",
+        "farmers walk",
+        "5",
+        "straight",
+        "0",
+        "10",
+        "",
+        "0",
+        "",
+        ""
+      ]
+    ],
+    "total_rows": 101
+  },
+  "Workout Summary": {
+    "headers": [
+      "Date",
+      "Day",
+      "Workout Name",
+      "Total Exercises",
+      "Total Sets",
+      "Total Volume (kg)",
+      "Top Exercise",
+      "Is PR Session",
+      "Notes"
+    ],
+    "sample_rows": [
+      [
+        "2026-04-18",
+        "Saturday",
+        "Imported Workout",
+        "13",
+        "31",
+        "3795.5",
+        "barbell straight leg deadlift",
+        "",
+        ""
+      ],
+      [
+        "2026-04-21",
+        "Tuesday",
+        "Imported Workout",
+        "13",
+        "39",
+        "5073.5",
+        "twin handle parallel grip lat pulldown",
+        "",
+        ""
+      ],
+      [
+        "2026-04-22",
+        "Wednesday",
+        "Imported Workout",
+        "10",
+        "30",
+        "3107",
+        "Dumbbell Calf Raise",
+        "",
+        ""
+      ]
+    ],
+    "total_rows": 4
+  },
+  "Exercise PRs": {
+    "headers": [
+      "Exercise",
+      "Best Weight (kg)",
+      "Best Reps at Best Weight",
+      "Best Single Set Volume (kg)",
+      "Date Achieved",
+      "Workout Name"
+    ],
+    "sample_rows": [
+      [
+        "Ab Wheel Rollout",
+        "0",
+        "8",
+        "0",
+        "2026-04-22",
+        "Imported Workout"
+      ],
+      [
+        "ankle circles",
+        "0",
+        "10",
+        "0",
+        "2026-04-18",
+        "Imported Workout"
+      ],
+      [
+        "assisted hanging knee raise",
+        "0",
+        "6",
+        "0",
+        "2026-04-22",
+        "Imported Workout"
+      ],
+      [
+        "back pec stretch",
+        "0",
+        "10",
+        "0",
+        "2026-04-21",
+        "Imported Workout"
+      ],
+      [
+        "band hip lift",
+        "0",
+        "20",
+        "0",
+        "2026-04-18",
+        "Imported Workout"
+      ]
+    ],
+    "total_rows": 37
+  },
+  "Weekly Volume": {
+    "headers": [
+      "Week (Mon\u2013Sun)",
+      "Mon",
+      "Tue",
+      "Wed",
+      "Thu",
+      "Fri",
+      "Sat",
+      "Sun",
+      "Total Volume",
+      "Sessions",
+      "Avg Volume"
+    ],
+    "sample_rows": [
+      [
+        "Apr 20\u201326, 2026",
+        "",
+        "5073.5",
+        "3107",
+        "",
+        "",
+        "",
+        "",
+        "8180.5",
+        "2",
+        "4090.25"
+      ],
+      [
+        "Apr 13\u201319, 2026",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "3795.5",
+        "",
+        "3795.5",
+        "1",
+        "3795.5"
+      ]
+    ],
+    "total_rows": 3
+  },
+  "Body Measurements": {
+    "headers": [
+      "Date",
+      "Weight (kg)",
+      "\u0394 Weight",
+      "Body Fat (%)",
+      "Chest",
+      "Shoulders",
+      "Waist",
+      "Hips",
+      "Left Arm",
+      "Right Arm",
+      "Left Thigh",
+      "Right Thigh",
+      "Left Calf",
+      "Right Calf",
+      "Notes"
+    ],
+    "sample_rows": [
+      [
+        "2026-04-12 00:00:00",
+        "76.8",
+        "",
+        "23.1",
+        "101",
+        "123",
+        "93",
+        "99.8",
+        "",
+        "36",
+        "",
+        "62",
+        "",
+        "35.5",
+        ""
+      ],
+      [
+        "2026-04-19 00:00:00",
+        "77.3",
+        "",
+        "23.4",
+        "101",
+        "122",
+        "92",
+        "99.5",
+        "",
+        "36.5",
+        "",
+        "61.5",
+        "",
+        "35.5",
+        ""
+      ]
+    ],
+    "total_rows": 3
+  }
+}

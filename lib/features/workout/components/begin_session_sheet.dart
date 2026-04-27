@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:ai_gym_mentor/features/workout/providers/workout_home_notifier.dart';
-import 'package:ai_gym_mentor/features/workout/components/instant_workout_generator_sheet.dart';
 import 'package:ai_gym_mentor/features/workout/workout_providers.dart';
 import 'package:ai_gym_mentor/features/workout/workout_repository.dart';
 import 'package:ai_gym_mentor/core/domain/entities/workout_program.dart';
@@ -102,10 +101,7 @@ class BeginSessionSheet extends ConsumerWidget {
 
           const SizedBox(height: 32),
 
-          // 2.5 AI Generator
-          _AiMagicCard(),
 
-          const SizedBox(height: 32),
 
           // 3. Quick Actions
           Row(
@@ -388,77 +384,7 @@ class _EmptyTemplatesPlaceholder extends StatelessWidget {
   }
 }
 
-class _AiMagicCard extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    return GestureDetector(
-      onTap: () {
-        Navigator.pop(context);
-        showModalBottomSheet(
-          context: context,
-          isScrollControlled: true,
-          backgroundColor: Colors.transparent,
-          builder: (context) => const InstantWorkoutGeneratorSheet(),
-        );
-      },
-      child: Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              colorScheme.primary.withValues(alpha: 0.1),
-              colorScheme.tertiary.withValues(alpha: 0.1)
-            ],
-          ),
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(
-            color: colorScheme.primary.withValues(alpha: 0.2),
-            width: 2,
-          ),
-        ),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: colorScheme.primary,
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(LucideIcons.sparkles, color: Colors.white, size: 24),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'AI MAGIC GENERATOR',
-                    style: GoogleFonts.outfit(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w900,
-                      color: colorScheme.primary,
-                      letterSpacing: 1.2,
-                    ),
-                  ),
-                  Text(
-                    'Create a personalized workout in seconds',
-                    style: GoogleFonts.outfit(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Icon(LucideIcons.chevronRight, color: colorScheme.primary, size: 24),
-          ],
-        ),
-      ),
-    );
-  }
-}
+
 
 extension StringExtension on String {
   String take(int n) => length <= n ? this : substring(0, n);

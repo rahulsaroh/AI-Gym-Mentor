@@ -250,6 +250,9 @@ class WorkoutRepository {
 
   Future<void> deleteWorkout(int workoutId) async {
     await _db.transaction(() async {
+      await (_db.delete(_db.syncQueue)
+            ..where((t) => t.workoutId.equals(workoutId)))
+          .go();
       await (_db.delete(_db.workoutSets)
             ..where((t) => t.workoutId.equals(workoutId)))
           .go();

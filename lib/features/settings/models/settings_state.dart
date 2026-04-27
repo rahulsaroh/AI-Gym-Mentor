@@ -43,7 +43,6 @@ class SettingsState {
   final DateTime? lastSynced;
   final DateTime? lastDriveBackup;
   final OneRmFormula oneRmFormula;
-  final String? geminiApiKey;
 
   const SettingsState({
     this.userName = 'Alex',
@@ -82,7 +81,6 @@ class SettingsState {
     this.lastSynced,
     this.lastDriveBackup,
     this.oneRmFormula = OneRmFormula.epley,
-    this.geminiApiKey,
   });
 
   SettingsState copyWith({
@@ -114,7 +112,6 @@ class SettingsState {
     DateTime? lastSynced,
     DateTime? lastDriveBackup,
     OneRmFormula? oneRmFormula,
-    String? geminiApiKey,
   }) {
     return SettingsState(
       userName: userName ?? this.userName,
@@ -146,7 +143,6 @@ class SettingsState {
       lastSynced: lastSynced ?? this.lastSynced,
       lastDriveBackup: lastDriveBackup ?? this.lastDriveBackup,
       oneRmFormula: oneRmFormula ?? this.oneRmFormula,
-      geminiApiKey: geminiApiKey ?? this.geminiApiKey,
     );
   }
 }

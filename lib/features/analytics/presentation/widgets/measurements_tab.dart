@@ -4,10 +4,13 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:ai_gym_mentor/features/analytics/analytics_providers.dart';
 import 'package:ai_gym_mentor/core/domain/entities/body_achievement.dart';
-import 'package:ai_gym_mentor/features/analytics/presentation/body_measurements_log_screen.dart';
 import 'package:ai_gym_mentor/features/analytics/presentation/metric_detail_screen.dart';
+import 'package:ai_gym_mentor/features/analytics/presentation/body_measurements_log_screen.dart';
 import 'package:intl/intl.dart';
 import 'dart:math' as math;
+import 'package:fl_chart/fl_chart.dart';
+import 'package:ai_gym_mentor/features/analytics/presentation/manage_measurements_screen.dart';
+import 'package:ai_gym_mentor/core/widgets/bouncing_card.dart';
 
 class MeasurementsTab extends ConsumerWidget {
   const MeasurementsTab({super.key});
@@ -41,11 +44,11 @@ class MeasurementsTab extends ConsumerWidget {
                       Row(
                         children: [
                           IconButton(
-                            icon: Icon(LucideIcons.trash2, 
+                            icon: Icon(LucideIcons.notebookText, 
                               size: 20, 
-                              color: Colors.red.withValues(alpha: 0.7)),
-                            onPressed: () => _confirmReset(context, ref),
-                            tooltip: 'Reset All Data',
+                              color: Theme.of(context).colorScheme.primary),
+                            onPressed: () => _openManageMeasurementsScreen(context),
+                            tooltip: 'Manage Logs',
                           ),
                           InkWell(
                             onTap: () => _openLogScreen(context),
@@ -121,44 +124,15 @@ class MeasurementsTab extends ConsumerWidget {
   }
 
   String _unitFor(String m) {
-    if (m == 'weight') return 'kg';
+    final cfg = standardMetrics.where((cfg) => cfg.id == m).firstOrNull;
+    if (cfg != null) return cfg.unit;
     if (m == 'bodyFat' || m == 'subcutaneousFat' || m == 'visceralFat') return '%';
     return 'cm';
   }
 
-  Future<void> _confirmReset(BuildContext context, WidgetRef ref) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text('Reset Measurements?',
-            style: GoogleFonts.outfit(fontWeight: FontWeight.bold)),
-        content: Text(
-            'This will delete ALL history logs and targets for body measurements. This cannot be undone.',
-            style: GoogleFonts.outfit()),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Cancel'),
-          ),
-          FilledButton(
-            style: FilledButton.styleFrom(backgroundColor: Colors.red),
-            onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Reset Everything'),
-          ),
-        ],
-      ),
-    );
-
-    if (confirmed == true) {
-      await ref.read(bodyMeasurementsListProvider.notifier).clearAllHistory();
-      await ref.read(bodyTargetsListProvider.notifier).clearAllTargets();
-      ref.invalidate(physiqueAchievementProvider);
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('All measurement data has been cleared.')),
-        );
-      }
-    }
+  void _openManageMeasurementsScreen(BuildContext context) {
+    Navigator.push(context,
+        MaterialPageRoute(builder: (_) => const ManageMeasurementsScreen()));
   }
 }
 
@@ -175,14 +149,9 @@ class _OverallProgressCard extends ConsumerWidget {
     final isImproving = physique.rawOverallScore >= 0;
     final progressColor = isImproving ? Colors.green : Colors.red;
 
-    // For 3-color gauge:
-    // Blue portion = "starting" ratio = first measurement achievement ratio
-    // We use the average starting achievement across all metrics that have targets
     final withTarget = physique.achievements.where((a) => a.targetValue > 0).toList();
     double startRatio = 0;
     if (withTarget.isNotEmpty) {
-      // starting achievement: how much of the target was already covered at start
-      // = startValue / targetValue (for gain) or targetValue/startValue (for loss)
       double totalStart = 0;
       for (final a in withTarget) {
         if (a.targetValue > 0 && a.startValue > 0) {
@@ -208,59 +177,9 @@ class _OverallProgressCard extends ConsumerWidget {
             color: Theme.of(context).dividerColor.withValues(alpha: 0.1)),
       ),
       child: Column(children: [
-        // Header row
-        Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-          Text('OVERALL PROGRESS',
-              style: GoogleFonts.outfit(
-                  fontSize: 16, fontWeight: FontWeight.bold)),
-          // Interval selector
-          const SizedBox(height: 12),
-          const _IntervalSelector(),
-        ]),
-      ),
-    );
-  }
-}
-
-class _IntervalSelector extends ConsumerWidget {
-  const _IntervalSelector();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final selected = ref.watch(selectedMeasurementIntervalProvider);
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: MeasurementInterval.values.map((interval) {
-          final isSelected = selected == interval;
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4),
-            child: ChoiceChip(
-              label: Text(interval.label, 
-                style: GoogleFonts.outfit(
-                  fontSize: 12, 
-                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                  color: isSelected ? Colors.white : null,
-                )),
-              selected: isSelected,
-              onSelected: (_) => ref.read(selectedMeasurementIntervalProvider.notifier).set(interval),
-              selectedColor: Theme.of(context).colorScheme.primary,
-              backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-              showCheckmark: false,
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            ),
-          );
-        }).toList(),
-      ),
-    );
-  }
-}
+        const MeasurementIntervalSelector(),
         const SizedBox(height: 24),
 
-        // 3-color Gauge
         SizedBox(
           height: 120,
           child: Stack(alignment: Alignment.bottomCenter, children: [
@@ -297,16 +216,7 @@ class _IntervalSelector extends ConsumerWidget {
           ]),
         ),
 
-        const SizedBox(height: 16),
-        // Mini Trendline
-        const SizedBox(
-          height: 30,
-          width: 200,
-          child: _OverallMiniTrendline(),
-        ),
-        const SizedBox(height: 8),
         const SizedBox(height: 12),
-        // Legend row
         Row(mainAxisAlignment: MainAxisAlignment.center, children: [
           _LegendDot(color: const Color(0xFF3B82F6), label: 'Start'),
           const SizedBox(width: 12),
@@ -339,26 +249,84 @@ class _IntervalSelector extends ConsumerWidget {
       ]),
     );
   }
+}
 
-  Future<void> _pickDateRange(
-      BuildContext context, WidgetRef ref, DateTimeRange? current) async {
-    final picked = await showDateRangePicker(
-      context: context,
-      firstDate: DateTime(2020),
-      lastDate: DateTime.now(),
-      initialDateRange: current ??
-          DateTimeRange(
-            start: DateTime.now().subtract(const Duration(days: 30)),
-            end: DateTime.now(),
+class MeasurementIntervalSelector extends ConsumerWidget {
+  const MeasurementIntervalSelector({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final selected = ref.watch(selectedMeasurementIntervalProvider);
+    return SizedBox(
+      height: 44,
+      child: Center(
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          physics: const BouncingScrollPhysics(),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: MeasurementInterval.values.map((interval) {
+              final isSelected = selected == interval;
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4),
+                child: _IntervalPill(
+                  label: interval.label,
+                  isSelected: isSelected,
+                  onTap: () {
+                    ref.read(selectedMeasurementIntervalProvider.notifier).set(interval);
+                  },
+                ),
+              );
+            }).toList(),
           ),
-      builder: (context, child) => Theme(
-        data: Theme.of(context),
-        child: child!,
+        ),
       ),
     );
-    if (picked != null) {
-      ref.read(measurementDateRangeProvider.notifier).set(picked);
-    }
+  }
+}
+
+class _IntervalPill extends StatelessWidget {
+  final String label;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _IntervalPill({
+    required this.label,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final primary = theme.colorScheme.primary;
+    
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(20),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        constraints: const BoxConstraints(minWidth: 50),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: isSelected ? primary : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: isSelected ? primary : theme.dividerColor.withValues(alpha: 0.15),
+            width: 1.2,
+          ),
+        ),
+        child: Text(
+          label,
+          style: GoogleFonts.outfit(
+            fontSize: 12,
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+            color: isSelected ? Colors.white : theme.colorScheme.onSurface.withValues(alpha: 0.8),
+          ),
+        ),
+      ),
+    );
   }
 }
 
@@ -381,12 +349,9 @@ class _LegendDot extends StatelessWidget {
   }
 }
 
-// ─── 3-color Gauge Painter ─────────────────────────────────────────────────
-// [BLUE = start portion] [GREEN/RED = progress from start] [GREY = remaining]
-
 class _GaugePainter extends CustomPainter {
-  final double startRatio;    // 0..1 — where the user started (blue end)
-  final double currentRatio;  // 0..1 — where the user is now (green/red end)
+  final double startRatio;
+  final double currentRatio;
   final bool isImproving;
   final bool hasTarget;
   final Color backgroundColor;
@@ -404,7 +369,6 @@ class _GaugePainter extends CustomPainter {
     final center = Offset(size.width / 2, size.height);
     final radius = size.width / 2;
 
-    // Grey background full arc
     canvas.drawArc(
       Rect.fromCircle(center: center, radius: radius),
       math.pi, math.pi, false,
@@ -420,7 +384,6 @@ class _GaugePainter extends CustomPainter {
       final greenEnd = currentRatio.clamp(0.0, 1.0);
       final activeColor = isImproving ? Colors.green : Colors.red;
 
-      // Blue segment: 0 → startRatio
       if (blueEnd > 0.001) {
         canvas.drawArc(
           Rect.fromCircle(center: center, radius: radius),
@@ -435,7 +398,6 @@ class _GaugePainter extends CustomPainter {
         );
       }
 
-      // Green / Red segment: startRatio → currentRatio
       if (greenEnd > blueEnd + 0.001) {
         canvas.drawArc(
           Rect.fromCircle(center: center, radius: radius),
@@ -453,7 +415,6 @@ class _GaugePainter extends CustomPainter {
             ..strokeCap = StrokeCap.round,
         );
       } else if (greenEnd < blueEnd - 0.001) {
-        // Regression: current < start → red from currentRatio → startRatio
         canvas.drawArc(
           Rect.fromCircle(center: center, radius: radius),
           math.pi + math.pi * greenEnd,
@@ -468,7 +429,6 @@ class _GaugePainter extends CustomPainter {
       }
     }
 
-    // Tick marks
     final outerR = radius + 20;
     final tickPaint = Paint()
       ..color = Colors.grey.withValues(alpha: 0.25)
@@ -492,8 +452,6 @@ class _GaugePainter extends CustomPainter {
       old.isImproving != isImproving;
 }
 
-// ─── Measurement Item Card ─────────────────────────────────────────────────
-
 class _MeasurementItem extends StatelessWidget {
   final MetricAchievement achievement;
   final VoidCallback onTap;
@@ -501,138 +459,155 @@ class _MeasurementItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final pct = achievement.percentage;        // used for progress bar (journey)
-    final achRatio = achievement.achievementRatio; // used for badge (absolute)
+    final pct = achievement.percentage;
+    final achRatio = achievement.achievementRatio;
     final badgePct = (achRatio * 100).toInt();
     final unit = _unitFor(achievement.metric);
     final fmt = DateFormat('d MMM yy');
     final hasData = achievement.currentValue > 0;
+    final theme = Theme.of(context);
 
-    return InkWell(
+    return BouncingCard(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(20),
       child: Container(
-        margin: const EdgeInsets.only(bottom: 12),
+        margin: const EdgeInsets.only(bottom: 16),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Theme.of(context).cardColor,
-          borderRadius: BorderRadius.circular(20),
+          color: theme.colorScheme.surfaceContainerLow.withValues(alpha: 0.8),
+          borderRadius: BorderRadius.circular(24),
           boxShadow: [
-            BoxShadow(color: Colors.black.withValues(alpha: 0.03),
-                blurRadius: 10, offset: const Offset(0, 4)),
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.04),
+              blurRadius: 15,
+              offset: const Offset(0, 8),
+            ),
           ],
           border: Border.all(
-              color: Theme.of(context).dividerColor.withValues(alpha: 0.05)),
+            color: theme.dividerColor.withValues(alpha: 0.05),
+          ),
         ),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Row(children: [
-            // Icon
-            // Icon
-            Builder(builder: (context) {
-              final cfg = standardMetrics.where((m) => m.id == achievement.metric).firstOrNull;
-              return Container(
-                width: 40, height: 40,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
-                ),
-                child: (cfg?.assetPath != null)
-                    ? Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Image.asset(cfg!.assetPath!, color: Theme.of(context).colorScheme.primary),
-                      )
-                    : Icon(_iconFor(achievement.metric),
-                        color: Theme.of(context).colorScheme.primary, size: 20),
-              );
-            }),
-            const SizedBox(width: 14),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Builder(builder: (context) {
+                  final cfg = standardMetrics.where((m) => m.id == achievement.metric).firstOrNull;
+                  return Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.surface,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.06),
+                          blurRadius: 8,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    child: Center(
+                      child: (cfg?.assetPath != null)
+                          ? Padding(
+                              padding: const EdgeInsets.all(10.0),
+                              child: Image.asset(cfg!.assetPath!, fit: BoxFit.contain),
+                            )
+                          : Icon(cfg?.icon ?? _iconFor(achievement.metric),
+                              color: theme.colorScheme.primary, size: 22),
+                    ),
+                  );
+                }),
+                const SizedBox(width: 14),
 
-            // Label + values
-            Expanded(child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(achievement.label,
-                  style: GoogleFonts.outfit(
-                      fontSize: 15, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 2),
-              Text(
-                !hasData
-                    ? 'No data logged yet — tap to log'
-                    : achievement.targetValue > 0
-                        ? '${achievement.startValue.toStringAsFixed(1)} → '
-                          '${achievement.currentValue.toStringAsFixed(1)} $unit'
-                          '  ·  Goal: ${achievement.targetValue.toStringAsFixed(1)} $unit'
-                        : 'Current: ${achievement.currentValue.toStringAsFixed(1)} $unit  ·  No target set',
-                style: GoogleFonts.outfit(
-                    fontSize: 11,
-                    color: !hasData ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.7) : Colors.grey),
-              ),
-              if (achievement.startDate != null && achievement.deadline != null)
-                Text(
-                  '${fmt.format(achievement.startDate!)} – ${fmt.format(achievement.deadline!)}',
-                  style: GoogleFonts.outfit(
-                      fontSize: 10,
-                      color: Theme.of(context).colorScheme.primary
-                          .withValues(alpha: 0.7)),
-                ),
-            ])),
-
-            // % badge
-            Builder(builder: (context) {
-              if (!hasData || achievement.targetValue <= 0) {
-                return Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
-                    color: Colors.grey.withValues(alpha: 0.1),
-                    border: Border.all(color: Colors.grey, width: 1.5),
-                  ),
-                  child: Text('--',
-                      style: GoogleFonts.outfit(
-                          fontSize: 12,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        achievement.label,
+                        style: GoogleFonts.outfit(
+                          fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          color: Colors.grey)),
-                );
-              }
-              final color = badgePct >= 100
-                  ? Colors.green
-                  : Theme.of(context).colorScheme.primary;
-              return Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  color: color.withValues(alpha: 0.1),
-                  border: Border.all(color: color, width: 1.5),
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        !hasData
+                            ? 'No data logged yet — tap to log'
+                            : achievement.targetValue > 0
+                                ? '${achievement.currentValue.toStringAsFixed(1)} $unit  (Start: ${achievement.startValue.toStringAsFixed(1)})'
+                                : 'Current: ${achievement.currentValue.toStringAsFixed(1)} $unit  ·  No target set',
+                        style: GoogleFonts.outfit(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w500,
+                          color: !hasData 
+                              ? theme.colorScheme.primary.withValues(alpha: 0.7) 
+                              : theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-                child: Text('$badgePct%',
+
+                _AchievementBadge(
+                  hasData: hasData,
+                  hasTarget: achievement.targetValue > 0,
+                  badgePct: badgePct,
+                ),
+                
+                const SizedBox(width: 4),
+                Icon(LucideIcons.chevronRight, 
+                  size: 16, 
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.3)
+                ),
+              ],
+            ),
+
+            if (hasData && achievement.targetValue > 0) ...[
+              const SizedBox(height: 16),
+              _SegmentedBar(
+                percentage: pct,
+                hasTarget: true,
+              ),
+              const SizedBox(height: 8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Goal: ${achievement.targetValue.toStringAsFixed(1)} $unit',
                     style: GoogleFonts.outfit(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        color: color)),
-              );
-            }),
-
-            // Chevron indicator
-            const SizedBox(width: 6),
-            Icon(LucideIcons.chevronRight, size: 16,
-                color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5)),
-          ]),
-
-          const SizedBox(height: 14),
-          _SegmentedBar(
-              percentage: pct,
-              hasTarget: achievement.targetValue > 0 && hasData),
-        ]),
+                      fontSize: 10,
+                      color: theme.colorScheme.primary.withValues(alpha: 0.6),
+                    ),
+                  ),
+                  if (achievement.deadline != null)
+                    Text(
+                      'Deadline: ${fmt.format(achievement.deadline!)}',
+                      style: GoogleFonts.outfit(
+                        fontSize: 10,
+                        color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
+                      ),
+                    ),
+                ],
+              ),
+            ],
+          ],
+        ),
       ),
     );
   }
 
   String _unitFor(String m) {
-    if (m == 'weight') return 'kg';
+    final cfg = standardMetrics.where((cfg) => cfg.id == m).firstOrNull;
+    if (cfg != null) return cfg.unit;
     if (m == 'bodyFat' || m == 'subcutaneousFat' || m == 'visceralFat') return '%';
     return 'cm';
   }
 
   IconData _iconFor(String m) {
+    final cfg = standardMetrics.where((cfg) => cfg.id == m).firstOrNull;
+    if (cfg != null) return cfg.icon;
     switch (m) {
       case 'weight': return LucideIcons.scale;
       case 'bodyFat': return LucideIcons.percent;
@@ -647,15 +622,33 @@ class _MeasurementItem extends StatelessWidget {
   }
 }
 
-// ─── 3-segment progress bar ────────────────────────────────────────────────
-// [BLUE thin marker = start] [GREEN = progress] [BLANK = remaining]
-// Regression: [RED] [BLUE] [BLANK]
+class _AchievementBadge extends StatelessWidget {
+  final bool hasData;
+  final bool hasTarget;
+  final int badgePct;
+  const _AchievementBadge({required this.hasData, required this.hasTarget, required this.badgePct});
+  @override
+  Widget build(BuildContext context) {
+    if (!hasData || !hasTarget) {
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+        decoration: BoxDecoration(borderRadius: BorderRadius.circular(12), color: Colors.grey.withValues(alpha: 0.1)),
+        child: Text('--', style: GoogleFonts.outfit(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.grey)),
+      );
+    }
+    final color = badgePct >= 100 ? Colors.green : Theme.of(context).colorScheme.primary;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(borderRadius: BorderRadius.circular(12), color: color.withValues(alpha: 0.1)),
+      child: Text('$badgePct%', style: GoogleFonts.outfit(fontSize: 12, fontWeight: FontWeight.bold, color: color)),
+    );
+  }
+}
 
 class _SegmentedBar extends StatelessWidget {
   final double percentage;
   final bool hasTarget;
   const _SegmentedBar({required this.percentage, this.hasTarget = true});
-
   @override
   Widget build(BuildContext context) {
     const markerW = 4.0;
@@ -663,25 +656,14 @@ class _SegmentedBar extends StatelessWidget {
     final clamped = percentage.clamp(-1.0, 1.0);
     final isRegression = clamped < 0;
     final abs = clamped.abs();
-    final primary = const Color(0xFF3B82F6); // blue
-
+    final primary = const Color(0xFF3B82F6);
     return LayoutBuilder(builder: (context, constraints) {
       final total = constraints.maxWidth;
-
-      // No target: show fully grey bar
       if (!hasTarget) {
-        return ClipRRect(
-          borderRadius: BorderRadius.circular(h / 2),
-          child: SizedBox(
-            height: h,
-            child: Container(color: Colors.grey.withValues(alpha: 0.2)),
-          ),
-        );
+        return ClipRRect(borderRadius: BorderRadius.circular(h / 2), child: SizedBox(height: h, child: Container(color: Colors.grey.withValues(alpha: 0.2))));
       }
-
       final progressW = (abs * (total - markerW)).clamp(0.0, total - markerW);
       final blankW = (total - markerW - progressW).clamp(0.0, double.infinity);
-
       return ClipRRect(
         borderRadius: BorderRadius.circular(h / 2),
         child: SizedBox(height: h, child: Row(children: [
@@ -700,121 +682,21 @@ class _SegmentedBar extends StatelessWidget {
   }
 }
 
-// ─── Empty State (kept for legacy fallback) ────────────────────────────────
-
-class _OverallMiniTrendline extends ConsumerWidget {
-  const _OverallMiniTrendline();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final trendAsync = ref.watch(overallAchievementTrendProvider);
-
-    return trendAsync.when(
-      data: (spots) {
-        if (spots.length < 2) return const SizedBox.shrink();
-
-        return LineChart(
-          LineChartData(
-            gridData: const FlGridData(show: false),
-            titlesData: const FlTitlesData(show: false),
-            borderData: const FlBorderData(show: false),
-            minX: spots.first.x,
-            maxX: spots.last.x,
-            minY: -0.1, 
-            maxY: 1.1,  
-            lineBarsData: [
-              LineChartBarData(
-                spots: spots,
-                isCurved: true,
-                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.5),
-                barWidth: 2,
-                isStrokeCapRound: true,
-                dotData: const FlDotData(show: false),
-                belowBarData: BarAreaData(
-                  show: true,
-                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.05),
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-      loading: () => const SizedBox.shrink(),
-      error: (_, __) => const SizedBox.shrink(),
-    );
-  }
-}
-
-class _MetricMiniTrendline extends ConsumerWidget {
-  final String metricId;
-  const _MetricMiniTrendline({required this.metricId});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final trendAsync = ref.watch(metricAchievementTrendProvider(metricId: metricId));
-
-    return trendAsync.when(
-      data: (spots) {
-        if (spots.length < 2) return const SizedBox.shrink();
-
-        return LineChart(
-          LineChartData(
-            gridData: const FlGridData(show: false),
-            titlesData: const FlTitlesData(show: false),
-            borderData: const FlBorderData(show: false),
-            minX: spots.first.x,
-            maxX: spots.last.x,
-            minY: -0.1,
-            maxY: 1.1,
-            lineBarsData: [
-              LineChartBarData(
-                spots: spots,
-                isCurved: true,
-                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.5),
-                barWidth: 2,
-                isStrokeCapRound: true,
-                dotData: const FlDotData(show: false),
-                belowBarData: BarAreaData(
-                  show: true,
-                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.05),
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-      loading: () => const SizedBox.shrink(),
-      error: (_, __) => const SizedBox.shrink(),
-    );
-  }
-}
-
 class _EmptyState extends StatelessWidget {
   final VoidCallback onTap;
   const _EmptyState({required this.onTap});
-
   @override
   Widget build(BuildContext context) {
     return Center(child: Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Icon(LucideIcons.target, size: 64,
-            color: Colors.grey.withValues(alpha: 0.4)),
+        Icon(LucideIcons.target, size: 64, color: Colors.grey.withValues(alpha: 0.4)),
         const SizedBox(height: 16),
-        Text('No Measurements Yet',
-            style: GoogleFonts.outfit(
-                fontSize: 20, fontWeight: FontWeight.bold)),
+        Text('No Measurements Yet', style: GoogleFonts.outfit(fontSize: 20, fontWeight: FontWeight.bold)),
         const SizedBox(height: 8),
-        Text('Tap below to log measurements\nand set your targets.',
-            textAlign: TextAlign.center,
-            style: GoogleFonts.outfit(color: Colors.grey)),
+        Text('Tap below to log measurements\nand set your targets.', textAlign: TextAlign.center, style: GoogleFonts.outfit(color: Colors.grey)),
         const SizedBox(height: 24),
-        FilledButton.icon(
-          onPressed: onTap,
-          icon: const Icon(LucideIcons.plus),
-          label: Text('Log Measurements',
-              style: GoogleFonts.outfit(fontWeight: FontWeight.bold)),
-        ),
+        FilledButton.icon(onPressed: onTap, icon: const Icon(LucideIcons.plus), label: const Text('Get Started')),
       ],
     ));
   }

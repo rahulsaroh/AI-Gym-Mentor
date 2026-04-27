@@ -10,7 +10,6 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:drift/drift.dart' show OrderingTerm, OrderingMode;
 import 'package:ai_gym_mentor/features/workout/providers/workout_home_notifier.dart';
 import 'package:ai_gym_mentor/features/workout/components/begin_session_sheet.dart';
-import 'package:ai_gym_mentor/features/workout/components/instant_workout_generator_sheet.dart';
 import 'package:ai_gym_mentor/services/plateau_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ai_gym_mentor/features/workout/workout_repository.dart';
@@ -589,21 +588,6 @@ class _QuickActionSection extends StatelessWidget {
               label: 'EXERCISES',
               color: Colors.blue.shade400,
               onTap: () => context.push('/exercises'),
-            ),
-            const SizedBox(width: 12),
-            _QuickActionItem(
-              icon: LucideIcons.sparkles,
-              label: 'AI AI',
-              color: Colors.amber.shade600,
-              isAi: true,
-              onTap: () {
-                showModalBottomSheet(
-                  context: context,
-                  isScrollControlled: true,
-                  backgroundColor: Colors.transparent,
-                  builder: (context) => const InstantWorkoutGeneratorSheet(),
-                );
-              },
             ),
           ],
         ),

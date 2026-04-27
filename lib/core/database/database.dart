@@ -168,9 +168,10 @@ class ProgressPhotos extends Table {
 
 class SyncQueue extends Table {
   IntColumn get id => integer().autoIncrement()();
-  IntColumn get workoutId => integer().nullable().references(Workouts, #id)();
+  IntColumn get workoutId =>
+      integer().nullable().references(Workouts, #id, onDelete: KeyAction.cascade)();
   IntColumn get measurementId =>
-      integer().nullable().references(BodyMeasurements, #id)();
+      integer().nullable().references(BodyMeasurements, #id, onDelete: KeyAction.cascade)();
   TextColumn get type => text()(); // workout, measurement
   TextColumn get status =>
       text().withDefault(const Constant('pending'))(); // pending, done, failed
@@ -211,7 +212,7 @@ class ExerciseEnrichedContent extends Table {
   TextColumn get enrichedOverview => text().nullable()();
   DateTimeColumn get enrichedAt => dateTime().nullable()();
   TextColumn get enrichmentSource => text()
-      .nullable()(); // 'manual', 'llm-gemini', 'llm-gpt4', 'auto-extracted'
+      .nullable()(); // 'manual', 'llm-gpt4', 'auto-extracted'
 
   @override
   Set<Column> get primaryKey => {exerciseId};

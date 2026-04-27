@@ -86,7 +86,7 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
               ),
               const SizedBox(height: 8),
               Text(
-                "Personalize your GymLog Pro experience.",
+                "Personalize your Your AI Gym Mentor experience.",
                 style: theme.textTheme.bodyLarge?.copyWith(
                   color: colorScheme.onSurfaceVariant,
                 ),

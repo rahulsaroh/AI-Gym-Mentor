@@ -31,7 +31,6 @@ import 'package:ai_gym_mentor/core/utils/weight_converter.dart';
 import 'package:ai_gym_mentor/features/settings/models/settings_state.dart';
 import 'package:ai_gym_mentor/features/workout/providers/workout_duration_provider.dart';
 import 'package:ai_gym_mentor/features/workout/components/exercise_header_card.dart';
-import 'package:ai_gym_mentor/features/workout/components/ai_coach_cue.dart';
 import 'package:ai_gym_mentor/features/workout/components/plate_calculator_dialog.dart';
 import 'package:ai_gym_mentor/features/workout/components/set_logging_table.dart';
 import 'package:ai_gym_mentor/features/workout/components/pr_victory_overlay.dart';
@@ -870,10 +869,7 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen>
             
             if (_isFocusMode) const SizedBox(height: 16),
 
-            // ── AI Coach Cues (Beat Hevy Phase 3) ──
-            AICoachCue(block: block, exerciseName: exercise.name),
-            
-            const SizedBox(height: 12),
+
             
             // ── Set Logging Table (Requirement 5) ──
             SetLoggingTable(

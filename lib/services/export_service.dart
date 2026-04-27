@@ -95,7 +95,7 @@ class ExportService {
           return [
             pw.Header(
                 level: 0,
-                child: pw.Text('GymLog Pro - Training Report',
+                child: pw.Text('Your AI Gym Mentor - Training Report',
                     style: pw.TextStyle(
                         fontSize: 24, fontWeight: pw.FontWeight.bold))),
             pw.SizedBox(height: 20),
@@ -245,7 +245,9 @@ class ExportService {
     final measurements = await db.select(db.bodyMeasurements).get();
 
     final excel = Excel.createExcel();
-    excel.delete('Sheet1'); // Remove default
+    // Default sheet is usually 'Sheet1', let's find it and delete it later if needed,
+    // but the most reliable way in current package is to delete it if it exists.
+    if (excel.tables.containsKey('Sheet1')) excel.delete('Sheet1');
 
     final exerciseById = {for (final e in exercises) e.id: e};
 
@@ -478,7 +480,7 @@ class ExportService {
     );
 
     final measureHeaders = [
-      'Date', 'Weight (kg)', 'Δ Weight', 'Body Fat (%)', 'Subcutaneous Fat (%)', 'Visceral Fat', 
+      'Date', 'Weight (kg)', 'Body Fat (%)', 'Subcutaneous Fat (%)', 'Visceral Fat', 
       'Neck', 'Chest', 'Shoulders', 'Left Bicep', 'Right Bicep', 'Left Forearm', 'Right Forearm',
       'Waist', 'Naval Waist', 'Hips', 'Left Thigh', 'Right Thigh', 
       'Left Calf', 'Right Calf', 'Notes'
@@ -490,16 +492,11 @@ class ExportService {
     }
 
     measurements.sort((a, b) => a.date.compareTo(b.date));
-    double? prevWeight;
 
     for (var m in measurements) {
-      final delta = (m.weight != null && prevWeight != null) ? m.weight! - prevWeight : null;
-      final deltaStr = delta != null ? (delta >= 0 ? '+${delta.toStringAsFixed(1)}' : delta.toStringAsFixed(1)) : '';
-      
       measureSheet.appendRow([
         TextCellValue(DateFormat('yyyy-MM-dd').format(m.date)),
         m.weight != null ? DoubleCellValue(m.weight!) : null,
-        TextCellValue(deltaStr),
         m.bodyFat != null ? DoubleCellValue(m.bodyFat!) : null,
         m.subcutaneousFat != null ? DoubleCellValue(m.subcutaneousFat!) : null,
         m.visceralFat != null ? DoubleCellValue(m.visceralFat!) : null,
@@ -519,7 +516,6 @@ class ExportService {
         m.calfRight != null ? DoubleCellValue(m.calfRight!) : null,
         TextCellValue(m.notes ?? ''),
       ]);
-      prevWeight = m.weight;
     }
 
     // ─── GLOBAL FORMATTING ───

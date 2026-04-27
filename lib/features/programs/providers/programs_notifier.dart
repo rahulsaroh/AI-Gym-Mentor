@@ -53,7 +53,7 @@ class ProgramsNotifier extends _$ProgramsNotifier {
 
     await Share.share(
       jsonStr,
-      subject: 'GymLog Pro Program: ${template?.name ?? "Workout"}',
+      subject: 'Your AI Gym Mentor Program: ${template?.name ?? "Workout"}',
     );
   }
 
@@ -63,7 +63,7 @@ class ProgramsNotifier extends _$ProgramsNotifier {
 
     await Share.share(
       jsonStr,
-      subject: 'GymLog Pro Sample Program Format',
+      subject: 'Your AI Gym Mentor Sample Program Format',
     );
   }
 

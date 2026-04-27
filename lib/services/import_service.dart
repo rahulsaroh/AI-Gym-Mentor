@@ -263,7 +263,8 @@ class ImportService {
         try {
           // Date — always column 0 (or mapped)
           final dateColIdx = hIdx['date'] ?? (mapping?.bodyMeasurementsMapping?.getIndex('Date') ?? 0);
-          final dateStr = row.length > dateColIdx ? row[dateColIdx]?.value?.toString() ?? '' : '';
+          final dateRaw = row.length > dateColIdx ? row[dateColIdx]?.value : null;
+          final dateStr = dateRaw?.toString() ?? '';
           final date = _parseDate(dateStr);
           if (date == null) continue;
 
@@ -277,10 +278,10 @@ class ImportService {
             chest:           Value(col(row, 'chest')),
             shoulders:       Value(col(row, 'shoulders')),
             waist:           Value(col(row, 'waist')),
-            waistNaval:      Value(col(row, 'naval waist')),
+            waistNaval:      Value(col(row, 'naval waist') ?? col(row, 'navel waist')),
             hips:            Value(col(row, 'hips')),
-            armLeft:         Value(col(row, 'left bicep')),
-            armRight:        Value(col(row, 'right bicep')),
+            armLeft:         Value(col(row, 'left bicep') ?? col(row, 'left arm')),
+            armRight:        Value(col(row, 'right bicep') ?? col(row, 'right arm')),
             forearmLeft:     Value(col(row, 'left forearm')),
             forearmRight:    Value(col(row, 'right forearm')),
             thighLeft:       Value(col(row, 'left thigh')),
@@ -319,6 +320,10 @@ class ImportService {
       return DateFormat('yyyy-MM-dd').parse(dateStr);
     } catch (_) {
       try {
+        // Handle common Excel format yyyy-MM-dd HH:mm:ss
+        if (dateStr.contains(' ')) {
+          return DateFormat('yyyy-MM-dd HH:mm:ss').parse(dateStr);
+        }
         return DateTime.parse(dateStr);
       } catch (_) {
         return DateTime.tryParse(dateStr);

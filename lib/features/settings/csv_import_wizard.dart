@@ -428,13 +428,48 @@ class _CsvImportWizardState extends ConsumerState<CsvImportWizard> {
             }
           }
 
-          final weight = double.tryParse(row[_headerMapping!.entries.where((e) => e.value == 'weight').firstOrNull?.key]?.toString() ?? '');
-          final bodyFat = double.tryParse(row[_headerMapping!.entries.where((e) => e.value == 'body_fat').firstOrNull?.key]?.toString() ?? '');
+          final double? weight = double.tryParse(row[_headerMapping!.entries.where((e) => e.value == 'weight').firstOrNull?.key]?.toString() ?? '');
+          final double? bodyFat = double.tryParse(row[_headerMapping!.entries.where((e) => e.value == 'body_fat').firstOrNull?.key]?.toString() ?? '');
           
+          final double? neck = double.tryParse(row[_headerMapping!.entries.where((e) => e.value == 'neck').firstOrNull?.key]?.toString() ?? '');
+          final double? chest = double.tryParse(row[_headerMapping!.entries.where((e) => e.value == 'chest').firstOrNull?.key]?.toString() ?? '');
+          final double? shoulders = double.tryParse(row[_headerMapping!.entries.where((e) => e.value == 'shoulders').firstOrNull?.key]?.toString() ?? '');
+          final double? armLeft = double.tryParse(row[_headerMapping!.entries.where((e) => e.value == 'arm_left').firstOrNull?.key]?.toString() ?? '');
+          final double? armRight = double.tryParse(row[_headerMapping!.entries.where((e) => e.value == 'arm_right').firstOrNull?.key]?.toString() ?? '');
+          final double? forearmLeft = double.tryParse(row[_headerMapping!.entries.where((e) => e.value == 'forearm_left').firstOrNull?.key]?.toString() ?? '');
+          final double? forearmRight = double.tryParse(row[_headerMapping!.entries.where((e) => e.value == 'forearm_right').firstOrNull?.key]?.toString() ?? '');
+          final double? waist = double.tryParse(row[_headerMapping!.entries.where((e) => e.value == 'waist').firstOrNull?.key]?.toString() ?? '');
+          final double? waistNaval = double.tryParse(row[_headerMapping!.entries.where((e) => e.value == 'waist_naval').firstOrNull?.key]?.toString() ?? '');
+          final double? hips = double.tryParse(row[_headerMapping!.entries.where((e) => e.value == 'hips').firstOrNull?.key]?.toString() ?? '');
+          final double? thighLeft = double.tryParse(row[_headerMapping!.entries.where((e) => e.value == 'thigh_left').firstOrNull?.key]?.toString() ?? '');
+          final double? thighRight = double.tryParse(row[_headerMapping!.entries.where((e) => e.value == 'thigh_right').firstOrNull?.key]?.toString() ?? '');
+          final double? calfLeft = double.tryParse(row[_headerMapping!.entries.where((e) => e.value == 'calf_left').firstOrNull?.key]?.toString() ?? '');
+          final double? calfRight = double.tryParse(row[_headerMapping!.entries.where((e) => e.value == 'calf_right').firstOrNull?.key]?.toString() ?? '');
+          final double? subFat = double.tryParse(row[_headerMapping!.entries.where((e) => e.value == 'subcutaneous_fat').firstOrNull?.key]?.toString() ?? '');
+          final double? viscFat = double.tryParse(row[_headerMapping!.entries.where((e) => e.value == 'visceral_fat').firstOrNull?.key]?.toString() ?? '');
+          final String? notes = row[_headerMapping!.entries.where((e) => e.value == 'notes').firstOrNull?.key]?.toString();
+
           await db.into(db.bodyMeasurements).insert(BodyMeasurementsCompanion.insert(
             date: date,
             weight: Value(weight),
             bodyFat: Value(bodyFat),
+            subcutaneousFat: Value(subFat),
+            visceralFat: Value(viscFat),
+            neck: Value(neck),
+            chest: Value(chest),
+            shoulders: Value(shoulders),
+            armLeft: Value(armLeft),
+            armRight: Value(armRight),
+            forearmLeft: Value(forearmLeft),
+            forearmRight: Value(forearmRight),
+            waist: Value(waist),
+            waistNaval: Value(waistNaval),
+            hips: Value(hips),
+            thighLeft: Value(thighLeft),
+            thighRight: Value(thighRight),
+            calfLeft: Value(calfLeft),
+            calfRight: Value(calfRight),
+            notes: Value(notes),
           ), mode: InsertMode.insertOrReplace);
 
           processed++;

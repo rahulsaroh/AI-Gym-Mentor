@@ -10,6 +10,7 @@ import 'package:ai_gym_mentor/core/domain/entities/body_achievement.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:fl_chart/fl_chart.dart';
 
 part 'analytics_providers.g.dart';
 
@@ -108,6 +109,12 @@ class AnalyticsDashboardData {
 Future<Map<String, dynamic>> dashboardStats(Ref ref) async {
   final repo = ref.watch(statsRepositoryProvider);
   return await repo.getOverviewStats();
+}
+
+@riverpod
+Future<List<Map<String, dynamic>>> recentPRs(Ref ref) async {
+  final repo = ref.watch(statsRepositoryProvider);
+  return await repo.getRecentPRs();
 }
 
 @riverpod
@@ -318,18 +325,30 @@ class BodyMeasurementsList extends _$BodyMeasurementsList {
     final repo = ref.read(measurementsRepositoryProvider);
     await repo.addMeasurement(measurement);
     ref.invalidateSelf();
+    ref.invalidate(physiqueAchievementProvider);
   }
 
   Future<void> deleteMeasurement(int id) async {
     final repo = ref.read(measurementsRepositoryProvider);
     await repo.deleteMeasurement(id);
     ref.invalidateSelf();
+    ref.invalidate(physiqueAchievementProvider);
+  }
+
+  Future<void> deleteMeasurements(Iterable<int> ids) async {
+    final repo = ref.read(measurementsRepositoryProvider);
+    for (final id in ids) {
+      await repo.deleteMeasurement(id);
+    }
+    ref.invalidateSelf();
+    ref.invalidate(physiqueAchievementProvider);
   }
 
   Future<void> clearAllHistory() async {
     final repo = ref.read(measurementsRepositoryProvider);
     await repo.deleteAllMeasurements();
     ref.invalidateSelf();
+    ref.invalidate(physiqueAchievementProvider);
   }
 
   Future<void> seedSampleData() async {
@@ -366,24 +385,7 @@ class BodyTargetsList extends _$BodyTargetsList {
   }
 
   Future<void> seedSampleTargets() async {
-    final repo = ref.read(measurementsRepositoryProvider);
-    
-    await repo.addTarget(target.BodyTarget(
-      id: 0,
-      metric: 'weight',
-      targetValue: 72.0,
-      createdAt: DateTime.now().subtract(const Duration(days: 90)),
-      deadline: DateTime.now().add(const Duration(days: 30)),
-    ));
-    
-    await repo.addTarget(target.BodyTarget(
-      id: 0,
-      metric: 'bodyFat',
-      targetValue: 15.0,
-      createdAt: DateTime.now().subtract(const Duration(days: 90)),
-      deadline: DateTime.now().add(const Duration(days: 30)),
-    ));
-    
+    // Hardcoded seeding disabled.
     ref.invalidateSelf();
   }
 }
@@ -397,13 +399,13 @@ class ProgressPhotosList extends _$ProgressPhotosList {
   }
 
   Future<void> addPhoto(photo.ProgressPhoto pp) async {
-    final repo = ref.read(progressPhotosRepositoryProvider);
+    final repo = ref.watch(progressPhotosRepositoryProvider);
     await repo.addPhoto(pp);
     ref.invalidateSelf();
   }
 
   Future<void> deletePhoto(int id) async {
-    final repo = ref.read(progressPhotosRepositoryProvider);
+    final repo = ref.watch(progressPhotosRepositoryProvider);
     await repo.deletePhoto(id);
     ref.invalidateSelf();
   }
@@ -440,7 +442,6 @@ Future<PhysiqueAchievement> physiqueAchievement(Ref ref) async {
   final dateRange = ref.watch(measurementDateRangeProvider);
 
   return calculatePhysiqueScore(
-    measurements.isEmpty ? null : measurements.first,
     targets,
     measurements,
     dateRange: dateRange,
@@ -448,7 +449,6 @@ Future<PhysiqueAchievement> physiqueAchievement(Ref ref) async {
 }
 
 PhysiqueAchievement calculatePhysiqueScore(
-  ent.BodyMeasurement? current,
   List<target.BodyTarget> targets,
   List<ent.BodyMeasurement> allMeasurements, {
   DateTimeRange? dateRange,
@@ -496,46 +496,32 @@ PhysiqueAchievement calculatePhysiqueScore(
     return (val, date);
   }
 
-  // ── Emit a card for EVERY standard metric — always, even if no data yet ──
+  // 1. Process Standard Metrics (Always show these)
   for (final cfg in standardMetrics) {
-    final t = latestTargetMap[cfg.id]; // may be null → no target set yet
-    final currentVal = findCurrent(cfg.id); // may be null → no measurement yet
-    // Always show card; state 'No data logged yet' handled in UI
-
+    final t = latestTargetMap[cfg.id];
+    final currentVal = findCurrent(cfg.id);
     final startLookup = dateRange?.start ?? t?.createdAt ?? DateTime.now();
     final (startRaw, startDate) = findStart(cfg.id, startLookup);
     final startVal = startRaw ?? currentVal ?? 0.0;
 
     double percentage = 0;
     if (t != null && t.targetValue > 0 && currentVal != null) {
-      // Universal formula: works for both gain (target > start) and
-      // loss (target < start) goals — direction auto-detected from target vs start.
-      // e.g. weight gain: start=74, target=77, current=76 → (76-74)/(77-74) = 67%
-      // e.g. weight loss: start=85, target=75, current=78 → (78-85)/(75-85) = 70%
-      // e.g. regression:  start=85, target=75, current=87 → (87-85)/(75-85) = -20%
-      final journeyLen = t.targetValue - startVal; // signed: positive = gain goal, negative = loss goal
+      final journeyLen = t.targetValue - startVal;
       if (journeyLen.abs() < 0.001) {
-        percentage = 1.0; // start == target, already done
+        percentage = 1.0;
       } else {
         percentage = (currentVal - startVal) / journeyLen;
         percentage = percentage.clamp(-1.0, 1.5);
       }
     }
 
-    // Achievement ratio: how close current is to target RIGHT NOW.
-    // For gain goal (target > current): current/target
-    // For loss goal (target < current): target/current
-    // e.g. current=90, target=100 → 90/100 = 90% (already 90% there)
-    // e.g. current=78, target=75  → 75/78 = 96% (close to loss target)
     double achievementRatio = 0;
     if (t != null && t.targetValue > 0) {
       final cv = currentVal ?? 0.0;
-      if (cv == 0 || t.targetValue == 0) {
-        achievementRatio = 0;
-      } else {
+      if (cv != 0) {
         achievementRatio = (cv <= t.targetValue)
-            ? cv / t.targetValue   // gain goal: approaching from below
-            : t.targetValue / cv;  // loss goal: approaching from above
+            ? cv / t.targetValue
+            : t.targetValue / cv;
         achievementRatio = achievementRatio.clamp(0.0, 1.0);
       }
     }
@@ -554,48 +540,64 @@ PhysiqueAchievement calculatePhysiqueScore(
     ));
   }
 
-  // ── Also emit cards for custom targets (not in standardMetrics) ───────────
-  for (final t in latestTargetMap.values) {
-    if (standardMetrics.any((m) => m.id == t.metric)) continue;
-    if (t.targetValue <= 0) continue;
-    final currentVal = findCurrent(t.metric);
-    final startLookup = dateRange?.start ?? t.createdAt;
-    final (startRaw, startDate) = findStart(t.metric, startLookup);
+  // 2. Process Custom Metrics (Those in history OR those with targets)
+  final allHistoryCustomKeys = allMeasurements
+      .expand((m) => m.customValues?.keys ?? <String>[])
+      .toSet();
+  
+  // Also include targets that aren't standard
+  final customTargetKeys = latestTargetMap.keys.where((k) => !standardMetrics.any((m) => m.id == k));
+  
+  final allCustomKeys = {...allHistoryCustomKeys, ...customTargetKeys};
+
+  for (final metricId in allCustomKeys) {
+    final t = latestTargetMap[metricId];
+    final currentVal = findCurrent(metricId);
+    
+    // If it's a custom metric and we have NO data and NO target, we skip it
+    if (currentVal == null && (t == null || t.targetValue <= 0)) continue;
+
+    final startLookup = dateRange?.start ?? t?.createdAt ?? DateTime.now();
+    final (startRaw, startDate) = findStart(metricId, startLookup);
     final startVal = startRaw ?? currentVal ?? 0.0;
+
     double percentage = 0;
-    if (currentVal != null) {
-      final journeyLen = (t.targetValue - startVal).abs();
-      if (journeyLen >= 0.001) {
-        percentage = (currentVal - startVal) / (t.targetValue - startVal);
-        percentage = percentage.clamp(-1.0, 1.5);
-      } else {
+    if (t != null && t.targetValue > 0 && currentVal != null) {
+      final journeyLen = t.targetValue - startVal;
+      if (journeyLen.abs() < 0.001) {
         percentage = 1.0;
+      } else {
+        percentage = (currentVal - startVal) / journeyLen;
+        percentage = percentage.clamp(-1.0, 1.5);
       }
     }
+
     double achievementRatio = 0;
-    if (currentVal != null && t.targetValue > 0) {
-      achievementRatio = (currentVal <= t.targetValue)
-          ? currentVal / t.targetValue
-          : t.targetValue / currentVal;
-      achievementRatio = achievementRatio.clamp(0.0, 1.0);
+    if (t != null && t.targetValue > 0) {
+      final cv = currentVal ?? 0.0;
+      if (cv != 0) {
+        achievementRatio = (cv <= t.targetValue)
+            ? cv / t.targetValue
+            : t.targetValue / cv;
+        achievementRatio = achievementRatio.clamp(0.0, 1.0);
+      }
     }
+
     achievements.add(MetricAchievement(
-      id: t.id,
-      metric: t.metric,
-      label: getMetricLabel(t.metric),
-      targetValue: t.targetValue,
+      id: t?.id ?? 0,
+      metric: metricId,
+      label: getMetricLabel(metricId),
+      targetValue: t?.targetValue ?? 0,
       startValue: startVal,
       currentValue: currentVal ?? 0,
       percentage: percentage,
       achievementRatio: achievementRatio,
-      deadline: dateRange?.end ?? t.deadline,
+      deadline: dateRange?.end ?? t?.deadline,
       startDate: startDate,
     ));
   }
 
-  // ── Overall score: average achievementRatio of metrics with a target ──────────
-  // achievementRatio = how close current is to target (not journey-based).
-  // rawScore uses journey percentages to detect if overall improving or regressing.
+  // ── Overall score calculation ──────────────────────────────────────────────
   final withTarget = achievements.where((a) => a.targetValue > 0).toList();
   double rawScore = 0, overallScore = 0;
   if (withTarget.isNotEmpty) {
@@ -624,9 +626,11 @@ double? extractMetricValue(ent.BodyMeasurement m, String metric) {
       return m.shoulders;
     case 'armRight':
     case 'rightArm':
+    case 'right bicep':
       return m.armRight;
     case 'armLeft':
     case 'leftArm':
+    case 'left bicep':
       return m.armLeft;
     case 'forearmLeft':
       return m.forearmLeft;

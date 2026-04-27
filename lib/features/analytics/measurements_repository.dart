@@ -135,7 +135,12 @@ class MeasurementsRepository {
   }
 
   Future<void> deleteMeasurement(int id) async {
-    await (db.delete(db.bodyMeasurements)..where((t) => t.id.equals(id))).go();
+    await db.transaction(() async {
+      await (db.delete(db.syncQueue)
+            ..where((t) => t.measurementId.equals(id)))
+          .go();
+      await (db.delete(db.bodyMeasurements)..where((t) => t.id.equals(id))).go();
+    });
   }
 
   Future<List<ent_m.BodyMeasurement>> getTrendData(String metric) async {
@@ -187,8 +192,12 @@ class MeasurementsRepository {
 
   Future<void> deleteAllMeasurements() async {
     await db.transaction(() async {
+      // Clear sync queue for measurements first
+      await (db.delete(db.syncQueue)
+            ..where((t) => t.type.equals('measurement')))
+          .go();
+      // Then delete all measurements
       await db.delete(db.bodyMeasurements).go();
-      await (db.delete(db.syncQueue)..where((t) => t.type.equals('measurement'))).go();
     });
   }
 

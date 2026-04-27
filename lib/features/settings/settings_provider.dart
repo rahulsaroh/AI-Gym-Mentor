@@ -71,11 +71,7 @@ class Settings extends _$Settings {
     await updateSettings(updated);
   }
 
-  Future<void> updateGeminiApiKey(String? key) async {
-    final current = await future;
-    final updated = current.copyWith(geminiApiKey: key);
-    await updateSettings(updated);
-  }
+
 }
 
 @riverpod

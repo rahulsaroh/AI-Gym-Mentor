@@ -10,7 +10,6 @@ import 'package:ai_gym_mentor/features/exercise_database/presentation/widgets/mu
 import 'package:ai_gym_mentor/features/exercise_database/presentation/widgets/instruction_step_widget.dart';
 import 'package:ai_gym_mentor/features/exercise_database/presentation/widgets/safety_tips_widget.dart';
 import 'package:ai_gym_mentor/features/exercise_database/presentation/widgets/progression_path_widget.dart';
-import 'package:ai_gym_mentor/features/exercise_database/data/datasources/gemini_service.dart';
 import 'package:ai_gym_mentor/features/exercise_database/presentation/providers/exercise_history_provider.dart';
 import 'package:ai_gym_mentor/l10n/app_localizations.dart';
 import 'package:ai_gym_mentor/features/exercise_database/presentation/widgets/exercise_media_widget.dart';
@@ -166,7 +165,7 @@ class _ExerciseDetailScreenState extends ConsumerState<ExerciseDetailScreen> wit
         ),
       ),
       actions: [
-        if (!exercise.isEnriched) _buildEnrichmentButton(exercise),
+
         Padding(
           padding: const EdgeInsets.all(4.0),
           child: CircleAvatar(
@@ -260,10 +259,6 @@ class _ExerciseDetailScreenState extends ConsumerState<ExerciseDetailScreen> wit
                           letterSpacing: -0.5,
                         ),
                       ),
-                      if (exercise.isEnriched) ...[
-                        const SizedBox(width: 8),
-                        const Icon(LucideIcons.sparkles, color: Colors.amber, size: 20),
-                      ],
                     ],
                   ),
                   if (exercise.nameHi != null) 
@@ -693,8 +688,6 @@ class _ExerciseDetailScreenState extends ConsumerState<ExerciseDetailScreen> wit
     );
   }
 
-  // Removing local _showFullScreenMedia as it's now handled by ExerciseMediaWidget
-
   Widget _buildEmptyInstructions(ExerciseEntity exercise) {
     return Container(
       padding: const EdgeInsets.all(32),
@@ -713,15 +706,9 @@ class _ExerciseDetailScreenState extends ConsumerState<ExerciseDetailScreen> wit
           ),
           const SizedBox(height: 8),
           Text(
-            'We don\'t have step-by-step instructions for this exercise yet. Let our AI Expert find them for you!',
+            'We don\'t have step-by-step instructions for this exercise yet.',
             style: TextStyle(color: Theme.of(context).colorScheme.outline, fontSize: 14),
             textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 24),
-          FilledButton.icon(
-            onPressed: () => _handleEnrichment(exercise),
-            icon: const Icon(LucideIcons.sparkles, size: 18),
-            label: const Text('Consult AI Expert'),
           ),
         ],
       ),
@@ -735,83 +722,6 @@ class _ExerciseDetailScreenState extends ConsumerState<ExerciseDetailScreen> wit
     return exercise.name;
   }
 
-  Widget _buildEnrichmentButton(ExerciseEntity exercise) {
-    return AnimatedSwitcher(
-      duration: const Duration(milliseconds: 300),
-      child: _isEnriching
-          ? Container(
-              padding: const EdgeInsets.all(8),
-              decoration: const BoxDecoration(color: Colors.black45, shape: BoxShape.circle),
-              child: const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)),
-            )
-          : Tooltip(
-              message: 'Enrich with AI Expert (Safety, Tips, Translations)',
-              child: FloatingActionButton.small(
-                heroTag: 'enrich_btn',
-                onPressed: () => _handleEnrichment(exercise),
-                backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-                child: const Icon(LucideIcons.sparkles, size: 18),
-              ),
-            ),
-    );
-  }
-
-  Future<void> _handleEnrichment(ExerciseEntity exercise) async {
-    setState(() => _isEnriching = true);
-    // Show loading overlay
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => const Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            CircularProgressIndicator(),
-            SizedBox(height: 16),
-            Text('Consulting AI Expert...', style: TextStyle(color: Colors.white)),
-          ],
-        ),
-      ),
-    );
-
-    try {
-      final gemini = ref.read(geminiServiceProvider.notifier);
-      final data = await gemini.enrichExercise(exercise);
-      
-      await ref.read(exerciseRepositoryProvider).saveEnrichedContent(
-        exercise.id,
-        safetyTips: List<String>.from(data['safety_tips'] ?? []),
-        commonMistakes: List<String>.from(data['common_mistakes'] ?? []),
-        variations: List<String>.from(data['variations'] ?? []),
-        enrichedOverview: data['overview'] as String?,
-        nameHi: data['name_hindi'] as String?,
-        nameMr: data['name_marathi'] as String?,
-        enrichmentSource: 'gemini-1.5-flash',
-      );
-
-      // Trigger re-fetch
-      ref.invalidate(exerciseDetailProvider(widget.exerciseId));
-      
-      if (mounted) {
-        Navigator.pop(context); // Close loading
-        setState(() => _isEnriching = false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Exercise enriched successfully! ✨'),
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        Navigator.pop(context); // Close loading
-        setState(() => _isEnriching = false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to enrich: $e')),
-        );
-      }
-    }
-  }
 
   Widget _buildFormScreen(ExerciseEntity exercise) {
     if (_name.isEmpty && widget.exerciseId > 0) {

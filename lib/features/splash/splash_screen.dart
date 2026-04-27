@@ -125,7 +125,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
             FadeTransition(
               opacity: _fadeAnimation,
               child: Text(
-                'GymLog Pro',
+                'Your AI Gym Mentor',
                 style: Theme.of(context).textTheme.headlineLarge?.copyWith(
                       fontWeight: FontWeight.bold,
                       letterSpacing: -1,

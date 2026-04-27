@@ -285,17 +285,10 @@ class AnalyticsDashboardScreen extends ConsumerWidget {
               listenable: DefaultTabController.of(context),
               builder: (context, _) {
                 final index = DefaultTabController.of(context).index;
-                if (index != 3) return const SizedBox.shrink();
+                if (index != 2) return const SizedBox.shrink();
   
                 return FloatingActionButton.extended(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const BodyMeasurementsLogScreen(),
-                      ),
-                    );
-                  },
+                  onPressed: () => context.push('/analytics/log-measurements'),
                   icon: const Icon(LucideIcons.plus),
                   label: const Text('+ Log Entry', style: TextStyle(fontWeight: FontWeight.bold)),
                 );

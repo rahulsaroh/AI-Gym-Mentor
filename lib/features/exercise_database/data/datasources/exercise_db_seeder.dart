@@ -178,7 +178,7 @@ class ExerciseDbSeeder {
                   safetyTips: Value(jsonEncode(item['safetyTips'])),
                   commonMistakes: Value(jsonEncode(item['commonMistakes'])),
                   enrichedAt: Value(DateTime.now()),
-                  enrichmentSource: const Value('llm-gemini-enriched'),
+                  enrichmentSource: const Value('llm-enriched'),
                 ),
                 mode: InsertMode.insertOrReplace);
           } else {
