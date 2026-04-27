@@ -783,16 +783,16 @@ class _ChangePill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = isImproving ? Colors.green : Colors.red;
-    final sign = changePct > 0 ? '+' : '';
+    final sign = changePct >= 0 ? '+' : '';
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(color: color.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(20)),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12), border: Border.all(color: color.withValues(alpha: 0.3))),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(changePct >= 0 ? LucideIcons.trendingUp : LucideIcons.trendingDown, size: 14, color: color.withValues(alpha: 0.8)),
+          Icon(isImproving ? LucideIcons.trendingUp : LucideIcons.trendingDown, size: 12, color: color),
           const SizedBox(width: 4),
-          Text('$sign${changePct.toStringAsFixed(1)}%', style: GoogleFonts.outfit(fontSize: 13, fontWeight: FontWeight.bold, color: color.withValues(alpha: 0.8))),
+          Text('$sign${changePct.toStringAsFixed(1)}%', style: GoogleFonts.robotoMono(fontSize: 11, fontWeight: FontWeight.bold, color: color)),
         ],
       ),
     );
@@ -804,39 +804,73 @@ class _EmptyLogState extends StatelessWidget {
   const _EmptyLogState({required this.metricLabel});
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 60, horizontal: 40),
-      child: Column(children: [
-        Icon(LucideIcons.clipboardList, size: 56, color: Colors.grey.withValues(alpha: 0.3)),
-        const SizedBox(height: 16),
-        Text('No $metricLabel logs yet', style: GoogleFonts.outfit(fontSize: 18, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
-        const SizedBox(height: 8),
-        Text('Start logging your measurements to see your progress here.', style: GoogleFonts.outfit(color: Colors.grey), textAlign: TextAlign.center),
-      ]),
-    );
+    return Center(child: Padding(padding: const EdgeInsets.symmetric(vertical: 48), child: Column(children: [Icon(LucideIcons.notebookText, size: 48, color: Colors.grey.withValues(alpha: 0.3)), const SizedBox(height: 16), Text('No $metricLabel logs yet', style: GoogleFonts.outfit(fontSize: 16, color: Colors.grey))])));
   }
 }
 
-double? extractMetricValue(dynamic m, String metricId) {
-  switch (metricId) {
-    case 'weight': return m.weight;
-    case 'body_fat': return m.bodyFat;
-    case 'subcutaneous_fat': return m.subcutaneousFat;
-    case 'visceral_fat': return m.visceralFat;
-    case 'neck': return m.neck;
-    case 'chest': return m.chest;
-    case 'shoulders': return m.shoulders;
-    case 'arm_left': return m.armLeft;
-    case 'arm_right': return m.armRight;
-    case 'forearm_left': return m.forearmLeft;
-    case 'forearm_right': return m.forearmRight;
-    case 'waist': return m.waist;
-    case 'waist_naval': return m.waistNaval;
-    case 'hips': return m.hips;
-    case 'thigh_left': return m.thighLeft;
-    case 'thigh_right': return m.thighRight;
-    case 'calf_left': return m.calfLeft;
-    case 'calf_right': return m.calfRight;
-    default: return null;
+double? extractMetricValue(dynamic m, String id) {
+  if (id == 'weight') return m.weight;
+  if (id == 'bodyFat') return m.bodyFat;
+  if (id == 'chest') return m.chest;
+  if (id == 'shoulders') return m.shoulders;
+  if (id == 'armLeft') return m.armLeft;
+  if (id == 'armRight') return m.armRight;
+  if (id == 'forearmLeft') return m.forearmLeft;
+  if (id == 'forearmRight') return m.forearmRight;
+  if (id == 'waist') return m.waist;
+  if (id == 'waistNaval') return m.waistNaval;
+  if (id == 'hips') return m.hips;
+  if (id == 'thighLeft') return m.thighLeft;
+  if (id == 'thighRight') return m.thighRight;
+  if (id == 'calfLeft') return m.calfLeft;
+  if (id == 'calfRight') return m.calfRight;
+  if (id == 'neck') return m.neck;
+  if (id == 'subcutaneousFat') return m.subcutaneousFat;
+  if (id == 'visceralFat') return m.visceralFat;
+  return null;
+}
+
+// ─── Mini Trendline ──────────────────────────────────────────────────────────
+// Kept from remote for potential future use
+
+class _MiniTrendline extends ConsumerWidget {
+  final String metricId;
+  const _MiniTrendline({required this.metricId});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final trendAsync = ref.watch(metricAchievementTrendProvider(metricId: metricId));
+
+    return trendAsync.when(
+      data: (spots) {
+        if (spots.length < 2) return const SizedBox.shrink();
+
+        return LineChart(
+          LineChartData(
+            gridData: const FlGridData(show: false),
+            titlesData: const FlTitlesData(show: false),
+            borderData: FlBorderData(show: false),
+            minX: spots.first.x,
+            maxX: spots.last.x,
+            lineBarsData: [
+              LineChartBarData(
+                spots: spots,
+                isCurved: true,
+                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.5),
+                barWidth: 2,
+                isStrokeCapRound: true,
+                dotData: const FlDotData(show: false),
+                belowBarData: BarAreaData(
+                  show: true,
+                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.05),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+      loading: () => const SizedBox.shrink(),
+      error: (_, __) => const SizedBox.shrink(),
+    );
   }
 }

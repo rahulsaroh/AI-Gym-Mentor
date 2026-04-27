@@ -682,22 +682,89 @@ class _SegmentedBar extends StatelessWidget {
   }
 }
 
-class _EmptyState extends StatelessWidget {
-  final VoidCallback onTap;
-  const _EmptyState({required this.onTap});
+// ─── Mini Trendlines (Kept from remote for potential future use) ──────────
+
+class _OverallMiniTrendline extends ConsumerWidget {
+  const _OverallMiniTrendline();
+
   @override
-  Widget build(BuildContext context) {
-    return Center(child: Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Icon(LucideIcons.target, size: 64, color: Colors.grey.withValues(alpha: 0.4)),
-        const SizedBox(height: 16),
-        Text('No Measurements Yet', style: GoogleFonts.outfit(fontSize: 20, fontWeight: FontWeight.bold)),
-        const SizedBox(height: 8),
-        Text('Tap below to log measurements\nand set your targets.', textAlign: TextAlign.center, style: GoogleFonts.outfit(color: Colors.grey)),
-        const SizedBox(height: 24),
-        FilledButton.icon(onPressed: onTap, icon: const Icon(LucideIcons.plus), label: const Text('Get Started')),
-      ],
-    ));
+  Widget build(BuildContext context, WidgetRef ref) {
+    final trendAsync = ref.watch(overallAchievementTrendProvider);
+
+    return trendAsync.when(
+      data: (spots) {
+        if (spots.length < 2) return const SizedBox.shrink();
+
+        return LineChart(
+          LineChartData(
+            gridData: const FlGridData(show: false),
+            titlesData: const FlTitlesData(show: false),
+            borderData: FlBorderData(show: false),
+            minX: spots.first.x,
+            maxX: spots.last.x,
+            minY: -0.1, 
+            maxY: 1.1,  
+            lineBarsData: [
+              LineChartBarData(
+                spots: spots,
+                isCurved: true,
+                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.5),
+                barWidth: 2,
+                isStrokeCapRound: true,
+                dotData: const FlDotData(show: false),
+                belowBarData: BarAreaData(
+                  show: true,
+                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.05),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+      loading: () => const SizedBox.shrink(),
+      error: (_, __) => const SizedBox.shrink(),
+    );
+  }
+}
+
+class _MetricMiniTrendline extends ConsumerWidget {
+  final String metricId;
+  const _MetricMiniTrendline({required this.metricId});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final trendAsync = ref.watch(metricAchievementTrendProvider(metricId: metricId));
+
+    return trendAsync.when(
+      data: (spots) {
+        if (spots.length < 2) return const SizedBox.shrink();
+
+        return LineChart(
+          LineChartData(
+            gridData: const FlGridData(show: false),
+            titlesData: const FlTitlesData(show: false),
+            borderData: FlBorderData(show: false),
+            minX: spots.first.x,
+            maxX: spots.last.x,
+            lineBarsData: [
+              LineChartBarData(
+                spots: spots,
+                isCurved: true,
+                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.5),
+                barWidth: 2,
+                isStrokeCapRound: true,
+                dotData: const FlDotData(show: false),
+                belowBarData: BarAreaData(
+                  show: true,
+                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.05),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+      loading: () => const SizedBox.shrink(),
+      error: (_, __) => const SizedBox.shrink(),
+    );
   }
 }
