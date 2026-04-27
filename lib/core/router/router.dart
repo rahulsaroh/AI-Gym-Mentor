@@ -181,7 +181,9 @@ final router = GoRouter(
                   builder: (context, state) {
                     final idStr = state.pathParameters['id'];
                     final id = int.tryParse(idStr ?? '0') ?? 0;
-                    return ProgramDetailScreen(templateId: id);
+                    final dayIdStr = state.uri.queryParameters['dayId'];
+                    final dayId = dayIdStr != null ? int.tryParse(dayIdStr) : null;
+                    return ProgramDetailScreen(templateId: id, initialDayId: dayId);
                   },
                 ),
                 GoRoute(

@@ -591,7 +591,6 @@ class _MeasurementItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final achRatio = achievement.achievementRatio;
     final unit = _unitFor(achievement.metric);
     final hasData = achievement.currentValue > 0;
 
@@ -670,18 +669,29 @@ class _MeasurementItem extends StatelessWidget {
                     ),
                   ),
 
-                  // + button
+                  // Achievement percentage or + button
                   Container(
-                    width: 32,
-                    height: 32,
+                    width: 38,
+                    height: 38,
                     decoration: BoxDecoration(
                       color: const Color(0xFF3D6FE8).withValues(alpha: 0.1),
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(
-                      LucideIcons.plus,
-                      size: 17,
-                      color: Color(0xFF3D6FE8),
+                    child: Center(
+                      child: achievement.targetValue > 0
+                          ? Text(
+                              '${(achievement.percentage.clamp(0.0, 2.0) * 100).toInt()}%',
+                              style: GoogleFonts.outfit(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w900,
+                                color: const Color(0xFF3D6FE8),
+                              ),
+                            )
+                          : const Icon(
+                              LucideIcons.plus,
+                              size: 18,
+                              color: Color(0xFF3D6FE8),
+                            ),
                     ),
                   ),
                   const SizedBox(width: 6),
@@ -702,7 +712,7 @@ class _MeasurementItem extends StatelessWidget {
               child: FractionallySizedBox(
                 alignment: Alignment.centerLeft,
                 widthFactor: hasData && achievement.targetValue > 0
-                    ? achRatio.clamp(0.0, 1.0)
+                    ? achievement.percentage.clamp(0.0, 1.0)
                     : 0.04,
                 child: Container(
                   decoration: BoxDecoration(

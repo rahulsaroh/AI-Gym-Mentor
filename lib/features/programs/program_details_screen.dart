@@ -11,8 +11,9 @@ import 'dart:convert';
 
 class ProgramDetailScreen extends ConsumerWidget {
   final int templateId;
+  final int? initialDayId;
 
-  const ProgramDetailScreen({super.key, required this.templateId});
+  const ProgramDetailScreen({super.key, required this.templateId, this.initialDayId});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -31,8 +32,13 @@ class ProgramDetailScreen extends ConsumerWidget {
             return const Center(child: Text('Program not found'));
           }
 
+          final initialIndex = initialDayId != null
+              ? program.days.indexWhere((d) => d.id == initialDayId)
+              : 0;
+
           return DefaultTabController(
             length: program.days.length,
+            initialIndex: initialIndex != -1 ? initialIndex : 0,
             child: Scaffold(
               backgroundColor: Colors.white,
               body: NestedScrollView(

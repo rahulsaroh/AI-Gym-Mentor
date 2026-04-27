@@ -325,17 +325,24 @@ class _TodayPlanSection extends ConsumerWidget {
                               ],
                             ],
                           ),
-                          Text(
-                            state.isRestDay
-                                ? 'Time to Recover'
-                                : (state.todayDayName ?? "Push Day A"),
-                            style: GoogleFonts.outfit(
-                              fontSize: 24,
-                              fontWeight: FontWeight.w900,
-                              color: Colors.white,
+                          InkWell(
+                            onTap: () {
+                              if (state.templateId != null && state.nextDayId != null) {
+                                context.push('/programs/details/${state.templateId}?dayId=${state.nextDayId}');
+                              }
+                            },
+                            child: Text(
+                              state.isRestDay
+                                  ? 'Time to Recover'
+                                  : (state.todayDayName ?? "Push Day A"),
+                              style: GoogleFonts.outfit(
+                                fontSize: 24,
+                                fontWeight: FontWeight.w900,
+                                color: Colors.white,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
                             ),
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
                           ),
                         ],
                       ),
@@ -370,21 +377,28 @@ class _TodayPlanSection extends ConsumerWidget {
                     children: [
                       ...state.todayExercises.take(3).map((ex) => _TodayExerciseItem(ex: ex)),
                       if (state.todayExercises.length > 3)
-                        Padding(
-                          padding: const EdgeInsets.only(top: 12),
-                          child: Row(
-                            children: [
-                              Icon(LucideIcons.plus, size: 14, color: Colors.white.withValues(alpha: 0.7)),
-                              const SizedBox(width: 8),
-                              Text(
-                                '${state.todayExercises.length - 3} more exercises',
-                                style: GoogleFonts.outfit(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.white.withValues(alpha: 0.7),
+                        InkWell(
+                          onTap: () {
+                            if (state.templateId != null && state.nextDayId != null) {
+                              context.push('/programs/details/${state.templateId}?dayId=${state.nextDayId}');
+                            }
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.only(top: 12),
+                            child: Row(
+                              children: [
+                                Icon(LucideIcons.plus, size: 14, color: Colors.white.withValues(alpha: 0.7)),
+                                const SizedBox(width: 8),
+                                Text(
+                                  '${state.todayExercises.length - 3} more exercises',
+                                  style: GoogleFonts.outfit(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.white.withValues(alpha: 0.7),
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
                     ],
