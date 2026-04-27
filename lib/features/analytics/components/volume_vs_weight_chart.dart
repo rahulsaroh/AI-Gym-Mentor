@@ -124,6 +124,8 @@ class _ChartContent extends StatelessWidget {
                   topTitles: const AxisTitles(
                       sideTitles: SideTitles(showTitles: false)),
                   bottomTitles: AxisTitles(
+                    sideTitles: SideTitles(
+                      showTitles: true,
                       interval: 1,
                       getTitlesWidget: (val, meta) {
                         if (val % 1 != 0) return const SizedBox.shrink();
@@ -137,6 +139,7 @@ class _ChartContent extends StatelessWidget {
                           style: const TextStyle(fontSize: 10),
                         );
                       },
+                    ),
                   ),
                 ),
                 gridData: const FlGridData(show: true, drawVerticalLine: false),
