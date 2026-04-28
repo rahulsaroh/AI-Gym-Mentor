@@ -111,7 +111,10 @@ class _MetricDetailView extends ConsumerWidget {
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(16, 32, 16, 0),
-                  child: _MetricHistoryChart(entries: entries),
+                  child: _MetricHistoryChart(
+                    entries: entries,
+                    targetValue: achievement?.targetValue,
+                  ),
                 ),
               ),
               SliverToBoxAdapter(
@@ -514,7 +517,8 @@ class _MetallicGaugePainter extends CustomPainter {
 
 class _MetricHistoryChart extends StatelessWidget {
   final List<_LogEntry> entries;
-  const _MetricHistoryChart({required this.entries});
+  final double? targetValue;
+  const _MetricHistoryChart({required this.entries, this.targetValue});
 
   @override
   Widget build(BuildContext context) {
@@ -526,8 +530,8 @@ class _MetricHistoryChart extends StatelessWidget {
     final minVal = values.reduce((a, b) => a < b ? a : b);
     final maxVal = values.reduce((a, b) => a > b ? a : b);
     final padding = (maxVal - minVal) * 0.15;
-    final minY = (minVal - padding).clamp(0.0, double.infinity);
-    final maxY = maxVal + padding;
+    final minY = (math.min(minVal, targetValue ?? minVal) - padding).clamp(0.0, double.infinity);
+    final maxY = math.max(maxVal, targetValue ?? maxVal) + padding;
 
     return Container(
       padding: const EdgeInsets.all(24),
@@ -615,6 +619,28 @@ class _MetricHistoryChart extends StatelessWidget {
                     ),
                   ),
                 ],
+                extraLinesData: ExtraLinesData(
+                  horizontalLines: [
+                    if (targetValue != null && targetValue! > 0)
+                      HorizontalLine(
+                        y: targetValue!,
+                        color: theme.colorScheme.primary.withValues(alpha: 0.5),
+                        strokeWidth: 2,
+                        dashArray: [5, 5],
+                        label: HorizontalLineLabel(
+                          show: true,
+                          alignment: Alignment.topRight,
+                          padding: const EdgeInsets.only(right: 5, bottom: 5),
+                          style: GoogleFonts.outfit(
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                            color: theme.colorScheme.primary,
+                          ),
+                          labelResolver: (line) => 'Target: ${line.y.toStringAsFixed(1)}',
+                        ),
+                      ),
+                  ],
+                ),
                 lineTouchData: LineTouchData(
                   touchTooltipData: LineTouchTooltipData(
                     getTooltipColor: (_) => theme.colorScheme.surfaceContainerHighest,

@@ -41,6 +41,20 @@ class SettingsScreen extends ConsumerWidget {
               icon: LucideIcons.graduationCap,
               onTap: () => _showExperienceDialog(context, ref, settings),
             ),
+            _buildTile(
+              context,
+              title: 'Height',
+              subtitle: '${settings.height} cm',
+              icon: LucideIcons.ruler,
+              onTap: () => _showHeightDialog(context, ref, settings),
+            ),
+            _buildTile(
+              context,
+              title: 'Biological Sex',
+              subtitle: _capitalize(settings.sex.name),
+              icon: settings.sex == BiologicalSex.male ? Icons.male : Icons.female,
+              onTap: () => _showSexDialog(context, ref, settings),
+            ),
             _buildUnitSegmented(context, ref, settings),
             const Divider(height: 32),
             _buildSectionHeader(context, 'Tools & Library'),
@@ -479,6 +493,58 @@ class SettingsScreen extends ConsumerWidget {
                     },
                   ))
               .toList(),
+        ),
+      ),
+    );
+  }
+
+  void _showHeightDialog(BuildContext context, WidgetRef ref, SettingsState settings) {
+    final controller = TextEditingController(text: settings.height.toString());
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Edit Height'),
+        content: TextField(
+          controller: controller,
+          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+          decoration: const InputDecoration(
+            hintText: 'Enter height in cm',
+            suffixText: 'cm',
+          ),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+          FilledButton(
+            onPressed: () {
+              final val = double.tryParse(controller.text) ?? 170.0;
+              ref.read(settingsProvider.notifier).updateHeight(val);
+              Navigator.pop(context);
+            },
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showSexDialog(BuildContext context, WidgetRef ref, SettingsState settings) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Biological Sex'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: BiologicalSex.values.map((s) => RadioListTile<BiologicalSex>(
+            title: Text(_capitalize(s.name)),
+            value: s,
+            groupValue: settings.sex,
+            onChanged: (val) {
+              if (val != null) {
+                ref.read(settingsProvider.notifier).updateSex(val);
+                Navigator.pop(context);
+              }
+            },
+          )).toList(),
         ),
       ),
     );

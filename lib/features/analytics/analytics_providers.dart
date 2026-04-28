@@ -7,13 +7,25 @@ import 'package:ai_gym_mentor/core/domain/entities/body_target.dart' as target;
 import 'package:ai_gym_mentor/core/domain/entities/progress_photo.dart'
     as photo;
 import 'package:ai_gym_mentor/core/domain/entities/body_achievement.dart';
+import 'package:ai_gym_mentor/features/settings/settings_provider.dart';
+import 'package:ai_gym_mentor/core/services/golden_ratio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 part 'analytics_providers.g.dart';
+
+/// Provides the golden-ratio ideal targets for the current user profile.
+final goldenRatioTargetsProvider = Provider<Map<String, double>>((ref) {
+  final settings = ref.watch(settingsProvider).asData?.value;
+  if (settings == null) return {};
+  return GoldenRatioService.calculateTargets(
+    heightCm: settings.height,
+    sex: settings.sex,
+  );
+});
 
 /// Global date-range filter for the Measurements tab.
 /// When null: each target uses its own createdAt/deadline.

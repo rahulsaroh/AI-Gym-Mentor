@@ -806,7 +806,7 @@ final class BodyMeasurementsListProvider
 }
 
 String _$bodyMeasurementsListHash() =>
-    r'98b95ac46d2af98823b402a6f3d9d3589a0100dc';
+    r'75b7bd2ab818e7660f9d81ea7cab59548cdd5087';
 
 abstract class _$BodyMeasurementsList
     extends $AsyncNotifier<List<ent.BodyMeasurement>> {

@@ -74,6 +74,8 @@ class SettingsRepository {
       'autoSyncICloud': s.autoSyncICloud,
       'googleDriveEmail': s.googleDriveEmail,
       'lastSynced': s.lastSynced?.toIso8601String(),
+      'height': s.height,
+      'sex': s.sex.name,
     };
   }
 
@@ -111,6 +113,11 @@ class SettingsRepository {
       googleDriveEmail: map['googleDriveEmail'],
       lastSynced:
           map['lastSynced'] != null ? DateTime.parse(map['lastSynced']) : null,
+      height: (map['height'] ?? 170.0).toDouble(),
+      sex: BiologicalSex.values.firstWhere(
+        (e) => e.name == (map['sex'] ?? 'male'),
+        orElse: () => BiologicalSex.male,
+      ),
     );
   }
 
