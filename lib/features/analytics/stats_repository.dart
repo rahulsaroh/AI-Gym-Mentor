@@ -484,6 +484,33 @@ class StatsRepository {
   }
 }
 
+
+  /// Returns muscle group volume per week for heatmap rendering.
+  Future<List<Map<String, dynamic>>> getMuscleVolumeByWeek(int weeks) async {
+    final cutoff = DateTime.now().subtract(Duration(days: weeks * 7));
+    final rows = await (db.select(db.workoutSets).join([
+      innerJoin(db.exercises, db.exercises.id.equalsExp(db.workoutSets.exerciseId)),
+      innerJoin(db.workouts, db.workouts.id.equalsExp(db.workoutSets.workoutId)),
+    ])
+      ..where(db.workoutSets.completed.equals(true) &
+              db.workouts.startTime.isBiggerOrEqualValue(cutoff))).get();
+
+    final result = <Map<String, dynamic>>[];
+    for (final row in rows) {
+      final s = row.readTable(db.workoutSets);
+      final ex = row.readTable(db.exercises);
+      final w = row.readTable(db.workouts);
+      final volume = s.weight * s.reps;
+      if (volume <= 0) continue;
+      result.add({
+        'date': w.startTime,
+        'muscle': ex.primaryMuscle.isNotEmpty ? ex.primaryMuscle : ex.category,
+        'volume': volume,
+      });
+    }
+    return result;
+  }
+
 @riverpod
 StatsRepository statsRepository(Ref ref) {
   return StatsRepository(ref.watch(appDatabaseProvider));
