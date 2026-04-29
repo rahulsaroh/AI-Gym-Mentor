@@ -22,6 +22,7 @@ import 'package:ai_gym_mentor/features/history/workout_detail_screen.dart';
 import 'package:ai_gym_mentor/features/analytics/analytics_dashboard_screen.dart';
 import 'package:ai_gym_mentor/features/analytics/pr_hall_of_fame_screen.dart';
 import 'package:ai_gym_mentor/features/analytics/progress_photos_screen.dart';
+import 'package:ai_gym_mentor/features/analytics/presentation/screens/progress_charts_screen.dart';
 import 'package:ai_gym_mentor/features/settings/settings_screen.dart';
 import 'package:ai_gym_mentor/features/settings/plates_config_screen.dart';
 import 'package:ai_gym_mentor/features/settings/about_screen.dart';
@@ -242,6 +243,10 @@ final router = GoRouter(
                     final year = int.tryParse(state.pathParameters['year'] ?? '') ?? DateTime.now().year;
                     return YearInReviewScreen(initialYear: year);
                   },
+                ),
+                                  GoRoute(
+                    path: 'progress-charts',
+                    builder: (context, state) => const ProgressChartsScreen(),
                 ),
               ],
             ),
