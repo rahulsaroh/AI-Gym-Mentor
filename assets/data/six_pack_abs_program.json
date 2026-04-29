@@ -1,0 +1,119 @@
+{
+  "name": "6 Weeks to Six-Pack Abs",
+  "description": "A 2-phase abs program by JefitTeam. Weeks 1-3: high reps to burn fat around the core. Weeks 4-6: increased resistance to build defined, fuller abs with oblique focus.",
+  "goal": "Fat Loss",
+  "duration": "6 weeks",
+  "tags": [
+    "Abs",
+    "Core",
+    "Cutting",
+    "Fat Loss",
+    "Intermediate"
+  ],
+  "days": [
+    {
+      "name": "Week 1-3 \u2014 Abs (High Rep Burn)",
+      "order": 0,
+      "weekday": 1,
+      "exercises": [
+        {
+          "exerciseName": "Weighted Crunch",
+          "githubId": "803",
+          "order": 0,
+          "setType": "straight",
+          "setsJson": "[{\"reps\":30,\"weight\":5.0},{\"reps\":30,\"weight\":5.0},{\"reps\":30,\"weight\":5.0}]",
+          "restTime": 45,
+          "notes": "Hold a weight plate on your chest. Full crunch \u2014 lift shoulder blades off the floor. Exhale hard at the top. High reps burn fat around upper abs."
+        },
+        {
+          "exerciseName": "Barbell Ab Rollout (Kneeling)",
+          "githubId": "294",
+          "order": 1,
+          "setType": "straight",
+          "setsJson": "[{\"reps\":20,\"weight\":0.0},{\"reps\":20,\"weight\":0.0},{\"reps\":20,\"weight\":0.0}]",
+          "restTime": 45,
+          "notes": "Kneel on a mat, grip the barbell. Roll out slowly until hips nearly touch floor, pull back using core only. One of the best full core exercises."
+        },
+        {
+          "exerciseName": "Hanging Leg Raise",
+          "githubId": "61",
+          "order": 2,
+          "setType": "straight",
+          "setsJson": "[{\"reps\":25,\"weight\":0.0},{\"reps\":25,\"weight\":0.0},{\"reps\":25,\"weight\":0.0}]",
+          "restTime": 45,
+          "notes": "Hang from a pull-up bar. Raise legs until parallel to floor or higher. Avoid swinging. Targets lower abs and hip flexors."
+        },
+        {
+          "exerciseName": "Decline Crunch",
+          "githubId": "78",
+          "order": 3,
+          "setType": "straight",
+          "setsJson": "[{\"reps\":20,\"weight\":0.0},{\"reps\":20,\"weight\":0.0},{\"reps\":20,\"weight\":0.0}]",
+          "restTime": 45,
+          "notes": "Set bench at 30-45 degree decline. Hands behind head. Slow controlled movement. Full range of motion \u2014 crunch all the way up, lower slowly."
+        },
+        {
+          "exerciseName": "Cable Kneeling Crunch",
+          "githubId": "695",
+          "order": 4,
+          "setType": "straight",
+          "setsJson": "[{\"reps\":30,\"weight\":10.0},{\"reps\":30,\"weight\":10.0},{\"reps\":30,\"weight\":10.0}]",
+          "restTime": 45,
+          "notes": "Kneel facing cable machine. Grip rope attachment behind head. Crunch torso down toward knees. Keep hips stationary. Squeeze at the bottom."
+        }
+      ]
+    },
+    {
+      "name": "Week 4-6 \u2014 Abs (Heavy & Defined)",
+      "order": 1,
+      "weekday": 1,
+      "exercises": [
+        {
+          "exerciseName": "Dumbbell Side Bend",
+          "githubId": "80",
+          "order": 0,
+          "setType": "straight",
+          "setsJson": "[{\"reps\":12,\"weight\":15.0},{\"reps\":12,\"weight\":15.0},{\"reps\":12,\"weight\":15.0},{\"reps\":12,\"weight\":15.0}]",
+          "restTime": 60,
+          "notes": "Hold dumbbell in one hand. Bend sideways as far as possible. Return to upright. Work one side at a time. Targets obliques for a carved waist."
+        },
+        {
+          "exerciseName": "Cable Side Bend",
+          "githubId": "680",
+          "order": 1,
+          "setType": "straight",
+          "setsJson": "[{\"reps\":12,\"weight\":15.0},{\"reps\":12,\"weight\":15.0},{\"reps\":12,\"weight\":15.0},{\"reps\":12,\"weight\":15.0}]",
+          "restTime": 60,
+          "notes": "Stand sideways to cable machine with a low pulley. Grip the handle and bend away from the cable. Full oblique stretch, squeeze at the top."
+        },
+        {
+          "exerciseName": "Weighted Hanging Knee Raise",
+          "githubId": "1005",
+          "order": 2,
+          "setType": "straight",
+          "setsJson": "[{\"reps\":20,\"weight\":5.0},{\"reps\":20,\"weight\":5.0},{\"reps\":20,\"weight\":5.0},{\"reps\":20,\"weight\":5.0}]",
+          "restTime": 60,
+          "notes": "Hang from pull-up bar with ankle weights or dumbbell between feet. Raise knees to chest. Added weight builds lower ab size and strength faster."
+        },
+        {
+          "exerciseName": "Bench Weighted Decline Crunch",
+          "githubId": "675",
+          "order": 3,
+          "setType": "straight",
+          "setsJson": "[{\"reps\":12,\"weight\":10.0},{\"reps\":12,\"weight\":10.0},{\"reps\":12,\"weight\":10.0},{\"reps\":12,\"weight\":10.0}]",
+          "restTime": 60,
+          "notes": "Decline bench with weight plate on chest. More resistance than weeks 1-3. Slow controlled descent. Maximum contraction at the top."
+        },
+        {
+          "exerciseName": "Cable Kneeling Crunch (Rope)",
+          "githubId": "79",
+          "order": 4,
+          "setType": "straight",
+          "setsJson": "[{\"reps\":12,\"weight\":20.0},{\"reps\":12,\"weight\":20.0},{\"reps\":12,\"weight\":20.0},{\"reps\":12,\"weight\":20.0}]",
+          "restTime": 60,
+          "notes": "Rope attachment on high cable. Pull elbows toward knees. Heavier weight than phase 1. Focus on full contraction at the bottom to build size and definition."
+        }
+      ]
+    }
+  ]
+}
