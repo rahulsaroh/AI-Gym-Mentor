@@ -127,6 +127,7 @@ class AnalyticsDashboardScreen extends ConsumerWidget {
                               children: [
                                 const FitnessWrappedCard(),
                                 _buildYearInReviewPromo(context, ref),
+                                                _buildProgressChartsPromo(context),
                                 // 1. Overview Stats Row
                                 statsAsync.when(
                                   data: (stats) {
@@ -366,6 +367,65 @@ class AnalyticsDashboardScreen extends ConsumerWidget {
 class _SectionHeader extends StatelessWidget {
   final String title;
   final String subtitle;
+  
+  Widget _buildProgressChartsPromo(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: InkWell(
+        onTap: () => context.push('/analytics/progress-charts'),
+        borderRadius: BorderRadius.circular(20),
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [Color(0xFF1A1A2E), Color(0xFF16213E)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          padding: const EdgeInsets.all(20),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: const Icon(LucideIcons.chartLine, color: Colors.white, size: 26),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Progress Charts',
+                      style: GoogleFonts.outfit(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: -0.5,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '1RM trends · Volume heatmap · Strength standards',
+                      style: GoogleFonts.outfit(
+                        color: Colors.white70,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const Icon(LucideIcons.chevronRight, color: Colors.white, size: 20),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
   final VoidCallback? onTrailingTap;
   final String? trailingLabel;
 
