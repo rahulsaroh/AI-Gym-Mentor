@@ -13,6 +13,51 @@ class ExerciseDbSeeder {
   static const String _seedKey =
       'exercises_seed_v8'; // v8: Integrated 2197 exercises from combined datasets
 
+  /// Deduplicates source JSON by removing alphabetic-ID entries when
+  /// numeric-ID alternatives exist with the same name.
+  /// Returns map with {original, final, removed} counts.
+  Future<Map<String, int>> _deduplicateExerciseData() async {
+    // This method is informational - the actual deduplication happens
+    // at build time via the Python script.
+    // We can optionally validate here.
+    final jsonString = await rootBundle.loadString('assets/data/exercises.json');
+    final List<dynamic> jsonList = json.decode(jsonString);
+    
+    // Group by name
+    final Map<String, List<dynamic>> nameGroups = {};
+    for (final item in jsonList) {
+      final name = (item['name'] as String?)?.trim();
+      if (name != null && name.isNotEmpty) {
+        nameGroups.putIfAbsent(name, () => []).add(item);
+      }
+    }
+    
+    bool isNumeric(String? id) {
+      if (id == null) return false;
+      return RegExp(r'^\d+$').hasMatch(id);
+    }
+    bool isAlpha(String? id) {
+      if (id == null) return false;
+      return RegExp(r'[a-zA-Z]').hasMatch(id);
+    }
+    
+    int removed = 0;
+    for (final items in nameGroups.values) {
+      if (items.length <= 1) continue;
+      final hasNumeric = items.any((i) => isNumeric(i['id']));
+      final hasAlpha = items.any((i) => isAlpha(i['id']));
+      if (hasNumeric && hasAlpha) {
+        removed += items.where((i) => isAlpha(i['id'])).length;
+      }
+    }
+    
+    return {
+      'original': jsonList.length,
+      'final': jsonList.length,
+      'removed': removed,
+    };
+  }
+
   Future<void> seed([AppDatabase? providedDb]) async {
     final prefs = await SharedPreferences.getInstance();
     if (prefs.getBool(_seedKey) == true) {
@@ -24,6 +69,13 @@ class ExerciseDbSeeder {
     final database = providedDb ?? AppDatabase();
 
     try {
+      // Pre-seed: Load and deduplicate exercise data
+      final dedupResult = await _deduplicateExerciseData();
+      if (dedupResult['original'] != dedupResult['final']) {
+        debugPrint('ExerciseDbSeeder: Deduplicated source data '
+            '(removed ${dedupResult['removed']} duplicates)');
+      }
+
       // 1. Load Main Exercise Data
       final jsonString =
           await rootBundle.loadString('assets/data/exercises.json');

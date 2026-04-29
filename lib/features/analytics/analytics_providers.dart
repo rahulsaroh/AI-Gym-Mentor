@@ -592,7 +592,7 @@ PhysiqueAchievement calculatePhysiqueScore(
   }
 
   // ── Overall score calculation ──────────────────────────────────────────────
-  final withTarget = achievements.where((a) => a.targetValue > 0).toList();
+  final withTarget = achievements.where((a) => a.targetValue > 0 && a.startDate != null).toList();
   double rawScore = 0, overallScore = 0;
   if (withTarget.isNotEmpty) {
     rawScore = withTarget.fold(0.0, (s, a) => s + a.percentage) / withTarget.length;

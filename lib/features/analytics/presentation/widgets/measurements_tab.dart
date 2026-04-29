@@ -310,9 +310,10 @@ class _OverallProgressCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final pct = (physique.overallScore.clamp(0.0, 1.0) * 100).toInt();
-    final hasScore = physique.overallScore > 0.001;
-    final isDecline = physique.rawOverallScore < -0.001;
+    final rawScore = physique.rawOverallScore;
+    final pct = (rawScore.clamp(0.0, 1.0) * 100).toInt();
+    final hasScore = physique.achievements.any((a) => a.startDate != null);
+    final isDecline = rawScore < -0.001;
 
     return Container(
       decoration: BoxDecoration(
@@ -350,7 +351,7 @@ class _OverallProgressCard extends ConsumerWidget {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8),
             child: _GaugeWidget(
-              score: physique.overallScore.clamp(0.0, 1.0) * 100,
+              score: rawScore.clamp(0.0, 1.0) * 100,
               pct: pct,
               hasScore: hasScore,
               progressColor: hasScore
@@ -391,19 +392,6 @@ class _OverallProgressCard extends ConsumerWidget {
               letterSpacing: 2.0,
               color: const Color(0xFF1A1A2E),
             ),
-          ),
-
-          const SizedBox(height: 14),
-
-          // Clear period button
-          _StadiumButton(
-            label: 'Clear period',
-            icon: Icons.close,
-            onTap: () {
-              ref
-                  .read(selectedMeasurementIntervalProvider.notifier)
-                  .set(MeasurementInterval.all);
-            },
           ),
 
           const SizedBox(height: 20),
