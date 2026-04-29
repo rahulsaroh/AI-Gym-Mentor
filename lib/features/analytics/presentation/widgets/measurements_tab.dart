@@ -186,7 +186,7 @@ class MeasurementsTab extends ConsumerWidget {
       final repo = ref.read(measurementsRepositoryProvider);
       for (final entry in targets.entries) {
         await repo.upsertTarget(ent_t.BodyTarget(
-          id: 0, // ID is auto-incremented in DB, entity needs one for the constructor
+          id: 0,
           metric: entry.key,
           targetValue: entry.value,
           createdAt: DateTime.now(),
@@ -317,7 +317,6 @@ class _OverallProgressCard extends ConsumerWidget {
 
     return Container(
       decoration: BoxDecoration(
-        // Light silvery-grey card background, matching reference
         gradient: const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -691,13 +690,13 @@ class _GaugePainter extends CustomPainter {
       ..shader = SweepGradient(
         center: Alignment.center,
         colors: const [
-          Color(0xFFB8BFC9),  // dark edge
-          Color(0xFFE8ECF4),  // highlight
-          Color(0xFFF5F7FC),  // bright peak
-          Color(0xFFDDE2EC),  // mid shimmer
-          Color(0xFFCDD2DE),  // mid-dark
-          Color(0xFFF0F3FA),  // second highlight
-          Color(0xFFB8BFC9),  // dark edge
+          Color(0xFFB8BFC9),
+          Color(0xFFE8ECF4),
+          Color(0xFFF5F7FC),
+          Color(0xFFDDE2EC),
+          Color(0xFFCDD2DE),
+          Color(0xFFF0F3FA),
+          Color(0xFFB8BFC9),
         ],
         stops: const [0.0, 0.15, 0.35, 0.5, 0.65, 0.85, 1.0],
         startAngle: math.pi,
@@ -792,6 +791,13 @@ class _MeasurementItem extends StatelessWidget {
   final VoidCallback onTap;
   const _MeasurementItem({required this.achievement, required this.onTap});
 
+  String _unitFor(String metric) {
+    final cfg = standardMetrics.where((m) => m.id == metric).firstOrNull;
+    if (cfg != null) return cfg.unit;
+    if (metric == 'bodyFat' || metric == 'subcutaneousFat' || metric == 'visceralFat') return '%';
+    return 'cm';
+  }
+
   @override
   Widget build(BuildContext context) {
     final unit = _unitFor(achievement.metric);
@@ -823,29 +829,22 @@ class _MeasurementItem extends StatelessWidget {
                   Builder(builder: (context) {
                     final cfg = standardMetrics.where((m) => m.id == achievement.metric).firstOrNull;
                     return Container(
-                      width: 48,
-                      height: 48,
+                      width: 44,
+                      height: 44,
                       decoration: BoxDecoration(
-                        color: const Color(0xFFF2F4F8),
-                        borderRadius: BorderRadius.circular(14),
+                        color: const Color(0xFF3D6FE8).withValues(alpha: 0.08),
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                      child: Center(
-                        child: (cfg?.assetPath != null)
-                            ? Padding(
-                                padding: const EdgeInsets.all(11.0),
-                                child: Image.asset(cfg!.assetPath!, fit: BoxFit.contain),
-                              )
-                            : Icon(
-                                cfg?.icon ?? LucideIcons.activity,
-                                color: const Color(0xFF3D6FE8),
-                                size: 22,
-                              ),
-                      ),
+                      child: cfg?.assetPath != null
+                          ? Padding(
+                              padding: const EdgeInsets.all(8),
+                              child: Image.asset(cfg!.assetPath!, fit: BoxFit.contain),
+                            )
+                          : Icon(cfg?.icon ?? LucideIcons.ruler, size: 22, color: const Color(0xFF3D6FE8)),
                     );
                   }),
-                  const SizedBox(width: 14),
-
-                  // Text
+                  const SizedBox(width: 12),
+                  // Label + values
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -859,182 +858,72 @@ class _MeasurementItem extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 2),
-                        Text(
-                          !hasData
-                              ? 'No records logged. Tap to add.'
-                              : 'Current: ${achievement.currentValue.toStringAsFixed(1)} $unit${achievement.targetValue > 0 ? '  ·  Target: ${achievement.targetValue.toStringAsFixed(1)} $unit' : ''}',
-                          style: GoogleFonts.outfit(
-                            fontSize: 12,
-                            color: const Color(0xFF9098A3),
+                        if (!hasData)
+                          Text(
+                            'No data logged yet',
+                            style: GoogleFonts.outfit(
+                              fontSize: 12,
+                              color: const Color(0xFF9098A3),
+                            ),
+                          )
+                        else
+                          Text(
+                            'Current: ${achievement.currentValue.toStringAsFixed(1)} $unit'
+                            '${achievement.targetValue > 0 ? '  •  Target: ${achievement.targetValue.toStringAsFixed(1)} $unit' : ''}',
+                            style: GoogleFonts.outfit(
+                              fontSize: 12,
+                              color: const Color(0xFF9098A3),
+                            ),
                           ),
-                        ),
                       ],
                     ),
                   ),
-
-                  // Achievement percentage or Change percentage
-                  _AchievementIndicator(achievement: achievement),
-                  const SizedBox(width: 6),
-                  const Icon(
-                    LucideIcons.chevronRight,
-                    size: 18,
-                    color: Color(0xFFBCC1CC),
-                  ),
+                  // Percentage badge
+                  if (hasData && achievement.targetValue > 0)
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                      decoration: BoxDecoration(
+                        color: _badgeColor(achievement.percentage).withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        '${(achievement.percentage * 100).toStringAsFixed(0)}%',
+                        style: GoogleFonts.outfit(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w800,
+                          color: _badgeColor(achievement.percentage),
+                        ),
+                      ),
+                    ),
                 ],
               ),
             ),
-
-            // Progress bar at bottom
-            Container(
-              height: 4,
-              width: double.infinity,
-              color: const Color(0xFFEDF0F7),
-              child: FractionallySizedBox(
-                alignment: Alignment.centerLeft,
-                widthFactor: hasData && achievement.targetValue > 0
-                    ? achievement.percentage.clamp(0.0, 1.0)
-                    : 0.04,
-                child: Container(
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [Color(0xFF5B87F0), Color(0xFF3D6FE8)],
+            // Progress bar
+            if (hasData && achievement.targetValue > 0)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(14, 0, 14, 14),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(4),
+                  child: LinearProgressIndicator(
+                    value: achievement.achievementRatio.clamp(0.0, 1.0),
+                    minHeight: 5,
+                    backgroundColor: const Color(0xFFF0F2F8),
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      _badgeColor(achievement.percentage),
                     ),
-                    borderRadius: BorderRadius.circular(2),
                   ),
                 ),
               ),
-            ),
           ],
         ),
       ),
     );
   }
 
-  String _unitFor(String m) {
-    final cfg = standardMetrics.where((cfg) => cfg.id == m).firstOrNull;
-    if (cfg != null) return cfg.unit;
-    if (m == 'bodyFat' || m == 'subcutaneousFat' || m == 'visceralFat') return '%';
-    return 'cm';
-  }
-
-  String _getChangeLabel(MetricAchievement a) {
-    if (a.startValue == 0 || a.currentValue == 0) return 'NEW';
-    final change = ((a.currentValue - a.startValue) / a.startValue) * 100;
-    if (change.abs() < 0.1) return '0%';
-    final sign = change > 0 ? '+' : '';
-    return '$sign${change.toStringAsFixed(1)}%';
-  }
-}
-
-class _AchievementIndicator extends StatelessWidget {
-  final MetricAchievement achievement;
-  const _AchievementIndicator({required this.achievement});
-
-  @override
-  Widget build(BuildContext context) {
-    final hasTarget = achievement.targetValue > 0;
-    if (!hasTarget) {
-      return Container(
-        width: 38,
-        height: 38,
-        decoration: BoxDecoration(
-          color: const Color(0xFF3D6FE8).withValues(alpha: 0.1),
-          shape: BoxShape.circle,
-        ),
-        child: Center(
-          child: Text(
-            _getChangeLabel(achievement),
-            style: GoogleFonts.outfit(
-              fontSize: achievement.startValue == 0 ? 11 : 10,
-              fontWeight: FontWeight.w800,
-              color: const Color(0xFF3D6FE8),
-            ),
-          ),
-        ),
-      );
-    }
-
-    // Color logic
-    final cfg = standardMetrics.where((m) => m.id == achievement.metric).firstOrNull;
-    final lowerIsBetter = cfg?.lowerIsBetter ?? false;
-    final ratio = achievement.achievementRatio;
-    
-    Color color;
-    if (ratio >= 0.95) {
-      color = const Color(0xFF2ECC71); // Green
-    } else if (ratio >= 0.85) {
-      color = Colors.amber;
-    } else {
-      color = const Color(0xFFE74C3C); // Red
-    }
-
-    return Container(
-      width: 42,
-      height: 42,
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        shape: BoxShape.circle,
-        border: Border.all(color: color.withValues(alpha: 0.2), width: 2),
-      ),
-      child: Center(
-        child: Text(
-          '${(ratio * 100).toInt()}%',
-          style: GoogleFonts.outfit(
-            fontSize: 11,
-            fontWeight: FontWeight.w900,
-            color: color,
-          ),
-        ),
-      ),
-    );
-  }
-
-  String _getChangeLabel(MetricAchievement a) {
-    if (a.startValue == 0 || a.currentValue == 0) return 'NEW';
-    final change = ((a.currentValue - a.startValue) / a.startValue) * 100;
-    if (change.abs() < 0.1) return '0%';
-    final sign = change > 0 ? '+' : '';
-    return '$sign${change.toStringAsFixed(1)}%';
-  }
-}
-
-// ─── Extracted Trendline Widget ──────────────────────────────────────────────
-
-class _OverallMiniTrendline extends ConsumerWidget {
-  const _OverallMiniTrendline();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final trendAsync = ref.watch(overallAchievementTrendProvider);
-    return trendAsync.when(
-      data: (spots) {
-        if (spots.length < 2) return const SizedBox.shrink();
-        return LineChart(LineChartData(
-          gridData: const FlGridData(show: false),
-          titlesData: const FlTitlesData(show: false),
-          borderData: FlBorderData(show: false),
-          minX: spots.first.x,
-          maxX: spots.last.x,
-          minY: -0.1,
-          maxY: 1.1,
-          lineBarsData: [
-            LineChartBarData(
-              spots: spots,
-              isCurved: true,
-              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.5),
-              barWidth: 2,
-              isStrokeCapRound: true,
-              dotData: const FlDotData(show: false),
-              belowBarData: BarAreaData(
-                show: true,
-                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.05),
-              ),
-            ),
-          ],
-        ));
-      },
-      loading: () => const SizedBox.shrink(),
-      error: (_, __) => const SizedBox.shrink(),
-    );
+  Color _badgeColor(double pct) {
+    if (pct >= 0.8) return const Color(0xFF2ECC71);
+    if (pct >= 0.4) return const Color(0xFF3D6FE8);
+    if (pct < 0) return const Color(0xFFE74C3C);
+    return const Color(0xFFF39C12);
   }
 }
