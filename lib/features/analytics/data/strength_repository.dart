@@ -286,6 +286,25 @@ class StrengthRepository {
       await processWorkout(id, formula);
     }
   }
+  
+  /// Gets the latest 1RM for standard benchmark exercises by name.
+  Future<Map<String, double>> getLatest1RMForStandardExercises(List<String> names) async {
+    final result = <String, double>{};
+    for (final name in names) {
+      final keyword = name.split(' ').first;
+      final query = db.select(db.exercise1RmSnapshots).join([
+        innerJoin(db.exercises, db.exercises.id.equalsExp(db.exercise1RmSnapshots.exerciseId)),
+      ])
+        ..where(db.exercises.name.like('%$keyword%'))
+        ..orderBy([OrderingTerm(expression: db.exercise1RmSnapshots.estimatedRm, mode: OrderingMode.desc)])
+        ..limit(1);
+      final rows = await query.get();
+      if (rows.isNotEmpty) {
+        result[name] = rows.first.readTable(db.exercise1RmSnapshots).estimatedRm;
+      }
+    }
+    return result;
+  }
 }
 
 @riverpod
