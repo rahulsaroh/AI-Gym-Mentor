@@ -330,6 +330,17 @@ class _ProgramsScreenState extends ConsumerState<ProgramsScreen> {
                   ref.read(programsProvider.notifier).importPplEliteProgram();
                 },
               ),
+              _importTile(
+                context: context,
+                ref: ref,
+                icon: LucideIcons.zap,
+                title: '6 Weeks to Six-Pack Abs',
+                subtitle: 'Jefit 2-phase abs cutting program',
+                onTap: () {
+                  Navigator.pop(context);
+                  ref.read(programsProvider.notifier).importSixPackAbsProgram();
+                },
+              ),
               const Divider(height: 24, color: _kBorder),
               _importTile(
                 context: context,
