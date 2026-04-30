@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:ai_gym_mentor/features/analytics/data/strength_repository.dart';
 import 'package:ai_gym_mentor/features/analytics/analytics_providers.dart';
+import 'package:ai_gym_mentor/features/analytics/stats_repository.dart';
 import 'package:ai_gym_mentor/features/analytics/measurements_repository.dart';
 import 'package:ai_gym_mentor/core/domain/entities/body_measurement.dart' as ent;
 import 'package:ai_gym_mentor/features/settings/models/settings_state.dart';

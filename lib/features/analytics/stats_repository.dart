@@ -482,7 +482,7 @@ class StatsRepository {
     prList.sort((a, b) => (b['date'] as DateTime).compareTo(a['date'] as DateTime));
     return prList;
   }
-}
+
 
 
   /// Returns muscle group volume per week for heatmap rendering.
@@ -510,6 +510,7 @@ class StatsRepository {
     }
     return result;
   }
+}
 
 @riverpod
 StatsRepository statsRepository(Ref ref) {

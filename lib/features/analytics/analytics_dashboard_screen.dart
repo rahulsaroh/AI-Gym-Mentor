@@ -362,12 +362,7 @@ class AnalyticsDashboardScreen extends ConsumerWidget {
       error: (_, _) => const SizedBox.shrink(),
     );
   }
-}
 
-class _SectionHeader extends StatelessWidget {
-  final String title;
-  final String subtitle;
-  
   Widget _buildProgressChartsPromo(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -426,6 +421,12 @@ class _SectionHeader extends StatelessWidget {
       ),
     );
   }
+}
+
+class _SectionHeader extends StatelessWidget {
+  final String title;
+  final String subtitle;
+  
   final VoidCallback? onTrailingTap;
   final String? trailingLabel;
 

@@ -17,6 +17,7 @@ class SettingsState {
   final int age;
   final String goals;
   final double height; // in cm
+  final double weight; // in kg
   final BiologicalSex sex;
 
   final ThemeMode themeMode;
@@ -55,6 +56,7 @@ class SettingsState {
     this.age = 25,
     this.goals = 'Build muscle and gain strength',
     this.height = 170.0,
+    this.weight = 75.0,
     this.sex = BiologicalSex.male,
     this.themeMode = ThemeMode.system,
     this.accentColor = Colors.blue,
@@ -96,6 +98,7 @@ class SettingsState {
     int? age,
     String? goals,
     double? height,
+    double? weight,
     BiologicalSex? sex,
     ThemeMode? themeMode,
     Color? accentColor,
@@ -128,6 +131,7 @@ class SettingsState {
       age: age ?? this.age,
       goals: goals ?? this.goals,
       height: height ?? this.height,
+      weight: weight ?? this.weight,
       sex: sex ?? this.sex,
       themeMode: themeMode ?? this.themeMode,
       accentColor: accentColor ?? this.accentColor,
