@@ -10,6 +10,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:drift/drift.dart' show OrderingTerm, OrderingMode;
 import 'package:ai_gym_mentor/features/workout/providers/workout_home_notifier.dart';
 import 'package:ai_gym_mentor/features/workout/components/begin_session_sheet.dart';
+import 'package:ai_gym_mentor/features/workout/components/phase_change_dialog.dart';
 import 'package:ai_gym_mentor/services/plateau_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ai_gym_mentor/features/workout/workout_repository.dart';
@@ -28,6 +29,21 @@ class WorkoutHomeScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final homeState = ref.watch(workoutHomeProvider);
+
+    ref.listen(workoutHomeProvider, (previous, next) {
+      next.whenData((state) {
+        if (state.phaseChangeMessage != null && state.activeProgress != null) {
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (context) => PhaseChangeDialog(
+              phaseIndex: state.activeProgress!.currentPhaseIndex,
+              message: state.phaseChangeMessage!,
+            ),
+          );
+        }
+      });
+    });
 
     return Scaffold(
       body: homeState.when(

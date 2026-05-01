@@ -9,7 +9,7 @@ class ProgramDbSeeder {
   static final ProgramDbSeeder instance = ProgramDbSeeder._();
   ProgramDbSeeder._();
 
-  static const String _seedKey = 'program_seed_v1';
+  static const String _seedKey = 'program_seed_v3';
 
   Future<void> seed(AppDatabase database) async {
     final prefs = await SharedPreferences.getInstance();

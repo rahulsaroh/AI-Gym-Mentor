@@ -11722,6 +11722,445 @@ class MesocycleExercisesCompanion extends UpdateCompanion<MesocycleExercise> {
   }
 }
 
+class $UserProgramProgressTable extends UserProgramProgress
+    with TableInfo<$UserProgramProgressTable, UserProgramProgressData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $UserProgramProgressTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _mesocycleIdMeta = const VerificationMeta(
+    'mesocycleId',
+  );
+  @override
+  late final GeneratedColumn<int> mesocycleId = GeneratedColumn<int>(
+    'mesocycle_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES mesocycles (id)',
+    ),
+  );
+  static const VerificationMeta _startDateMeta = const VerificationMeta(
+    'startDate',
+  );
+  @override
+  late final GeneratedColumn<DateTime> startDate = GeneratedColumn<DateTime>(
+    'start_date',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _currentPhaseIndexMeta = const VerificationMeta(
+    'currentPhaseIndex',
+  );
+  @override
+  late final GeneratedColumn<int> currentPhaseIndex = GeneratedColumn<int>(
+    'current_phase_index',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _isCompletedMeta = const VerificationMeta(
+    'isCompleted',
+  );
+  @override
+  late final GeneratedColumn<bool> isCompleted = GeneratedColumn<bool>(
+    'is_completed',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_completed" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _lastPhaseAlertAtMeta = const VerificationMeta(
+    'lastPhaseAlertAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> lastPhaseAlertAt =
+      GeneratedColumn<DateTime>(
+        'last_phase_alert_at',
+        aliasedName,
+        true,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: false,
+      );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    mesocycleId,
+    startDate,
+    currentPhaseIndex,
+    isCompleted,
+    lastPhaseAlertAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'user_program_progress';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<UserProgramProgressData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('mesocycle_id')) {
+      context.handle(
+        _mesocycleIdMeta,
+        mesocycleId.isAcceptableOrUnknown(
+          data['mesocycle_id']!,
+          _mesocycleIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_mesocycleIdMeta);
+    }
+    if (data.containsKey('start_date')) {
+      context.handle(
+        _startDateMeta,
+        startDate.isAcceptableOrUnknown(data['start_date']!, _startDateMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_startDateMeta);
+    }
+    if (data.containsKey('current_phase_index')) {
+      context.handle(
+        _currentPhaseIndexMeta,
+        currentPhaseIndex.isAcceptableOrUnknown(
+          data['current_phase_index']!,
+          _currentPhaseIndexMeta,
+        ),
+      );
+    }
+    if (data.containsKey('is_completed')) {
+      context.handle(
+        _isCompletedMeta,
+        isCompleted.isAcceptableOrUnknown(
+          data['is_completed']!,
+          _isCompletedMeta,
+        ),
+      );
+    }
+    if (data.containsKey('last_phase_alert_at')) {
+      context.handle(
+        _lastPhaseAlertAtMeta,
+        lastPhaseAlertAt.isAcceptableOrUnknown(
+          data['last_phase_alert_at']!,
+          _lastPhaseAlertAtMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  UserProgramProgressData map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return UserProgramProgressData(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      mesocycleId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}mesocycle_id'],
+      )!,
+      startDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}start_date'],
+      )!,
+      currentPhaseIndex: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}current_phase_index'],
+      )!,
+      isCompleted: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_completed'],
+      )!,
+      lastPhaseAlertAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}last_phase_alert_at'],
+      ),
+    );
+  }
+
+  @override
+  $UserProgramProgressTable createAlias(String alias) {
+    return $UserProgramProgressTable(attachedDatabase, alias);
+  }
+}
+
+class UserProgramProgressData extends DataClass
+    implements Insertable<UserProgramProgressData> {
+  final int id;
+  final int mesocycleId;
+  final DateTime startDate;
+  final int currentPhaseIndex;
+  final bool isCompleted;
+  final DateTime? lastPhaseAlertAt;
+  const UserProgramProgressData({
+    required this.id,
+    required this.mesocycleId,
+    required this.startDate,
+    required this.currentPhaseIndex,
+    required this.isCompleted,
+    this.lastPhaseAlertAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['mesocycle_id'] = Variable<int>(mesocycleId);
+    map['start_date'] = Variable<DateTime>(startDate);
+    map['current_phase_index'] = Variable<int>(currentPhaseIndex);
+    map['is_completed'] = Variable<bool>(isCompleted);
+    if (!nullToAbsent || lastPhaseAlertAt != null) {
+      map['last_phase_alert_at'] = Variable<DateTime>(lastPhaseAlertAt);
+    }
+    return map;
+  }
+
+  UserProgramProgressCompanion toCompanion(bool nullToAbsent) {
+    return UserProgramProgressCompanion(
+      id: Value(id),
+      mesocycleId: Value(mesocycleId),
+      startDate: Value(startDate),
+      currentPhaseIndex: Value(currentPhaseIndex),
+      isCompleted: Value(isCompleted),
+      lastPhaseAlertAt: lastPhaseAlertAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lastPhaseAlertAt),
+    );
+  }
+
+  factory UserProgramProgressData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return UserProgramProgressData(
+      id: serializer.fromJson<int>(json['id']),
+      mesocycleId: serializer.fromJson<int>(json['mesocycleId']),
+      startDate: serializer.fromJson<DateTime>(json['startDate']),
+      currentPhaseIndex: serializer.fromJson<int>(json['currentPhaseIndex']),
+      isCompleted: serializer.fromJson<bool>(json['isCompleted']),
+      lastPhaseAlertAt: serializer.fromJson<DateTime?>(
+        json['lastPhaseAlertAt'],
+      ),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'mesocycleId': serializer.toJson<int>(mesocycleId),
+      'startDate': serializer.toJson<DateTime>(startDate),
+      'currentPhaseIndex': serializer.toJson<int>(currentPhaseIndex),
+      'isCompleted': serializer.toJson<bool>(isCompleted),
+      'lastPhaseAlertAt': serializer.toJson<DateTime?>(lastPhaseAlertAt),
+    };
+  }
+
+  UserProgramProgressData copyWith({
+    int? id,
+    int? mesocycleId,
+    DateTime? startDate,
+    int? currentPhaseIndex,
+    bool? isCompleted,
+    Value<DateTime?> lastPhaseAlertAt = const Value.absent(),
+  }) => UserProgramProgressData(
+    id: id ?? this.id,
+    mesocycleId: mesocycleId ?? this.mesocycleId,
+    startDate: startDate ?? this.startDate,
+    currentPhaseIndex: currentPhaseIndex ?? this.currentPhaseIndex,
+    isCompleted: isCompleted ?? this.isCompleted,
+    lastPhaseAlertAt: lastPhaseAlertAt.present
+        ? lastPhaseAlertAt.value
+        : this.lastPhaseAlertAt,
+  );
+  UserProgramProgressData copyWithCompanion(UserProgramProgressCompanion data) {
+    return UserProgramProgressData(
+      id: data.id.present ? data.id.value : this.id,
+      mesocycleId: data.mesocycleId.present
+          ? data.mesocycleId.value
+          : this.mesocycleId,
+      startDate: data.startDate.present ? data.startDate.value : this.startDate,
+      currentPhaseIndex: data.currentPhaseIndex.present
+          ? data.currentPhaseIndex.value
+          : this.currentPhaseIndex,
+      isCompleted: data.isCompleted.present
+          ? data.isCompleted.value
+          : this.isCompleted,
+      lastPhaseAlertAt: data.lastPhaseAlertAt.present
+          ? data.lastPhaseAlertAt.value
+          : this.lastPhaseAlertAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('UserProgramProgressData(')
+          ..write('id: $id, ')
+          ..write('mesocycleId: $mesocycleId, ')
+          ..write('startDate: $startDate, ')
+          ..write('currentPhaseIndex: $currentPhaseIndex, ')
+          ..write('isCompleted: $isCompleted, ')
+          ..write('lastPhaseAlertAt: $lastPhaseAlertAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    mesocycleId,
+    startDate,
+    currentPhaseIndex,
+    isCompleted,
+    lastPhaseAlertAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is UserProgramProgressData &&
+          other.id == this.id &&
+          other.mesocycleId == this.mesocycleId &&
+          other.startDate == this.startDate &&
+          other.currentPhaseIndex == this.currentPhaseIndex &&
+          other.isCompleted == this.isCompleted &&
+          other.lastPhaseAlertAt == this.lastPhaseAlertAt);
+}
+
+class UserProgramProgressCompanion
+    extends UpdateCompanion<UserProgramProgressData> {
+  final Value<int> id;
+  final Value<int> mesocycleId;
+  final Value<DateTime> startDate;
+  final Value<int> currentPhaseIndex;
+  final Value<bool> isCompleted;
+  final Value<DateTime?> lastPhaseAlertAt;
+  const UserProgramProgressCompanion({
+    this.id = const Value.absent(),
+    this.mesocycleId = const Value.absent(),
+    this.startDate = const Value.absent(),
+    this.currentPhaseIndex = const Value.absent(),
+    this.isCompleted = const Value.absent(),
+    this.lastPhaseAlertAt = const Value.absent(),
+  });
+  UserProgramProgressCompanion.insert({
+    this.id = const Value.absent(),
+    required int mesocycleId,
+    required DateTime startDate,
+    this.currentPhaseIndex = const Value.absent(),
+    this.isCompleted = const Value.absent(),
+    this.lastPhaseAlertAt = const Value.absent(),
+  }) : mesocycleId = Value(mesocycleId),
+       startDate = Value(startDate);
+  static Insertable<UserProgramProgressData> custom({
+    Expression<int>? id,
+    Expression<int>? mesocycleId,
+    Expression<DateTime>? startDate,
+    Expression<int>? currentPhaseIndex,
+    Expression<bool>? isCompleted,
+    Expression<DateTime>? lastPhaseAlertAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (mesocycleId != null) 'mesocycle_id': mesocycleId,
+      if (startDate != null) 'start_date': startDate,
+      if (currentPhaseIndex != null) 'current_phase_index': currentPhaseIndex,
+      if (isCompleted != null) 'is_completed': isCompleted,
+      if (lastPhaseAlertAt != null) 'last_phase_alert_at': lastPhaseAlertAt,
+    });
+  }
+
+  UserProgramProgressCompanion copyWith({
+    Value<int>? id,
+    Value<int>? mesocycleId,
+    Value<DateTime>? startDate,
+    Value<int>? currentPhaseIndex,
+    Value<bool>? isCompleted,
+    Value<DateTime?>? lastPhaseAlertAt,
+  }) {
+    return UserProgramProgressCompanion(
+      id: id ?? this.id,
+      mesocycleId: mesocycleId ?? this.mesocycleId,
+      startDate: startDate ?? this.startDate,
+      currentPhaseIndex: currentPhaseIndex ?? this.currentPhaseIndex,
+      isCompleted: isCompleted ?? this.isCompleted,
+      lastPhaseAlertAt: lastPhaseAlertAt ?? this.lastPhaseAlertAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (mesocycleId.present) {
+      map['mesocycle_id'] = Variable<int>(mesocycleId.value);
+    }
+    if (startDate.present) {
+      map['start_date'] = Variable<DateTime>(startDate.value);
+    }
+    if (currentPhaseIndex.present) {
+      map['current_phase_index'] = Variable<int>(currentPhaseIndex.value);
+    }
+    if (isCompleted.present) {
+      map['is_completed'] = Variable<bool>(isCompleted.value);
+    }
+    if (lastPhaseAlertAt.present) {
+      map['last_phase_alert_at'] = Variable<DateTime>(lastPhaseAlertAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('UserProgramProgressCompanion(')
+          ..write('id: $id, ')
+          ..write('mesocycleId: $mesocycleId, ')
+          ..write('startDate: $startDate, ')
+          ..write('currentPhaseIndex: $currentPhaseIndex, ')
+          ..write('isCompleted: $isCompleted, ')
+          ..write('lastPhaseAlertAt: $lastPhaseAlertAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $Exercise1RmSnapshotsTable extends Exercise1RmSnapshots
     with TableInfo<$Exercise1RmSnapshotsTable, Exercise1RmSnapshot> {
   @override
@@ -12322,6 +12761,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
       $ExerciseMuscleMapTable(this);
   late final $MesocycleExercisesTable mesocycleExercises =
       $MesocycleExercisesTable(this);
+  late final $UserProgramProgressTable userProgramProgress =
+      $UserProgramProgressTable(this);
   late final $Exercise1RmSnapshotsTable exercise1RmSnapshots =
       $Exercise1RmSnapshotsTable(this);
   late final BodyMapDao bodyMapDao = BodyMapDao(this as AppDatabase);
@@ -12352,6 +12793,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     exerciseInstructions,
     exerciseMuscleMap,
     mesocycleExercises,
+    userProgramProgress,
     exercise1RmSnapshots,
   ];
   @override
@@ -15618,6 +16060,33 @@ final class $$MesocyclesTableReferences
       manager.$state.copyWith(prefetchedData: cache),
     );
   }
+
+  static MultiTypedResultKey<
+    $UserProgramProgressTable,
+    List<UserProgramProgressData>
+  >
+  _userProgramProgressRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.userProgramProgress,
+        aliasName: $_aliasNameGenerator(
+          db.mesocycles.id,
+          db.userProgramProgress.mesocycleId,
+        ),
+      );
+
+  $$UserProgramProgressTableProcessedTableManager get userProgramProgressRefs {
+    final manager = $$UserProgramProgressTableTableManager(
+      $_db,
+      $_db.userProgramProgress,
+    ).filter((f) => f.mesocycleId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _userProgramProgressRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
 }
 
 class $$MesocyclesTableFilterComposer
@@ -15725,6 +16194,31 @@ class $$MesocyclesTableFilterComposer
           }) => $$WorkoutsTableFilterComposer(
             $db: $db,
             $table: $db.workouts,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> userProgramProgressRefs(
+    Expression<bool> Function($$UserProgramProgressTableFilterComposer f) f,
+  ) {
+    final $$UserProgramProgressTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.userProgramProgress,
+      getReferencedColumn: (t) => t.mesocycleId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$UserProgramProgressTableFilterComposer(
+            $db: $db,
+            $table: $db.userProgramProgress,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -15899,6 +16393,32 @@ class $$MesocyclesTableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> userProgramProgressRefs<T extends Object>(
+    Expression<T> Function($$UserProgramProgressTableAnnotationComposer a) f,
+  ) {
+    final $$UserProgramProgressTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.userProgramProgress,
+          getReferencedColumn: (t) => t.mesocycleId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$UserProgramProgressTableAnnotationComposer(
+                $db: $db,
+                $table: $db.userProgramProgress,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
 }
 
 class $$MesocyclesTableTableManager
@@ -15914,7 +16434,11 @@ class $$MesocyclesTableTableManager
           $$MesocyclesTableUpdateCompanionBuilder,
           (Mesocycle, $$MesocyclesTableReferences),
           Mesocycle,
-          PrefetchHooks Function({bool mesocycleWeeksRefs, bool workoutsRefs})
+          PrefetchHooks Function({
+            bool mesocycleWeeksRefs,
+            bool workoutsRefs,
+            bool userProgramProgressRefs,
+          })
         > {
   $$MesocyclesTableTableManager(_$AppDatabase db, $MesocyclesTable table)
     : super(
@@ -15988,12 +16512,17 @@ class $$MesocyclesTableTableManager
               )
               .toList(),
           prefetchHooksCallback:
-              ({mesocycleWeeksRefs = false, workoutsRefs = false}) {
+              ({
+                mesocycleWeeksRefs = false,
+                workoutsRefs = false,
+                userProgramProgressRefs = false,
+              }) {
                 return PrefetchHooks(
                   db: db,
                   explicitlyWatchedTables: [
                     if (mesocycleWeeksRefs) db.mesocycleWeeks,
                     if (workoutsRefs) db.workouts,
+                    if (userProgramProgressRefs) db.userProgramProgress,
                   ],
                   addJoins: null,
                   getPrefetchedDataCallback: (items) async {
@@ -16040,6 +16569,27 @@ class $$MesocyclesTableTableManager
                               ),
                           typedResults: items,
                         ),
+                      if (userProgramProgressRefs)
+                        await $_getPrefetchedData<
+                          Mesocycle,
+                          $MesocyclesTable,
+                          UserProgramProgressData
+                        >(
+                          currentTable: table,
+                          referencedTable: $$MesocyclesTableReferences
+                              ._userProgramProgressRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$MesocyclesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).userProgramProgressRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.mesocycleId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -16060,7 +16610,11 @@ typedef $$MesocyclesTableProcessedTableManager =
       $$MesocyclesTableUpdateCompanionBuilder,
       (Mesocycle, $$MesocyclesTableReferences),
       Mesocycle,
-      PrefetchHooks Function({bool mesocycleWeeksRefs, bool workoutsRefs})
+      PrefetchHooks Function({
+        bool mesocycleWeeksRefs,
+        bool workoutsRefs,
+        bool userProgramProgressRefs,
+      })
     >;
 typedef $$MesocycleWeeksTableCreateCompanionBuilder =
     MesocycleWeeksCompanion Function({
@@ -23659,6 +24213,366 @@ typedef $$MesocycleExercisesTableProcessedTableManager =
       MesocycleExercise,
       PrefetchHooks Function({bool mesocycleDayId, bool exerciseId})
     >;
+typedef $$UserProgramProgressTableCreateCompanionBuilder =
+    UserProgramProgressCompanion Function({
+      Value<int> id,
+      required int mesocycleId,
+      required DateTime startDate,
+      Value<int> currentPhaseIndex,
+      Value<bool> isCompleted,
+      Value<DateTime?> lastPhaseAlertAt,
+    });
+typedef $$UserProgramProgressTableUpdateCompanionBuilder =
+    UserProgramProgressCompanion Function({
+      Value<int> id,
+      Value<int> mesocycleId,
+      Value<DateTime> startDate,
+      Value<int> currentPhaseIndex,
+      Value<bool> isCompleted,
+      Value<DateTime?> lastPhaseAlertAt,
+    });
+
+final class $$UserProgramProgressTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $UserProgramProgressTable,
+          UserProgramProgressData
+        > {
+  $$UserProgramProgressTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $MesocyclesTable _mesocycleIdTable(_$AppDatabase db) =>
+      db.mesocycles.createAlias(
+        $_aliasNameGenerator(
+          db.userProgramProgress.mesocycleId,
+          db.mesocycles.id,
+        ),
+      );
+
+  $$MesocyclesTableProcessedTableManager get mesocycleId {
+    final $_column = $_itemColumn<int>('mesocycle_id')!;
+
+    final manager = $$MesocyclesTableTableManager(
+      $_db,
+      $_db.mesocycles,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_mesocycleIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$UserProgramProgressTableFilterComposer
+    extends Composer<_$AppDatabase, $UserProgramProgressTable> {
+  $$UserProgramProgressTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get startDate => $composableBuilder(
+    column: $table.startDate,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get currentPhaseIndex => $composableBuilder(
+    column: $table.currentPhaseIndex,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isCompleted => $composableBuilder(
+    column: $table.isCompleted,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get lastPhaseAlertAt => $composableBuilder(
+    column: $table.lastPhaseAlertAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$MesocyclesTableFilterComposer get mesocycleId {
+    final $$MesocyclesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.mesocycleId,
+      referencedTable: $db.mesocycles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$MesocyclesTableFilterComposer(
+            $db: $db,
+            $table: $db.mesocycles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$UserProgramProgressTableOrderingComposer
+    extends Composer<_$AppDatabase, $UserProgramProgressTable> {
+  $$UserProgramProgressTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get startDate => $composableBuilder(
+    column: $table.startDate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get currentPhaseIndex => $composableBuilder(
+    column: $table.currentPhaseIndex,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isCompleted => $composableBuilder(
+    column: $table.isCompleted,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get lastPhaseAlertAt => $composableBuilder(
+    column: $table.lastPhaseAlertAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$MesocyclesTableOrderingComposer get mesocycleId {
+    final $$MesocyclesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.mesocycleId,
+      referencedTable: $db.mesocycles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$MesocyclesTableOrderingComposer(
+            $db: $db,
+            $table: $db.mesocycles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$UserProgramProgressTableAnnotationComposer
+    extends Composer<_$AppDatabase, $UserProgramProgressTable> {
+  $$UserProgramProgressTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get startDate =>
+      $composableBuilder(column: $table.startDate, builder: (column) => column);
+
+  GeneratedColumn<int> get currentPhaseIndex => $composableBuilder(
+    column: $table.currentPhaseIndex,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get isCompleted => $composableBuilder(
+    column: $table.isCompleted,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get lastPhaseAlertAt => $composableBuilder(
+    column: $table.lastPhaseAlertAt,
+    builder: (column) => column,
+  );
+
+  $$MesocyclesTableAnnotationComposer get mesocycleId {
+    final $$MesocyclesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.mesocycleId,
+      referencedTable: $db.mesocycles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$MesocyclesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.mesocycles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$UserProgramProgressTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $UserProgramProgressTable,
+          UserProgramProgressData,
+          $$UserProgramProgressTableFilterComposer,
+          $$UserProgramProgressTableOrderingComposer,
+          $$UserProgramProgressTableAnnotationComposer,
+          $$UserProgramProgressTableCreateCompanionBuilder,
+          $$UserProgramProgressTableUpdateCompanionBuilder,
+          (UserProgramProgressData, $$UserProgramProgressTableReferences),
+          UserProgramProgressData,
+          PrefetchHooks Function({bool mesocycleId})
+        > {
+  $$UserProgramProgressTableTableManager(
+    _$AppDatabase db,
+    $UserProgramProgressTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$UserProgramProgressTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$UserProgramProgressTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$UserProgramProgressTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> mesocycleId = const Value.absent(),
+                Value<DateTime> startDate = const Value.absent(),
+                Value<int> currentPhaseIndex = const Value.absent(),
+                Value<bool> isCompleted = const Value.absent(),
+                Value<DateTime?> lastPhaseAlertAt = const Value.absent(),
+              }) => UserProgramProgressCompanion(
+                id: id,
+                mesocycleId: mesocycleId,
+                startDate: startDate,
+                currentPhaseIndex: currentPhaseIndex,
+                isCompleted: isCompleted,
+                lastPhaseAlertAt: lastPhaseAlertAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int mesocycleId,
+                required DateTime startDate,
+                Value<int> currentPhaseIndex = const Value.absent(),
+                Value<bool> isCompleted = const Value.absent(),
+                Value<DateTime?> lastPhaseAlertAt = const Value.absent(),
+              }) => UserProgramProgressCompanion.insert(
+                id: id,
+                mesocycleId: mesocycleId,
+                startDate: startDate,
+                currentPhaseIndex: currentPhaseIndex,
+                isCompleted: isCompleted,
+                lastPhaseAlertAt: lastPhaseAlertAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$UserProgramProgressTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({mesocycleId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (mesocycleId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.mesocycleId,
+                                referencedTable:
+                                    $$UserProgramProgressTableReferences
+                                        ._mesocycleIdTable(db),
+                                referencedColumn:
+                                    $$UserProgramProgressTableReferences
+                                        ._mesocycleIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$UserProgramProgressTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $UserProgramProgressTable,
+      UserProgramProgressData,
+      $$UserProgramProgressTableFilterComposer,
+      $$UserProgramProgressTableOrderingComposer,
+      $$UserProgramProgressTableAnnotationComposer,
+      $$UserProgramProgressTableCreateCompanionBuilder,
+      $$UserProgramProgressTableUpdateCompanionBuilder,
+      (UserProgramProgressData, $$UserProgramProgressTableReferences),
+      UserProgramProgressData,
+      PrefetchHooks Function({bool mesocycleId})
+    >;
 typedef $$Exercise1RmSnapshotsTableCreateCompanionBuilder =
     Exercise1RmSnapshotsCompanion Function({
       Value<int> id,
@@ -24217,6 +25131,8 @@ class $AppDatabaseManager {
       $$ExerciseMuscleMapTableTableManager(_db, _db.exerciseMuscleMap);
   $$MesocycleExercisesTableTableManager get mesocycleExercises =>
       $$MesocycleExercisesTableTableManager(_db, _db.mesocycleExercises);
+  $$UserProgramProgressTableTableManager get userProgramProgress =>
+      $$UserProgramProgressTableTableManager(_db, _db.userProgramProgress);
   $$Exercise1RmSnapshotsTableTableManager get exercise1RmSnapshots =>
       $$Exercise1RmSnapshotsTableTableManager(_db, _db.exercise1RmSnapshots);
 }

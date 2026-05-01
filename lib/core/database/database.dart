@@ -294,6 +294,15 @@ class MesocycleExercises extends Table {
   TextColumn get notes => text().nullable()();
 }
 
+class UserProgramProgress extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get mesocycleId => integer().references(Mesocycles, #id)();
+  DateTimeColumn get startDate => dateTime()();
+  IntColumn get currentPhaseIndex => integer().withDefault(const Constant(0))();
+  BoolColumn get isCompleted => boolean().withDefault(const Constant(false))();
+  DateTimeColumn get lastPhaseAlertAt => dateTime().nullable()();
+}
+
 class Exercise1RmSnapshots extends Table {
   IntColumn get id => integer().autoIncrement()();
   IntColumn get exerciseId => integer().references(Exercises, #id)();
@@ -329,6 +338,7 @@ class Exercise1RmSnapshots extends Table {
   MesocycleWeeks,
   MesocycleDays,
   MesocycleExercises,
+  UserProgramProgress,
   Exercise1RmSnapshots,
 ], daos: [
   BodyMapDao,
@@ -349,7 +359,7 @@ class AppDatabase extends _$AppDatabase {
   }
 
   @override
-  int get schemaVersion => 27;
+  int get schemaVersion => 28;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -572,6 +582,9 @@ class AppDatabase extends _$AppDatabase {
             if (!await hasColumn('body_measurements', 'visceral_fat')) {
               await m.addColumn(bodyMeasurements, bodyMeasurements.visceralFat);
             }
+          }
+          if (from < 28) {
+            await m.createTable(userProgramProgress);
           }
         },
         beforeOpen: (details) async {

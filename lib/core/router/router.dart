@@ -8,7 +8,8 @@ import 'package:ai_gym_mentor/features/shell/placeholder_screens.dart'
         OnboardingScreen,
         WorkoutScreen,
         HistoryScreen,
-        SettingsScreen;
+        SettingsScreen,
+        ExerciseLibraryScreen;
 import 'package:ai_gym_mentor/features/splash/splash_screen.dart';
 import 'package:ai_gym_mentor/features/onboarding/onboarding_screen.dart';
 import 'package:ai_gym_mentor/features/setup/setup_screen.dart';
@@ -16,6 +17,7 @@ import 'package:ai_gym_mentor/features/onboarding/welcome_back_screen.dart';
 import 'package:ai_gym_mentor/features/exercise_database/presentation/screens/muscle_group_screen.dart';
 import 'package:ai_gym_mentor/features/exercise_database/presentation/screens/exercise_history_screen.dart';
 import 'package:ai_gym_mentor/features/exercise_database/presentation/screens/exercise_detail_screen.dart';
+import 'package:ai_gym_mentor/features/exercise_database/presentation/screens/exercise_library_screen.dart';
 import 'package:ai_gym_mentor/features/workout/active_workout_screen.dart';
 import 'package:ai_gym_mentor/features/history/history_screen.dart';
 import 'package:ai_gym_mentor/features/history/workout_detail_screen.dart';
@@ -79,7 +81,7 @@ final router = GoRouter(
     // Exercise library — accessible via push from Settings or anywhere, not a bottom tab
     GoRoute(
       path: '/exercises',
-      builder: (context, state) => const GithubExerciseLibraryScreen(),
+      builder: (context, state) => const ExerciseLibraryScreen(),
       routes: [
         GoRoute(
           path: 'muscle-groups',

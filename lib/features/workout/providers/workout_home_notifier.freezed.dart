@@ -561,7 +561,7 @@ as String?,
 /// @nodoc
 mixin _$WorkoutHomeState implements DiagnosticableTreeMixin {
 
- String get greeting; String get userName; String get dateString; int get currentStreak; MotivationTip get dailyTip; WorkoutSession? get lastWorkout; WorkoutSession? get activeDraft; Map<int, double> get weeklyVolume; BodyMeasurement? get lastWeight; String? get lastWorkoutSummary; bool get isRestDay; String? get todayDayName; List<TodayExercise> get todayExercises; int get estimatedDuration; int? get nextDayId; int? get templateId; int? get manualDayId;
+ String get greeting; String get userName; String get dateString; int get currentStreak; MotivationTip get dailyTip; WorkoutSession? get lastWorkout; WorkoutSession? get activeDraft; Map<int, double> get weeklyVolume; BodyMeasurement? get lastWeight; String? get lastWorkoutSummary; bool get isRestDay; String? get todayDayName; List<TodayExercise> get todayExercises; int get estimatedDuration; int? get nextDayId; int? get templateId; int? get manualDayId; UserProgramProgressEntity? get activeProgress; int get currentWeek; String? get phaseChangeMessage;
 /// Create a copy of WorkoutHomeState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -573,21 +573,21 @@ $WorkoutHomeStateCopyWith<WorkoutHomeState> get copyWith => _$WorkoutHomeStateCo
 void debugFillProperties(DiagnosticPropertiesBuilder properties) {
   properties
     ..add(DiagnosticsProperty('type', 'WorkoutHomeState'))
-    ..add(DiagnosticsProperty('greeting', greeting))..add(DiagnosticsProperty('userName', userName))..add(DiagnosticsProperty('dateString', dateString))..add(DiagnosticsProperty('currentStreak', currentStreak))..add(DiagnosticsProperty('dailyTip', dailyTip))..add(DiagnosticsProperty('lastWorkout', lastWorkout))..add(DiagnosticsProperty('activeDraft', activeDraft))..add(DiagnosticsProperty('weeklyVolume', weeklyVolume))..add(DiagnosticsProperty('lastWeight', lastWeight))..add(DiagnosticsProperty('lastWorkoutSummary', lastWorkoutSummary))..add(DiagnosticsProperty('isRestDay', isRestDay))..add(DiagnosticsProperty('todayDayName', todayDayName))..add(DiagnosticsProperty('todayExercises', todayExercises))..add(DiagnosticsProperty('estimatedDuration', estimatedDuration))..add(DiagnosticsProperty('nextDayId', nextDayId))..add(DiagnosticsProperty('templateId', templateId))..add(DiagnosticsProperty('manualDayId', manualDayId));
+    ..add(DiagnosticsProperty('greeting', greeting))..add(DiagnosticsProperty('userName', userName))..add(DiagnosticsProperty('dateString', dateString))..add(DiagnosticsProperty('currentStreak', currentStreak))..add(DiagnosticsProperty('dailyTip', dailyTip))..add(DiagnosticsProperty('lastWorkout', lastWorkout))..add(DiagnosticsProperty('activeDraft', activeDraft))..add(DiagnosticsProperty('weeklyVolume', weeklyVolume))..add(DiagnosticsProperty('lastWeight', lastWeight))..add(DiagnosticsProperty('lastWorkoutSummary', lastWorkoutSummary))..add(DiagnosticsProperty('isRestDay', isRestDay))..add(DiagnosticsProperty('todayDayName', todayDayName))..add(DiagnosticsProperty('todayExercises', todayExercises))..add(DiagnosticsProperty('estimatedDuration', estimatedDuration))..add(DiagnosticsProperty('nextDayId', nextDayId))..add(DiagnosticsProperty('templateId', templateId))..add(DiagnosticsProperty('manualDayId', manualDayId))..add(DiagnosticsProperty('activeProgress', activeProgress))..add(DiagnosticsProperty('currentWeek', currentWeek))..add(DiagnosticsProperty('phaseChangeMessage', phaseChangeMessage));
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is WorkoutHomeState&&(identical(other.greeting, greeting) || other.greeting == greeting)&&(identical(other.userName, userName) || other.userName == userName)&&(identical(other.dateString, dateString) || other.dateString == dateString)&&(identical(other.currentStreak, currentStreak) || other.currentStreak == currentStreak)&&(identical(other.dailyTip, dailyTip) || other.dailyTip == dailyTip)&&(identical(other.lastWorkout, lastWorkout) || other.lastWorkout == lastWorkout)&&(identical(other.activeDraft, activeDraft) || other.activeDraft == activeDraft)&&const DeepCollectionEquality().equals(other.weeklyVolume, weeklyVolume)&&(identical(other.lastWeight, lastWeight) || other.lastWeight == lastWeight)&&(identical(other.lastWorkoutSummary, lastWorkoutSummary) || other.lastWorkoutSummary == lastWorkoutSummary)&&(identical(other.isRestDay, isRestDay) || other.isRestDay == isRestDay)&&(identical(other.todayDayName, todayDayName) || other.todayDayName == todayDayName)&&const DeepCollectionEquality().equals(other.todayExercises, todayExercises)&&(identical(other.estimatedDuration, estimatedDuration) || other.estimatedDuration == estimatedDuration)&&(identical(other.nextDayId, nextDayId) || other.nextDayId == nextDayId)&&(identical(other.templateId, templateId) || other.templateId == templateId)&&(identical(other.manualDayId, manualDayId) || other.manualDayId == manualDayId));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is WorkoutHomeState&&(identical(other.greeting, greeting) || other.greeting == greeting)&&(identical(other.userName, userName) || other.userName == userName)&&(identical(other.dateString, dateString) || other.dateString == dateString)&&(identical(other.currentStreak, currentStreak) || other.currentStreak == currentStreak)&&(identical(other.dailyTip, dailyTip) || other.dailyTip == dailyTip)&&(identical(other.lastWorkout, lastWorkout) || other.lastWorkout == lastWorkout)&&(identical(other.activeDraft, activeDraft) || other.activeDraft == activeDraft)&&const DeepCollectionEquality().equals(other.weeklyVolume, weeklyVolume)&&(identical(other.lastWeight, lastWeight) || other.lastWeight == lastWeight)&&(identical(other.lastWorkoutSummary, lastWorkoutSummary) || other.lastWorkoutSummary == lastWorkoutSummary)&&(identical(other.isRestDay, isRestDay) || other.isRestDay == isRestDay)&&(identical(other.todayDayName, todayDayName) || other.todayDayName == todayDayName)&&const DeepCollectionEquality().equals(other.todayExercises, todayExercises)&&(identical(other.estimatedDuration, estimatedDuration) || other.estimatedDuration == estimatedDuration)&&(identical(other.nextDayId, nextDayId) || other.nextDayId == nextDayId)&&(identical(other.templateId, templateId) || other.templateId == templateId)&&(identical(other.manualDayId, manualDayId) || other.manualDayId == manualDayId)&&(identical(other.activeProgress, activeProgress) || other.activeProgress == activeProgress)&&(identical(other.currentWeek, currentWeek) || other.currentWeek == currentWeek)&&(identical(other.phaseChangeMessage, phaseChangeMessage) || other.phaseChangeMessage == phaseChangeMessage));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,greeting,userName,dateString,currentStreak,dailyTip,lastWorkout,activeDraft,const DeepCollectionEquality().hash(weeklyVolume),lastWeight,lastWorkoutSummary,isRestDay,todayDayName,const DeepCollectionEquality().hash(todayExercises),estimatedDuration,nextDayId,templateId,manualDayId);
+int get hashCode => Object.hashAll([runtimeType,greeting,userName,dateString,currentStreak,dailyTip,lastWorkout,activeDraft,const DeepCollectionEquality().hash(weeklyVolume),lastWeight,lastWorkoutSummary,isRestDay,todayDayName,const DeepCollectionEquality().hash(todayExercises),estimatedDuration,nextDayId,templateId,manualDayId,activeProgress,currentWeek,phaseChangeMessage]);
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
-  return 'WorkoutHomeState(greeting: $greeting, userName: $userName, dateString: $dateString, currentStreak: $currentStreak, dailyTip: $dailyTip, lastWorkout: $lastWorkout, activeDraft: $activeDraft, weeklyVolume: $weeklyVolume, lastWeight: $lastWeight, lastWorkoutSummary: $lastWorkoutSummary, isRestDay: $isRestDay, todayDayName: $todayDayName, todayExercises: $todayExercises, estimatedDuration: $estimatedDuration, nextDayId: $nextDayId, templateId: $templateId, manualDayId: $manualDayId)';
+  return 'WorkoutHomeState(greeting: $greeting, userName: $userName, dateString: $dateString, currentStreak: $currentStreak, dailyTip: $dailyTip, lastWorkout: $lastWorkout, activeDraft: $activeDraft, weeklyVolume: $weeklyVolume, lastWeight: $lastWeight, lastWorkoutSummary: $lastWorkoutSummary, isRestDay: $isRestDay, todayDayName: $todayDayName, todayExercises: $todayExercises, estimatedDuration: $estimatedDuration, nextDayId: $nextDayId, templateId: $templateId, manualDayId: $manualDayId, activeProgress: $activeProgress, currentWeek: $currentWeek, phaseChangeMessage: $phaseChangeMessage)';
 }
 
 
@@ -598,11 +598,11 @@ abstract mixin class $WorkoutHomeStateCopyWith<$Res>  {
   factory $WorkoutHomeStateCopyWith(WorkoutHomeState value, $Res Function(WorkoutHomeState) _then) = _$WorkoutHomeStateCopyWithImpl;
 @useResult
 $Res call({
- String greeting, String userName, String dateString, int currentStreak, MotivationTip dailyTip, WorkoutSession? lastWorkout, WorkoutSession? activeDraft, Map<int, double> weeklyVolume, BodyMeasurement? lastWeight, String? lastWorkoutSummary, bool isRestDay, String? todayDayName, List<TodayExercise> todayExercises, int estimatedDuration, int? nextDayId, int? templateId, int? manualDayId
+ String greeting, String userName, String dateString, int currentStreak, MotivationTip dailyTip, WorkoutSession? lastWorkout, WorkoutSession? activeDraft, Map<int, double> weeklyVolume, BodyMeasurement? lastWeight, String? lastWorkoutSummary, bool isRestDay, String? todayDayName, List<TodayExercise> todayExercises, int estimatedDuration, int? nextDayId, int? templateId, int? manualDayId, UserProgramProgressEntity? activeProgress, int currentWeek, String? phaseChangeMessage
 });
 
 
-$MotivationTipCopyWith<$Res> get dailyTip;$WorkoutSessionCopyWith<$Res>? get lastWorkout;$WorkoutSessionCopyWith<$Res>? get activeDraft;$BodyMeasurementCopyWith<$Res>? get lastWeight;
+$MotivationTipCopyWith<$Res> get dailyTip;$WorkoutSessionCopyWith<$Res>? get lastWorkout;$WorkoutSessionCopyWith<$Res>? get activeDraft;$BodyMeasurementCopyWith<$Res>? get lastWeight;$UserProgramProgressEntityCopyWith<$Res>? get activeProgress;
 
 }
 /// @nodoc
@@ -615,7 +615,7 @@ class _$WorkoutHomeStateCopyWithImpl<$Res>
 
 /// Create a copy of WorkoutHomeState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? greeting = null,Object? userName = null,Object? dateString = null,Object? currentStreak = null,Object? dailyTip = null,Object? lastWorkout = freezed,Object? activeDraft = freezed,Object? weeklyVolume = null,Object? lastWeight = freezed,Object? lastWorkoutSummary = freezed,Object? isRestDay = null,Object? todayDayName = freezed,Object? todayExercises = null,Object? estimatedDuration = null,Object? nextDayId = freezed,Object? templateId = freezed,Object? manualDayId = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? greeting = null,Object? userName = null,Object? dateString = null,Object? currentStreak = null,Object? dailyTip = null,Object? lastWorkout = freezed,Object? activeDraft = freezed,Object? weeklyVolume = null,Object? lastWeight = freezed,Object? lastWorkoutSummary = freezed,Object? isRestDay = null,Object? todayDayName = freezed,Object? todayExercises = null,Object? estimatedDuration = null,Object? nextDayId = freezed,Object? templateId = freezed,Object? manualDayId = freezed,Object? activeProgress = freezed,Object? currentWeek = null,Object? phaseChangeMessage = freezed,}) {
   return _then(_self.copyWith(
 greeting: null == greeting ? _self.greeting : greeting // ignore: cast_nullable_to_non_nullable
 as String,userName: null == userName ? _self.userName : userName // ignore: cast_nullable_to_non_nullable
@@ -634,7 +634,10 @@ as List<TodayExercise>,estimatedDuration: null == estimatedDuration ? _self.esti
 as int,nextDayId: freezed == nextDayId ? _self.nextDayId : nextDayId // ignore: cast_nullable_to_non_nullable
 as int?,templateId: freezed == templateId ? _self.templateId : templateId // ignore: cast_nullable_to_non_nullable
 as int?,manualDayId: freezed == manualDayId ? _self.manualDayId : manualDayId // ignore: cast_nullable_to_non_nullable
-as int?,
+as int?,activeProgress: freezed == activeProgress ? _self.activeProgress : activeProgress // ignore: cast_nullable_to_non_nullable
+as UserProgramProgressEntity?,currentWeek: null == currentWeek ? _self.currentWeek : currentWeek // ignore: cast_nullable_to_non_nullable
+as int,phaseChangeMessage: freezed == phaseChangeMessage ? _self.phaseChangeMessage : phaseChangeMessage // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 /// Create a copy of WorkoutHomeState
@@ -681,6 +684,18 @@ $BodyMeasurementCopyWith<$Res>? get lastWeight {
 
   return $BodyMeasurementCopyWith<$Res>(_self.lastWeight!, (value) {
     return _then(_self.copyWith(lastWeight: value));
+  });
+}/// Create a copy of WorkoutHomeState
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$UserProgramProgressEntityCopyWith<$Res>? get activeProgress {
+    if (_self.activeProgress == null) {
+    return null;
+  }
+
+  return $UserProgramProgressEntityCopyWith<$Res>(_self.activeProgress!, (value) {
+    return _then(_self.copyWith(activeProgress: value));
   });
 }
 }
@@ -764,10 +779,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String greeting,  String userName,  String dateString,  int currentStreak,  MotivationTip dailyTip,  WorkoutSession? lastWorkout,  WorkoutSession? activeDraft,  Map<int, double> weeklyVolume,  BodyMeasurement? lastWeight,  String? lastWorkoutSummary,  bool isRestDay,  String? todayDayName,  List<TodayExercise> todayExercises,  int estimatedDuration,  int? nextDayId,  int? templateId,  int? manualDayId)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String greeting,  String userName,  String dateString,  int currentStreak,  MotivationTip dailyTip,  WorkoutSession? lastWorkout,  WorkoutSession? activeDraft,  Map<int, double> weeklyVolume,  BodyMeasurement? lastWeight,  String? lastWorkoutSummary,  bool isRestDay,  String? todayDayName,  List<TodayExercise> todayExercises,  int estimatedDuration,  int? nextDayId,  int? templateId,  int? manualDayId,  UserProgramProgressEntity? activeProgress,  int currentWeek,  String? phaseChangeMessage)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _WorkoutHomeState() when $default != null:
-return $default(_that.greeting,_that.userName,_that.dateString,_that.currentStreak,_that.dailyTip,_that.lastWorkout,_that.activeDraft,_that.weeklyVolume,_that.lastWeight,_that.lastWorkoutSummary,_that.isRestDay,_that.todayDayName,_that.todayExercises,_that.estimatedDuration,_that.nextDayId,_that.templateId,_that.manualDayId);case _:
+return $default(_that.greeting,_that.userName,_that.dateString,_that.currentStreak,_that.dailyTip,_that.lastWorkout,_that.activeDraft,_that.weeklyVolume,_that.lastWeight,_that.lastWorkoutSummary,_that.isRestDay,_that.todayDayName,_that.todayExercises,_that.estimatedDuration,_that.nextDayId,_that.templateId,_that.manualDayId,_that.activeProgress,_that.currentWeek,_that.phaseChangeMessage);case _:
   return orElse();
 
 }
@@ -785,10 +800,10 @@ return $default(_that.greeting,_that.userName,_that.dateString,_that.currentStre
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String greeting,  String userName,  String dateString,  int currentStreak,  MotivationTip dailyTip,  WorkoutSession? lastWorkout,  WorkoutSession? activeDraft,  Map<int, double> weeklyVolume,  BodyMeasurement? lastWeight,  String? lastWorkoutSummary,  bool isRestDay,  String? todayDayName,  List<TodayExercise> todayExercises,  int estimatedDuration,  int? nextDayId,  int? templateId,  int? manualDayId)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String greeting,  String userName,  String dateString,  int currentStreak,  MotivationTip dailyTip,  WorkoutSession? lastWorkout,  WorkoutSession? activeDraft,  Map<int, double> weeklyVolume,  BodyMeasurement? lastWeight,  String? lastWorkoutSummary,  bool isRestDay,  String? todayDayName,  List<TodayExercise> todayExercises,  int estimatedDuration,  int? nextDayId,  int? templateId,  int? manualDayId,  UserProgramProgressEntity? activeProgress,  int currentWeek,  String? phaseChangeMessage)  $default,) {final _that = this;
 switch (_that) {
 case _WorkoutHomeState():
-return $default(_that.greeting,_that.userName,_that.dateString,_that.currentStreak,_that.dailyTip,_that.lastWorkout,_that.activeDraft,_that.weeklyVolume,_that.lastWeight,_that.lastWorkoutSummary,_that.isRestDay,_that.todayDayName,_that.todayExercises,_that.estimatedDuration,_that.nextDayId,_that.templateId,_that.manualDayId);case _:
+return $default(_that.greeting,_that.userName,_that.dateString,_that.currentStreak,_that.dailyTip,_that.lastWorkout,_that.activeDraft,_that.weeklyVolume,_that.lastWeight,_that.lastWorkoutSummary,_that.isRestDay,_that.todayDayName,_that.todayExercises,_that.estimatedDuration,_that.nextDayId,_that.templateId,_that.manualDayId,_that.activeProgress,_that.currentWeek,_that.phaseChangeMessage);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -805,10 +820,10 @@ return $default(_that.greeting,_that.userName,_that.dateString,_that.currentStre
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String greeting,  String userName,  String dateString,  int currentStreak,  MotivationTip dailyTip,  WorkoutSession? lastWorkout,  WorkoutSession? activeDraft,  Map<int, double> weeklyVolume,  BodyMeasurement? lastWeight,  String? lastWorkoutSummary,  bool isRestDay,  String? todayDayName,  List<TodayExercise> todayExercises,  int estimatedDuration,  int? nextDayId,  int? templateId,  int? manualDayId)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String greeting,  String userName,  String dateString,  int currentStreak,  MotivationTip dailyTip,  WorkoutSession? lastWorkout,  WorkoutSession? activeDraft,  Map<int, double> weeklyVolume,  BodyMeasurement? lastWeight,  String? lastWorkoutSummary,  bool isRestDay,  String? todayDayName,  List<TodayExercise> todayExercises,  int estimatedDuration,  int? nextDayId,  int? templateId,  int? manualDayId,  UserProgramProgressEntity? activeProgress,  int currentWeek,  String? phaseChangeMessage)?  $default,) {final _that = this;
 switch (_that) {
 case _WorkoutHomeState() when $default != null:
-return $default(_that.greeting,_that.userName,_that.dateString,_that.currentStreak,_that.dailyTip,_that.lastWorkout,_that.activeDraft,_that.weeklyVolume,_that.lastWeight,_that.lastWorkoutSummary,_that.isRestDay,_that.todayDayName,_that.todayExercises,_that.estimatedDuration,_that.nextDayId,_that.templateId,_that.manualDayId);case _:
+return $default(_that.greeting,_that.userName,_that.dateString,_that.currentStreak,_that.dailyTip,_that.lastWorkout,_that.activeDraft,_that.weeklyVolume,_that.lastWeight,_that.lastWorkoutSummary,_that.isRestDay,_that.todayDayName,_that.todayExercises,_that.estimatedDuration,_that.nextDayId,_that.templateId,_that.manualDayId,_that.activeProgress,_that.currentWeek,_that.phaseChangeMessage);case _:
   return null;
 
 }
@@ -820,7 +835,7 @@ return $default(_that.greeting,_that.userName,_that.dateString,_that.currentStre
 
 
 class _WorkoutHomeState extends WorkoutHomeState with DiagnosticableTreeMixin {
-  const _WorkoutHomeState({required this.greeting, required this.userName, required this.dateString, required this.currentStreak, required this.dailyTip, this.lastWorkout = null, this.activeDraft = null, final  Map<int, double> weeklyVolume = const {}, this.lastWeight = null, this.lastWorkoutSummary, this.isRestDay = false, this.todayDayName, final  List<TodayExercise> todayExercises = const [], this.estimatedDuration = 0, this.nextDayId, this.templateId, this.manualDayId}): _weeklyVolume = weeklyVolume,_todayExercises = todayExercises,super._();
+  const _WorkoutHomeState({required this.greeting, required this.userName, required this.dateString, required this.currentStreak, required this.dailyTip, this.lastWorkout = null, this.activeDraft = null, final  Map<int, double> weeklyVolume = const {}, this.lastWeight = null, this.lastWorkoutSummary, this.isRestDay = false, this.todayDayName, final  List<TodayExercise> todayExercises = const [], this.estimatedDuration = 0, this.nextDayId, this.templateId, this.manualDayId, this.activeProgress = null, this.currentWeek = 1, this.phaseChangeMessage = null}): _weeklyVolume = weeklyVolume,_todayExercises = todayExercises,super._();
   
 
 @override final  String greeting;
@@ -852,6 +867,9 @@ class _WorkoutHomeState extends WorkoutHomeState with DiagnosticableTreeMixin {
 @override final  int? nextDayId;
 @override final  int? templateId;
 @override final  int? manualDayId;
+@override@JsonKey() final  UserProgramProgressEntity? activeProgress;
+@override@JsonKey() final  int currentWeek;
+@override@JsonKey() final  String? phaseChangeMessage;
 
 /// Create a copy of WorkoutHomeState
 /// with the given fields replaced by the non-null parameter values.
@@ -864,21 +882,21 @@ _$WorkoutHomeStateCopyWith<_WorkoutHomeState> get copyWith => __$WorkoutHomeStat
 void debugFillProperties(DiagnosticPropertiesBuilder properties) {
   properties
     ..add(DiagnosticsProperty('type', 'WorkoutHomeState'))
-    ..add(DiagnosticsProperty('greeting', greeting))..add(DiagnosticsProperty('userName', userName))..add(DiagnosticsProperty('dateString', dateString))..add(DiagnosticsProperty('currentStreak', currentStreak))..add(DiagnosticsProperty('dailyTip', dailyTip))..add(DiagnosticsProperty('lastWorkout', lastWorkout))..add(DiagnosticsProperty('activeDraft', activeDraft))..add(DiagnosticsProperty('weeklyVolume', weeklyVolume))..add(DiagnosticsProperty('lastWeight', lastWeight))..add(DiagnosticsProperty('lastWorkoutSummary', lastWorkoutSummary))..add(DiagnosticsProperty('isRestDay', isRestDay))..add(DiagnosticsProperty('todayDayName', todayDayName))..add(DiagnosticsProperty('todayExercises', todayExercises))..add(DiagnosticsProperty('estimatedDuration', estimatedDuration))..add(DiagnosticsProperty('nextDayId', nextDayId))..add(DiagnosticsProperty('templateId', templateId))..add(DiagnosticsProperty('manualDayId', manualDayId));
+    ..add(DiagnosticsProperty('greeting', greeting))..add(DiagnosticsProperty('userName', userName))..add(DiagnosticsProperty('dateString', dateString))..add(DiagnosticsProperty('currentStreak', currentStreak))..add(DiagnosticsProperty('dailyTip', dailyTip))..add(DiagnosticsProperty('lastWorkout', lastWorkout))..add(DiagnosticsProperty('activeDraft', activeDraft))..add(DiagnosticsProperty('weeklyVolume', weeklyVolume))..add(DiagnosticsProperty('lastWeight', lastWeight))..add(DiagnosticsProperty('lastWorkoutSummary', lastWorkoutSummary))..add(DiagnosticsProperty('isRestDay', isRestDay))..add(DiagnosticsProperty('todayDayName', todayDayName))..add(DiagnosticsProperty('todayExercises', todayExercises))..add(DiagnosticsProperty('estimatedDuration', estimatedDuration))..add(DiagnosticsProperty('nextDayId', nextDayId))..add(DiagnosticsProperty('templateId', templateId))..add(DiagnosticsProperty('manualDayId', manualDayId))..add(DiagnosticsProperty('activeProgress', activeProgress))..add(DiagnosticsProperty('currentWeek', currentWeek))..add(DiagnosticsProperty('phaseChangeMessage', phaseChangeMessage));
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _WorkoutHomeState&&(identical(other.greeting, greeting) || other.greeting == greeting)&&(identical(other.userName, userName) || other.userName == userName)&&(identical(other.dateString, dateString) || other.dateString == dateString)&&(identical(other.currentStreak, currentStreak) || other.currentStreak == currentStreak)&&(identical(other.dailyTip, dailyTip) || other.dailyTip == dailyTip)&&(identical(other.lastWorkout, lastWorkout) || other.lastWorkout == lastWorkout)&&(identical(other.activeDraft, activeDraft) || other.activeDraft == activeDraft)&&const DeepCollectionEquality().equals(other._weeklyVolume, _weeklyVolume)&&(identical(other.lastWeight, lastWeight) || other.lastWeight == lastWeight)&&(identical(other.lastWorkoutSummary, lastWorkoutSummary) || other.lastWorkoutSummary == lastWorkoutSummary)&&(identical(other.isRestDay, isRestDay) || other.isRestDay == isRestDay)&&(identical(other.todayDayName, todayDayName) || other.todayDayName == todayDayName)&&const DeepCollectionEquality().equals(other._todayExercises, _todayExercises)&&(identical(other.estimatedDuration, estimatedDuration) || other.estimatedDuration == estimatedDuration)&&(identical(other.nextDayId, nextDayId) || other.nextDayId == nextDayId)&&(identical(other.templateId, templateId) || other.templateId == templateId)&&(identical(other.manualDayId, manualDayId) || other.manualDayId == manualDayId));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _WorkoutHomeState&&(identical(other.greeting, greeting) || other.greeting == greeting)&&(identical(other.userName, userName) || other.userName == userName)&&(identical(other.dateString, dateString) || other.dateString == dateString)&&(identical(other.currentStreak, currentStreak) || other.currentStreak == currentStreak)&&(identical(other.dailyTip, dailyTip) || other.dailyTip == dailyTip)&&(identical(other.lastWorkout, lastWorkout) || other.lastWorkout == lastWorkout)&&(identical(other.activeDraft, activeDraft) || other.activeDraft == activeDraft)&&const DeepCollectionEquality().equals(other._weeklyVolume, _weeklyVolume)&&(identical(other.lastWeight, lastWeight) || other.lastWeight == lastWeight)&&(identical(other.lastWorkoutSummary, lastWorkoutSummary) || other.lastWorkoutSummary == lastWorkoutSummary)&&(identical(other.isRestDay, isRestDay) || other.isRestDay == isRestDay)&&(identical(other.todayDayName, todayDayName) || other.todayDayName == todayDayName)&&const DeepCollectionEquality().equals(other._todayExercises, _todayExercises)&&(identical(other.estimatedDuration, estimatedDuration) || other.estimatedDuration == estimatedDuration)&&(identical(other.nextDayId, nextDayId) || other.nextDayId == nextDayId)&&(identical(other.templateId, templateId) || other.templateId == templateId)&&(identical(other.manualDayId, manualDayId) || other.manualDayId == manualDayId)&&(identical(other.activeProgress, activeProgress) || other.activeProgress == activeProgress)&&(identical(other.currentWeek, currentWeek) || other.currentWeek == currentWeek)&&(identical(other.phaseChangeMessage, phaseChangeMessage) || other.phaseChangeMessage == phaseChangeMessage));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,greeting,userName,dateString,currentStreak,dailyTip,lastWorkout,activeDraft,const DeepCollectionEquality().hash(_weeklyVolume),lastWeight,lastWorkoutSummary,isRestDay,todayDayName,const DeepCollectionEquality().hash(_todayExercises),estimatedDuration,nextDayId,templateId,manualDayId);
+int get hashCode => Object.hashAll([runtimeType,greeting,userName,dateString,currentStreak,dailyTip,lastWorkout,activeDraft,const DeepCollectionEquality().hash(_weeklyVolume),lastWeight,lastWorkoutSummary,isRestDay,todayDayName,const DeepCollectionEquality().hash(_todayExercises),estimatedDuration,nextDayId,templateId,manualDayId,activeProgress,currentWeek,phaseChangeMessage]);
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
-  return 'WorkoutHomeState(greeting: $greeting, userName: $userName, dateString: $dateString, currentStreak: $currentStreak, dailyTip: $dailyTip, lastWorkout: $lastWorkout, activeDraft: $activeDraft, weeklyVolume: $weeklyVolume, lastWeight: $lastWeight, lastWorkoutSummary: $lastWorkoutSummary, isRestDay: $isRestDay, todayDayName: $todayDayName, todayExercises: $todayExercises, estimatedDuration: $estimatedDuration, nextDayId: $nextDayId, templateId: $templateId, manualDayId: $manualDayId)';
+  return 'WorkoutHomeState(greeting: $greeting, userName: $userName, dateString: $dateString, currentStreak: $currentStreak, dailyTip: $dailyTip, lastWorkout: $lastWorkout, activeDraft: $activeDraft, weeklyVolume: $weeklyVolume, lastWeight: $lastWeight, lastWorkoutSummary: $lastWorkoutSummary, isRestDay: $isRestDay, todayDayName: $todayDayName, todayExercises: $todayExercises, estimatedDuration: $estimatedDuration, nextDayId: $nextDayId, templateId: $templateId, manualDayId: $manualDayId, activeProgress: $activeProgress, currentWeek: $currentWeek, phaseChangeMessage: $phaseChangeMessage)';
 }
 
 
@@ -889,11 +907,11 @@ abstract mixin class _$WorkoutHomeStateCopyWith<$Res> implements $WorkoutHomeSta
   factory _$WorkoutHomeStateCopyWith(_WorkoutHomeState value, $Res Function(_WorkoutHomeState) _then) = __$WorkoutHomeStateCopyWithImpl;
 @override @useResult
 $Res call({
- String greeting, String userName, String dateString, int currentStreak, MotivationTip dailyTip, WorkoutSession? lastWorkout, WorkoutSession? activeDraft, Map<int, double> weeklyVolume, BodyMeasurement? lastWeight, String? lastWorkoutSummary, bool isRestDay, String? todayDayName, List<TodayExercise> todayExercises, int estimatedDuration, int? nextDayId, int? templateId, int? manualDayId
+ String greeting, String userName, String dateString, int currentStreak, MotivationTip dailyTip, WorkoutSession? lastWorkout, WorkoutSession? activeDraft, Map<int, double> weeklyVolume, BodyMeasurement? lastWeight, String? lastWorkoutSummary, bool isRestDay, String? todayDayName, List<TodayExercise> todayExercises, int estimatedDuration, int? nextDayId, int? templateId, int? manualDayId, UserProgramProgressEntity? activeProgress, int currentWeek, String? phaseChangeMessage
 });
 
 
-@override $MotivationTipCopyWith<$Res> get dailyTip;@override $WorkoutSessionCopyWith<$Res>? get lastWorkout;@override $WorkoutSessionCopyWith<$Res>? get activeDraft;@override $BodyMeasurementCopyWith<$Res>? get lastWeight;
+@override $MotivationTipCopyWith<$Res> get dailyTip;@override $WorkoutSessionCopyWith<$Res>? get lastWorkout;@override $WorkoutSessionCopyWith<$Res>? get activeDraft;@override $BodyMeasurementCopyWith<$Res>? get lastWeight;@override $UserProgramProgressEntityCopyWith<$Res>? get activeProgress;
 
 }
 /// @nodoc
@@ -906,7 +924,7 @@ class __$WorkoutHomeStateCopyWithImpl<$Res>
 
 /// Create a copy of WorkoutHomeState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? greeting = null,Object? userName = null,Object? dateString = null,Object? currentStreak = null,Object? dailyTip = null,Object? lastWorkout = freezed,Object? activeDraft = freezed,Object? weeklyVolume = null,Object? lastWeight = freezed,Object? lastWorkoutSummary = freezed,Object? isRestDay = null,Object? todayDayName = freezed,Object? todayExercises = null,Object? estimatedDuration = null,Object? nextDayId = freezed,Object? templateId = freezed,Object? manualDayId = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? greeting = null,Object? userName = null,Object? dateString = null,Object? currentStreak = null,Object? dailyTip = null,Object? lastWorkout = freezed,Object? activeDraft = freezed,Object? weeklyVolume = null,Object? lastWeight = freezed,Object? lastWorkoutSummary = freezed,Object? isRestDay = null,Object? todayDayName = freezed,Object? todayExercises = null,Object? estimatedDuration = null,Object? nextDayId = freezed,Object? templateId = freezed,Object? manualDayId = freezed,Object? activeProgress = freezed,Object? currentWeek = null,Object? phaseChangeMessage = freezed,}) {
   return _then(_WorkoutHomeState(
 greeting: null == greeting ? _self.greeting : greeting // ignore: cast_nullable_to_non_nullable
 as String,userName: null == userName ? _self.userName : userName // ignore: cast_nullable_to_non_nullable
@@ -925,7 +943,10 @@ as List<TodayExercise>,estimatedDuration: null == estimatedDuration ? _self.esti
 as int,nextDayId: freezed == nextDayId ? _self.nextDayId : nextDayId // ignore: cast_nullable_to_non_nullable
 as int?,templateId: freezed == templateId ? _self.templateId : templateId // ignore: cast_nullable_to_non_nullable
 as int?,manualDayId: freezed == manualDayId ? _self.manualDayId : manualDayId // ignore: cast_nullable_to_non_nullable
-as int?,
+as int?,activeProgress: freezed == activeProgress ? _self.activeProgress : activeProgress // ignore: cast_nullable_to_non_nullable
+as UserProgramProgressEntity?,currentWeek: null == currentWeek ? _self.currentWeek : currentWeek // ignore: cast_nullable_to_non_nullable
+as int,phaseChangeMessage: freezed == phaseChangeMessage ? _self.phaseChangeMessage : phaseChangeMessage // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 
@@ -973,6 +994,18 @@ $BodyMeasurementCopyWith<$Res>? get lastWeight {
 
   return $BodyMeasurementCopyWith<$Res>(_self.lastWeight!, (value) {
     return _then(_self.copyWith(lastWeight: value));
+  });
+}/// Create a copy of WorkoutHomeState
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$UserProgramProgressEntityCopyWith<$Res>? get activeProgress {
+    if (_self.activeProgress == null) {
+    return null;
+  }
+
+  return $UserProgramProgressEntityCopyWith<$Res>(_self.activeProgress!, (value) {
+    return _then(_self.copyWith(activeProgress: value));
   });
 }
 }

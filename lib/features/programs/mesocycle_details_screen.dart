@@ -26,6 +26,7 @@ class MesocycleDetailsScreen extends ConsumerWidget {
               _buildAppBar(context, mesocycle),
               _buildHeader(mesocycle),
               _buildStats(mesocycle),
+              _buildStartButton(context, ref, mesocycle),
               _buildWeeksList(context, ref, mesocycle),
               const SliverToBoxAdapter(child: SizedBox(height: 100)),
             ],
@@ -93,6 +94,40 @@ class MesocycleDetailsScreen extends ConsumerWidget {
             _statItem('DAYS/WK', '${mes.daysPerWeek}'),
             _statItem('TYPE', mes.splitType.split(' ').first),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStartButton(BuildContext context, WidgetRef ref, ent.MesocycleEntity mes) {
+    return SliverToBoxAdapter(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
+        child: SizedBox(
+          width: double.infinity,
+          child: ElevatedButton.icon(
+            onPressed: () async {
+              final repo = ref.read(mesocycleRepositoryProvider);
+              await repo.startProgram(mes.id);
+              ref.invalidate(workoutHomeProvider);
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('${mes.name} set as active program!'),
+                    backgroundColor: Colors.green,
+                  ),
+                );
+              }
+            },
+            icon: const Icon(LucideIcons.play),
+            label: const Text('START THIS PROGRAM'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.orange[800],
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            ),
+          ),
         ),
       ),
     );

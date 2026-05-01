@@ -5,13 +5,14 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ai_gym_mentor/core/database/database.dart' as schema;
 import 'package:ai_gym_mentor/core/database/database.dart'; // For AppDatabase without prefix if needed, or use schema.AppDatabase
+import 'package:ai_gym_mentor/core/database/initial_data.dart';
 
 class ExerciseDbSeeder {
   static final ExerciseDbSeeder instance = ExerciseDbSeeder._();
   ExerciseDbSeeder._();
 
   static const String _seedKey =
-      'exercises_seed_v8'; // v8: Integrated 2197 exercises from combined datasets
+      'exercises_seed_v9'; // v9: Integrated initialExercises from initial_data.dart
 
   Future<void> seed([AppDatabase? providedDb]) async {
     final prefs = await SharedPreferences.getInstance();
@@ -47,7 +48,20 @@ class ExerciseDbSeeder {
 
       final Map<String, int> sourceIdToDbId = {};
 
-      // Pass 1: Exercises (Upsert Logic)
+      // Pass 1.1: initialExercises from initial_data.dart (Upsert Logic)
+      await database.batch((batch) {
+        for (final companion in initialExercises) {
+          final name = companion.name.value;
+          if (existingIdMap.containsKey(name)) {
+            final dbId = existingIdMap[name]!;
+            batch.update(database.exercises, companion, where: (t) => t.id.equals(dbId));
+          } else {
+            batch.insert(database.exercises, companion, mode: InsertMode.insertOrIgnore);
+          }
+        }
+      });
+
+      // Pass 1.2: JSON Exercises (Upsert Logic)
       await database.batch((batch) {
         for (final item in jsonList) {
           final extId = item['id'].toString();

@@ -1,5 +1,6 @@
 import 'package:ai_gym_mentor/core/database/database.dart';
 import 'package:ai_gym_mentor/core/domain/entities/mesocycle.dart';
+import 'package:ai_gym_mentor/core/domain/entities/program_progress.dart';
 import 'package:ai_gym_mentor/features/exercise_database/domain/repositories/exercise_repository.dart';
 import 'package:ai_gym_mentor/features/exercise_database/presentation/providers/repository_provider.dart';
 import 'package:drift/drift.dart';
@@ -103,6 +104,17 @@ class MesocycleRepository {
       }
     }
     return result;
+  }
+
+  UserProgramProgressEntity _toProgressEntity(UserProgramProgressData row) {
+    return UserProgramProgressEntity(
+      id: row.id,
+      mesocycleId: row.mesocycleId,
+      startDate: row.startDate,
+      currentPhaseIndex: row.currentPhaseIndex,
+      isCompleted: row.isCompleted,
+      lastPhaseAlertAt: row.lastPhaseAlertAt,
+    );
   }
 
   // --- CRUD Operations ---
@@ -241,6 +253,40 @@ class MesocycleRepository {
       }
       return id;
     });
+  }
+
+  // --- Progress Tracking ---
+
+  Future<UserProgramProgressEntity?> getActiveProgramProgress() async {
+    final row = await (_db.select(_db.userProgramProgress)
+          ..where((t) => t.isCompleted.equals(false))
+          ..orderBy([(t) => OrderingTerm(expression: t.startDate, mode: OrderingMode.desc)])
+          ..limit(1))
+        .getSingleOrNull();
+
+    if (row == null) return null;
+    return _toProgressEntity(row);
+  }
+
+  Future<int> startProgram(int mesocycleId) async {
+    return await _db.into(_db.userProgramProgress).insert(
+          UserProgramProgressCompanion.insert(
+            mesocycleId: mesocycleId,
+            startDate: DateTime.now(),
+          ),
+        );
+  }
+
+  Future<void> updateProgress(UserProgramProgressCompanion companion) async {
+    await (_db.update(_db.userProgramProgress)
+          ..where((t) => t.id.equals(companion.id.value)))
+        .write(companion);
+  }
+
+  Future<void> markProgramCompleted(int progressId) async {
+    await (_db.update(_db.userProgramProgress)
+          ..where((t) => t.id.equals(progressId)))
+        .write(const UserProgramProgressCompanion(isCompleted: Value(true)));
   }
 }
 

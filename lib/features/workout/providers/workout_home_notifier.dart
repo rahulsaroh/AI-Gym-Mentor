@@ -1,10 +1,16 @@
 import 'package:flutter/foundation.dart';
+import 'package:drift/drift.dart' hide JsonKey;
+import 'package:ai_gym_mentor/core/database/database.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:ai_gym_mentor/core/domain/entities/body_measurement.dart';
 import 'package:ai_gym_mentor/core/domain/entities/workout_session.dart';
+import 'package:ai_gym_mentor/core/domain/entities/program_progress.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:ai_gym_mentor/features/workout/workout_repository.dart';
+import 'package:ai_gym_mentor/features/programs/repositories/mesocycle_repository.dart';
 import 'package:ai_gym_mentor/features/analytics/measurements_repository.dart';
+import 'package:ai_gym_mentor/core/services/ai_service.dart';
+import 'package:ai_gym_mentor/core/ai_context_builder.dart';
 import 'package:ai_gym_mentor/features/settings/settings_provider.dart';
 
 part 'workout_home_notifier.freezed.dart';
@@ -50,6 +56,9 @@ abstract class WorkoutHomeState with _$WorkoutHomeState {
     int? nextDayId,
     int? templateId,
     int? manualDayId,
+    @Default(null) UserProgramProgressEntity? activeProgress,
+    @Default(1) int currentWeek,
+    @Default(null) String? phaseChangeMessage,
   }) = _WorkoutHomeState;
 
   const WorkoutHomeState._();
@@ -139,12 +148,12 @@ class WorkoutHomeNotifier extends _$WorkoutHomeNotifier {
     ];
     final dateString =
         '${days[now.weekday - 1]}, ${now.day} ${months[now.month - 1]} ${now.year}';
-
+    
     // Motivation Tip
     final tips = _getMotivationTips();
     final tipIndex = (now.year * 365 + now.month * 31 + now.day) % tips.length;
 
-    // Program logic: Determine today's workout day from active template
+    // Initialize workout variables
     String? todayDayName;
     List<TodayExercise> todayExercises = [];
     int estimatedDuration = 0;
@@ -154,7 +163,6 @@ class WorkoutHomeNotifier extends _$WorkoutHomeNotifier {
     final activeTemplate = await workoutRepo.getActiveTemplate();
     if (activeTemplate != null) {
       activeTemplateId = activeTemplate.id;
-      // Fix #16: getActiveTemplate() already fetches days, reuse them.
       final templateDays = activeTemplate.days;
       if (templateDays.isNotEmpty) {
         final lastTemplateWorkout =
@@ -180,9 +188,7 @@ class WorkoutHomeNotifier extends _$WorkoutHomeNotifier {
           }
         }
 
-        // Weekday Priority Logic:
-        // Try to find a day that specifically matches today's weekday
-        final todayWeekday = now.weekday; // 1 = Mon, 7 = Sun
+        final todayWeekday = now.weekday;
         final weekdayMatchIndex = templateDays.indexWhere((d) => d.weekday == todayWeekday);
         
         final nextDay = (forcedDayId != null) 
@@ -201,11 +207,82 @@ class WorkoutHomeNotifier extends _$WorkoutHomeNotifier {
                   ? te.exercise.imageUrls.first
                   : (te.exercise.gifUrl ?? ''),
             )).toList();
-        // Estimate duration based on historical averages
+        
         final avgDurationPerExercise = (stats['avgDuration'] ?? 45) / (stats['avgExercises'] ?? 5);
         estimatedDuration = (templateExercises.length * avgDurationPerExercise).round();
 
         isRestDay = completedToday && forcedDayId == null;
+      }
+    }
+
+    // --- Program Progression Logic ---
+    final mesocycleRepo = ref.read(mesocycleRepositoryProvider);
+    final activeProgress = await mesocycleRepo.getActiveProgramProgress();
+    int currentWeekNum = 1;
+    String? phaseChangeMessage;
+
+    if (activeProgress != null) {
+      final mesocycle = (await mesocycleRepo.getAllMesocycles(includeArchived: true))
+          .firstWhere((m) => m.id == activeProgress.mesocycleId);
+      
+      currentWeekNum = _calculateCurrentWeek(activeProgress.startDate);
+      
+      int targetPhaseIndex = 0;
+      if (currentWeekNum > 3 && currentWeekNum <= 6) {
+        targetPhaseIndex = 1;
+      } else if (currentWeekNum > 6) {
+        targetPhaseIndex = 2;
+      }
+
+      if (targetPhaseIndex > activeProgress.currentPhaseIndex) {
+        // Only alert if we haven't alerted for this specific phase transition recently
+        final lastAlert = activeProgress.lastPhaseAlertAt;
+        final shouldAlert = lastAlert == null || 
+            now.difference(lastAlert).inHours > 24;
+
+        if (shouldAlert) {
+          // Fetch context for AI
+          final aiContextBuilder = ref.read(aiContextBuilderProvider);
+          final context = await aiContextBuilder.buildGeneralContext();
+          final aiService = ref.read(aiServiceProvider);
+          
+          phaseChangeMessage = await aiService.generatePhaseChangeMessage(
+            userName: userName,
+            previousPhase: activeProgress.currentPhaseIndex + 1,
+            nextPhase: targetPhaseIndex + 1,
+            context: context,
+          );
+
+          // Trigger Phase Change in DB
+          await mesocycleRepo.updateProgress(UserProgramProgressCompanion(
+            id: Value(activeProgress.id),
+            currentPhaseIndex: Value(targetPhaseIndex),
+            lastPhaseAlertAt: Value(DateTime.now()),
+          ));
+        }
+      }
+
+      if (mesocycle.weeks.length >= currentWeekNum) {
+        final currentWeekData = mesocycle.weeks[currentWeekNum - 1];
+        if (currentWeekData.days.isNotEmpty) {
+          final workoutsInThisWeek = await workoutRepo.getWorkoutsInWeek(activeProgress.mesocycleId, currentWeekData.id);
+          int nextDayIdx = workoutsInThisWeek.length % currentWeekData.days.length;
+          final nextDay = currentWeekData.days[nextDayIdx];
+          
+          todayDayName = "Week $currentWeekNum: ${nextDay.title}";
+          nextDayId = nextDay.id;
+          
+          final templateExercises = await workoutRepo.getTemplateExercises(nextDay.id);
+          todayExercises = templateExercises.map((te) => TodayExercise(
+                id: te.exercise.id,
+                name: te.exercise.name,
+                imageUrl: te.exercise.imageUrls.isNotEmpty
+                    ? te.exercise.imageUrls.first
+                    : (te.exercise.gifUrl ?? ''),
+              )).toList();
+          
+          estimatedDuration = (templateExercises.length * 9).round();
+        }
       }
     }
 
@@ -235,9 +312,19 @@ class WorkoutHomeNotifier extends _$WorkoutHomeNotifier {
       estimatedDuration: estimatedDuration,
       nextDayId: nextDayId,
       templateId: activeTemplateId,
-      manualDayId: null, // This gets overridden by state in the actual notifier behavior if we use state.value
+      manualDayId: null,
+      activeProgress: activeProgress,
+      currentWeek: currentWeekNum,
+      phaseChangeMessage: phaseChangeMessage,
     );
   }
+
+  int _calculateCurrentWeek(DateTime startDate) {
+    final now = DateTime.now();
+    final difference = now.difference(startDate).inDays;
+    return (difference / 7).floor() + 1;
+  }
+
 
   // Helper to get manualDayId from current state
   int? get _currentManualDayId => state.asData?.value.manualDayId;

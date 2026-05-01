@@ -600,6 +600,15 @@ class WorkoutRepository {
     return _toSessionEntity(row, []);
   }
 
+  Future<List<Workout>> getWorkoutsInWeek(int mesocycleId, int mesocycleWeekId) async {
+    return await (_db.select(_db.workouts)
+          ..where((t) =>
+              t.mesocycleId.equals(mesocycleId) &
+              t.mesocycleWeekId.equals(mesocycleWeekId) &
+              t.status.equals('completed')))
+        .get();
+  }
+
   Future<int> createWorkout(
       {String name = 'New Workout', int? templateId, int? dayId}) async {
     debugPrint('WorkoutRepository.createWorkout: name=$name, templateId=$templateId, dayId=$dayId');

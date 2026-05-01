@@ -5,6 +5,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ai_gym_mentor/services/import_service.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 
 class WelcomeBackScreen extends ConsumerStatefulWidget {
   final String filePath;
@@ -26,6 +28,27 @@ class _WelcomeBackScreenState extends ConsumerState<WelcomeBackScreen> {
     });
 
     try {
+      if (Platform.isAndroid) {
+        final deviceInfo = DeviceInfoPlugin();
+        final androidInfo = await deviceInfo.androidInfo;
+        
+        if (androidInfo.version.sdkInt >= 33) {
+          // Android 13+ doesn't use Permission.storage
+          // For non-media files, we might need MANAGE_EXTERNAL_STORAGE or just hope the system allows it if we ask
+          // But usually, Permission.storage is what we use in older apps.
+          // Let's try Permission.manageExternalStorage if it's in a sensitive location
+          final status = await Permission.manageExternalStorage.request();
+          if (!status.isGranted) {
+            throw 'Storage access is required to read the backup file. Please enable it in Settings.';
+          }
+        } else {
+          final status = await Permission.storage.request();
+          if (!status.isGranted) {
+            throw 'Storage permission denied. Cannot read backup file.';
+          }
+        }
+      }
+
       final importService = ref.read(importServiceProvider);
       final results = await importService.importFromXlsx(File(widget.filePath));
       
@@ -34,7 +57,7 @@ class _WelcomeBackScreenState extends ConsumerState<WelcomeBackScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Successfully restored $total records!')),
         );
-        context.go('/home');
+        context.go('/app');
       }
     } catch (e) {
       setState(() => _error = e.toString());
@@ -98,7 +121,7 @@ class _WelcomeBackScreenState extends ConsumerState<WelcomeBackScreen> {
               ),
               const SizedBox(height: 16),
               TextButton(
-                onPressed: () => context.go('/home'),
+                onPressed: () => context.go('/onboarding'),
                 child: Text(
                   'Start Fresh',
                   style: TextStyle(color: Theme.of(context).colorScheme.outline),
