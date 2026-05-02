@@ -114,9 +114,28 @@ class ProgramsNotifier extends _$ProgramsNotifier {
     await refresh();
   }
 
+  Future<void> toggleSelected(int id, bool isSelected) async {
+    final repo = ref.read(workoutRepositoryProvider);
+    await repo.toggleTemplateSelected(id, isSelected);
+    await refresh();
+  }
+
   Future<void> resetPrograms() async {
     final repo = ref.read(workoutRepositoryProvider);
     await repo.clearAllTemplatesAndInsertSample();
     await refresh();
   }
+
+  Future<void> importSixPackAbsProgram() async {
+    try {
+      final jsonStr = await rootBundle.loadString('assets/data/six_pack_abs_program.json');
+      final repo = ref.read(workoutRepositoryProvider);
+      await repo.importTemplateFromJson(jsonStr);
+      await refresh();
+    } catch (e, st) {
+      print('DEBUG: Failed to import Six Pack Abs program: \$e');
+      state = AsyncValue.error(e, st);
+    }
+  }
+
 }

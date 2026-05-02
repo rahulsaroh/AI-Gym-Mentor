@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$WorkoutProgram {
 
- int get id; String get name; String? get description; DateTime? get lastUsed; List<ProgramDay> get days;
+ int get id; String get name; String? get description; DateTime? get lastUsed; bool get isSelected; List<ProgramDay> get days;
 /// Create a copy of WorkoutProgram
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $WorkoutProgramCopyWith<WorkoutProgram> get copyWith => _$WorkoutProgramCopyWith
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is WorkoutProgram&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.lastUsed, lastUsed) || other.lastUsed == lastUsed)&&const DeepCollectionEquality().equals(other.days, days));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is WorkoutProgram&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.lastUsed, lastUsed) || other.lastUsed == lastUsed)&&(identical(other.isSelected, isSelected) || other.isSelected == isSelected)&&const DeepCollectionEquality().equals(other.days, days));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,description,lastUsed,const DeepCollectionEquality().hash(days));
+int get hashCode => Object.hash(runtimeType,id,name,description,lastUsed,isSelected,const DeepCollectionEquality().hash(days));
 
 @override
 String toString() {
-  return 'WorkoutProgram(id: $id, name: $name, description: $description, lastUsed: $lastUsed, days: $days)';
+  return 'WorkoutProgram(id: $id, name: $name, description: $description, lastUsed: $lastUsed, isSelected: $isSelected, days: $days)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $WorkoutProgramCopyWith<$Res>  {
   factory $WorkoutProgramCopyWith(WorkoutProgram value, $Res Function(WorkoutProgram) _then) = _$WorkoutProgramCopyWithImpl;
 @useResult
 $Res call({
- int id, String name, String? description, DateTime? lastUsed, List<ProgramDay> days
+ int id, String name, String? description, DateTime? lastUsed, bool isSelected, List<ProgramDay> days
 });
 
 
@@ -65,13 +65,14 @@ class _$WorkoutProgramCopyWithImpl<$Res>
 
 /// Create a copy of WorkoutProgram
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? description = freezed,Object? lastUsed = freezed,Object? days = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? description = freezed,Object? lastUsed = freezed,Object? isSelected = null,Object? days = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
 as String?,lastUsed: freezed == lastUsed ? _self.lastUsed : lastUsed // ignore: cast_nullable_to_non_nullable
-as DateTime?,days: null == days ? _self.days : days // ignore: cast_nullable_to_non_nullable
+as DateTime?,isSelected: null == isSelected ? _self.isSelected : isSelected // ignore: cast_nullable_to_non_nullable
+as bool,days: null == days ? _self.days : days // ignore: cast_nullable_to_non_nullable
 as List<ProgramDay>,
   ));
 }
@@ -157,10 +158,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int id,  String name,  String? description,  DateTime? lastUsed,  List<ProgramDay> days)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int id,  String name,  String? description,  DateTime? lastUsed,  bool isSelected,  List<ProgramDay> days)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _WorkoutProgram() when $default != null:
-return $default(_that.id,_that.name,_that.description,_that.lastUsed,_that.days);case _:
+return $default(_that.id,_that.name,_that.description,_that.lastUsed,_that.isSelected,_that.days);case _:
   return orElse();
 
 }
@@ -178,10 +179,10 @@ return $default(_that.id,_that.name,_that.description,_that.lastUsed,_that.days)
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int id,  String name,  String? description,  DateTime? lastUsed,  List<ProgramDay> days)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int id,  String name,  String? description,  DateTime? lastUsed,  bool isSelected,  List<ProgramDay> days)  $default,) {final _that = this;
 switch (_that) {
 case _WorkoutProgram():
-return $default(_that.id,_that.name,_that.description,_that.lastUsed,_that.days);case _:
+return $default(_that.id,_that.name,_that.description,_that.lastUsed,_that.isSelected,_that.days);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -198,10 +199,10 @@ return $default(_that.id,_that.name,_that.description,_that.lastUsed,_that.days)
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int id,  String name,  String? description,  DateTime? lastUsed,  List<ProgramDay> days)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int id,  String name,  String? description,  DateTime? lastUsed,  bool isSelected,  List<ProgramDay> days)?  $default,) {final _that = this;
 switch (_that) {
 case _WorkoutProgram() when $default != null:
-return $default(_that.id,_that.name,_that.description,_that.lastUsed,_that.days);case _:
+return $default(_that.id,_that.name,_that.description,_that.lastUsed,_that.isSelected,_that.days);case _:
   return null;
 
 }
@@ -213,13 +214,14 @@ return $default(_that.id,_that.name,_that.description,_that.lastUsed,_that.days)
 @JsonSerializable()
 
 class _WorkoutProgram extends WorkoutProgram {
-  const _WorkoutProgram({required this.id, required this.name, this.description, this.lastUsed, final  List<ProgramDay> days = const []}): _days = days,super._();
+  const _WorkoutProgram({required this.id, required this.name, this.description, this.lastUsed, this.isSelected = false, final  List<ProgramDay> days = const []}): _days = days,super._();
   factory _WorkoutProgram.fromJson(Map<String, dynamic> json) => _$WorkoutProgramFromJson(json);
 
 @override final  int id;
 @override final  String name;
 @override final  String? description;
 @override final  DateTime? lastUsed;
+@override@JsonKey() final  bool isSelected;
  final  List<ProgramDay> _days;
 @override@JsonKey() List<ProgramDay> get days {
   if (_days is EqualUnmodifiableListView) return _days;
@@ -241,16 +243,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _WorkoutProgram&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.lastUsed, lastUsed) || other.lastUsed == lastUsed)&&const DeepCollectionEquality().equals(other._days, _days));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _WorkoutProgram&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.lastUsed, lastUsed) || other.lastUsed == lastUsed)&&(identical(other.isSelected, isSelected) || other.isSelected == isSelected)&&const DeepCollectionEquality().equals(other._days, _days));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,description,lastUsed,const DeepCollectionEquality().hash(_days));
+int get hashCode => Object.hash(runtimeType,id,name,description,lastUsed,isSelected,const DeepCollectionEquality().hash(_days));
 
 @override
 String toString() {
-  return 'WorkoutProgram(id: $id, name: $name, description: $description, lastUsed: $lastUsed, days: $days)';
+  return 'WorkoutProgram(id: $id, name: $name, description: $description, lastUsed: $lastUsed, isSelected: $isSelected, days: $days)';
 }
 
 
@@ -261,7 +263,7 @@ abstract mixin class _$WorkoutProgramCopyWith<$Res> implements $WorkoutProgramCo
   factory _$WorkoutProgramCopyWith(_WorkoutProgram value, $Res Function(_WorkoutProgram) _then) = __$WorkoutProgramCopyWithImpl;
 @override @useResult
 $Res call({
- int id, String name, String? description, DateTime? lastUsed, List<ProgramDay> days
+ int id, String name, String? description, DateTime? lastUsed, bool isSelected, List<ProgramDay> days
 });
 
 
@@ -278,13 +280,14 @@ class __$WorkoutProgramCopyWithImpl<$Res>
 
 /// Create a copy of WorkoutProgram
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? description = freezed,Object? lastUsed = freezed,Object? days = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? description = freezed,Object? lastUsed = freezed,Object? isSelected = null,Object? days = null,}) {
   return _then(_WorkoutProgram(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
 as String?,lastUsed: freezed == lastUsed ? _self.lastUsed : lastUsed // ignore: cast_nullable_to_non_nullable
-as DateTime?,days: null == days ? _self._days : days // ignore: cast_nullable_to_non_nullable
+as DateTime?,isSelected: null == isSelected ? _self.isSelected : isSelected // ignore: cast_nullable_to_non_nullable
+as bool,days: null == days ? _self._days : days // ignore: cast_nullable_to_non_nullable
 as List<ProgramDay>,
   ));
 }

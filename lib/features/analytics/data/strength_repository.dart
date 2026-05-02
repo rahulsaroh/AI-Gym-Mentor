@@ -116,6 +116,21 @@ class StrengthRepository {
     return latest.values.toList()..sort((a,b) => b.date.compareTo(a.date));
   }
 
+  /// Gets all unique exercises that have at least one 1RM snapshot.
+  Future<List<Map<String, dynamic>>> getAllTrackedExercises() async {
+    final query = db.selectOnly(db.exercise1RmSnapshots, distinct: true).join([
+      innerJoin(db.exercises, db.exercises.id.equalsExp(db.exercise1RmSnapshots.exerciseId)),
+    ])
+      ..addColumns([db.exercise1RmSnapshots.exerciseId, db.exercises.name])
+      ..orderBy([OrderingTerm(expression: db.exercises.name)]);
+
+    final rows = await query.get();
+    return rows.map((r) => {
+      'exerciseId': r.read(db.exercise1RmSnapshots.exerciseId),
+      'name': r.read(db.exercises.name),
+    }).toList();
+  }
+
   /// Gets the name of an exercise.
   Future<String> getExerciseName(int id) async {
     final ex = await (db.select(db.exercises)..where((t) => t.id.equals(id))).getSingleOrNull();
@@ -285,6 +300,25 @@ class StrengthRepository {
     for (final id in workoutIds) {
       await processWorkout(id, formula);
     }
+  }
+  
+  /// Gets the latest 1RM for standard benchmark exercises by name.
+  Future<Map<String, double>> getLatest1RMForStandardExercises(List<String> names) async {
+    final result = <String, double>{};
+    for (final name in names) {
+      final keyword = name.split(' ').first;
+      final query = db.select(db.exercise1RmSnapshots).join([
+        innerJoin(db.exercises, db.exercises.id.equalsExp(db.exercise1RmSnapshots.exerciseId)),
+      ])
+        ..where(db.exercises.name.like('%$keyword%'))
+        ..orderBy([OrderingTerm(expression: db.exercise1RmSnapshots.estimated1Rm, mode: OrderingMode.desc)])
+        ..limit(1);
+      final rows = await query.get();
+      if (rows.isNotEmpty) {
+        result[name] = rows.first.readTable(db.exercise1RmSnapshots).estimated1Rm;
+      }
+    }
+    return result;
   }
 }
 

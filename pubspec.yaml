@@ -121,6 +121,7 @@ flutter:
   assets:
     - assets/animations/
     - assets/data/
+    - assets/data/six_pack_abs_program.json
     - assets/icon/
     - assets/exercise_data/
     - assets/svgs/

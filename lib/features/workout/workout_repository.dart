@@ -65,6 +65,7 @@ class WorkoutRepository {
       name: row.name,
       description: row.description,
       lastUsed: row.lastUsed,
+      isSelected: row.isSelected,
       days: days,
     );
   }
@@ -504,6 +505,11 @@ class WorkoutRepository {
   Future<void> setActiveTemplate(int id) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt('active_template_id', id);
+  }
+
+  Future<void> toggleTemplateSelected(int id, bool isSelected) async {
+    await (_db.update(_db.workoutTemplates)..where((t) => t.id.equals(id)))
+        .write(WorkoutTemplatesCompanion(isSelected: Value(isSelected)));
   }
 
   Future<List<ent.ProgramDay>> getTemplateDays(int templateId) async {

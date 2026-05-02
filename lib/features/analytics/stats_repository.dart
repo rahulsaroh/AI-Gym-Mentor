@@ -77,8 +77,9 @@ class StatsRepository {
       final volume = row.readTable(db.workoutSets).weight *
           row.readTable(db.workoutSets).reps;
 
-      // Calculate week start for the key
-      final weekStart = date.subtract(Duration(days: date.weekday - 1));
+      // Calculate week start for the key using local time to be consistent with user's perspective
+      final localDate = date.toLocal();
+      final weekStart = localDate.subtract(Duration(days: localDate.weekday - 1));
       final key = DateTime(weekStart.year, weekStart.month, weekStart.day)
           .millisecondsSinceEpoch;
 
@@ -108,7 +109,8 @@ class StatsRepository {
     final Map<int, int> frequency = {};
 
     for (final w in workouts) {
-      final weekStart = w.date.subtract(Duration(days: w.date.weekday - 1));
+      final localDate = w.date.toLocal();
+      final weekStart = localDate.subtract(Duration(days: localDate.weekday - 1));
       final key = DateTime(weekStart.year, weekStart.month, weekStart.day)
           .millisecondsSinceEpoch;
       frequency[key] = (frequency[key] ?? 0) + 1;
@@ -165,7 +167,8 @@ class StatsRepository {
     final Map<int, List<int>> weeklyDurations = {};
 
     for (final w in workouts) {
-      final weekStart = w.date.subtract(Duration(days: w.date.weekday - 1));
+      final localDate = w.date.toLocal();
+      final weekStart = localDate.subtract(Duration(days: localDate.weekday - 1));
       final key = DateTime(weekStart.year, weekStart.month, weekStart.day)
           .millisecondsSinceEpoch;
       
@@ -478,6 +481,34 @@ class StatsRepository {
     final prList = bests.values.toList();
     prList.sort((a, b) => (b['date'] as DateTime).compareTo(a['date'] as DateTime));
     return prList;
+  }
+
+
+
+  /// Returns muscle group volume per week for heatmap rendering.
+  Future<List<Map<String, dynamic>>> getMuscleVolumeByWeek(int weeks) async {
+    final cutoff = DateTime.now().subtract(Duration(days: weeks * 7));
+    final rows = await (db.select(db.workoutSets).join([
+      innerJoin(db.exercises, db.exercises.id.equalsExp(db.workoutSets.exerciseId)),
+      innerJoin(db.workouts, db.workouts.id.equalsExp(db.workoutSets.workoutId)),
+    ])
+      ..where(db.workoutSets.completed.equals(true) &
+              db.workouts.startTime.isBiggerOrEqualValue(cutoff))).get();
+
+    final result = <Map<String, dynamic>>[];
+    for (final row in rows) {
+      final s = row.readTable(db.workoutSets);
+      final ex = row.readTable(db.exercises);
+      final w = row.readTable(db.workouts);
+      final volume = s.weight * s.reps;
+      if (volume <= 0) continue;
+      result.add({
+        'date': w.startTime,
+        'muscle': ex.primaryMuscle.isNotEmpty ? ex.primaryMuscle : ex.category,
+        'volume': volume,
+      });
+    }
+    return result;
   }
 }
 

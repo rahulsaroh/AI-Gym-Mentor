@@ -61,6 +61,7 @@ class _BouncingCardState extends State<BouncingCard> with SingleTickerProviderSt
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
+      behavior: HitTestBehavior.translucent,
       onTapDown: _handleTapDown,
       onTapUp: _handleTapUp,
       onTapCancel: _handleTapCancel,

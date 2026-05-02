@@ -12,6 +12,7 @@ import 'package:share_plus/share_plus.dart';
 import 'dart:convert';
 import 'package:file_picker/file_picker.dart';
 import 'package:excel/excel.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 final exportServiceProvider = Provider((ref) => ExportService(ref));
 
@@ -238,22 +239,71 @@ class ExportService {
   }
 
   Future<Map<String, dynamic>?> exportToXlsx() async {
+    final result = await _generateExcelData();
+    if (result == null) return null;
+
+    final directory = await getTemporaryDirectory();
+    final filePath = '${directory.path}/gym_report_${DateTime.now().millisecondsSinceEpoch}.xlsx';
+    
+    final file = File(filePath)..writeAsBytesSync(result['bytes']);
+    
+    return {
+      'path': file.path,
+      'exerciseRows': result['exerciseRows'],
+      'measurementRows': result['measurementRows'],
+      'fileSize': file.lengthSync(),
+    };
+  }
+
+  Future<Map<String, dynamic>?> saveExcelToDownloads() async {
+    if (Platform.isAndroid) {
+      var status = await Permission.manageExternalStorage.status;
+      if (!status.isGranted) {
+        status = await Permission.manageExternalStorage.request();
+      }
+      
+      // Fallback for older Android versions
+      if (!status.isGranted) {
+        await Permission.storage.request();
+      }
+    }
+
+    final result = await _generateExcelData();
+    if (result == null) return null;
+
+    const folderPath = '/storage/emulated/0/Download/GymLog';
+    final directory = Directory(folderPath);
+    if (!await directory.exists()) {
+      await directory.create(recursive: true);
+    }
+
+    final filePath = '$folderPath/gym_log.xlsx';
+    final file = File(filePath);
+    await file.writeAsBytes(result['bytes']);
+
+    return {
+      'path': file.path,
+      'exerciseRows': result['exerciseRows'],
+      'measurementRows': result['measurementRows'],
+      'fileSize': file.lengthSync(),
+    };
+  }
+
+  Future<Map<String, dynamic>?> _generateExcelData() async {
     final db = ref.read(appDatabaseProvider);
     final workouts = await db.select(db.workouts).get();
     final allSets = await db.select(db.workoutSets).get();
     final exercises = await ref.read(exerciseRepositoryProvider).getAllExercises();
     final measurements = await db.select(db.bodyMeasurements).get();
+    final targets = await db.select(db.bodyTargets).get();
 
     final excel = Excel.createExcel();
-    // Default sheet is usually 'Sheet1', let's find it and delete it later if needed,
-    // but the most reliable way in current package is to delete it if it exists.
     if (excel.tables.containsKey('Sheet1')) excel.delete('Sheet1');
 
     final exerciseById = {for (final e in exercises) e.id: e};
 
     // ─── 1. RAW LOG SHEET ───
     final rawSheet = excel['Raw Log'];
-    // prSheet.setTabColor(...) not supported in 4.0.6
     
     final rawHeaderStyle = CellStyle(
       bold: true,
@@ -282,17 +332,21 @@ class ExportService {
       final dateStr = DateFormat('yyyy-MM-dd').format(w.startTime ?? w.date);
       final dayName = DateFormat('EEEE').format(w.startTime ?? w.date);
 
+      final exerciseSetCounts = <int, int>{};
       for (var s in wSets) {
         final ex = exerciseById[s.exerciseId];
         final vol = s.weight * s.reps;
         
+        final currentSetNum = (exerciseSetCounts[s.exerciseId] ?? 0) + 1;
+        exerciseSetCounts[s.exerciseId] = currentSetNum;
+
         rawSheet.appendRow([
           TextCellValue(dateStr),
           TextCellValue(dayName),
           TextCellValue(w.name),
           TextCellValue(ex?.name ?? 'Unknown'),
           IntCellValue(s.exerciseId),
-          IntCellValue(s.setNumber),
+          IntCellValue(currentSetNum),
           TextCellValue(s.setType.name),
           DoubleCellValue(s.weight),
           DoubleCellValue(s.reps),
@@ -307,6 +361,7 @@ class ExportService {
           'dateStr': dateStr,
           'dayName': dayName,
           'workoutName': w.name,
+          'duration': w.duration,
           'exercise': ex?.name ?? 'Unknown',
           'weight': s.weight,
           'reps': s.reps,
@@ -319,7 +374,6 @@ class ExportService {
 
     // ─── 2. WORKOUT SUMMARY SHEET ───
     final summarySheet = excel['Workout Summary'];
-    // setTabColor not supported in 4.0.6
     final summaryHeaderStyle = CellStyle(
       bold: true,
       fontColorHex: ExcelColor.white,
@@ -328,7 +382,7 @@ class ExportService {
     final prRowStyle = CellStyle(backgroundColorHex: ExcelColor.fromHexString('#FFD700')); // Gold for PR
 
     final summaryHeaders = [
-      'Date', 'Day', 'Workout Name', 'Total Exercises', 'Total Sets', 
+      'Date', 'Day', 'Workout Name', 'Duration (mins)', 'Total Exercises', 'Total Sets', 
       'Total Volume (kg)', 'Top Exercise', 'Is PR Session', 'Notes'
     ];
     for (var i = 0; i < summaryHeaders.length; i++) {
@@ -355,6 +409,7 @@ class ExportService {
         TextCellValue(sets.first['dateStr']),
         TextCellValue(sets.first['dayName']),
         TextCellValue(sets.first['workoutName']),
+        sets.first['duration'] != null ? IntCellValue(sets.first['duration'] as int) : null,
         IntCellValue(uniqueExCount),
         IntCellValue(sets.length),
         DoubleCellValue(totalVol),
@@ -364,15 +419,13 @@ class ExportService {
       ]);
 
       if (hasPR) {
-        // Highlighting PR rows - apply to specific cells in the last row
         final lastRowIdx = summarySheet.maxRows - 1;
-        summarySheet.cell(CellIndex.indexByColumnRow(columnIndex: 7, rowIndex: lastRowIdx)).cellStyle = prRowStyle;
+        summarySheet.cell(CellIndex.indexByColumnRow(columnIndex: 8, rowIndex: lastRowIdx)).cellStyle = prRowStyle;
       }
     }
 
     // ─── 3. EXERCISE PRS SHEET ───
     final prSheet = excel['Exercise PRs'];
-    // setTabColor not supported in 4.0.6
     final prHeaderStyle = CellStyle(
       bold: true,
       fontColorHex: ExcelColor.white,
@@ -413,7 +466,6 @@ class ExportService {
 
     // ─── 4. WEEKLY VOLUME SHEET ───
     final weekSheet = excel['Weekly Volume'];
-    // setTabColor not supported in 4.0.6
     final weekHeaderStyle = CellStyle(
       bold: true,
       fontColorHex: ExcelColor.white,
@@ -428,7 +480,7 @@ class ExportService {
     }
 
     final setsByWeek = _groupBy(processedSets, (s) => _getWeekLabel(s['date']));
-    final sortedWeeks = setsByWeek.keys.toList()..sort((a, b) => b.compareTo(a)); // Newest first
+    final sortedWeeks = setsByWeek.keys.toList()..sort((a, b) => b.compareTo(a));
 
     for (var weekLabel in sortedWeeks) {
       final weekSets = setsByWeek[weekLabel]!;
@@ -436,7 +488,6 @@ class ExportService {
       final sessionDates = <String>{};
       
       for (var s in weekSets) {
-        // Monday = 1, Sunday = 7 in ISO
         final weekday = (s['date'] as DateTime).weekday;
         dayVols[weekday - 1] += (s['volume'] as double);
         sessionDates.add(s['dateStr']);
@@ -456,14 +507,13 @@ class ExportService {
       ]);
       weekSheet.appendRow(rowData);
 
-      // Apply heatmap styling
       final rowIdx = weekSheet.maxRows - 1;
       for (var i = 0; i < 7; i++) {
         final vol = dayVols[i];
         if (vol > 0) {
-          String color = '#C8E6C9'; // Light
-          if (vol >= 5000) color = '#2E7D32'; // High
-          else if (vol >= 2000) color = '#66BB6A'; // Medium
+          String color = '#C8E6C9';
+          if (vol >= 5000) color = '#2E7D32';
+          else if (vol >= 2000) color = '#66BB6A';
           weekSheet.cell(CellIndex.indexByColumnRow(columnIndex: i + 1, rowIndex: rowIdx)).cellStyle = 
             CellStyle(backgroundColorHex: ExcelColor.fromHexString(color));
         }
@@ -472,7 +522,6 @@ class ExportService {
 
     // ─── 5. BODY MEASUREMENTS SHEET ───
     final measureSheet = excel['Body Measurements'];
-    // setTabColor not supported in 4.0.6
     final measureHeaderStyle = CellStyle(
       bold: true,
       fontColorHex: ExcelColor.white,
@@ -518,30 +567,45 @@ class ExportService {
       ]);
     }
 
-    // ─── GLOBAL FORMATTING ───
-    // Note: setSheetOrder and setDefaultSheet are not supported in excel: 4.0.6
-    // Sheets follow creation order: Raw Log, Workout Summary, Exercise PRs, Weekly Volume, Body Measurements
-
-    // Column Widths
     for (var sheet in excel.tables.values) {
-       sheet.setColumnWidth(0, 15); // Date / Exercise
+       sheet.setColumnWidth(0, 15);
        if (sheet.sheetName == 'Raw Log') {
-         sheet.setColumnWidth(3, 25); // Exercise
-         sheet.setColumnWidth(2, 20); // Workout Name
+         sheet.setColumnWidth(3, 25);
+         sheet.setColumnWidth(2, 20);
        }
     }
 
-    // Save
-    final directory = await getTemporaryDirectory();
-    final filePath = '${directory.path}/gym_report_${DateTime.now().millisecondsSinceEpoch}.xlsx';
+    // ─── 6. TARGETS SHEET ───
+    final targetSheet = excel['Measurement Targets'];
+    final targetHeaderStyle = CellStyle(
+      bold: true,
+      fontColorHex: ExcelColor.white,
+      backgroundColorHex: ExcelColor.fromHexString('#BF360C'),
+    );
+
+    final targetHeaders = ['Metric', 'Target Value', 'Created At', 'Deadline'];
+    for (var i = 0; i < targetHeaders.length; i++) {
+      var cell = targetSheet.cell(CellIndex.indexByColumnRow(columnIndex: i, rowIndex: 0));
+      cell.value = TextCellValue(targetHeaders[i]);
+      cell.cellStyle = targetHeaderStyle;
+    }
+
+    for (var t in targets) {
+      targetSheet.appendRow([
+        TextCellValue(t.metric),
+        DoubleCellValue(t.targetValue),
+        TextCellValue(DateFormat('yyyy-MM-dd').format(t.createdAt)),
+        t.deadline != null ? TextCellValue(DateFormat('yyyy-MM-dd').format(t.deadline!)) : null,
+      ]);
+    }
+
     final fileBytes = excel.save();
     if (fileBytes != null) {
-      final file = File(filePath)..writeAsBytesSync(fileBytes);
       return {
-        'path': file.path,
+        'bytes': fileBytes,
         'exerciseRows': rawSheet.maxRows - 1,
         'measurementRows': measureSheet.maxRows - 1,
-        'fileSize': file.lengthSync(),
+        'targetRows': targetSheet.maxRows - 1,
       };
     }
     return null;

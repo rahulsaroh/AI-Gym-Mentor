@@ -7,13 +7,25 @@ import 'package:ai_gym_mentor/core/domain/entities/body_target.dart' as target;
 import 'package:ai_gym_mentor/core/domain/entities/progress_photo.dart'
     as photo;
 import 'package:ai_gym_mentor/core/domain/entities/body_achievement.dart';
+import 'package:ai_gym_mentor/features/settings/settings_provider.dart';
+import 'package:ai_gym_mentor/core/services/golden_ratio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 part 'analytics_providers.g.dart';
+
+/// Provides the golden-ratio ideal targets for the current user profile.
+final goldenRatioTargetsProvider = Provider<Map<String, double>>((ref) {
+  final settings = ref.watch(settingsProvider).asData?.value;
+  if (settings == null) return {};
+  return GoldenRatioService.calculateTargets(
+    heightCm: settings.height,
+    sex: settings.sex,
+  );
+});
 
 /// Global date-range filter for the Measurements tab.
 /// When null: each target uses its own createdAt/deadline.
@@ -37,7 +49,6 @@ class SelectedMeasurementInterval extends _$SelectedMeasurementInterval {
 
   void set(MeasurementInterval interval) {
     state = interval;
-    // Also update the date range
     final now = DateTime.now();
     DateTime? start;
     switch (interval) {
@@ -60,10 +71,10 @@ class SelectedMeasurementInterval extends _$SelectedMeasurementInterval {
         start = null;
         break;
     }
-    
+
     if (start != null) {
       ref.read(measurementDateRangeProvider.notifier).set(
-        DateTimeRange(start: start, end: now.add(const Duration(days: 1)))
+        DateTimeRange(start: start, end: now.add(const Duration(days: 1))),
       );
     } else {
       ref.read(measurementDateRangeProvider.notifier).clear();
@@ -78,9 +89,9 @@ class SelectedMeasurementInterval extends _$SelectedMeasurementInterval {
 class MeasurementDateRange extends _$MeasurementDateRange {
   @override
   DateTimeRange? build() => DateTimeRange(
-    start: DateTime.now().subtract(const Duration(days: 30)),
-    end: DateTime.now().add(const Duration(days: 1)),
-  );
+        start: DateTime.now().subtract(const Duration(days: 30)),
+        end: DateTime.now().add(const Duration(days: 1)),
+      );
 
   void set(DateTimeRange? range) => state = range;
   void clear() => state = null;
@@ -171,7 +182,6 @@ Future<List<Map<String, dynamic>>> volumeVsWeightTrend(Ref ref) async {
   return volume.map((v) {
     final vDate = v['date'] as DateTime;
 
-    // Find closest weight measurement to this week
     Map<String, dynamic>? closestWeight;
     int minDiff = 999999999;
 
@@ -206,23 +216,21 @@ Future<List<FlSpot>> overallAchievementTrend(Ref ref) async {
 
   if (targets.isEmpty) return [];
 
-  // 1. Filter and sort measurements
   final filtered = measurements.where((m) {
     if (dateRange == null) return true;
     return m.date.isAfter(dateRange.start) && m.date.isBefore(dateRange.end);
   }).toList();
   filtered.sort((a, b) => a.date.compareTo(b.date));
 
-  // 2. For each measurement date, calculate average achievement
   final List<FlSpot> spots = [];
   for (final m in filtered) {
     double totalAchievement = 0;
     int count = 0;
     for (final t in targets) {
       final currentVal = extractMetricValue(m, t.metric);
+      // Skip metrics with no data — do not count in average
       if (currentVal == null || currentVal == 0) continue;
 
-      // Find first measurement ever for this metric to be the "start"
       final firstM = measurements
           .where((m2) => extractMetricValue(m2, t.metric) != null)
           .toList()
@@ -238,6 +246,7 @@ Future<List<FlSpot>> overallAchievementTrend(Ref ref) async {
         count++;
       }
     }
+    // Only add a spot when at least one metric had data
     if (count > 0) {
       spots.add(FlSpot(
           m.date.millisecondsSinceEpoch.toDouble(), totalAchievement / count));
@@ -287,8 +296,6 @@ Future<List<FlSpot>> metricAchievementTrend(Ref ref,
       .toList();
 }
 
-
-
 @riverpod
 Future<List<Map<String, dynamic>>> fullPRHistory(Ref ref) async {
   final repo = ref.watch(statsRepositoryProvider);
@@ -300,7 +307,6 @@ Future<List<int>> workoutPRs(Ref ref, int workoutId) async {
   final repo = ref.watch(statsRepositoryProvider);
   final fullHistory = await ref.watch(fullPRHistoryProvider.future);
 
-  // A PR was achieved in this workout if the date of its all-time best matches the workout date
   final workout = await (repo.db.select(
     repo.db.workouts,
   )..where((t) => t.id.equals(workoutId))).getSingle();
@@ -328,14 +334,12 @@ class BodyMeasurementsList extends _$BodyMeasurementsList {
     final repo = ref.read(measurementsRepositoryProvider);
     await repo.addMeasurement(measurement);
     ref.invalidateSelf();
-    ref.invalidate(physiqueAchievementProvider);
   }
 
   Future<void> deleteMeasurement(int id) async {
     final repo = ref.read(measurementsRepositoryProvider);
     await repo.deleteMeasurement(id);
     ref.invalidateSelf();
-    ref.invalidate(physiqueAchievementProvider);
   }
 
   Future<void> deleteMeasurements(Iterable<int> ids) async {
@@ -344,19 +348,15 @@ class BodyMeasurementsList extends _$BodyMeasurementsList {
       await repo.deleteMeasurement(id);
     }
     ref.invalidateSelf();
-    ref.invalidate(physiqueAchievementProvider);
   }
 
   Future<void> clearAllHistory() async {
     final repo = ref.read(measurementsRepositoryProvider);
     await repo.deleteAllMeasurements();
     ref.invalidateSelf();
-    ref.invalidate(physiqueAchievementProvider);
   }
 
   Future<void> seedSampleData() async {
-    // Hardcoded seeding disabled to ensure data integrity.
-    // In the future, this could be replaced with a real demo-data generator if needed.
     ref.invalidateSelf();
   }
 }
@@ -388,7 +388,6 @@ class BodyTargetsList extends _$BodyTargetsList {
   }
 
   Future<void> seedSampleTargets() async {
-    // Hardcoded seeding disabled.
     ref.invalidateSelf();
   }
 }
@@ -416,7 +415,6 @@ class ProgressPhotosList extends _$ProgressPhotosList {
 
 @riverpod
 Future<AnalyticsDashboardData> unifiedDashboardData(Ref ref) async {
-  // Use .future to wait for all the individual providers to resolve
   final results = await Future.wait([
     ref.watch(dashboardStatsProvider.future),
     ref.watch(recentPRsProvider.future),
@@ -442,6 +440,7 @@ Future<AnalyticsDashboardData> unifiedDashboardData(Ref ref) async {
 Future<PhysiqueAchievement> physiqueAchievement(Ref ref) async {
   final targets = await ref.watch(bodyTargetsListProvider.future);
   final measurements = await ref.watch(bodyMeasurementsListProvider.future);
+  // Re-run whenever the selected interval changes
   final dateRange = ref.watch(measurementDateRangeProvider);
 
   return calculatePhysiqueScore(
@@ -468,47 +467,41 @@ PhysiqueAchievement calculatePhysiqueScore(
   }
 
   // ── Local helpers ─────────────────────────────────────────────────────────
-  double? findCurrent(String metric) {
-    if (dateRange != null) {
-      int minDiff = 999999999;
-      double? found;
-      for (var m in allMeasurements) {
-        final v = extractMetricValue(m, metric);
-        if (v == null) continue;
-        final diff = m.date.difference(dateRange.end).inSeconds.abs();
-        if (diff < minDiff) { minDiff = diff; found = v; }
-      }
-      return found;
-    } else {
-      for (var m in allMeasurements) {
-        final v = extractMetricValue(m, metric);
-        if (v != null) return v;
-      }
-      return null;
-    }
+  (double? current, double? start, DateTime? startDate) getMetricRangeValues(
+      String metric) {
+    final filtered = allMeasurements
+        .where((m) {
+          final v = extractMetricValue(m, metric);
+          // Skip measurements where this specific metric has no value (null or 0)
+          if (v == null || v == 0) return false;
+          if (dateRange == null) return true;
+          return m.date.isAfter(
+                  dateRange.start.subtract(const Duration(seconds: 1))) &&
+              m.date
+                  .isBefore(dateRange.end.add(const Duration(seconds: 1)));
+        })
+        .toList()
+      ..sort((a, b) => a.date.compareTo(b.date));
+
+    if (filtered.isEmpty) return (null, null, null);
+
+    final startVal = extractMetricValue(filtered.first, metric);
+    final currentVal = extractMetricValue(filtered.last, metric);
+    final startDate = filtered.first.date;
+
+    return (currentVal, startVal, startDate);
   }
 
-  (double?, DateTime?) findStart(String metric, DateTime lookup) {
-    double? val; DateTime? date; int best = 999999999;
-    for (var m in allMeasurements) {
-      final v = extractMetricValue(m, metric);
-      if (v == null) continue;
-      final diff = m.date.difference(lookup).inSeconds.abs();
-      if (diff < best) { best = diff; val = v; date = m.date; }
-    }
-    return (val, date);
-  }
-
-  // 1. Process Standard Metrics (Always show these)
+  // 1. Process Standard Metrics
   for (final cfg in standardMetrics) {
     final t = latestTargetMap[cfg.id];
-    final currentVal = findCurrent(cfg.id);
-    final startLookup = dateRange?.start ?? t?.createdAt ?? DateTime.now();
-    final (startRaw, startDate) = findStart(cfg.id, startLookup);
-    final startVal = startRaw ?? currentVal ?? 0.0;
+    final (currentVal, startVal, startDate) = getMetricRangeValues(cfg.id);
 
     double percentage = 0;
-    if (t != null && t.targetValue > 0 && currentVal != null) {
+    if (t != null &&
+        t.targetValue > 0 &&
+        currentVal != null &&
+        startVal != null) {
       final journeyLen = t.targetValue - startVal;
       if (journeyLen.abs() < 0.001) {
         percentage = 1.0;
@@ -534,7 +527,7 @@ PhysiqueAchievement calculatePhysiqueScore(
       metric: cfg.id,
       label: cfg.label,
       targetValue: t?.targetValue ?? 0,
-      startValue: startVal,
+      startValue: startVal ?? 0.0,
       currentValue: currentVal ?? 0,
       percentage: percentage,
       achievementRatio: achievementRatio,
@@ -543,29 +536,27 @@ PhysiqueAchievement calculatePhysiqueScore(
     ));
   }
 
-  // 2. Process Custom Metrics (Those in history OR those with targets)
+  // 2. Process Custom Metrics
   final allHistoryCustomKeys = allMeasurements
       .expand((m) => m.customValues?.keys ?? <String>[])
       .toSet();
-  
-  // Also include targets that aren't standard
-  final customTargetKeys = latestTargetMap.keys.where((k) => !standardMetrics.any((m) => m.id == k));
-  
+
+  final customTargetKeys = latestTargetMap.keys
+      .where((k) => !standardMetrics.any((m) => m.id == k));
+
   final allCustomKeys = {...allHistoryCustomKeys, ...customTargetKeys};
 
   for (final metricId in allCustomKeys) {
     final t = latestTargetMap[metricId];
-    final currentVal = findCurrent(metricId);
-    
-    // If it's a custom metric and we have NO data and NO target, we skip it
+    final (currentVal, startVal, startDate) = getMetricRangeValues(metricId);
+
     if (currentVal == null && (t == null || t.targetValue <= 0)) continue;
 
-    final startLookup = dateRange?.start ?? t?.createdAt ?? DateTime.now();
-    final (startRaw, startDate) = findStart(metricId, startLookup);
-    final startVal = startRaw ?? currentVal ?? 0.0;
-
     double percentage = 0;
-    if (t != null && t.targetValue > 0 && currentVal != null) {
+    if (t != null &&
+        t.targetValue > 0 &&
+        currentVal != null &&
+        startVal != null) {
       final journeyLen = t.targetValue - startVal;
       if (journeyLen.abs() < 0.001) {
         percentage = 1.0;
@@ -591,7 +582,7 @@ PhysiqueAchievement calculatePhysiqueScore(
       metric: metricId,
       label: getMetricLabel(metricId),
       targetValue: t?.targetValue ?? 0,
-      startValue: startVal,
+      startValue: startVal ?? 0.0,
       currentValue: currentVal ?? 0,
       percentage: percentage,
       achievementRatio: achievementRatio,
@@ -600,12 +591,18 @@ PhysiqueAchievement calculatePhysiqueScore(
     ));
   }
 
-  // ── Overall score calculation ──────────────────────────────────────────────
-  final withTarget = achievements.where((a) => a.targetValue > 0).toList();
+  // ── Overall score: average ONLY metrics that have actual data (currentValue > 0)
+  // and a target set. Empty measurements are excluded from the count.
+  final withData = achievements
+      .where((a) => a.targetValue > 0 && a.currentValue > 0 && a.startDate != null)
+      .toList();
+
   double rawScore = 0, overallScore = 0;
-  if (withTarget.isNotEmpty) {
-    rawScore = withTarget.fold(0.0, (s, a) => s + a.percentage) / withTarget.length;
-    overallScore = withTarget.fold(0.0, (s, a) => s + a.achievementRatio) / withTarget.length;
+  if (withData.isNotEmpty) {
+    rawScore =
+        withData.fold(0.0, (s, a) => s + a.percentage) / withData.length;
+    overallScore =
+        withData.fold(0.0, (s, a) => s + a.achievementRatio) / withData.length;
   }
 
   return PhysiqueAchievement(
@@ -664,7 +661,6 @@ double? extractMetricValue(ent.BodyMeasurement m, String metric) {
       return m.visceralFat;
   }
 
-  // Custom values
   if (m.customValues != null && m.customValues!.containsKey(metric)) {
     return m.customValues![metric];
   }

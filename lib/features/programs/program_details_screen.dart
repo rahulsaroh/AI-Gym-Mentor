@@ -7,80 +7,135 @@ import 'package:ai_gym_mentor/features/workout/workout_repository.dart';
 import 'package:ai_gym_mentor/core/domain/entities/workout_program.dart' as ent;
 import 'package:ai_gym_mentor/features/workout/providers/workout_home_notifier.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:ai_gym_mentor/features/programs/providers/programs_notifier.dart';
 import 'dart:convert';
 
 class ProgramDetailScreen extends ConsumerWidget {
   final int templateId;
+  final int? initialDayId;
 
-  const ProgramDetailScreen({super.key, required this.templateId});
+  const ProgramDetailScreen({super.key, required this.templateId, this.initialDayId});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: FutureBuilder<List<ent.WorkoutProgram>>(
-        future: ref.read(workoutRepositoryProvider).getAllTemplates(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          final program = snapshot.data?.firstWhere((t) => t.id == templateId,
-              orElse: () => throw Exception('Program not found'));
+    final state = ref.watch(programsProvider);
 
-          if (program == null) {
-            return const Center(child: Text('Program not found'));
-          }
+    return state.when(
+      loading: () => const Scaffold(
+        backgroundColor: Colors.white,
+        body: Center(child: CircularProgressIndicator()),
+      ),
+      error: (err, stack) => Scaffold(
+        backgroundColor: Colors.white,
+        body: Center(child: Text('Error: $err')),
+      ),
+      data: (programsState) {
+        final program = programsState.templates
+            .where((t) => t.id == templateId)
+            .firstOrNull;
 
-          return DefaultTabController(
-            length: program.days.length,
-            child: Scaffold(
+        if (program == null) {
+          return Scaffold(
+            backgroundColor: Colors.white,
+            appBar: AppBar(
+                elevation: 0,
+                backgroundColor: Colors.white,
+                leading: const BackButton(color: Colors.black)),
+            body: const Center(child: Text('Program not found')),
+          );
+        }
+
+        if (program.days.isEmpty) {
+          return Scaffold(
+            backgroundColor: Colors.white,
+            appBar: AppBar(
+              elevation: 0,
               backgroundColor: Colors.white,
-              body: NestedScrollView(
-                headerSliverBuilder: (context, innerBoxIsScrolled) => [
-                  _buildAppBar(context, program),
-                  _buildHeader(context, program),
-                  _buildOverview(context, program),
-                  SliverPersistentHeader(
-                    pinned: true,
-                    delegate: _TabBarDelegate(
-                      TabBar(
-                        isScrollable: true,
-                        labelColor: Colors.teal[900],
-                        unselectedLabelColor: Colors.grey,
-                        indicatorColor: Colors.teal[900],
-                        indicatorWeight: 3,
-                        labelStyle: GoogleFonts.outfit(fontWeight: FontWeight.bold),
-                        tabs: program.days.map((day) {
-                          final weekdayName = day.weekday != null 
-                              ? _getWeekdayName(day.weekday!).substring(0, 3) 
-                              : 'Day ${day.order + 1}';
-                          return Tab(text: day.weekday != null ? '$weekdayName (D${day.order + 1})' : 'Day ${day.order + 1}');
-                        }).toList(),
-                      ),
-                    ),
+              leading: const BackButton(color: Colors.black),
+              title: Text(program.name,
+                  style: GoogleFonts.outfit(color: Colors.black)),
+            ),
+            body: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(LucideIcons.calendarX2,
+                      size: 64, color: Colors.grey),
+                  const SizedBox(height: 16),
+                  Text(
+                    'No days found for this program.',
+                    style:
+                        GoogleFonts.outfit(fontSize: 18, color: Colors.grey[600]),
+                  ),
+                  const SizedBox(height: 24),
+                  ElevatedButton(
+                    onPressed: () => context.push('/programs/edit/${program.id}'),
+                    child: const Text('Add Days'),
                   ),
                 ],
-                body: TabBarView(
-                  children: program.days
-                      .map((day) => _buildDaySingleView(context, ref, day, program.name))
-                      .toList(),
-                ),
               ),
-              floatingActionButton: _buildBottomButton(context, ref, program),
-              floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
             ),
           );
-        },
-      ),
+        }
+
+        final initialIndex = initialDayId != null
+            ? program.days.indexWhere((d) => d.id == initialDayId)
+            : 0;
+
+        return DefaultTabController(
+          length: program.days.length,
+          initialIndex: initialIndex != -1 ? initialIndex : 0,
+          child: Scaffold(
+            backgroundColor: Colors.white,
+            body: NestedScrollView(
+              headerSliverBuilder: (context, innerBoxIsScrolled) => [
+                _buildAppBar(context, program),
+                _buildOverview(context, program),
+                SliverPersistentHeader(
+                  pinned: true,
+                  delegate: _TabBarDelegate(
+                    TabBar(
+                      isScrollable: true,
+                      labelColor: Colors.teal[900],
+                      unselectedLabelColor: Colors.grey,
+                      indicatorColor: Colors.teal[900],
+                      indicatorWeight: 3,
+                      labelStyle: GoogleFonts.outfit(fontWeight: FontWeight.bold),
+                      tabs: program.days.map((day) {
+                        final weekdayName = day.weekday != null
+                            ? _getWeekdayName(day.weekday!).substring(0, 3)
+                            : 'Day ${day.order + 1}';
+                        return Tab(
+                            text: day.weekday != null
+                                ? '$weekdayName (D${day.order + 1})'
+                                : 'Day ${day.order + 1}');
+                      }).toList(),
+                    ),
+                  ),
+                ),
+              ],
+              body: TabBarView(
+                children: program.days
+                    .map((day) =>
+                        _buildDaySingleView(context, ref, day, program.name))
+                    .toList(),
+              ),
+            ),
+            floatingActionButton: _buildBottomButton(context, ref, program),
+            floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+          ),
+        );
+      },
     );
   }
 
   Widget _buildAppBar(BuildContext context, ent.WorkoutProgram program) {
+    final totalExercises = program.days.fold(0, (sum, day) => sum + day.exercises.length);
     return SliverAppBar(
-      expandedHeight: 220,
+      expandedHeight: 200,
       pinned: true,
       elevation: 0,
-      backgroundColor: Colors.orange[800],
+      backgroundColor: Colors.orange[900],
       leading: IconButton(
         icon: const Icon(LucideIcons.arrowLeft, color: Colors.white),
         onPressed: () => context.pop(),
@@ -93,90 +148,100 @@ class ProgramDetailScreen extends ConsumerWidget {
           style: IconButton.styleFrom(backgroundColor: Colors.black26),
           tooltip: 'Edit program',
         ),
-        IconButton(
-          icon: const Icon(LucideIcons.sparkles, color: Colors.white),
-          onPressed: () {},
-          style: IconButton.styleFrom(backgroundColor: Colors.black26),
-        ),
         const SizedBox(width: 8),
       ],
       flexibleSpace: FlexibleSpaceBar(
+        collapseMode: CollapseMode.pin,
         background: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [Colors.orange[900]!, Colors.orange[400]!],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
+              colors: [Colors.orange[900]!, Colors.orange[600]!],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
             ),
           ),
-          child: Center(
-            child: Opacity(
-              opacity: 0.2,
-              child: Icon(LucideIcons.dumbbell, size: 80, color: Colors.white),
-            ),
+          child: Stack(
+            children: [
+              // Decorative dumbbell icon
+              Positioned(
+                right: -30,
+                top: 20,
+                child: Opacity(
+                  opacity: 0.12,
+                  child: Icon(LucideIcons.dumbbell, size: 180, color: Colors.white),
+                ),
+              ),
+              // Program name and stats at the bottom of the expanded area
+              Positioned(
+                left: 20,
+                right: 20,
+                bottom: 20,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      program.name,
+                      style: GoogleFonts.outfit(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w900,
+                        fontSize: 22,
+                        height: 1.2,
+                        shadows: [
+                          const Shadow(
+                            color: Colors.black38,
+                            offset: Offset(0, 2),
+                            blurRadius: 4,
+                          ),
+                        ],
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        _statPill(LucideIcons.calendar, '${program.days.length} Days'),
+                        const SizedBox(width: 8),
+                        _statPill(LucideIcons.dumbbell, '$totalExercises Exercises'),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ),
       ),
     );
   }
 
-  Widget _buildHeader(BuildContext context, ent.WorkoutProgram program) {
-    final duration = '12 Weeks'; // Fallback
-    final goal = 'Aesthetics'; // Fallback
-
-    return SliverToBoxAdapter(
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Text(
-                    program.name,
-                    style: GoogleFonts.outfit(
-                      fontSize: 28,
-                      fontWeight: FontWeight.w900,
-                      color: Colors.black,
-                      letterSpacing: -0.5,
-                    ),
-                  ),
-                ),
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: Colors.orange[50],
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: Colors.orange[100]!),
-                  ),
-                  child: Text(
-                    duration,
-                    style: GoogleFonts.outfit(
-                      color: Colors.orange[800],
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
-                    ),
-                  ),
-                ),
-              ],
+  Widget _statPill(IconData icon, String label) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.2),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.white30),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 12, color: Colors.white),
+          const SizedBox(width: 4),
+          Text(
+            label,
+            style: GoogleFonts.outfit(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 12,
             ),
-            const SizedBox(height: 16),
-            Wrap(
-              spacing: 8,
-              children: [
-                _tag(goal),
-                _tag('Muscle Gain'),
-                _tag('Strength'),
-              ],
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
+
 
   Widget _tag(String text) {
     return Container(
@@ -199,7 +264,7 @@ class ProgramDetailScreen extends ConsumerWidget {
   Widget _buildOverview(BuildContext context, ent.WorkoutProgram program) {
     return SliverToBoxAdapter(
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(20, 32, 20, 0),
+        padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -421,6 +486,13 @@ class ProgramDetailScreen extends ConsumerWidget {
     final imageUrl = ex.exercise.imageUrls.isNotEmpty 
         ? ex.exercise.imageUrls.first 
         : (ex.exercise.gifUrl ?? '');
+    final hasImage = imageUrl.isNotEmpty;
+
+    // Generate a consistent color from exercise name
+    final nameHash = ex.exercise.name.codeUnits.fold(0, (a, b) => a + b);
+    final hue = (nameHash * 37) % 360;
+    final avatarColor = HSVColor.fromAHSV(1.0, hue.toDouble(), 0.6, 0.7).toColor();
+    final initial = ex.exercise.name.isNotEmpty ? ex.exercise.name[0].toUpperCase() : '?';
 
     return InkWell(
       onTap: () => context.push('/exercises/${ex.exercise.id}'),
@@ -435,18 +507,45 @@ class ProgramDetailScreen extends ConsumerWidget {
               height: 50,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.grey[200],
-                border: Border.all(color: Colors.grey[300]!, width: 1.5),
+                color: avatarColor.withOpacity(0.15),
+                border: Border.all(color: avatarColor.withOpacity(0.3), width: 1.5),
               ),
               clipBehavior: Clip.antiAlias,
-              child: imageUrl.isNotEmpty
+              child: hasImage
                   ? CachedNetworkImage(
                       imageUrl: imageUrl,
                       fit: BoxFit.cover,
-                      placeholder: (context, url) => const Icon(LucideIcons.image, size: 20, color: Colors.grey),
-                      errorWidget: (context, url, error) => const Icon(LucideIcons.dumbbell, size: 20, color: Colors.grey),
+                      placeholder: (context, url) => Center(
+                        child: Text(
+                          initial,
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: avatarColor,
+                          ),
+                        ),
+                      ),
+                      errorWidget: (context, url, error) => Center(
+                        child: Text(
+                          initial,
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: avatarColor,
+                          ),
+                        ),
+                      ),
                     )
-                  : const Icon(LucideIcons.dumbbell, size: 20, color: Colors.grey),
+                  : Center(
+                      child: Text(
+                        initial,
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: avatarColor,
+                        ),
+                      ),
+                    ),
             ),
             const SizedBox(width: 16),
             // Exercise Info

@@ -24,7 +24,6 @@ class ProgramDbSeeder {
     try {
       final existingTemplates = await repository.getAllTemplates();
       final existingNames = existingTemplates.map((t) => t.name).toSet();
-
       int addedCount = 0;
       for (final program in allSamplePrograms) {
         if (!existingNames.contains(program.name)) {

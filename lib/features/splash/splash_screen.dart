@@ -6,6 +6,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:ai_gym_mentor/features/settings/settings_provider.dart';
+import 'package:ai_gym_mentor/features/settings/models/settings_state.dart';
+
 
 class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
@@ -70,13 +73,17 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
       debugPrint('SplashScreen: Backup detection skipped: $e');
     }
 
+    final settings = await ref.read(settingsProvider.future);
+    final isProfileIncomplete = settings.height == 170.0;
+
     if (!hasSeenOnboarding) {
       if (mounted) context.go('/onboarding');
-    } else if (!hasCompletedSetup) {
+    } else if (!hasCompletedSetup || isProfileIncomplete) {
       if (mounted) context.go('/setup');
     } else {
       if (mounted) context.go('/app');
     }
+
   }
 
   @override

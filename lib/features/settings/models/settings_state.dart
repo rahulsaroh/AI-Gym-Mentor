@@ -8,12 +8,17 @@ enum FontSize { normal, large }
 
 enum OneRmFormula { epley, brzycki }
 
+enum BiologicalSex { male, female }
+
 class SettingsState {
   final String userName;
   final ExperienceLevel experienceLevel;
   final WeightUnit weightUnit;
   final int age;
   final String goals;
+  final double height; // in cm
+  final double weight; // in kg
+  final BiologicalSex sex;
 
   final ThemeMode themeMode;
   final Color accentColor;
@@ -50,6 +55,9 @@ class SettingsState {
     this.weightUnit = WeightUnit.kg,
     this.age = 25,
     this.goals = 'Build muscle and gain strength',
+    this.height = 170.0,
+    this.weight = 75.0,
+    this.sex = BiologicalSex.male,
     this.themeMode = ThemeMode.system,
     this.accentColor = Colors.blue,
     this.fontSize = FontSize.normal,
@@ -89,6 +97,9 @@ class SettingsState {
     WeightUnit? weightUnit,
     int? age,
     String? goals,
+    double? height,
+    double? weight,
+    BiologicalSex? sex,
     ThemeMode? themeMode,
     Color? accentColor,
     FontSize? fontSize,
@@ -119,6 +130,9 @@ class SettingsState {
       weightUnit: weightUnit ?? this.weightUnit,
       age: age ?? this.age,
       goals: goals ?? this.goals,
+      height: height ?? this.height,
+      weight: weight ?? this.weight,
+      sex: sex ?? this.sex,
       themeMode: themeMode ?? this.themeMode,
       accentColor: accentColor ?? this.accentColor,
       fontSize: fontSize ?? this.fontSize,
@@ -146,3 +160,4 @@ class SettingsState {
     );
   }
 }
+

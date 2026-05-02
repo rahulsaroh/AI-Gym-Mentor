@@ -14,6 +14,7 @@ _WorkoutProgram _$WorkoutProgramFromJson(Map<String, dynamic> json) =>
       lastUsed: json['lastUsed'] == null
           ? null
           : DateTime.parse(json['lastUsed'] as String),
+      isSelected: json['isSelected'] as bool? ?? false,
       days:
           (json['days'] as List<dynamic>?)
               ?.map((e) => ProgramDay.fromJson(e as Map<String, dynamic>))
@@ -27,6 +28,7 @@ Map<String, dynamic> _$WorkoutProgramToJson(_WorkoutProgram instance) =>
       'name': instance.name,
       'description': instance.description,
       'lastUsed': instance.lastUsed?.toIso8601String(),
+      'isSelected': instance.isSelected,
       'days': instance.days,
     };
 

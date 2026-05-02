@@ -57,10 +57,25 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
         physics: const BouncingScrollPhysics(
             parent: AlwaysScrollableScrollPhysics()),
         slivers: [
-          SliverAppBar.large(
-            title: const Text('History'),
+          SliverAppBar(
+            expandedHeight: 130,
             floating: true,
             pinned: true,
+            elevation: 0,
+            backgroundColor: Theme.of(context).colorScheme.surface,
+            surfaceTintColor: Colors.transparent,
+            flexibleSpace: FlexibleSpaceBar(
+              title: Text(
+                'History',
+                style: GoogleFonts.outfit(
+                  color: Theme.of(context).colorScheme.onSurface,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              titlePadding: const EdgeInsetsDirectional.only(start: 16, bottom: 76),
+              centerTitle: false,
+              expandedTitleScale: 1.3,
+            ),
             actions: [
               IconButton(
                 icon: const Icon(LucideIcons.share2),
@@ -364,15 +379,42 @@ class _StatChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: color.withOpacity(0.2)),
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(20),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            color.withValues(alpha: 0.12),
+            color.withValues(alpha: 0.05),
+          ],
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: color.withValues(alpha: 0.1),
+            blurRadius: 8,
+            offset: const Offset(4, 4),
+          ),
+          const BoxShadow(
+            color: Colors.white,
+            blurRadius: 8,
+            offset: Offset(-4, -4),
+          ),
+        ],
+        border: Border.all(color: color.withValues(alpha: 0.15), width: 1.2),
       ),
       child: Row(
         children: [
-          Icon(icon, color: color, size: 20),
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.5),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(icon, color: color, size: 18),
+          ),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -381,17 +423,23 @@ class _StatChip extends StatelessWidget {
               children: [
                 NumberTicker(
                   value: value,
-                  style: const TextStyle(
-                      fontWeight: FontWeight.bold, fontSize: 16),
+                  style: GoogleFonts.outfit(
+                    fontWeight: FontWeight.w900,
+                    fontSize: 18,
+                    color: color.withValues(alpha: 0.9),
+                  ),
                   decimalPlaces: 0,
-                  suffix: isVolume && value >= 1000
-                      ? 'kg'
-                      : (isVolume ? ' kg' : ''),
+                  suffix: isVolume && value >= 1000 ? 'kg' : (isVolume ? ' kg' : ''),
                 ),
-                Text(label,
-                    style: TextStyle(
-                        fontSize: 10,
-                        color: Theme.of(context).colorScheme.outline)),
+                Text(
+                  label.toUpperCase(),
+                  style: GoogleFonts.outfit(
+                    fontSize: 9,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 0.8,
+                    color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.7),
+                  ),
+                ),
               ],
             ),
           ),

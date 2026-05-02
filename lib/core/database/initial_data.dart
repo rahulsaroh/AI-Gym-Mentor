@@ -1823,7 +1823,7 @@ final elitePPLProgram = SampleProgram(
           notes: 'back on wall and slide hands on wall 2x10 reps',
         ),
         SampleProgramExercise(
-          name: 'Band face pull',
+          name: 'Band pull-apart',
           setType: 'warmup',
           notes: '2x15 reps',
         ),
@@ -1951,7 +1951,7 @@ final elitePPLProgram = SampleProgram(
       exercises: [
         SampleProgramExercise(name: 'Band pull-apart', notes: '2x15 reps'),
         SampleProgramExercise(
-          name: 'Rotator cuff internal/external rotation',
+          name: 'Wall shoulder CARs',
           notes: 'each 2x12 reps',
         ),
         SampleProgramExercise(
@@ -3464,7 +3464,7 @@ final sixDayBulkingSplitProgram = SampleProgram(
   duration: '7 Days',
   days: [
     SampleProgramDay(
-      name: 'Day 1 & 4: Chest/Back',
+      name: 'Day 1: Chest/Back (Focus: Power)',
       exercises: [
         SampleProgramExercise(name: 'Barbell Bench Press', setsJson: '[{"reps": 12, "weight": 0.0}, {"reps": 10, "weight": 0.0}, {"reps": 8, "weight": 0.0}, {"reps": 6, "weight": 0.0}]'),
         SampleProgramExercise(name: 'Barbell Incline Bench Press', setsJson: '[{"reps": 12, "weight": 0.0}, {"reps": 10, "weight": 0.0}, {"reps": 8, "weight": 0.0}, {"reps": 6, "weight": 0.0}]'),
@@ -3475,7 +3475,7 @@ final sixDayBulkingSplitProgram = SampleProgram(
       ],
     ),
     SampleProgramDay(
-      name: 'Day 2 & 5: Arms/Shoulders/Forearms',
+      name: 'Day 2: Arms/Shoulders (Focus: Power)',
       exercises: [
         SampleProgramExercise(name: 'Barbell Shoulder Press', setsJson: '[{"reps": 12, "weight": 0.0}, {"reps": 10, "weight": 0.0}, {"reps": 8, "weight": 0.0}, {"reps": 6, "weight": 0.0}]'),
         SampleProgramExercise(name: 'Barbell Shrug', setsJson: '[{"reps": 12, "weight": 0.0}, {"reps": 10, "weight": 0.0}, {"reps": 8, "weight": 0.0}, {"reps": 6, "weight": 0.0}]'),
@@ -3485,7 +3485,7 @@ final sixDayBulkingSplitProgram = SampleProgram(
       ],
     ),
     SampleProgramDay(
-      name: 'Day 3 & 6: Legs/Lower Back',
+      name: 'Day 3: Legs/Lower Back (Focus: Power)',
       exercises: [
         SampleProgramExercise(name: 'Deep Squat', setsJson: '[{"reps": 12, "weight": 0.0}, {"reps": 10, "weight": 0.0}, {"reps": 8, "weight": 0.0}, {"reps": 6, "weight": 0.0}]'),
         SampleProgramExercise(name: 'Hack Squat', setsJson: '[{"reps": 12, "weight": 0.0}, {"reps": 10, "weight": 0.0}, {"reps": 8, "weight": 0.0}, {"reps": 6, "weight": 0.0}]'),
@@ -3493,6 +3493,36 @@ final sixDayBulkingSplitProgram = SampleProgram(
         SampleProgramExercise(name: 'Dumbbell Stiff-Leg Deadlift', setsJson: '[{"reps": 12, "weight": 0.0}, {"reps": 10, "weight": 0.0}, {"reps": 8, "weight": 0.0}, {"reps": 6, "weight": 0.0}]'),
         SampleProgramExercise(name: 'Barbell Standing Calf Raise', setsJson: '[{"reps": 12, "weight": 0.0}, {"reps": 12, "weight": 0.0}, {"reps": 12, "weight": 0.0}]'),
         SampleProgramExercise(name: 'Good Mornings', setsJson: '[{"reps": 12, "weight": 0.0}, {"reps": 10, "weight": 0.0}, {"reps": 10, "weight": 0.0}]'),
+      ],
+    ),
+    SampleProgramDay(
+      name: 'Day 4: Chest/Back (Focus: Hypertrophy)',
+      exercises: [
+        SampleProgramExercise(name: 'Dumbbell Bench Press', setsJson: '[{"reps": 12, "weight": 0.0}, {"reps": 12, "weight": 0.0}, {"reps": 12, "weight": 0.0}]'),
+        SampleProgramExercise(name: 'Dumbbell Fly', setsJson: '[{"reps": 12, "weight": 0.0}, {"reps": 12, "weight": 0.0}, {"reps": 12, "weight": 0.0}]'),
+        SampleProgramExercise(name: 'Cable Lat Pulldown (Wide Grip)', setsJson: '[{"reps": 12, "weight": 0.0}, {"reps": 12, "weight": 0.0}, {"reps": 12, "weight": 0.0}]'),
+        SampleProgramExercise(name: 'Seated Cable Row', setsJson: '[{"reps": 12, "weight": 0.0}, {"reps": 12, "weight": 0.0}, {"reps": 12, "weight": 0.0}]'),
+        SampleProgramExercise(name: 'Dumbbell Shrug', setsJson: '[{"reps": 15, "weight": 0.0}, {"reps": 15, "weight": 0.0}]'),
+      ],
+    ),
+    SampleProgramDay(
+      name: 'Day 5: Arms/Shoulders (Focus: Hypertrophy)',
+      exercises: [
+        SampleProgramExercise(name: 'Dumbbell Shoulder Press', setsJson: '[{"reps": 12, "weight": 0.0}, {"reps": 12, "weight": 0.0}, {"reps": 12, "weight": 0.0}]'),
+        SampleProgramExercise(name: 'Dumbbell Lateral Raise', setsJson: '[{"reps": 15, "weight": 0.0}, {"reps": 15, "weight": 0.0}, {"reps": 15, "weight": 0.0}]'),
+        SampleProgramExercise(name: 'Dumbbell Alternating Bicep Curl', setsJson: '[{"reps": 12, "weight": 0.0}, {"reps": 12, "weight": 0.0}, {"reps": 12, "weight": 0.0}]'),
+        SampleProgramExercise(name: 'Dumbbell Tricep Kickback', setsJson: '[{"reps": 12, "weight": 0.0}, {"reps": 12, "weight": 0.0}, {"reps": 12, "weight": 0.0}]'),
+        SampleProgramExercise(name: 'Hammer Curls', setsJson: '[{"reps": 12, "weight": 0.0}, {"reps": 12, "weight": 0.0}]'),
+      ],
+    ),
+    SampleProgramDay(
+      name: 'Day 6: Legs/Lower Back (Focus: Hypertrophy)',
+      exercises: [
+        SampleProgramExercise(name: 'Machine Leg Press', setsJson: '[{"reps": 15, "weight": 0.0}, {"reps": 15, "weight": 0.0}, {"reps": 15, "weight": 0.0}]'),
+        SampleProgramExercise(name: 'Machine Leg Extension', setsJson: '[{"reps": 15, "weight": 0.0}, {"reps": 15, "weight": 0.0}, {"reps": 15, "weight": 0.0}]'),
+        SampleProgramExercise(name: 'Machine Seated Leg Curl', setsJson: '[{"reps": 15, "weight": 0.0}, {"reps": 15, "weight": 0.0}, {"reps": 15, "weight": 0.0}]'),
+        SampleProgramExercise(name: 'Machine Calf Raise', setsJson: '[{"reps": 15, "weight": 0.0}, {"reps": 15, "weight": 0.0}, {"reps": 15, "weight": 0.0}]'),
+        SampleProgramExercise(name: 'Back Extension', setsJson: '[{"reps": 15, "weight": 0.0}, {"reps": 15, "weight": 0.0}]'),
       ],
     ),
   ],

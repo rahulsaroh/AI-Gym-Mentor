@@ -61,6 +61,7 @@ class WorkoutTemplates extends Table {
   TextColumn get goal => text().nullable()(); // e.g. Aesthetics, Strength
   TextColumn get duration => text().nullable()(); // e.g. 12 weeks
   DateTimeColumn get lastUsed => dateTime().nullable()();
+  BoolColumn get isSelected => boolean().withDefault(const Constant(false))();
 }
 
 class TemplateDays extends Table {
@@ -359,7 +360,7 @@ class AppDatabase extends _$AppDatabase {
   }
 
   @override
-  int get schemaVersion => 28;
+  int get schemaVersion => 29;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -585,6 +586,11 @@ class AppDatabase extends _$AppDatabase {
           }
           if (from < 28) {
             await m.createTable(userProgramProgress);
+          }
+          if (from < 29) {
+            if (!await hasColumn('workout_templates', 'is_selected')) {
+              await m.addColumn(workoutTemplates, workoutTemplates.isSelected);
+            }
           }
         },
         beforeOpen: (details) async {

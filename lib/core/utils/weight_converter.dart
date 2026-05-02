@@ -4,8 +4,11 @@ class WeightConverter {
   /// Converts weight from storage (KG) to display (KG/LBS)
   static double toDisplay(double kg, WeightUnit unit) {
     if (unit == WeightUnit.kg) return kg;
-    return kg * 2.20462;
+    return kgToLbs(kg);
   }
+
+  static double kgToLbs(double kg) => kg * 2.20462;
+  static double lbsToKg(double lbs) => lbs / 2.20462;
 
   /// Converts weight from user input (KG/LBS) to storage (KG)
   static double toStorage(double displayValue, WeightUnit unit) {

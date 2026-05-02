@@ -13,6 +13,7 @@ abstract class WorkoutProgram with _$WorkoutProgram {
     required String name,
     String? description,
     DateTime? lastUsed,
+    @Default(false) bool isSelected,
     @Default([]) List<ProgramDay> days,
   }) = _WorkoutProgram;
 

@@ -126,12 +126,14 @@ class _ChartContent extends StatelessWidget {
                   bottomTitles: AxisTitles(
                     sideTitles: SideTitles(
                       showTitles: true,
+                      interval: 1,
                       getTitlesWidget: (val, meta) {
-                        if (val.toInt() >= data.length ||
-                            val.toInt() % 4 != 0) {
+                        if (val % 1 != 0) return const SizedBox.shrink();
+                        int index = val.toInt();
+                        if (index >= data.length || index % 4 != 0) {
                           return const SizedBox.shrink();
                         }
-                        final d = data[val.toInt()]['date'] as DateTime;
+                        final d = data[index]['date'] as DateTime;
                         return Text(
                           DateFormat('MM/dd').format(d),
                           style: const TextStyle(fontSize: 10),

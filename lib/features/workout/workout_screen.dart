@@ -22,6 +22,19 @@ import 'package:ai_gym_mentor/features/bodymap/providers/bodymap_provider.dart';
 import 'package:ai_gym_mentor/features/bodymap/widgets/body_map_painter.dart';
 import 'package:ai_gym_mentor/features/bodymap/widgets/muscle_path_registry.dart';
 import 'package:ai_gym_mentor/core/services/heatmap_color_service.dart';
+import 'package:ai_gym_mentor/features/workout/providers/workout_home_notifier.dart';
+import 'package:ai_gym_mentor/features/workout/components/begin_session_sheet.dart';
+import 'package:ai_gym_mentor/services/plateau_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:ai_gym_mentor/features/workout/workout_repository.dart';
+import 'package:ai_gym_mentor/features/analytics/presentation/widgets/stats_trend_chart.dart';
+import 'package:ai_gym_mentor/features/analytics/analytics_providers.dart';
+import 'package:ai_gym_mentor/features/analytics/presentation/widgets/workout_heatmap.dart';
+import 'package:ai_gym_mentor/core/widgets/skeleton_card.dart';
+import 'package:ai_gym_mentor/features/bodymap/providers/bodymap_provider.dart';
+import 'package:ai_gym_mentor/features/bodymap/widgets/body_map_painter.dart';
+import 'package:ai_gym_mentor/features/bodymap/widgets/muscle_path_registry.dart';
+import 'package:ai_gym_mentor/core/services/heatmap_color_service.dart';
 
 class WorkoutHomeScreen extends ConsumerWidget {
   const WorkoutHomeScreen({super.key});
@@ -341,17 +354,24 @@ class _TodayPlanSection extends ConsumerWidget {
                               ],
                             ],
                           ),
-                          Text(
-                            state.isRestDay
-                                ? 'Time to Recover'
-                                : (state.todayDayName ?? "Push Day A"),
-                            style: GoogleFonts.outfit(
-                              fontSize: 24,
-                              fontWeight: FontWeight.w900,
-                              color: Colors.white,
+                          InkWell(
+                            onTap: () {
+                              if (state.templateId != null && state.nextDayId != null) {
+                                context.push('/programs/details/${state.templateId}?dayId=${state.nextDayId}');
+                              }
+                            },
+                            child: Text(
+                              state.isRestDay
+                                  ? 'Time to Recover'
+                                  : (state.todayDayName ?? "Push Day A"),
+                              style: GoogleFonts.outfit(
+                                fontSize: 24,
+                                fontWeight: FontWeight.w900,
+                                color: Colors.white,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
                             ),
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
                           ),
                         ],
                       ),
@@ -386,21 +406,28 @@ class _TodayPlanSection extends ConsumerWidget {
                     children: [
                       ...state.todayExercises.take(3).map((ex) => _TodayExerciseItem(ex: ex)),
                       if (state.todayExercises.length > 3)
-                        Padding(
-                          padding: const EdgeInsets.only(top: 12),
-                          child: Row(
-                            children: [
-                              Icon(LucideIcons.plus, size: 14, color: Colors.white.withValues(alpha: 0.7)),
-                              const SizedBox(width: 8),
-                              Text(
-                                '${state.todayExercises.length - 3} more exercises',
-                                style: GoogleFonts.outfit(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.white.withValues(alpha: 0.7),
+                        InkWell(
+                          onTap: () {
+                            if (state.templateId != null && state.nextDayId != null) {
+                              context.push('/programs/details/${state.templateId}?dayId=${state.nextDayId}');
+                            }
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.only(top: 12),
+                            child: Row(
+                              children: [
+                                Icon(LucideIcons.plus, size: 14, color: Colors.white.withValues(alpha: 0.7)),
+                                const SizedBox(width: 8),
+                                Text(
+                                  '${state.todayExercises.length - 3} more exercises',
+                                  style: GoogleFonts.outfit(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.white.withValues(alpha: 0.7),
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
                     ],
@@ -603,7 +630,7 @@ class _QuickActionSection extends StatelessWidget {
               icon: LucideIcons.dumbbell,
               label: 'EXERCISES',
               color: Colors.blue.shade400,
-              onTap: () => context.push('/exercises'),
+              onTap: () => context.go('/exercises'),
             ),
           ],
         ),

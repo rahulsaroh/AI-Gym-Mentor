@@ -1425,6 +1425,21 @@ class $WorkoutTemplatesTable extends WorkoutTemplates
     type: DriftSqlType.dateTime,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _isSelectedMeta = const VerificationMeta(
+    'isSelected',
+  );
+  @override
+  late final GeneratedColumn<bool> isSelected = GeneratedColumn<bool>(
+    'is_selected',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_selected" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -1433,6 +1448,7 @@ class $WorkoutTemplatesTable extends WorkoutTemplates
     goal,
     duration,
     lastUsed,
+    isSelected,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -1484,6 +1500,12 @@ class $WorkoutTemplatesTable extends WorkoutTemplates
         lastUsed.isAcceptableOrUnknown(data['last_used']!, _lastUsedMeta),
       );
     }
+    if (data.containsKey('is_selected')) {
+      context.handle(
+        _isSelectedMeta,
+        isSelected.isAcceptableOrUnknown(data['is_selected']!, _isSelectedMeta),
+      );
+    }
     return context;
   }
 
@@ -1517,6 +1539,10 @@ class $WorkoutTemplatesTable extends WorkoutTemplates
         DriftSqlType.dateTime,
         data['${effectivePrefix}last_used'],
       ),
+      isSelected: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_selected'],
+      )!,
     );
   }
 
@@ -1533,6 +1559,7 @@ class WorkoutTemplate extends DataClass implements Insertable<WorkoutTemplate> {
   final String? goal;
   final String? duration;
   final DateTime? lastUsed;
+  final bool isSelected;
   const WorkoutTemplate({
     required this.id,
     required this.name,
@@ -1540,6 +1567,7 @@ class WorkoutTemplate extends DataClass implements Insertable<WorkoutTemplate> {
     this.goal,
     this.duration,
     this.lastUsed,
+    required this.isSelected,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -1558,6 +1586,7 @@ class WorkoutTemplate extends DataClass implements Insertable<WorkoutTemplate> {
     if (!nullToAbsent || lastUsed != null) {
       map['last_used'] = Variable<DateTime>(lastUsed);
     }
+    map['is_selected'] = Variable<bool>(isSelected);
     return map;
   }
 
@@ -1575,6 +1604,7 @@ class WorkoutTemplate extends DataClass implements Insertable<WorkoutTemplate> {
       lastUsed: lastUsed == null && nullToAbsent
           ? const Value.absent()
           : Value(lastUsed),
+      isSelected: Value(isSelected),
     );
   }
 
@@ -1590,6 +1620,7 @@ class WorkoutTemplate extends DataClass implements Insertable<WorkoutTemplate> {
       goal: serializer.fromJson<String?>(json['goal']),
       duration: serializer.fromJson<String?>(json['duration']),
       lastUsed: serializer.fromJson<DateTime?>(json['lastUsed']),
+      isSelected: serializer.fromJson<bool>(json['isSelected']),
     );
   }
   @override
@@ -1602,6 +1633,7 @@ class WorkoutTemplate extends DataClass implements Insertable<WorkoutTemplate> {
       'goal': serializer.toJson<String?>(goal),
       'duration': serializer.toJson<String?>(duration),
       'lastUsed': serializer.toJson<DateTime?>(lastUsed),
+      'isSelected': serializer.toJson<bool>(isSelected),
     };
   }
 
@@ -1612,6 +1644,7 @@ class WorkoutTemplate extends DataClass implements Insertable<WorkoutTemplate> {
     Value<String?> goal = const Value.absent(),
     Value<String?> duration = const Value.absent(),
     Value<DateTime?> lastUsed = const Value.absent(),
+    bool? isSelected,
   }) => WorkoutTemplate(
     id: id ?? this.id,
     name: name ?? this.name,
@@ -1619,6 +1652,7 @@ class WorkoutTemplate extends DataClass implements Insertable<WorkoutTemplate> {
     goal: goal.present ? goal.value : this.goal,
     duration: duration.present ? duration.value : this.duration,
     lastUsed: lastUsed.present ? lastUsed.value : this.lastUsed,
+    isSelected: isSelected ?? this.isSelected,
   );
   WorkoutTemplate copyWithCompanion(WorkoutTemplatesCompanion data) {
     return WorkoutTemplate(
@@ -1630,6 +1664,9 @@ class WorkoutTemplate extends DataClass implements Insertable<WorkoutTemplate> {
       goal: data.goal.present ? data.goal.value : this.goal,
       duration: data.duration.present ? data.duration.value : this.duration,
       lastUsed: data.lastUsed.present ? data.lastUsed.value : this.lastUsed,
+      isSelected: data.isSelected.present
+          ? data.isSelected.value
+          : this.isSelected,
     );
   }
 
@@ -1641,14 +1678,15 @@ class WorkoutTemplate extends DataClass implements Insertable<WorkoutTemplate> {
           ..write('description: $description, ')
           ..write('goal: $goal, ')
           ..write('duration: $duration, ')
-          ..write('lastUsed: $lastUsed')
+          ..write('lastUsed: $lastUsed, ')
+          ..write('isSelected: $isSelected')
           ..write(')'))
         .toString();
   }
 
   @override
   int get hashCode =>
-      Object.hash(id, name, description, goal, duration, lastUsed);
+      Object.hash(id, name, description, goal, duration, lastUsed, isSelected);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -1658,7 +1696,8 @@ class WorkoutTemplate extends DataClass implements Insertable<WorkoutTemplate> {
           other.description == this.description &&
           other.goal == this.goal &&
           other.duration == this.duration &&
-          other.lastUsed == this.lastUsed);
+          other.lastUsed == this.lastUsed &&
+          other.isSelected == this.isSelected);
 }
 
 class WorkoutTemplatesCompanion extends UpdateCompanion<WorkoutTemplate> {
@@ -1668,6 +1707,7 @@ class WorkoutTemplatesCompanion extends UpdateCompanion<WorkoutTemplate> {
   final Value<String?> goal;
   final Value<String?> duration;
   final Value<DateTime?> lastUsed;
+  final Value<bool> isSelected;
   const WorkoutTemplatesCompanion({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
@@ -1675,6 +1715,7 @@ class WorkoutTemplatesCompanion extends UpdateCompanion<WorkoutTemplate> {
     this.goal = const Value.absent(),
     this.duration = const Value.absent(),
     this.lastUsed = const Value.absent(),
+    this.isSelected = const Value.absent(),
   });
   WorkoutTemplatesCompanion.insert({
     this.id = const Value.absent(),
@@ -1683,6 +1724,7 @@ class WorkoutTemplatesCompanion extends UpdateCompanion<WorkoutTemplate> {
     this.goal = const Value.absent(),
     this.duration = const Value.absent(),
     this.lastUsed = const Value.absent(),
+    this.isSelected = const Value.absent(),
   }) : name = Value(name);
   static Insertable<WorkoutTemplate> custom({
     Expression<int>? id,
@@ -1691,6 +1733,7 @@ class WorkoutTemplatesCompanion extends UpdateCompanion<WorkoutTemplate> {
     Expression<String>? goal,
     Expression<String>? duration,
     Expression<DateTime>? lastUsed,
+    Expression<bool>? isSelected,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -1699,6 +1742,7 @@ class WorkoutTemplatesCompanion extends UpdateCompanion<WorkoutTemplate> {
       if (goal != null) 'goal': goal,
       if (duration != null) 'duration': duration,
       if (lastUsed != null) 'last_used': lastUsed,
+      if (isSelected != null) 'is_selected': isSelected,
     });
   }
 
@@ -1709,6 +1753,7 @@ class WorkoutTemplatesCompanion extends UpdateCompanion<WorkoutTemplate> {
     Value<String?>? goal,
     Value<String?>? duration,
     Value<DateTime?>? lastUsed,
+    Value<bool>? isSelected,
   }) {
     return WorkoutTemplatesCompanion(
       id: id ?? this.id,
@@ -1717,6 +1762,7 @@ class WorkoutTemplatesCompanion extends UpdateCompanion<WorkoutTemplate> {
       goal: goal ?? this.goal,
       duration: duration ?? this.duration,
       lastUsed: lastUsed ?? this.lastUsed,
+      isSelected: isSelected ?? this.isSelected,
     );
   }
 
@@ -1741,6 +1787,9 @@ class WorkoutTemplatesCompanion extends UpdateCompanion<WorkoutTemplate> {
     if (lastUsed.present) {
       map['last_used'] = Variable<DateTime>(lastUsed.value);
     }
+    if (isSelected.present) {
+      map['is_selected'] = Variable<bool>(isSelected.value);
+    }
     return map;
   }
 
@@ -1752,7 +1801,8 @@ class WorkoutTemplatesCompanion extends UpdateCompanion<WorkoutTemplate> {
           ..write('description: $description, ')
           ..write('goal: $goal, ')
           ..write('duration: $duration, ')
-          ..write('lastUsed: $lastUsed')
+          ..write('lastUsed: $lastUsed, ')
+          ..write('isSelected: $isSelected')
           ..write(')'))
         .toString();
   }
@@ -14552,6 +14602,7 @@ typedef $$WorkoutTemplatesTableCreateCompanionBuilder =
       Value<String?> goal,
       Value<String?> duration,
       Value<DateTime?> lastUsed,
+      Value<bool> isSelected,
     });
 typedef $$WorkoutTemplatesTableUpdateCompanionBuilder =
     WorkoutTemplatesCompanion Function({
@@ -14561,6 +14612,7 @@ typedef $$WorkoutTemplatesTableUpdateCompanionBuilder =
       Value<String?> goal,
       Value<String?> duration,
       Value<DateTime?> lastUsed,
+      Value<bool> isSelected,
     });
 
 final class $$WorkoutTemplatesTableReferences
@@ -14655,6 +14707,11 @@ class $$WorkoutTemplatesTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<bool> get isSelected => $composableBuilder(
+    column: $table.isSelected,
+    builder: (column) => ColumnFilters(column),
+  );
+
   Expression<bool> templateDaysRefs(
     Expression<bool> Function($$TemplateDaysTableFilterComposer f) f,
   ) {
@@ -14744,6 +14801,11 @@ class $$WorkoutTemplatesTableOrderingComposer
     column: $table.lastUsed,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<bool> get isSelected => $composableBuilder(
+    column: $table.isSelected,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$WorkoutTemplatesTableAnnotationComposer
@@ -14774,6 +14836,11 @@ class $$WorkoutTemplatesTableAnnotationComposer
 
   GeneratedColumn<DateTime> get lastUsed =>
       $composableBuilder(column: $table.lastUsed, builder: (column) => column);
+
+  GeneratedColumn<bool> get isSelected => $composableBuilder(
+    column: $table.isSelected,
+    builder: (column) => column,
+  );
 
   Expression<T> templateDaysRefs<T extends Object>(
     Expression<T> Function($$TemplateDaysTableAnnotationComposer a) f,
@@ -14862,6 +14929,7 @@ class $$WorkoutTemplatesTableTableManager
                 Value<String?> goal = const Value.absent(),
                 Value<String?> duration = const Value.absent(),
                 Value<DateTime?> lastUsed = const Value.absent(),
+                Value<bool> isSelected = const Value.absent(),
               }) => WorkoutTemplatesCompanion(
                 id: id,
                 name: name,
@@ -14869,6 +14937,7 @@ class $$WorkoutTemplatesTableTableManager
                 goal: goal,
                 duration: duration,
                 lastUsed: lastUsed,
+                isSelected: isSelected,
               ),
           createCompanionCallback:
               ({
@@ -14878,6 +14947,7 @@ class $$WorkoutTemplatesTableTableManager
                 Value<String?> goal = const Value.absent(),
                 Value<String?> duration = const Value.absent(),
                 Value<DateTime?> lastUsed = const Value.absent(),
+                Value<bool> isSelected = const Value.absent(),
               }) => WorkoutTemplatesCompanion.insert(
                 id: id,
                 name: name,
@@ -14885,6 +14955,7 @@ class $$WorkoutTemplatesTableTableManager
                 goal: goal,
                 duration: duration,
                 lastUsed: lastUsed,
+                isSelected: isSelected,
               ),
           withReferenceMapper: (p0) => p0
               .map(
