@@ -12,12 +12,13 @@ import 'package:ai_gym_mentor/features/workout/providers/workout_home_notifier.d
 import 'package:ai_gym_mentor/features/programs/components/mesocycle_list_view.dart';
 
 // ─── Design tokens ────────────────────────────────────────────────────────────
-const _kBg      = Color(0xFFF6F6F4);
+const _kBg      = Color(0xFFFBFBF9);
 const _kSurface = Colors.white;
 const _kText    = Color(0xFF111111);
 const _kMuted   = Color(0xFF8A8A8E);
 const _kBorder  = Color(0xFFE5E5EA);
-const _kPrimary = Color(0xFF141414);
+const _kPrimary = Colors.orange; // Vibrant orange instead of black
+const _kAccent  = Color(0xFFFB923C); // Warm orange for CTA
 // ─────────────────────────────────────────────────────────────────────────────
 
 class ProgramsScreen extends ConsumerStatefulWidget {
@@ -33,7 +34,7 @@ class _ProgramsScreenState extends ConsumerState<ProgramsScreen> {
   final List<String> _goals = [
     'All Goals',
     'Aesthetics',
-    'Athletic Performance',
+    'Performance',
     'Muscle Gain',
     'Fat Loss',
     'Strength',
@@ -47,67 +48,103 @@ class _ProgramsScreenState extends ConsumerState<ProgramsScreen> {
       length: 3,
       child: Scaffold(
         backgroundColor: _kBg,
-        appBar: AppBar(
-          backgroundColor: _kBg,
-          surfaceTintColor: Colors.transparent,
-          elevation: 0,
-          scrolledUnderElevation: 0,
-          centerTitle: false,
-          titleSpacing: 20,
-          title: Text(
-            'Training Programs',
-            style: GoogleFonts.outfit(
-              fontWeight: FontWeight.w800,
-              fontSize: 26,
-              color: _kText,
-              letterSpacing: -0.7,
-            ),
-          ),
-          actions: [
-            IconButton(
-              icon: const Icon(LucideIcons.rotateCcw, size: 20),
-              color: _kText,
-              tooltip: 'Reset to Sample',
-              onPressed: () => _showResetConfirm(context),
-            ),
-            IconButton(
-              icon: const Icon(LucideIcons.download, size: 20),
-              color: _kText,
-              tooltip: 'Import JSON',
-              onPressed: () => _showImportOptions(context, ref),
-            ),
-            const SizedBox(width: 6),
-          ],
-          bottom: PreferredSize(
-            preferredSize: const Size.fromHeight(48),
-            child: Container(
-              decoration: const BoxDecoration(
-                border: Border(bottom: BorderSide(color: _kBorder)),
+        body: NestedScrollView(
+          headerSliverBuilder: (context, innerBoxIsScrolled) => [
+            SliverAppBar(
+              expandedHeight: 120,
+              floating: true,
+              pinned: true,
+              elevation: 0,
+              scrolledUnderElevation: 0,
+              backgroundColor: _kBg,
+              flexibleSpace: FlexibleSpaceBar(
+                centerTitle: false,
+                titlePadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                title: Text(
+                  'Training Programs',
+                  style: GoogleFonts.outfit(
+                    fontWeight: FontWeight.w800,
+                    fontSize: 24,
+                    color: _kText,
+                    letterSpacing: -0.8,
+                  ),
+                ),
               ),
-              child: TabBar(
-                dividerColor: Colors.transparent,
-                indicatorSize: TabBarIndicatorSize.label,
-                indicatorColor: _kPrimary,
-                indicatorWeight: 2,
-                labelColor: _kText,
-                unselectedLabelColor: _kMuted,
-                labelStyle: GoogleFonts.outfit(fontWeight: FontWeight.w700, fontSize: 15),
-                unselectedLabelStyle: GoogleFonts.outfit(fontWeight: FontWeight.w600, fontSize: 15),
-                tabs: const [
-                  Tab(text: 'Exercise Plans'),
-                  Tab(text: 'Selected'),
-                  Tab(text: 'Mesocycles'),
-                ],
+              actions: [
+                IconButton(
+                  icon: const Icon(LucideIcons.rotateCcw, size: 20),
+                  color: _kText,
+                  tooltip: 'Reset to Sample',
+                  onPressed: () => _showResetConfirm(context),
+                ),
+                IconButton(
+                  icon: const Icon(LucideIcons.download, size: 20),
+                  color: _kText,
+                  tooltip: 'Import JSON',
+                  onPressed: () => _showImportOptions(context, ref),
+                ),
+                const SizedBox(width: 8),
+              ],
+            ),
+            SliverPersistentHeader(
+              pinned: true,
+              delegate: _SliverAppBarDelegate(
+                child: Container(
+                  color: _kBg,
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        child: Container(
+                          height: 48,
+                          padding: const EdgeInsets.all(4),
+                          decoration: BoxDecoration(
+                            color: _kBorder.withValues(alpha: 0.3),
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          child: TabBar(
+                            dividerColor: Colors.transparent,
+                            indicatorSize: TabBarIndicatorSize.tab,
+                            indicator: BoxDecoration(
+                              color: _kSurface,
+                              borderRadius: BorderRadius.circular(10),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.05),
+                                  blurRadius: 4,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            labelColor: _kText,
+                            unselectedLabelColor: _kMuted,
+                            labelStyle: GoogleFonts.outfit(fontWeight: FontWeight.w700, fontSize: 13.5),
+                            unselectedLabelStyle: GoogleFonts.outfit(fontWeight: FontWeight.w600, fontSize: 13.5),
+                            tabs: const [
+                              Tab(text: 'All Plans'),
+                              Tab(text: 'Selected'),
+                              Tab(text: 'Cycles'),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                maxHeight: 64,
+                minHeight: 64,
               ),
             ),
-          ),
-        ),
-        body: TabBarView(
-          children: [
-            _buildPlansList(stateAsync),
-            _buildSelectedPlansList(stateAsync),
-            const MesocycleListView(),
           ],
+          body: TabBarView(
+            children: [
+              _buildPlansList(stateAsync),
+              _buildSelectedPlansList(stateAsync),
+              const MesocycleListView(),
+            ],
+          ),
         ),
         floatingActionButton: Builder(
           builder: (context) {
@@ -117,16 +154,29 @@ class _ProgramsScreenState extends ConsumerState<ProgramsScreen> {
               builder: (context, _) {
                 final isMesocycleTab = tabController.index == 2;
                 return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: SizedBox(
-                    width: double.infinity,
-                    height: 54,
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [_kAccent, _kAccent.withValues(alpha: 0.8)],
+                      ),
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          color: _kAccent.withValues(alpha: 0.3),
+                          blurRadius: 15,
+                          offset: const Offset(0, 8),
+                        ),
+                      ],
+                    ),
                     child: FloatingActionButton.extended(
                       elevation: 0,
+                      focusElevation: 0,
+                      hoverElevation: 0,
                       highlightElevation: 0,
-                      backgroundColor: _kPrimary,
+                      backgroundColor: Colors.transparent,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(18),
+                        borderRadius: BorderRadius.circular(20),
                       ),
                       onPressed: () {
                         if (isMesocycleTab) {
@@ -135,12 +185,12 @@ class _ProgramsScreenState extends ConsumerState<ProgramsScreen> {
                           context.push('/programs/create');
                         }
                       },
-                      icon: const Icon(LucideIcons.plus, color: Colors.white, size: 19),
+                      icon: const Icon(LucideIcons.plus, color: Colors.white, size: 20),
                       label: Text(
-                        isMesocycleTab ? 'Create Mesocycle' : 'New Plan',
+                        isMesocycleTab ? 'Create Mesocycle' : 'New Training Plan',
                         style: GoogleFonts.outfit(
                           color: Colors.white,
-                          fontWeight: FontWeight.w700,
+                          fontWeight: FontWeight.w800,
                           fontSize: 15,
                         ),
                       ),
@@ -177,9 +227,9 @@ class _ProgramsScreenState extends ConsumerState<ProgramsScreen> {
 
               return RefreshIndicator(
                 onRefresh: () => ref.read(programsProvider.notifier).refresh(),
-                color: _kPrimary,
+                color: _kAccent,
                 child: ListView.builder(
-                  padding: const EdgeInsets.fromLTRB(16, 4, 16, 110),
+                  padding: const EdgeInsets.fromLTRB(16, 4, 16, 120),
                   itemCount: filteredTemplates.length,
                   itemBuilder: (context, index) {
                     return _ProgramCard(
@@ -191,7 +241,7 @@ class _ProgramsScreenState extends ConsumerState<ProgramsScreen> {
               );
             },
             loading: () => const Center(child: CircularProgressIndicator()),
-            error: (e, s) => Center(child: Text('Error: \$e')),
+            error: (e, s) => Center(child: Text('Error: $e')),
           ),
         ),
       ],
@@ -211,25 +261,25 @@ class _ProgramsScreenState extends ConsumerState<ProgramsScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(24),
+                    padding: const EdgeInsets.all(32),
                     decoration: BoxDecoration(
                       color: _kBorder.withValues(alpha: 0.1),
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(LucideIcons.dumbbell, size: 48, color: _kMuted),
+                    child: const Icon(LucideIcons.dumbbell, size: 64, color: _kMuted),
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 32),
                   Text(
-                    'No plans selected yet',
+                    'No active programs',
                     style: GoogleFonts.outfit(
-                      fontSize: 20,
+                      fontSize: 22,
                       fontWeight: FontWeight.w800,
                       color: _kText,
                     ),
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    'Browse the Plans tab to get started!',
+                    'Select a training plan from the main library to start tracking your progress here.',
                     textAlign: TextAlign.center,
                     style: GoogleFonts.outfit(
                       fontSize: 15,
@@ -245,9 +295,9 @@ class _ProgramsScreenState extends ConsumerState<ProgramsScreen> {
 
         return RefreshIndicator(
           onRefresh: () => ref.read(programsProvider.notifier).refresh(),
-          color: _kPrimary,
+          color: _kAccent,
           child: ListView.builder(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 110),
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 120),
             itemCount: selectedTemplates.length,
             itemBuilder: (context, index) {
               return _ProgramCard(
@@ -264,36 +314,45 @@ class _ProgramsScreenState extends ConsumerState<ProgramsScreen> {
   }
 
   Widget _buildFilters() {
-    return SizedBox(
-      height: 54,
+    return Container(
+      height: 58,
+      padding: const EdgeInsets.symmetric(vertical: 10),
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 16),
         itemCount: _goals.length,
         itemBuilder: (context, index) {
           final goal = _goals[index];
           final isSelected = _selectedGoal == goal;
           return Padding(
-            padding: const EdgeInsets.only(right: 8),
+            padding: const EdgeInsets.only(right: 10),
             child: GestureDetector(
               onTap: () => setState(() => _selectedGoal = goal),
               child: AnimatedContainer(
-                duration: const Duration(milliseconds: 160),
-                curve: Curves.easeOut,
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                duration: const Duration(milliseconds: 200),
+                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
                 decoration: BoxDecoration(
-                  color: isSelected ? _kPrimary : _kSurface,
-                  borderRadius: BorderRadius.circular(999),
+                  color: isSelected ? _kAccent : _kSurface,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: isSelected ? [
+                    BoxShadow(
+                      color: _kAccent.withValues(alpha: 0.2),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    )
+                  ] : [],
                   border: Border.all(
-                    color: isSelected ? _kPrimary : _kBorder,
+                    color: isSelected ? _kAccent : _kBorder,
                   ),
                 ),
-                child: Text(
-                  goal,
-                  style: GoogleFonts.outfit(
-                    fontSize: 13.5,
-                    fontWeight: FontWeight.w700,
-                    color: isSelected ? Colors.white : _kText,
+                child: Center(
+                  child: Text(
+                    goal,
+                    style: GoogleFonts.outfit(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                      color: isSelected ? Colors.white : _kText,
+                    ),
                   ),
                 ),
               ),
@@ -309,26 +368,30 @@ class _ProgramsScreenState extends ConsumerState<ProgramsScreen> {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: _kSurface,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Text('Reset All Plans?',
-            style: GoogleFonts.outfit(fontWeight: FontWeight.w800)),
-        content: const Text(
-          'This will delete all current programs and restore the professional '
-          'sample plan. This cannot be undone.',
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        title: Text('Reset Library?',
+            style: GoogleFonts.outfit(fontWeight: FontWeight.w900)),
+        content: Text(
+          'This will permanently delete your custom programs and restore the original templates.',
+          style: GoogleFonts.outfit(height: 1.4),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('Cancel', style: GoogleFonts.outfit(color: _kMuted)),
+            child: Text('Cancel', style: GoogleFonts.outfit(color: _kMuted, fontWeight: FontWeight.w600)),
           ),
-          TextButton(
+          ElevatedButton(
             onPressed: () {
               ref.read(programsProvider.notifier).resetPrograms();
               Navigator.pop(context);
             },
-            child: Text('Reset Now',
-                style: GoogleFonts.outfit(
-                    color: Colors.red, fontWeight: FontWeight.w700)),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+              elevation: 0,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+            child: Text('Reset', style: GoogleFonts.outfit(fontWeight: FontWeight.w700)),
           ),
         ],
       ),
@@ -338,89 +401,71 @@ class _ProgramsScreenState extends ConsumerState<ProgramsScreen> {
   void _showImportOptions(BuildContext context, WidgetRef ref) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: _kSurface,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      builder: (context) => SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 42,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: _kBorder,
-                  borderRadius: BorderRadius.circular(999),
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        decoration: const BoxDecoration(
+          color: _kSurface,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
+        ),
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: _kBorder,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 18),
-              Text(
-                'Import Plan',
-                style: GoogleFonts.outfit(
-                    fontSize: 20, fontWeight: FontWeight.w800, color: _kText),
-              ),
-              const SizedBox(height: 14),
-              _importTile(
-                context: context,
-                ref: ref,
-                icon: LucideIcons.file,
-                title: 'Choose JSON File',
-                subtitle: 'Import from a .json plan or exercise list',
-                onTap: () {
-                  Navigator.pop(context);
-                  ref.read(programsProvider.notifier).importTemplate();
-                },
-              ),
-              _importTile(
-                context: context,
-                ref: ref,
-                icon: LucideIcons.clipboard,
-                title: 'Paste JSON Data',
-                subtitle: 'Paste copied JSON content',
-                onTap: () {
-                  Navigator.pop(context);
-                  _showPasteJsonDialog(context, ref);
-                },
-              ),
-              const Divider(height: 24, color: _kBorder),
-              _importTile(
-                context: context,
-                ref: ref,
-                icon: LucideIcons.trophy,
-                title: '6-Day PPL Elite',
-                subtitle: 'Push/Pull/Legs split with GitHub exercises',
-                onTap: () {
-                  Navigator.pop(context);
-                  ref.read(programsProvider.notifier).importPplEliteProgram();
-                },
-              ),
-              _importTile(
-                context: context,
-                ref: ref,
-                icon: LucideIcons.zap,
-                title: '6 Weeks to Six-Pack Abs',
-                subtitle: 'Jefit 2-phase abs cutting program',
-                onTap: () {
-                  Navigator.pop(context);
-                  ref.read(programsProvider.notifier).importSixPackAbsProgram();
-                },
-              ),
-              const Divider(height: 24, color: _kBorder),
-              _importTile(
-                context: context,
-                ref: ref,
-                icon: LucideIcons.code,
-                title: 'View Sample JSON Template',
-                subtitle: 'Copy format to use for custom imports',
-                onTap: () {
-                  Navigator.pop(context);
-                  _showSampleJsonDialog(context, ref);
-                },
-              ),
-            ],
+                const SizedBox(height: 24),
+                Text(
+                  'Import Program',
+                  style: GoogleFonts.outfit(
+                      fontSize: 22, fontWeight: FontWeight.w900, color: _kText),
+                ),
+                const SizedBox(height: 24),
+                _importTile(
+                  context: context,
+                  ref: ref,
+                  icon: LucideIcons.file,
+                  title: 'Import JSON File',
+                  subtitle: 'Load a training plan from local storage',
+                  onTap: () {
+                    Navigator.pop(context);
+                    ref.read(programsProvider.notifier).importTemplate();
+                  },
+                ),
+                _importTile(
+                  context: context,
+                  ref: ref,
+                  icon: LucideIcons.clipboard,
+                  title: 'Paste Template',
+                  subtitle: 'Import from copied JSON text',
+                  onTap: () {
+                    Navigator.pop(context);
+                    _showPasteJsonDialog(context, ref);
+                  },
+                ),
+                const SizedBox(height: 12),
+                const Divider(color: _kBorder),
+                const SizedBox(height: 12),
+                _importTile(
+                  context: context,
+                  ref: ref,
+                  icon: LucideIcons.flame,
+                  title: 'Elite 6-Day PPL',
+                  subtitle: 'Professional Push/Pull/Legs splitting',
+                  onTap: () {
+                    Navigator.pop(context);
+                    ref.read(programsProvider.notifier).importPplEliteProgram();
+                  },
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -436,10 +481,17 @@ class _ProgramsScreenState extends ConsumerState<ProgramsScreen> {
     required VoidCallback onTap,
   }) {
     return ListTile(
-      contentPadding: const EdgeInsets.symmetric(horizontal: 4),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-      leading: Icon(icon, color: _kText, size: 22),
-      title: Text(title, style: GoogleFonts.outfit(fontWeight: FontWeight.w700)),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      leading: Container(
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: _kAccent.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Icon(icon, color: _kAccent, size: 22),
+      ),
+      title: Text(title, style: GoogleFonts.outfit(fontWeight: FontWeight.w800, fontSize: 16)),
       subtitle: Text(subtitle,
           style: GoogleFonts.outfit(fontSize: 13, color: _kMuted)),
       onTap: onTap,
@@ -458,30 +510,20 @@ class _ProgramsScreenState extends ConsumerState<ProgramsScreen> {
       context: context,
       builder: (dialogContext) => AlertDialog(
         backgroundColor: _kSurface,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text('Paste JSON',
-                style: GoogleFonts.outfit(fontWeight: FontWeight.w800)),
-            TextButton.icon(
-              onPressed: () async {
-                final data = await Clipboard.getData(Clipboard.kTextPlain);
-                if (data?.text != null) controller.text = data!.text!;
-              },
-              icon: const Icon(LucideIcons.clipboard, size: 16),
-              label: const Text('Paste'),
-            ),
-          ],
-        ),
-        content: SizedBox(
-          width: double.maxFinite,
-          child: TextField(
-            controller: controller,
-            maxLines: 10,
-            decoration: InputDecoration(
-              hintText: 'Paste your JSON here…',
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        title: Text('Paste JSON',
+            style: GoogleFonts.outfit(fontWeight: FontWeight.w900)),
+        content: TextField(
+          controller: controller,
+          maxLines: 8,
+          style: GoogleFonts.firaCode(fontSize: 12),
+          decoration: InputDecoration(
+            hintText: 'Paste template code here...',
+            filled: true,
+            fillColor: _kBg,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(16),
+              borderSide: BorderSide.none,
             ),
           ),
         ),
@@ -490,7 +532,7 @@ class _ProgramsScreenState extends ConsumerState<ProgramsScreen> {
             onPressed: () => Navigator.pop(dialogContext),
             child: Text('Cancel', style: GoogleFonts.outfit(color: _kMuted)),
           ),
-          TextButton(
+          ElevatedButton(
             onPressed: () async {
               final jsonStr = controller.text.trim();
               if (jsonStr.isEmpty) return;
@@ -501,89 +543,23 @@ class _ProgramsScreenState extends ConsumerState<ProgramsScreen> {
                     .importTemplateFromString(jsonStr);
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Plan imported successfully')),
+                    const SnackBar(content: Text('Import successful')),
                   );
                 }
               } catch (e) {
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Error importing plan: \$e')),
+                    SnackBar(content: Text('Import failed: $e')),
                   );
                 }
               }
             },
-            child: Text('Import',
-                style: GoogleFonts.outfit(fontWeight: FontWeight.w700)),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showSampleJsonDialog(BuildContext context, WidgetRef ref) {
-    final repo = ref.read(workoutRepositoryProvider);
-    final rawJson = repo.getSampleJson();
-    final decoded = jsonDecode(rawJson);
-    final prettyJson = const JsonEncoder.withIndent('  ').convert(decoded);
-
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: _kSurface,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text('Sample JSON',
-                style: GoogleFonts.outfit(fontWeight: FontWeight.w800)),
-            IconButton(
-              icon: const Icon(LucideIcons.copy, size: 20),
-              tooltip: 'Copy',
-              onPressed: () {
-                Clipboard.setData(ClipboardData(text: prettyJson));
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Copied to clipboard')),
-                );
-              },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: _kAccent,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
-          ],
-        ),
-        content: SizedBox(
-          width: double.maxFinite,
-          height: MediaQuery.of(context).size.height * 0.6,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Use this format for custom plan imports.',
-                style: GoogleFonts.outfit(fontSize: 13, color: _kMuted),
-              ),
-              const SizedBox(height: 12),
-              Expanded(
-                child: Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF4F4F5),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: _kBorder),
-                  ),
-                  child: SingleChildScrollView(
-                    child: SelectableText(
-                      prettyJson,
-                      style: GoogleFonts.firaCode(
-                          fontSize: 11, color: const Color(0xFF37474F)),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('Close',
-                style: GoogleFonts.outfit(fontWeight: FontWeight.w700)),
+            child: Text('Import', style: GoogleFonts.outfit(fontWeight: FontWeight.w700)),
           ),
         ],
       ),
@@ -592,64 +568,58 @@ class _ProgramsScreenState extends ConsumerState<ProgramsScreen> {
 
   Widget _buildEmptyState(BuildContext context, WidgetRef ref) {
     return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(40),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(LucideIcons.dumbbell, size: 56, color: _kBorder),
-            const SizedBox(height: 20),
-            Text(
-              'No plans yet',
-              style: GoogleFonts.outfit(
-                  fontSize: 20, fontWeight: FontWeight.w800, color: _kText),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(LucideIcons.library, size: 80, color: _kBorder),
+          const SizedBox(height: 24),
+          Text(
+            'Library is empty',
+            style: GoogleFonts.outfit(fontSize: 22, fontWeight: FontWeight.w900),
+          ),
+          const SizedBox(height: 32),
+          ElevatedButton.icon(
+            onPressed: () => _showImportOptions(context, ref),
+            icon: const Icon(LucideIcons.download),
+            label: const Text('Import Sample Plan'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: _kAccent,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             ),
-            const SizedBox(height: 8),
-            Text(
-              'Import an existing plan or create your first one.',
-              textAlign: TextAlign.center,
-              style: GoogleFonts.outfit(fontSize: 14, color: _kMuted),
-            ),
-            const SizedBox(height: 28),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                OutlinedButton.icon(
-                  onPressed: () => _showImportOptions(context, ref),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: _kText,
-                    side: const BorderSide(color: _kBorder),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14)),
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 12),
-                  ),
-                  icon: const Icon(LucideIcons.download, size: 18),
-                  label: Text('Import',
-                      style: GoogleFonts.outfit(fontWeight: FontWeight.w700)),
-                ),
-                const SizedBox(width: 12),
-                ElevatedButton.icon(
-                  onPressed: () => context.push('/programs/create'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: _kPrimary,
-                    foregroundColor: Colors.white,
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14)),
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 12),
-                  ),
-                  icon: const Icon(LucideIcons.plus, size: 18),
-                  label: Text('Create',
-                      style: GoogleFonts.outfit(fontWeight: FontWeight.w700)),
-                ),
-              ],
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
+  }
+}
+
+class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
+  _SliverAppBarDelegate({
+    required this.minHeight,
+    required this.maxHeight,
+    required this.child,
+  });
+  final double minHeight;
+  final double maxHeight;
+  final Widget child;
+
+  @override
+  double get minExtent => minHeight;
+  @override
+  double get maxExtent => maxHeight;
+
+  @override
+  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
+    return SizedBox.expand(child: child);
+  }
+
+  @override
+  bool shouldRebuild(_SliverAppBarDelegate oldDelegate) {
+    return maxHeight != oldDelegate.maxHeight ||
+        minHeight != oldDelegate.minHeight ||
+        child != oldDelegate.child;
   }
 }
 
@@ -668,201 +638,229 @@ class _ProgramCard extends ConsumerWidget {
     final tags = _resolveTags(template, selectedGoal);
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
         color: _kSurface,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: _kBorder),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: _kBorder.withValues(alpha: 0.7)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
-      child: Material(
-        color: Colors.transparent,
-        borderRadius: BorderRadius.circular(20),
-        child: InkWell(
-          onTap: () => context.push('/programs/details/${template.id}'),
-          borderRadius: BorderRadius.circular(20),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
+      clipBehavior: Clip.antiAlias,
+      child: Stack(
+        children: [
+          Positioned(
+            left: 0,
+            top: 0,
+            bottom: 0,
+            width: 5,
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    _kAccent.withValues(alpha: 0.8),
+                    _kAccent.withValues(alpha: 0.3),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () => context.push('/programs/details/${template.id}'),
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(22, 20, 20, 20),
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Expanded(
-                      child: Text(
-                        template.name,
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            template.name,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: GoogleFonts.outfit(
+                              fontSize: 20,
+                              height: 1.1,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: -0.6,
+                              color: _kText,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        PopupMenuButton<String>(
+                          padding: EdgeInsets.zero,
+                          icon: const Icon(LucideIcons.ellipsisVertical,
+                              size: 19, color: _kMuted),
+                          elevation: 1,
+                          color: _kSurface,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14)),
+                          itemBuilder: (context) => [
+                            PopupMenuItem(
+                                value: 'edit',
+                                child: Text('Edit Plan', style: GoogleFonts.outfit())),
+                            PopupMenuItem(
+                                value: 'export',
+                                child: Text('Export JSON', style: GoogleFonts.outfit())),
+                            PopupMenuItem(
+                                value: 'delete',
+                                child: Text('Delete',
+                                    style: GoogleFonts.outfit(color: Colors.red))),
+                          ],
+                          onSelected: (val) {
+                            if (val == 'edit') {
+                              context.push('/programs/edit/${template.id}');
+                            } else if (val == 'export') {
+                              ref.read(programsProvider.notifier).exportTemplate(template.id);
+                            } else if (val == 'delete') {
+                              _showDeleteDialog(context, ref);
+                            }
+                          },
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      '${template.days.length} Days • ${template.days.fold(0, (sum, day) => sum + day.exercises.length)} Exercises',
+                      style: GoogleFonts.outfit(
+                        fontSize: 13.5,
+                        fontWeight: FontWeight.w600,
+                        color: _kMuted,
+                      ),
+                    ),
+                    if (tags.isNotEmpty) ...[
+                      const SizedBox(height: 14),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: tags.take(3).map((t) => _colorfulTag(t)).toList(),
+                      ),
+                    ],
+                    if ((template.description ?? '').trim().isNotEmpty) ...[
+                      const SizedBox(height: 12),
+                      Text(
+                        template.description!,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: GoogleFonts.outfit(
-                          fontSize: 20,
-                          height: 1.1,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: -0.6,
-                          color: _kText,
+                          fontSize: 14,
+                          height: 1.45,
+                          color: _kMuted,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
-                    ),
-                    const SizedBox(width: 8),
-                    PopupMenuButton<String>(
-                      padding: EdgeInsets.zero,
-                      icon: const Icon(LucideIcons.ellipsisVertical,
-                          size: 19, color: _kMuted),
-                      elevation: 1,
-                      color: _kSurface,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14)),
-                      itemBuilder: (context) => [
-                        PopupMenuItem(
-                            value: 'edit',
-                            child: Text('Edit Plan', style: GoogleFonts.outfit())),
-                        PopupMenuItem(
-                            value: 'export',
-                            child: Text('Export JSON', style: GoogleFonts.outfit())),
-                        PopupMenuItem(
-                            value: 'delete',
-                            child: Text('Delete',
-                                style: GoogleFonts.outfit(color: Colors.red))),
-                      ],
-                      onSelected: (val) {
-                        if (val == 'edit') {
-                          context.push('/programs/edit/${template.id}');
-                        } else if (val == 'export') {
-                          ref.read(programsProvider.notifier).exportTemplate(template.id);
-                        } else if (val == 'delete') {
-                          _showDeleteDialog(context, ref);
-                        }
-                      },
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  '${template.days.length} Days • ${template.days.fold(0, (sum, day) => sum + day.exercises.length)} Exercises',
-                  style: GoogleFonts.outfit(
-                    fontSize: 13.5,
-                    fontWeight: FontWeight.w600,
-                    color: _kMuted,
-                  ),
-                ),
-                if (tags.isNotEmpty) ...[
-                  const SizedBox(height: 14),
-                  Wrap(
-                    spacing: 6,
-                    runSpacing: 6,
-                    children: tags.take(2).map((t) => _minimalTag(t)).toList(),
-                  ),
-                ],
-                if ((template.description ?? '').trim().isNotEmpty) ...[
-                  const SizedBox(height: 12),
-                  Text(
-                    template.description!,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.outfit(
-                      fontSize: 14,
-                      height: 1.45,
-                      color: _kMuted,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
-                const SizedBox(height: 16),
-                const Divider(height: 1, color: _kBorder),
-                const SizedBox(height: 14),
-                Row(
-                  children: [
-                    GestureDetector(
-                      onTap: () async {
-                        await ref.read(programsProvider.notifier).toggleSelected(
-                          template.id,
-                          !template.isSelected,
-                        );
-                        if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                template.isSelected
-                                    ? '${template.name} removed from Selected'
-                                    : '${template.name} added to Selected',
-                              ),
-                              duration: const Duration(seconds: 2),
-                            ),
-                          );
-                        }
-                      },
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            LucideIcons.star,
-                            size: 15,
-                            color: template.isSelected ? _kPrimary : _kMuted,
-                          ),
-                          const SizedBox(width: 5),
-                          Text(
-                            template.isSelected ? 'Selected' : 'Select plan',
-                            style: GoogleFonts.outfit(
-                              fontSize: 13.5,
-                              fontWeight: FontWeight.w700,
-                              color: template.isSelected ? _kPrimary : _kMuted,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const Spacer(),
-                    OutlinedButton(
-                      onPressed: () {
-                        context.push('/programs/details/${template.id}');
-                      },
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: _kText,
-                        side: const BorderSide(color: _kBorder),
-                        elevation: 0,
-                        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                        minimumSize: Size.zero,
-                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      ),
-                      child: Text('View',
-                          style: GoogleFonts.outfit(fontWeight: FontWeight.w700, fontSize: 14)),
-                    ),
-                    const SizedBox(width: 8),
-                    ElevatedButton(
-                      onPressed: () async {
-                        final repo = ref.read(workoutRepositoryProvider);
-                        final days = await repo.getTemplateDays(template.id);
-                        if (days.isNotEmpty && context.mounted) {
-                          final id = await ref
-                              .read(workoutHomeProvider.notifier)
-                              .startWorkout(
-                                templateId: template.id,
-                                dayId: days.first.id,
-                                name: template.name,
+                    ],
+                    const SizedBox(height: 16),
+                    const Divider(height: 1, color: _kBorder),
+                    const SizedBox(height: 14),
+                    Row(
+                      children: [
+                        GestureDetector(
+                          onTap: () async {
+                            await ref.read(programsProvider.notifier).toggleSelected(
+                              template.id,
+                              !template.isSelected,
+                            );
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    template.isSelected
+                                        ? '${template.name} removed from Selected'
+                                        : '${template.name} added to Selected',
+                                  ),
+                                  duration: const Duration(seconds: 2),
+                                ),
                               );
-                          if (context.mounted) {
-                            context.push('/app/workout/active?id=$id&dayId=${days.first.id}');
-                          }
-                        }
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: _kPrimary,
-                        foregroundColor: Colors.white,
-                        elevation: 0,
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                        minimumSize: Size.zero,
-                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      ),
-                      child: Text('Start',
-                          style: GoogleFonts.outfit(fontWeight: FontWeight.w700, fontSize: 14)),
+                            }
+                          },
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                LucideIcons.star,
+                                size: 15,
+                                color: template.isSelected ? _kAccent : _kMuted,
+                              ),
+                              const SizedBox(width: 5),
+                              Text(
+                                template.isSelected ? 'Selected' : 'Select plan',
+                                style: GoogleFonts.outfit(
+                                  fontSize: 13.5,
+                                  fontWeight: FontWeight.w700,
+                                  color: template.isSelected ? _kAccent : _kMuted,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const Spacer(),
+                        OutlinedButton(
+                          onPressed: () {
+                            context.push('/programs/details/${template.id}');
+                          },
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: _kText,
+                            side: const BorderSide(color: _kBorder),
+                            elevation: 0,
+                            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                            minimumSize: Size.zero,
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          ),
+                          child: Text('View',
+                              style: GoogleFonts.outfit(fontWeight: FontWeight.w700, fontSize: 14)),
+                        ),
+                        const SizedBox(width: 8),
+                        ElevatedButton(
+                          onPressed: () async {
+                            final repo = ref.read(workoutRepositoryProvider);
+                            final days = await repo.getTemplateDays(template.id);
+                            if (days.isNotEmpty && context.mounted) {
+                              final id = await ref
+                                  .read(workoutHomeProvider.notifier)
+                                  .startWorkout(
+                                    templateId: template.id,
+                                    dayId: days.first.id,
+                                    name: template.name,
+                                  );
+                              if (context.mounted) {
+                                context.push('/app/workout/active?id=$id&dayId=${days.first.id}');
+                              }
+                            }
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: _kAccent,
+                            foregroundColor: Colors.white,
+                            elevation: 0,
+                            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                            minimumSize: Size.zero,
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                            shadowColor: _kAccent.withValues(alpha: 0.4),
+                          ),
+                          child: Text('Start', style: GoogleFonts.outfit(fontWeight: FontWeight.w800, fontSize: 15)),
+                        ),
+                      ],
                     ),
                   ],
                 ),
-              ],
+              ),
             ),
           ),
-        ),
+        ],
       ),
     );
   }
@@ -881,20 +879,41 @@ class _ProgramCard extends ConsumerWidget {
     return tags.toSet().toList();
   }
 
-  Widget _minimalTag(String text) {
+  Widget _colorfulTag(String text) {
+    Color color;
+    switch (text.toLowerCase()) {
+      case 'fat loss':
+        color = const Color(0xFFFF2D55);
+        break;
+      case 'muscle gain':
+        color = const Color(0xFFFF9500);
+        break;
+      case 'strength':
+        color = const Color(0xFF5856D6);
+        break;
+      case 'aesthetics':
+        color = const Color(0xFF007AFF);
+        break;
+      case 'performance':
+        color = const Color(0xFF34C759);
+        break;
+      default:
+        color = _kMuted;
+    }
+
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: const Color(0xFFF4F4F5),
-        borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: _kBorder),
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: color.withValues(alpha: 0.2)),
       ),
       child: Text(
         text,
         style: GoogleFonts.outfit(
           fontSize: 12,
           fontWeight: FontWeight.w700,
-          color: _kText,
+          color: color,
         ),
       ),
     );

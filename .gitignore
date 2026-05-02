@@ -70,6 +70,7 @@ lib/generated_plugin_registrant.dart
 # Database related
 *.db
 *.sqlite
+*.bin
 
 # Environment files
 .env*
@@ -78,3 +79,19 @@ lib/generated_plugin_registrant.dart
 # App-specific archive
 dev/archive/
 nul
+
+# Screenshots and Artifacts
+*.png
+*.jpg
+*.jpeg
+*.xml
+*.txt
+*.backup
+!assets/**/*.png
+!assets/**/*.jpg
+!assets/**/*.jpeg
+!assets/**/*.xml
+!android/**/*.xml
+!ios/**/*.xml
+!web/**/*.png
+!web/**/*.xml
