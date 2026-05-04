@@ -1,0 +1,121 @@
+[
+  {
+    "base_id": "yuhonas_Pushups",
+    "chain": [
+      {"id": "yuhonas_Push-Up_Wide", "position": -1},
+      {"id": "yuhonas_Pushups", "position": 0},
+      {"id": "3294", "position": 1},
+      {"id": "yuhonas_Single-Arm_Push-Up", "position": 2}
+    ]
+  },
+  {
+    "base_id": "yuhonas_Bodyweight_Squat",
+    "chain": [
+      {"id": "yuhonas_Bodyweight_Squat", "position": 0},
+      {"id": "yuhonas_Goblet_Squat", "position": 1},
+      {"id": "yuhonas_Barbell_Squat", "position": 2}
+    ]
+  },
+  {
+    "base_id": "yuhonas_Barbell_Deadlift",
+    "chain": [
+      {"id": "yuhonas_Romanian_Deadlift", "position": -1},
+      {"id": "yuhonas_Barbell_Deadlift", "position": 0},
+      {"id": "yuhonas_Sumo_Deadlift", "position": 1}
+    ]
+  },
+  {
+    "base_id": "yuhonas_Pullups",
+    "chain": [
+      {"id": "yuhonas_Scapular_Pull-Up", "position": -1},
+      {"id": "yuhonas_Pullups", "position": 0},
+      {"id": "yuhonas_Weighted_Pull_Ups", "position": 1},
+      {"id": "yuhonas_Muscle_Up", "position": 2}
+    ]
+  },
+  {
+    "base_id": "yuhonas_Plank",
+    "chain": [
+      {"id": "yuhonas_kneeling_plank_tap_shoulder_(male)", "position": -1},
+      {"id": "yuhonas_Plank", "position": 0},
+      {"id": "yuhonas_weighted_front_plank", "position": 1}
+    ]
+  },
+  {
+    "base_id": "yuhonas_Bent_Over_Barbell_Row",
+    "chain": [
+      {"id": "yuhonas_Inverted_Row", "position": -1},
+      {"id": "yuhonas_Bent_Over_Barbell_Row", "position": 0},
+      {"id": "yuhonas_One-Arm_Dumbbell_Row", "position": 1}
+    ]
+  },
+  {
+    "base_id": "yuhonas_Bodyweight_Walking_Lunge",
+    "chain": [
+      {"id": "yuhonas_Crossover_Reverse_Lunge", "position": -1},
+      {"id": "yuhonas_Bodyweight_Walking_Lunge", "position": 0},
+      {"id": "yuhonas_Barbell_Walking_Lunge", "position": 1}
+    ]
+  },
+  {
+    "base_id": "yuhonas_Push_Press",
+    "chain": [
+      {"id": "yuhonas_Shoulder_Press_-_With_Bands", "position": -1},
+      {"id": "yuhonas_Push_Press", "position": 0},
+      {"id": "yuhonas_Arnold_Dumbbell_Press", "position": 1}
+    ]
+  },
+  {
+    "base_id": "yuhonas_Barbell_Curl",
+    "chain": [
+      {"id": "yuhonas_Barbell_Curl", "position": 0},
+      {"id": "yuhonas_Hammer_Curls", "position": 1},
+      {"id": "yuhonas_Incline_Dumbbell_Curl", "position": 2}
+    ]
+  },
+  {
+    "base_id": "yuhonas_Dips_-_Triceps_Version",
+    "chain": [
+      {"id": "yuhonas_Bench_Dips", "position": -1},
+      {"id": "yuhonas_Dips_-_Triceps_Version", "position": 0},
+      {"id": "yuhonas_Weighted_Bench_Dip", "position": 1}
+    ]
+  },
+  {
+    "base_id": "yuhonas_Barbell_Bench_Press_-_Medium_Grip",
+    "chain": [
+      {"id": "yuhonas_Pushups", "position": -1},
+      {"id": "yuhonas_Barbell_Bench_Press_-_Medium_Grip", "position": 0},
+      {"id": "yuhonas_Incline_Barbell_Bench_Press_-_Medium_Grip", "position": 1}
+    ]
+  },
+  {
+    "base_id": "yuhonas_Wide-Grip_Lat_Pulldown",
+    "chain": [
+      {"id": "yuhonas_Wide-Grip_Lat_Pulldown", "position": 0},
+      {"id": "yuhonas_Close-Grip_Front_Lat_Pulldown", "position": 1},
+      {"id": "yuhonas_Pullups", "position": 2}
+    ]
+  },
+  {
+    "base_id": "yuhonas_Leg_Press",
+    "chain": [
+      {"id": "yuhonas_Leg_Press", "position": 0},
+      {"id": "yuhonas_Barbell_Squat", "position": 1}
+    ]
+  },
+  {
+    "base_id": "yuhonas_Barbell_Hip_Thrust",
+    "chain": [
+      {"id": "yuhonas_Barbell_Glute_Bridge", "position": -1},
+      {"id": "yuhonas_Barbell_Hip_Thrust", "position": 0}
+    ]
+  },
+  {
+    "base_id": "yuhonas_One-Arm_Dumbbell_Row",
+    "chain": [
+      {"id": "yuhonas_One-Arm_Dumbbell_Row", "position": 0},
+      {"id": "yuhonas_Bent_Over_Barbell_Row", "position": 1}
+    ]
+  }
+]
