@@ -9,6 +9,7 @@ import 'package:ai_gym_mentor/features/settings/settings_provider.dart';
 import 'package:ai_gym_mentor/services/backup_service.dart';
 import 'package:ai_gym_mentor/features/settings/excel_sync_screen.dart';
 import 'package:ai_gym_mentor/features/settings/import_wizard_screen.dart';
+import 'package:ai_gym_mentor/core/services/permission_service.dart';
 import 'package:intl/intl.dart';
 
 class SettingsScreen extends ConsumerWidget {
@@ -181,6 +182,20 @@ class SettingsScreen extends ConsumerWidget {
             _buildDataBackupSection(context, ref, settings),
 
             _buildSectionHeader(context, 'Privacy & Security'),
+            _buildTile(
+              context,
+              title: 'App Permissions',
+              subtitle: 'Storage, Notifications, & Media',
+              icon: LucideIcons.shieldAlert,
+              onTap: () => ref.read(permissionServiceProvider).requestAllPermissions(),
+            ),
+            _buildTile(
+              context,
+              title: 'System Settings',
+              subtitle: 'Open Android settings for this app',
+              icon: LucideIcons.settings,
+              onTap: () => ref.read(permissionServiceProvider).openSettings(),
+            ),
             _buildPrivacyCard(context),
             const Divider(height: 32),
             _buildSectionHeader(context, 'Danger Zone', isDanger: true),

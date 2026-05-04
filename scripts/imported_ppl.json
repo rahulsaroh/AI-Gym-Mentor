@@ -1,0 +1,1762 @@
+{
+  "name": "6 Day PPL",
+  "description": "Imported from 6 Day PPL.xlsx",
+  "days": [
+    {
+      "name": "Pull Day",
+      "exercises": [
+        {
+          "name": "Pull A",
+          "notes": "Notes / Cues",
+          "defaultSets": "Default\nSets",
+          "defaultReps": "Default\nReps",
+          "logs": [
+            {
+              "set": 1,
+              "weight": 1.0,
+              "reps": 1.0
+            },
+            {
+              "set": 2,
+              "weight": 2.0,
+              "reps": 2.0
+            },
+            {
+              "set": 3,
+              "weight": 3.0,
+              "reps": 3.0
+            },
+            {
+              "set": 4,
+              "weight": 4.0,
+              "reps": 4.0
+            },
+            {
+              "set": 5,
+              "weight": 5.0,
+              "reps": 5.0
+            }
+          ]
+        },
+        {
+          "name": "Scapular wall slides",
+          "notes": "back on wall and slide hands on wall 2x10 reps",
+          "defaultSets": "3",
+          "defaultReps": "10",
+          "logs": []
+        },
+        {
+          "name": "Band face pull",
+          "notes": "2x15 reps",
+          "defaultSets": "3",
+          "defaultReps": "10",
+          "logs": []
+        },
+        {
+          "name": "Dead hang on pull-up bar",
+          "notes": "2x20 sec",
+          "defaultSets": "3",
+          "defaultReps": "10",
+          "logs": []
+        },
+        {
+          "name": "Band pull apart with external rotation",
+          "notes": "2x12 reps",
+          "defaultSets": "3",
+          "defaultReps": "10",
+          "logs": []
+        },
+        {
+          "name": "Pull-ups / assisted pull-ups (wide Grip)",
+          "notes": "V-taper KING. Band assist if needed.",
+          "defaultSets": "3",
+          "defaultReps": "Max",
+          "logs": [
+            {
+              "set": 1,
+              "weight": 78.0,
+              "reps": 2.0
+            },
+            {
+              "set": 2,
+              "weight": 78.0,
+              "reps": 2.0
+            },
+            {
+              "set": 3,
+              "weight": 78.0,
+              "reps": 2.0
+            }
+          ]
+        },
+        {
+          "name": "Dumbbell Bent-Over Row",
+          "notes": "Elbows back, not flared. Squeeze at top.Mid-back thickness. ",
+          "defaultSets": "3",
+          "defaultReps": "12",
+          "logs": [
+            {
+              "set": 1,
+              "weight": 5.0,
+              "reps": 30.0
+            },
+            {
+              "set": 2,
+              "weight": 7.5,
+              "reps": 20.0
+            },
+            {
+              "set": 3,
+              "weight": 10.0,
+              "reps": 10.0
+            },
+            {
+              "set": 4,
+              "weight": 10.0,
+              "reps": 14.0
+            }
+          ]
+        },
+        {
+          "name": "Cable/Pulley Lat Pulldown",
+          "notes": "Wide grip. Pull to upper chest. Stretch at top.",
+          "defaultSets": "3",
+          "defaultReps": "12",
+          "logs": [
+            {
+              "set": 1,
+              "weight": 15.0,
+              "reps": 20.0
+            },
+            {
+              "set": 2,
+              "weight": 25.0,
+              "reps": 11.0
+            },
+            {
+              "set": 3,
+              "weight": 27.5,
+              "reps": 13.0
+            },
+            {
+              "set": 4,
+              "weight": 27.5,
+              "reps": 10.0
+            }
+          ]
+        },
+        {
+          "name": "Dumbbell Reverse Fly",
+          "notes": "Rear delts. Slow arc. 3D shoulder look.",
+          "defaultSets": "3",
+          "defaultReps": "15",
+          "logs": [
+            {
+              "set": 1,
+              "weight": 7.5,
+              "reps": 12.0
+            },
+            {
+              "set": 2,
+              "weight": 10.0,
+              "reps": 8.0
+            },
+            {
+              "set": 3,
+              "weight": 10.0,
+              "reps": 6.0
+            }
+          ]
+        },
+        {
+          "name": "Dumbbell Face Pull (bent over)",
+          "notes": "Elbows high. Rotator cuff + posture.",
+          "defaultSets": "3",
+          "defaultReps": "15",
+          "logs": [
+            {
+              "set": 1,
+              "weight": 7.5,
+              "reps": 10.0
+            },
+            {
+              "set": 2,
+              "weight": 10.0,
+              "reps": 8.0
+            },
+            {
+              "set": 3,
+              "weight": 10.0,
+              "reps": 8.0
+            }
+          ]
+        },
+        {
+          "name": "Dumbbell Hammer Curl",
+          "notes": "60° bench. Long head bicep peak.",
+          "defaultSets": "3",
+          "defaultReps": "12",
+          "logs": [
+            {
+              "set": 1,
+              "weight": 7.5,
+              "reps": 11.0
+            },
+            {
+              "set": 2,
+              "weight": 7.5,
+              "reps": 11.0
+            },
+            {
+              "set": 3,
+              "weight": 7.5,
+              "reps": 6.0
+            }
+          ]
+        },
+        {
+          "name": "Barbell-style curl (DB)",
+          "notes": "Supinated grip. Full ROM, no swinging.",
+          "defaultSets": "3",
+          "defaultReps": "10",
+          "logs": [
+            {
+              "set": 1,
+              "weight": 7.5,
+              "reps": 10.0
+            },
+            {
+              "set": 2,
+              "weight": 10.0,
+              "reps": 4.0
+            },
+            {
+              "set": 3,
+              "weight": 10.0,
+              "reps": 3.0
+            }
+          ]
+        },
+        {
+          "name": "BAG: Hooks + Uppercuts",
+          "notes": "3×1 min. Rotate hips. Power from body not arm.",
+          "defaultSets": "3",
+          "defaultReps": "10",
+          "logs": []
+        },
+        {
+          "name": "Dead hang passive stretch",
+          "notes": "close grip stretch back while hang, 2x30 sec",
+          "defaultSets": "3",
+          "defaultReps": "10",
+          "logs": []
+        },
+        {
+          "name": "Doorway lat stretch",
+          "notes": "30 sec each side",
+          "defaultSets": "3",
+          "defaultReps": "10",
+          "logs": []
+        },
+        {
+          "name": "Bicep wall stretch",
+          "notes": "30 sec each side",
+          "defaultSets": "3",
+          "defaultReps": "10",
+          "logs": []
+        },
+        {
+          "name": "Cat-cow spinal decompression",
+          "notes": "60 sec",
+          "defaultSets": "3",
+          "defaultReps": "10",
+          "logs": []
+        },
+        {
+          "name": "Progressive overload rule: If you complete ALL reps of ALL sets, INCREASE the weight by 1–2.5 kg next session.",
+          "notes": "",
+          "defaultSets": "3",
+          "defaultReps": "10",
+          "logs": []
+        },
+        {
+          "name": "💪  Legs + Abs — Session Log",
+          "notes": "",
+          "defaultSets": "3",
+          "defaultReps": "10",
+          "logs": []
+        },
+        {
+          "name": "Legs + Abs A — Quads, Glutes, Core",
+          "notes": "Notes / Cues",
+          "defaultSets": "Default\nSets",
+          "defaultReps": "Default\nReps",
+          "logs": [
+            {
+              "set": 1,
+              "weight": 1.0,
+              "reps": 1.0
+            },
+            {
+              "set": 2,
+              "weight": 2.0,
+              "reps": 2.0
+            },
+            {
+              "set": 3,
+              "weight": 3.0,
+              "reps": 3.0
+            },
+            {
+              "set": 4,
+              "weight": 4.0,
+              "reps": 4.0
+            },
+            {
+              "set": 5,
+              "weight": 5.0,
+              "reps": 5.0
+            }
+          ]
+        },
+        {
+          "name": "Hip circles + leg swings",
+          "notes": "60 sec each direction\n",
+          "defaultSets": "3",
+          "defaultReps": "10",
+          "logs": []
+        },
+        {
+          "name": "Bodyweight squat (slow)",
+          "notes": "2×12 reps\n",
+          "defaultSets": "3",
+          "defaultReps": "10",
+          "logs": []
+        },
+        {
+          "name": "Glute bridges",
+          "notes": "2×15 reps\n",
+          "defaultSets": "3",
+          "defaultReps": "10",
+          "logs": []
+        },
+        {
+          "name": "Band lateral walks",
+          "notes": "2×15 steps\n",
+          "defaultSets": "3",
+          "defaultReps": "10",
+          "logs": []
+        },
+        {
+          "name": "Dumbbell Goblet Squat",
+          "notes": "Hold DB at chest. Full depth. Knees track toes.",
+          "defaultSets": "3",
+          "defaultReps": "12",
+          "logs": []
+        },
+        {
+          "name": "Dumbbell Romanian Deadlift",
+          "notes": "Hinge at hips. Hamstring stretch. HUGE for glutes.",
+          "defaultSets": "3",
+          "defaultReps": "12",
+          "logs": []
+        },
+        {
+          "name": "Dumbbell Reverse Lunge",
+          "notes": "Stepping back. Less knee stress than forward lunge.",
+          "defaultSets": "3",
+          "defaultReps": "10 each",
+          "logs": []
+        },
+        {
+          "name": "Resistance Band Squat",
+          "notes": "Band above knees. Activates glute med for width.",
+          "defaultSets": "3",
+          "defaultReps": "12",
+          "logs": []
+        },
+        {
+          "name": "Dumbbell Sumo Squat",
+          "notes": "Wide stance. Inner quad and adductor focus.",
+          "defaultSets": "3",
+          "defaultReps": "15",
+          "logs": []
+        },
+        {
+          "name": "Ab Wheel Rollout",
+          "notes": "Slow controlled. BEST core exercise you own.",
+          "defaultSets": "3",
+          "defaultReps": "20",
+          "logs": []
+        },
+        {
+          "name": "Hanging Knee Raises (Pull-up Bar)",
+          "notes": "Don't swing. Lower slowly.",
+          "defaultSets": "3",
+          "defaultReps": "10 each",
+          "logs": []
+        },
+        {
+          "name": "Plank Variations",
+          "notes": "Side plank alternating. Oblique definition.",
+          "defaultSets": "3",
+          "defaultReps": "10 each",
+          "logs": []
+        },
+        {
+          "name": "Standing quad stretch",
+          "notes": "30 sec each\n",
+          "defaultSets": "3",
+          "defaultReps": "8",
+          "logs": []
+        },
+        {
+          "name": "Pigeon pose (hip flexor)",
+          "notes": "45 sec each side\n",
+          "defaultSets": "3",
+          "defaultReps": "12",
+          "logs": []
+        },
+        {
+          "name": "Seated hamstring stretch",
+          "notes": "45 sec each\n",
+          "defaultSets": "3",
+          "defaultReps": "10",
+          "logs": []
+        },
+        {
+          "name": "Glute figure-4 stretch",
+          "notes": "30 sec each\n",
+          "defaultSets": "3",
+          "defaultReps": "30 sec",
+          "logs": []
+        },
+        {
+          "name": "Progressive overload rule: If you complete ALL reps of ALL sets, INCREASE the weight by 1–2.5 kg next session.",
+          "notes": "",
+          "defaultSets": "3",
+          "defaultReps": "10",
+          "logs": []
+        },
+        {
+          "name": "Push B — Shoulders Focus, Chest, Triceps",
+          "notes": "Notes / Cues",
+          "defaultSets": "Default\nSets",
+          "defaultReps": "Default\nReps",
+          "logs": [
+            {
+              "set": 1,
+              "weight": 1.0,
+              "reps": 1.0
+            },
+            {
+              "set": 2,
+              "weight": 2.0,
+              "reps": 2.0
+            },
+            {
+              "set": 3,
+              "weight": 3.0,
+              "reps": 3.0
+            },
+            {
+              "set": 4,
+              "weight": 4.0,
+              "reps": 4.0
+            },
+            {
+              "set": 5,
+              "weight": 5.0,
+              "reps": 5.0
+            }
+          ]
+        },
+        {
+          "name": "Band pull-apart",
+          "notes": "2x15 reps",
+          "defaultSets": "3",
+          "defaultReps": "10",
+          "logs": []
+        },
+        {
+          "name": "Rotator cuff internal/external rotation",
+          "notes": "each 2x12  reps",
+          "defaultSets": "3",
+          "defaultReps": "10",
+          "logs": []
+        },
+        {
+          "name": "Wall shoulder CARs",
+          "notes": "5 slow circles each arm",
+          "defaultSets": "3",
+          "defaultReps": "10",
+          "logs": []
+        },
+        {
+          "name": "Light lateral raise",
+          "notes": "1×20 reps",
+          "defaultSets": "3",
+          "defaultReps": "10",
+          "logs": [
+            {
+              "set": 1,
+              "weight": 2.5,
+              "reps": 20.0
+            }
+          ]
+        },
+        {
+          "name": "Dumbbell Arnold Press",
+          "notes": "Rotation hits all 3 delt heads. V-taper essential.",
+          "defaultSets": "3",
+          "defaultReps": "12–16",
+          "logs": [
+            {
+              "set": 1,
+              "weight": 5.0,
+              "reps": 15.0
+            },
+            {
+              "set": 2,
+              "weight": 7.5,
+              "reps": 12.0
+            },
+            {
+              "set": 3,
+              "weight": 10.0,
+              "reps": 9.0
+            }
+          ]
+        },
+        {
+          "name": "Dumbbell front raise",
+          "notes": "Combined arms. Controlled, no swinging.",
+          "defaultSets": "3",
+          "defaultReps": "10",
+          "logs": [
+            {
+              "set": 1,
+              "weight": 7.5,
+              "reps": 10.0
+            },
+            {
+              "set": 2,
+              "weight": 10.0,
+              "reps": 7.0
+            },
+            {
+              "set": 3,
+              "weight": 10.0,
+              "reps": 8.0
+            }
+          ]
+        },
+        {
+          "name": "Dumbbell Lateral Raise (drop set)",
+          "notes": "4 sec negative. Most important exercise for width.",
+          "defaultSets": "3",
+          "defaultReps": "16",
+          "logs": [
+            {
+              "set": 1,
+              "weight": 7.5,
+              "reps": 7.0
+            },
+            {
+              "set": 2,
+              "weight": 7.5,
+              "reps": 7.0
+            },
+            {
+              "set": 3,
+              "weight": 7.5,
+              "reps": 6.0
+            }
+          ]
+        },
+        {
+          "name": "Push-ups (feet elevated)",
+          "notes": "Elevated feet shift load to upper chest.",
+          "defaultSets": "3",
+          "defaultReps": "12–15",
+          "logs": []
+        },
+        {
+          "name": "Dumbbell decline press",
+          "notes": "Lower chest definition. Decline on bench.",
+          "defaultSets": "3",
+          "defaultReps": "12–15",
+          "logs": [
+            {
+              "set": 1,
+              "weight": 7.5,
+              "reps": 20.0
+            },
+            {
+              "set": 2,
+              "weight": 10.0,
+              "reps": 17.0
+            },
+            {
+              "set": 3,
+              "weight": 10.0,
+              "reps": 20.0
+            }
+          ]
+        },
+        {
+          "name": "Cable/Band  overhead tricep",
+          "notes": "Long head stretch. Width to arms.",
+          "defaultSets": "3",
+          "defaultReps": "15",
+          "logs": [
+            {
+              "set": 1,
+              "weight": 15.0,
+              "reps": 10.0
+            },
+            {
+              "set": 2,
+              "weight": 15.0,
+              "reps": 10.0
+            },
+            {
+              "set": 3,
+              "weight": 15.0,
+              "reps": 6.0
+            }
+          ]
+        },
+        {
+          "name": "Diamond push-ups",
+          "notes": "Bodyweight finisher. Medial tricep.",
+          "defaultSets": "3",
+          "defaultReps": "15",
+          "logs": []
+        },
+        {
+          "name": "Pec minor stretch (doorway)",
+          "notes": "40 sec each side",
+          "defaultSets": "2",
+          "defaultReps": "15",
+          "logs": []
+        },
+        {
+          "name": "Overhead shoulder stretch",
+          "notes": "30 sec each",
+          "defaultSets": "3",
+          "defaultReps": "10",
+          "logs": []
+        },
+        {
+          "name": "Wrist flexor/extensor stretch",
+          "notes": "30 sec each",
+          "defaultSets": "3",
+          "defaultReps": "10",
+          "logs": []
+        },
+        {
+          "name": "Thoracic spine foam roll / floor",
+          "notes": "60 sec",
+          "defaultSets": "3",
+          "defaultReps": "10",
+          "logs": []
+        },
+        {
+          "name": "Progressive overload rule: If you complete ALL reps of ALL sets, INCREASE the weight by 1–2.5 kg next session.",
+          "notes": "",
+          "defaultSets": "3",
+          "defaultReps": "10",
+          "logs": []
+        },
+        {
+          "name": "Pull B",
+          "notes": "Notes / Cues",
+          "defaultSets": "Default\nSets",
+          "defaultReps": "Default\nReps",
+          "logs": [
+            {
+              "set": 1,
+              "weight": 1.0,
+              "reps": 1.0
+            },
+            {
+              "set": 2,
+              "weight": 2.0,
+              "reps": 2.0
+            },
+            {
+              "set": 3,
+              "weight": 3.0,
+              "reps": 3.0
+            },
+            {
+              "set": 4,
+              "weight": 4.0,
+              "reps": 4.0
+            },
+            {
+              "set": 5,
+              "weight": 5.0,
+              "reps": 5.0
+            }
+          ]
+        },
+        {
+          "name": "Resistance band pull-aparts",
+          "notes": "3×15 reps\n",
+          "defaultSets": "3",
+          "defaultReps": "10",
+          "logs": []
+        },
+        {
+          "name": "Cat-cow thoracic rotation",
+          "notes": "2×10 reps",
+          "defaultSets": "3",
+          "defaultReps": "10",
+          "logs": []
+        },
+        {
+          "name": "Banded face pull",
+          "notes": "2×12 reps",
+          "defaultSets": "3",
+          "defaultReps": "10",
+          "logs": []
+        },
+        {
+          "name": "Scapular pull-ups (just scaps)",
+          "notes": "2x8 reps",
+          "defaultSets": "3",
+          "defaultReps": "10",
+          "logs": []
+        },
+        {
+          "name": "Wide-grip pull-ups",
+          "notes": "Widest grip comfortable. Creates V-taper back.",
+          "defaultSets": "3",
+          "defaultReps": "Max",
+          "logs": []
+        },
+        {
+          "name": "Cable/pulley seated row",
+          "notes": "Neutral grip. Retract scapula. Mid-back thickness.",
+          "defaultSets": "3",
+          "defaultReps": "12",
+          "logs": []
+        },
+        {
+          "name": "Single-arm dumbbell row",
+          "notes": "Knee on bench. Full ROM. Heavy is okay here.",
+          "defaultSets": "3",
+          "defaultReps": "12",
+          "logs": [
+            {
+              "set": 1,
+              "weight": 10.0,
+              "reps": 15.0
+            },
+            {
+              "set": 2,
+              "weight": 10.0,
+              "reps": 15.0
+            },
+            {
+              "set": 3,
+              "weight": 10.0,
+              "reps": 15.0
+            }
+          ]
+        },
+        {
+          "name": "Dumbbell shrug",
+          "notes": "Traps for that athletic look. Hold at top 1 sec.",
+          "defaultSets": "3",
+          "defaultReps": "12",
+          "logs": [
+            {
+              "set": 1,
+              "weight": 10.0,
+              "reps": 15.0
+            },
+            {
+              "set": 2,
+              "weight": 10.0,
+              "reps": 15.0
+            },
+            {
+              "set": 3,
+              "weight": 10.0,
+              "reps": 15.0
+            }
+          ]
+        },
+        {
+          "name": "Resistance band pull-apart (supinated)",
+          "notes": "Arm health, rear delt, external rotators.",
+          "defaultSets": "3",
+          "defaultReps": "15",
+          "logs": []
+        },
+        {
+          "name": "Incline dumbbell curl",
+          "notes": "On bench 60°. Long head bicep. Peak builder.",
+          "defaultSets": "3",
+          "defaultReps": "15",
+          "logs": [
+            {
+              "set": 1,
+              "weight": 10.0,
+              "reps": 6.0
+            },
+            {
+              "set": 2,
+              "weight": 10.0,
+              "reps": 4.0
+            },
+            {
+              "set": 3,
+              "weight": 10.0,
+              "reps": 3.0
+            }
+          ]
+        },
+        {
+          "name": "Concentration curl",
+          "notes": "Elbow on inner thigh. Mind-muscle maximum.",
+          "defaultSets": "3",
+          "defaultReps": "10",
+          "logs": [
+            {
+              "set": 1,
+              "weight": 10.0,
+              "reps": 9.0
+            },
+            {
+              "set": 2,
+              "weight": 10.0,
+              "reps": 6.0
+            },
+            {
+              "set": 3,
+              "weight": 10.0,
+              "reps": 6.0
+            }
+          ]
+        },
+        {
+          "name": "Dumbell Shoulder PullUps",
+          "notes": "Pull dumbell till face height",
+          "defaultSets": "3",
+          "defaultReps": "10",
+          "logs": [
+            {
+              "set": 1,
+              "weight": 10.0,
+              "reps": 10.0
+            },
+            {
+              "set": 2,
+              "weight": 10.0,
+              "reps": 10.0
+            },
+            {
+              "set": 3,
+              "weight": 10.0,
+              "reps": 10.0
+            },
+            {
+              "set": 4,
+              "weight": 10.0,
+              "reps": 10.0
+            }
+          ]
+        },
+        {
+          "name": "Lat stretch in doorway",
+          "notes": "30 sec each",
+          "defaultSets": "3",
+          "defaultReps": "10",
+          "logs": []
+        },
+        {
+          "name": "Child's pose with arm reach",
+          "notes": "60 sec",
+          "defaultSets": "3",
+          "defaultReps": "10",
+          "logs": []
+        },
+        {
+          "name": "Supinator/pronator forearm stretch",
+          "notes": "30 sec each",
+          "defaultSets": "3",
+          "defaultReps": "10",
+          "logs": []
+        },
+        {
+          "name": "Neck side stretch",
+          "notes": "20 sec each side",
+          "defaultSets": "3",
+          "defaultReps": "10",
+          "logs": []
+        },
+        {
+          "name": "Progressive overload rule: If you complete ALL reps of ALL sets, INCREASE the weight by 1–2.5 kg next session.",
+          "notes": "",
+          "defaultSets": "3",
+          "defaultReps": "10",
+          "logs": []
+        },
+        {
+          "name": "Legs + Abs B — Posterior Chain, Calves, Obliques",
+          "notes": "Notes / Cues",
+          "defaultSets": "Default\nSets",
+          "defaultReps": "Default\nReps",
+          "logs": [
+            {
+              "set": 1,
+              "weight": 1.0,
+              "reps": 1.0
+            },
+            {
+              "set": 2,
+              "weight": 2.0,
+              "reps": 2.0
+            },
+            {
+              "set": 3,
+              "weight": 3.0,
+              "reps": 3.0
+            },
+            {
+              "set": 4,
+              "weight": 4.0,
+              "reps": 4.0
+            },
+            {
+              "set": 5,
+              "weight": 5.0,
+              "reps": 5.0
+            }
+          ]
+        },
+        {
+          "name": "Resistance Band Walk (Lateral + Fwd)",
+          "notes": "2×15 steps each",
+          "defaultSets": "3",
+          "defaultReps": "10",
+          "logs": []
+        },
+        {
+          "name": "Hip Thrust Hold (Bodyweight)",
+          "notes": "2×10 reps, 2 sec hold",
+          "defaultSets": "3",
+          "defaultReps": "10",
+          "logs": []
+        },
+        {
+          "name": "Inchworm Walk-outs",
+          "notes": "2×8 reps",
+          "defaultSets": "3",
+          "defaultReps": "10",
+          "logs": []
+        },
+        {
+          "name": "Ankle Circles + Calf Raises",
+          "notes": "20 reps each",
+          "defaultSets": "3",
+          "defaultReps": "10",
+          "logs": []
+        },
+        {
+          "name": "Dumbbell Stiff-Leg Deadlift",
+          "notes": "Hamstring dominant. Slower than RDL. Feel the stretch.",
+          "defaultSets": "3",
+          "defaultReps": "12",
+          "logs": []
+        },
+        {
+          "name": "Dumbbell Hip Thrust (Bench)",
+          "notes": "Upper back on bench, DB on hips. Glute max.",
+          "defaultSets": "3",
+          "defaultReps": "12",
+          "logs": []
+        },
+        {
+          "name": "Bulgarian Split Squat (DB)",
+          "notes": "Hardest leg exercise you'll do. Quads + glutes.",
+          "defaultSets": "3",
+          "defaultReps": "11 each",
+          "logs": []
+        },
+        {
+          "name": "Resistance Band Glute Kickback",
+          "notes": "On all fours. Band around ankle. Glute activation.",
+          "defaultSets": "3",
+          "defaultReps": "12",
+          "logs": []
+        },
+        {
+          "name": "Dumbbell Calf Raise (Standing)",
+          "notes": "Slow negative 3 sec. Full ROM. Calves need volume.",
+          "defaultSets": "3",
+          "defaultReps": "15",
+          "logs": []
+        },
+        {
+          "name": "Ab Wheel Rollout (Advanced)",
+          "notes": "Phase 2: feet elevated. Phase 3: single-arm attempt.",
+          "defaultSets": "3",
+          "defaultReps": "20",
+          "logs": []
+        },
+        {
+          "name": "Decline Sit-up / Russian Twist",
+          "notes": "Use bench decline. Add DB for resistance.",
+          "defaultSets": "3",
+          "defaultReps": "10 each",
+          "logs": []
+        },
+        {
+          "name": "Leg Raise (Hanging or Floor)",
+          "notes": "Lower abs. Slow, controlled descent.",
+          "defaultSets": "3",
+          "defaultReps": "10 each",
+          "logs": []
+        },
+        {
+          "name": "90-90 Hip Stretch",
+          "notes": "45 sec each side",
+          "defaultSets": "3",
+          "defaultReps": "16",
+          "logs": []
+        },
+        {
+          "name": "Lying Hamstring Stretch (Band)",
+          "notes": "45 sec each",
+          "defaultSets": "3",
+          "defaultReps": "20",
+          "logs": []
+        },
+        {
+          "name": "Calf Doorway Stretch",
+          "notes": "30 sec each (bent + straight knee)",
+          "defaultSets": "3",
+          "defaultReps": "31 sec",
+          "logs": []
+        },
+        {
+          "name": "Supine Spinal Twist",
+          "notes": "30 sec each side",
+          "defaultSets": "3",
+          "defaultReps": "10",
+          "logs": []
+        },
+        {
+          "name": "Progressive overload rule: If you complete ALL reps of ALL sets, INCREASE the weight by 1–2.5 kg next session.",
+          "notes": "",
+          "defaultSets": "3",
+          "defaultReps": "10",
+          "logs": []
+        },
+        {
+          "name": "Push A - Chest, Shoulders, Triceps",
+          "notes": "Notes / Cues",
+          "defaultSets": "Default\nSets",
+          "defaultReps": "Default\nReps",
+          "logs": [
+            {
+              "set": 1,
+              "weight": 1.0,
+              "reps": 1.0
+            },
+            {
+              "set": 2,
+              "weight": 2.0,
+              "reps": 2.0
+            },
+            {
+              "set": 3,
+              "weight": 3.0,
+              "reps": 3.0
+            },
+            {
+              "set": 4,
+              "weight": 4.0,
+              "reps": 4.0
+            },
+            {
+              "set": 5,
+              "weight": 5.0,
+              "reps": 5.0
+            }
+          ]
+        },
+        {
+          "name": "Arm circles + shoulder rolls",
+          "notes": "61 sec each direction",
+          "defaultSets": "3",
+          "defaultReps": "10",
+          "logs": []
+        },
+        {
+          "name": "Band pull-apart",
+          "notes": "2x15 reps",
+          "defaultSets": "3",
+          "defaultReps": "10",
+          "logs": []
+        },
+        {
+          "name": "Incline Push-ups",
+          "notes": "slow 2x10 reps",
+          "defaultSets": "3",
+          "defaultReps": "10",
+          "logs": []
+        },
+        {
+          "name": "Light Dumbell Lateral Raise",
+          "notes": "1x15 reps",
+          "defaultSets": "3",
+          "defaultReps": "10",
+          "logs": [
+            {
+              "set": 1,
+              "weight": 2.5,
+              "reps": 20.0
+            }
+          ]
+        },
+        {
+          "name": "Dumbbell flat bench press",
+          "notes": "Bench. Full ROM, elbows 45°. Primary chest builder.",
+          "defaultSets": "3",
+          "defaultReps": "12–16",
+          "logs": [
+            {
+              "set": 1,
+              "weight": 10.0,
+              "reps": 20.0
+            },
+            {
+              "set": 2,
+              "weight": 10.0,
+              "reps": 15.0
+            },
+            {
+              "set": 3,
+              "weight": 10.0,
+              "reps": 15.0
+            }
+          ]
+        },
+        {
+          "name": "Dumbbell incline press",
+          "notes": "45° bench angle. Hits upper chest for V-taper.",
+          "defaultSets": "3",
+          "defaultReps": "16",
+          "logs": [
+            {
+              "set": 1,
+              "weight": 10.0,
+              "reps": 11.0
+            },
+            {
+              "set": 2,
+              "weight": 10.0,
+              "reps": 9.0
+            },
+            {
+              "set": 3,
+              "weight": 10.0,
+              "reps": 8.0
+            }
+          ]
+        },
+        {
+          "name": "Dumbbell lateral raise",
+          "notes": "Slow eccentric 3 sec. KEY for shoulder width.",
+          "defaultSets": "3",
+          "defaultReps": "12–15",
+          "logs": [
+            {
+              "set": 1,
+              "weight": 7.5,
+              "reps": 12.0
+            },
+            {
+              "set": 2,
+              "weight": 7.5,
+              "reps": 10.0
+            },
+            {
+              "set": 3,
+              "weight": 10.0,
+              "reps": 6.0
+            }
+          ]
+        },
+        {
+          "name": "Standing dumbbell OHP",
+          "notes": "Core braced. Don't flare elbows excessively.",
+          "defaultSets": "3",
+          "defaultReps": "12–15",
+          "logs": [
+            {
+              "set": 1,
+              "weight": 10.0,
+              "reps": 7.0
+            },
+            {
+              "set": 2,
+              "weight": 10.0,
+              "reps": 6.0
+            },
+            {
+              "set": 3,
+              "weight": 10.0,
+              "reps": 6.0
+            }
+          ]
+        },
+        {
+          "name": "Cable/Band Chest Fly",
+          "notes": "Deep stretch. Peak chest contraction.",
+          "defaultSets": "3",
+          "defaultReps": "15",
+          "logs": [
+            {
+              "set": 1,
+              "weight": 15.0,
+              "reps": 14.0
+            },
+            {
+              "set": 2,
+              "weight": 20.0,
+              "reps": 11.0
+            },
+            {
+              "set": 3,
+              "weight": 20.0,
+              "reps": 9.0
+            }
+          ]
+        },
+        {
+          "name": "Tricep Cable/Band Pushdown",
+          "notes": "Elbows fixed. Full extension. Triceps = 2/3 of arm.",
+          "defaultSets": "3",
+          "defaultReps": "15",
+          "logs": [
+            {
+              "set": 1,
+              "weight": 20.0,
+              "reps": 6.0
+            },
+            {
+              "set": 2,
+              "weight": 20.0,
+              "reps": 6.0
+            },
+            {
+              "set": 3,
+              "weight": 20.0,
+              "reps": 4.0
+            }
+          ]
+        },
+        {
+          "name": "Overhead DB Tricep Extension",
+          "notes": "Long head stretch. Arms bigger from behind.",
+          "defaultSets": "2",
+          "defaultReps": "15",
+          "logs": [
+            {
+              "set": 1,
+              "weight": 15.0,
+              "reps": 7.0
+            },
+            {
+              "set": 2,
+              "weight": 15.0,
+              "reps": 7.0
+            },
+            {
+              "set": 3,
+              "weight": 15.0,
+              "reps": 4.0
+            }
+          ]
+        },
+        {
+          "name": "BAG: Straight Punch Rounds",
+          "notes": "3×1 min. Hands up. Exhale each punch.",
+          "defaultSets": "3",
+          "defaultReps": "10",
+          "logs": []
+        },
+        {
+          "name": "Door-frame chest stretch",
+          "notes": "",
+          "defaultSets": "3",
+          "defaultReps": "10",
+          "logs": []
+        },
+        {
+          "name": "Across-body shoulder stretch",
+          "notes": "",
+          "defaultSets": "3",
+          "defaultReps": "10",
+          "logs": []
+        },
+        {
+          "name": "Tricep Overhead Stretch",
+          "notes": "",
+          "defaultSets": "3",
+          "defaultReps": "10",
+          "logs": []
+        },
+        {
+          "name": "Child's Pose",
+          "notes": "",
+          "defaultSets": "4",
+          "defaultReps": "2 min",
+          "logs": []
+        },
+        {
+          "name": "Progressive overload rule: If you complete ALL reps of ALL sets, INCREASE the weight by 1–2.5 kg next session.",
+          "notes": "",
+          "defaultSets": "3",
+          "defaultReps": "10",
+          "logs": []
+        },
+        {
+          "name": "Pull A",
+          "notes": "Notes / Cues",
+          "defaultSets": "Default\nSets",
+          "defaultReps": "Default\nReps",
+          "logs": [
+            {
+              "set": 1,
+              "weight": 1.0,
+              "reps": 1.0
+            },
+            {
+              "set": 2,
+              "weight": 2.0,
+              "reps": 2.0
+            },
+            {
+              "set": 3,
+              "weight": 3.0,
+              "reps": 3.0
+            },
+            {
+              "set": 4,
+              "weight": 4.0,
+              "reps": 4.0
+            },
+            {
+              "set": 5,
+              "weight": 5.0,
+              "reps": 5.0
+            }
+          ]
+        },
+        {
+          "name": "Scapular wall slides",
+          "notes": "back on wall and slide hands on wall 2x10 reps",
+          "defaultSets": "3",
+          "defaultReps": "10",
+          "logs": []
+        },
+        {
+          "name": "Band face pull",
+          "notes": "2x15 reps",
+          "defaultSets": "3",
+          "defaultReps": "10",
+          "logs": []
+        },
+        {
+          "name": "Dead hang on pull-up bar",
+          "notes": "2x20 sec",
+          "defaultSets": "3",
+          "defaultReps": "10",
+          "logs": []
+        },
+        {
+          "name": "Band pull apart with external rotation",
+          "notes": "2x12 reps",
+          "defaultSets": "3",
+          "defaultReps": "10",
+          "logs": []
+        },
+        {
+          "name": "Pull-ups / assisted pull-ups (wide Grip)",
+          "notes": "V-taper KING. Band assist if needed.",
+          "defaultSets": "3",
+          "defaultReps": "Max",
+          "logs": []
+        },
+        {
+          "name": "Dumbbell Bent-Over Row",
+          "notes": "Elbows back, not flared. Squeeze at top.Mid-back thickness. ",
+          "defaultSets": "3",
+          "defaultReps": "12",
+          "logs": [
+            {
+              "set": 1,
+              "weight": 7.5,
+              "reps": 10.0
+            },
+            {
+              "set": 2,
+              "weight": 10.0,
+              "reps": 10.0
+            },
+            {
+              "set": 3,
+              "weight": 10.0,
+              "reps": 10.0
+            },
+            {
+              "set": 4,
+              "weight": 10.0,
+              "reps": 10.0
+            }
+          ]
+        },
+        {
+          "name": "Cable/Pulley Lat Pulldown",
+          "notes": "Wide grip. Pull to upper chest. Stretch at top.",
+          "defaultSets": "3",
+          "defaultReps": "12",
+          "logs": [
+            {
+              "set": 1,
+              "weight": 25.0,
+              "reps": 15.0
+            },
+            {
+              "set": 2,
+              "weight": 30.0,
+              "reps": 12.0
+            },
+            {
+              "set": 3,
+              "weight": 30.0,
+              "reps": 10.0
+            }
+          ]
+        },
+        {
+          "name": "Dumbbell Reverse Fly",
+          "notes": "Rear delts. Slow arc. 3D shoulder look.",
+          "defaultSets": "3",
+          "defaultReps": "15",
+          "logs": [
+            {
+              "set": 1,
+              "weight": 10.0,
+              "reps": 8.0
+            },
+            {
+              "set": 2,
+              "weight": 10.0,
+              "reps": 8.0
+            },
+            {
+              "set": 3,
+              "weight": 10.0,
+              "reps": 7.0
+            }
+          ]
+        },
+        {
+          "name": "Dumbbell Face Pull (bent over)",
+          "notes": "Elbows high. Rotator cuff + posture.",
+          "defaultSets": "3",
+          "defaultReps": "15",
+          "logs": [
+            {
+              "set": 1,
+              "weight": 10.0,
+              "reps": 10.0
+            },
+            {
+              "set": 2,
+              "weight": 10.0,
+              "reps": 10.0
+            },
+            {
+              "set": 3,
+              "weight": 10.0,
+              "reps": 9.0
+            }
+          ]
+        },
+        {
+          "name": "Dumbbell Hammer Curl",
+          "notes": "60° bench. Long head bicep peak.",
+          "defaultSets": "3",
+          "defaultReps": "12",
+          "logs": [
+            {
+              "set": 1,
+              "weight": 10.0,
+              "reps": 9.0
+            },
+            {
+              "set": 2,
+              "weight": 10.0,
+              "reps": 7.0
+            },
+            {
+              "set": 3,
+              "weight": 10.0,
+              "reps": 7.0
+            }
+          ]
+        },
+        {
+          "name": "Barbell-style curl (DB)",
+          "notes": "Supinated grip. Full ROM, no swinging.",
+          "defaultSets": "3",
+          "defaultReps": "10",
+          "logs": [
+            {
+              "set": 1,
+              "weight": 10.0,
+              "reps": 6.0
+            },
+            {
+              "set": 2,
+              "weight": 10.0,
+              "reps": 5.0
+            },
+            {
+              "set": 3,
+              "weight": 10.0,
+              "reps": 4.0
+            }
+          ]
+        },
+        {
+          "name": "Reverse Grip Dumbell curl",
+          "notes": "",
+          "defaultSets": "3",
+          "defaultReps": "10",
+          "logs": [
+            {
+              "set": 1,
+              "weight": 7.5,
+              "reps": 8.0
+            },
+            {
+              "set": 2,
+              "weight": 7.5,
+              "reps": 6.0
+            },
+            {
+              "set": 3,
+              "weight": 7.5,
+              "reps": 4.0
+            }
+          ]
+        },
+        {
+          "name": "BAG: Hooks + Uppercuts",
+          "notes": "3×1 min. Rotate hips. Power from body not arm.",
+          "defaultSets": "3",
+          "defaultReps": "10",
+          "logs": []
+        },
+        {
+          "name": "Dead hang passive stretch",
+          "notes": "close grip stretch back while hang, 2x30 sec",
+          "defaultSets": "3",
+          "defaultReps": "10",
+          "logs": []
+        },
+        {
+          "name": "Doorway lat stretch",
+          "notes": "30 sec each side",
+          "defaultSets": "3",
+          "defaultReps": "10",
+          "logs": []
+        },
+        {
+          "name": "Bicep wall stretch",
+          "notes": "30 sec each side",
+          "defaultSets": "3",
+          "defaultReps": "10",
+          "logs": []
+        },
+        {
+          "name": "Cat-cow spinal decompression",
+          "notes": "61 sec",
+          "defaultSets": "3",
+          "defaultReps": "10",
+          "logs": []
+        },
+        {
+          "name": "Progressive overload rule: If you complete ALL reps of ALL sets, INCREASE the weight by 1–2.5 kg next session.",
+          "notes": "",
+          "defaultSets": "3",
+          "defaultReps": "10",
+          "logs": []
+        },
+        {
+          "name": "Legs + Abs A — Quads, Glutes, Core",
+          "notes": "Notes / Cues",
+          "defaultSets": "Default\nSets",
+          "defaultReps": "Default\nReps",
+          "logs": [
+            {
+              "set": 1,
+              "weight": 1.0,
+              "reps": 1.0
+            },
+            {
+              "set": 2,
+              "weight": 2.0,
+              "reps": 2.0
+            },
+            {
+              "set": 3,
+              "weight": 3.0,
+              "reps": 3.0
+            },
+            {
+              "set": 4,
+              "weight": 4.0,
+              "reps": 4.0
+            },
+            {
+              "set": 5,
+              "weight": 5.0,
+              "reps": 5.0
+            }
+          ]
+        },
+        {
+          "name": "Hip circles + leg swings",
+          "notes": "60 sec each direction\n",
+          "defaultSets": "3",
+          "defaultReps": "10",
+          "logs": []
+        },
+        {
+          "name": "Bodyweight squat (slow)",
+          "notes": "2×12 reps\n",
+          "defaultSets": "3",
+          "defaultReps": "10",
+          "logs": []
+        },
+        {
+          "name": "Glute bridges",
+          "notes": "2×15 reps\n",
+          "defaultSets": "3",
+          "defaultReps": "10",
+          "logs": []
+        },
+        {
+          "name": "Band lateral walks",
+          "notes": "2×15 steps\n",
+          "defaultSets": "3",
+          "defaultReps": "10",
+          "logs": []
+        },
+        {
+          "name": "Dumbbell Goblet Squat",
+          "notes": "Hold DB at chest. Full depth. Knees track toes.",
+          "defaultSets": "3",
+          "defaultReps": "12",
+          "logs": []
+        },
+        {
+          "name": "Dumbbell Romanian Deadlift",
+          "notes": "Hinge at hips. Hamstring stretch. HUGE for glutes.",
+          "defaultSets": "3",
+          "defaultReps": "12",
+          "logs": []
+        },
+        {
+          "name": "Dumbbell Reverse Lunge",
+          "notes": "Stepping back. Less knee stress than forward lunge.",
+          "defaultSets": "3",
+          "defaultReps": "10 each",
+          "logs": []
+        },
+        {
+          "name": "Resistance Band Squat",
+          "notes": "Band above knees. Activates glute med for width.",
+          "defaultSets": "3",
+          "defaultReps": "12",
+          "logs": []
+        },
+        {
+          "name": "Dumbbell Sumo Squat",
+          "notes": "Wide stance. Inner quad and adductor focus.",
+          "defaultSets": "3",
+          "defaultReps": "15",
+          "logs": []
+        },
+        {
+          "name": "Ab Wheel Rollout",
+          "notes": "Slow controlled. BEST core exercise you own.",
+          "defaultSets": "3",
+          "defaultReps": "20",
+          "logs": []
+        },
+        {
+          "name": "Hanging Knee Raises (Pull-up Bar)",
+          "notes": "Don't swing. Lower slowly.",
+          "defaultSets": "3",
+          "defaultReps": "10 each",
+          "logs": []
+        },
+        {
+          "name": "Plank Variations",
+          "notes": "Side plank alternating. Oblique definition.",
+          "defaultSets": "3",
+          "defaultReps": "10 each",
+          "logs": []
+        },
+        {
+          "name": "Standing quad stretch",
+          "notes": "30 sec each\n",
+          "defaultSets": "3",
+          "defaultReps": "8",
+          "logs": []
+        },
+        {
+          "name": "Pigeon pose (hip flexor)",
+          "notes": "45 sec each side\n",
+          "defaultSets": "3",
+          "defaultReps": "12",
+          "logs": []
+        },
+        {
+          "name": "Seated hamstring stretch",
+          "notes": "45 sec each\n",
+          "defaultSets": "3",
+          "defaultReps": "10",
+          "logs": []
+        },
+        {
+          "name": "Glute figure-4 stretch",
+          "notes": "30 sec each\n",
+          "defaultSets": "3",
+          "defaultReps": "30 sec",
+          "logs": []
+        },
+        {
+          "name": "Progressive overload rule: If you complete ALL reps of ALL sets, INCREASE the weight by 1–2.5 kg next session.",
+          "notes": "",
+          "defaultSets": "3",
+          "defaultReps": "10",
+          "logs": []
+        }
+      ]
+    }
+  ]
+}

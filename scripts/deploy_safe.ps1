@@ -1,0 +1,56 @@
+# AI Gym Mentor Data-Safe Deployment Script
+# This script ensures that the database is backed up and the app is updated without data loss.
+
+$flutterPath = "C:\flutter\bin\flutter.bat"
+$adbPath = "C:\Users\dell\AppData\Local\Android\Sdk\platform-tools\adb.exe"
+$javaPath = "C:\Program Files\Android\Android Studio\jbr"
+$packageName = "com.aigymmentor.app"
+$dbName = "gym_log.sqlite"
+
+# 1. Environment Setup
+$env:JAVA_HOME = $javaPath
+$timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
+$backupDir = "build\backups"
+if (!(Test-Path $backupDir)) { New-Item -ItemType Directory -Path $backupDir }
+
+# 2. Check Device
+Write-Host "--- Checking Device ---" -ForegroundColor Cyan
+$devices = & $adbPath devices | Select-String -Pattern "\tdevice$"
+if ($devices.Count -eq 0) {
+    Write-Host "Error: No device connected via ADB." -ForegroundColor Red
+    exit 1
+}
+$deviceId = $devices[0].ToString().Split("`t")[0].Trim()
+Write-Host "Target Device: $deviceId" -ForegroundColor Green
+
+# 3. Backup Database
+Write-Host "--- Backing Up Database ---" -ForegroundColor Cyan
+$backupFile = "$backupDir\gym_log_$timestamp.sqlite"
+# Stage the file in a public directory first to allow adb pull
+& $adbPath -s $deviceId shell "run-as $packageName cp app_flutter/$dbName /data/local/tmp/$dbName"
+& $adbPath -s $deviceId pull /data/local/tmp/$dbName $backupFile
+& $adbPath -s $deviceId shell "rm /data/local/tmp/$dbName"
+
+if (Test-Path $backupFile) {
+    Write-Host "Backup saved to: $backupFile" -ForegroundColor Green
+} else {
+    Write-Host "Warning: Backup failed or app not installed yet." -ForegroundColor Yellow
+}
+
+# 4. Build APK
+Write-Host "--- Building APK (assembleDebug) ---" -ForegroundColor Cyan
+Push-Location android
+.\gradlew.bat assembleDebug
+Pop-Location
+
+# 5. Safe Install
+Write-Host "--- Performing Safe Installation (Update) ---" -ForegroundColor Cyan
+$apkPath = "build\app\outputs\flutter-apk\app-debug.apk"
+& $adbPath -s $deviceId install -r $apkPath
+
+if ($LASTEXITCODE -eq 0) {
+    Write-Host "--- Deployment Successful (Data Preserved) ---" -ForegroundColor Green
+    & $adbPath -s $deviceId shell am start -n $packageName/$packageName.MainActivity
+} else {
+    Write-Host "--- Deployment Failed ---" -ForegroundColor Red
+}

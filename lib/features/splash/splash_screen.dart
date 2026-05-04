@@ -8,6 +8,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ai_gym_mentor/features/settings/settings_provider.dart';
 import 'package:ai_gym_mentor/features/settings/models/settings_state.dart';
+import 'package:ai_gym_mentor/core/services/permission_service.dart';
 
 
 class SplashScreen extends ConsumerStatefulWidget {
@@ -47,6 +48,13 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
   }
 
   Future<void> _navigateToNext() async {
+    // Request permissions on startup
+    try {
+      await ref.read(permissionServiceProvider).requestAllPermissions();
+    } catch (e) {
+      debugPrint('Permission request failed: $e');
+    }
+
     await Future.delayed(const Duration(milliseconds: 2000));
     if (!mounted) return;
 

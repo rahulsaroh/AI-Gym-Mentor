@@ -213,8 +213,8 @@ return $default(_that.id,_that.mesocycleId,_that.startDate,_that.currentPhaseInd
 /// @nodoc
 @JsonSerializable()
 
-class _UserProgramProgressEntity extends UserProgramProgressEntity {
-  const _UserProgramProgressEntity({required this.id, required this.mesocycleId, required this.startDate, this.currentPhaseIndex = 0, this.isCompleted = false, this.lastPhaseAlertAt}): super._();
+class _UserProgramProgressEntity implements UserProgramProgressEntity {
+  const _UserProgramProgressEntity({required this.id, required this.mesocycleId, required this.startDate, this.currentPhaseIndex = 0, this.isCompleted = false, this.lastPhaseAlertAt});
   factory _UserProgramProgressEntity.fromJson(Map<String, dynamic> json) => _$UserProgramProgressEntityFromJson(json);
 
 @override final  int id;

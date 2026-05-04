@@ -1,0 +1,97 @@
+# Miscellaneous
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+.atom/
+.buildlog/
+.history
+.svn/
+migrate_working_dir/
+
+# IntelliJ related
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# The .vscode folder contains launch configurations and tasks you actually want to
+# keep. However, dev-specific settings and the local repository configuration
+# usually should not be tracked.
+.vscode/settings.json
+.vscode/tasks.json
+.vscode/launch.json
+.vscode/extensions.json
+
+# Flutter/Dart/Pub related
+**/doc/api/
+**/ios/Flutter/.last_build_id
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.metadata
+.packages
+.pub-cache/
+.pub/
+/build/
+
+# Symbolisation charts and compiled manifest
+/analysis_options.yaml.lock
+
+# Android related
+**/android/**/generated/
+**/android/gen/
+**/android/out/
+**/android/gradle/
+.gradle/
+build/
+
+# iOS related
+**/ios/**/*.mode1v3
+**/ios/**/*.mode2v3
+**/ios/**/*.perspectivev3
+**/ios/Flutter/App.framework
+**/ios/Flutter/Flutter.framework
+**/ios/Flutter/Generated.xcconfig
+**/ios/Flutter/app.flx
+**/ios/Flutter/app.zip
+**/ios/Flutter/flutter_assets/
+**/ios/Flutter/flutter_export_info.plist
+**/ios/ServiceDefinitions.json
+**/ios/Runner/GeneratedPluginRegistrant.[mh]
+**/*.xcworkspace
+
+# Web related
+node_modules/
+dist/
+lib/generated_plugin_registrant.dart
+
+# Database related
+*.db
+*.sqlite
+*.bin
+
+# Environment files
+.env*
+!.env.example
+
+# App-specific archive
+dev/archive/
+nul
+
+# Screenshots and Artifacts
+*.png
+*.jpg
+*.jpeg
+*.xml
+*.txt
+*.backup
+!assets/**/*.png
+!assets/**/*.jpg
+!assets/**/*.jpeg
+!assets/**/*.xml
+!android/**/*.xml
+!ios/**/*.xml
+!web/**/*.png
+!web/**/*.xml
