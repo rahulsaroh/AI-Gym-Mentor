@@ -360,7 +360,7 @@ class AppDatabase extends _$AppDatabase {
   }
 
   @override
-  int get schemaVersion => 29;
+  int get schemaVersion => 30;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -584,13 +584,16 @@ class AppDatabase extends _$AppDatabase {
               await m.addColumn(bodyMeasurements, bodyMeasurements.visceralFat);
             }
           }
-          if (from < 28) {
-            await m.createTable(userProgramProgress);
+                   if (from < 28) {
+            await m.createTableIfNotExists(userProgramProgress);
           }
           if (from < 29) {
             if (!await hasColumn('workout_templates', 'is_selected')) {
               await m.addColumn(workoutTemplates, workoutTemplates.isSelected);
             }
+          }
+          if (from < 30) {
+            await m.createTableIfNotExists(exercise1RmSnapshots);
           }
         },
         beforeOpen: (details) async {
