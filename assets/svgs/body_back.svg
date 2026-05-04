@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 400">
+  <!-- Body Back SVG -->
+  <g id="body-back">
+    <!-- Head -->
+    <ellipse id="head" cx="100" cy="30" rx="20" ry="25" fill="#D3D1C7"/>
+    <!-- Neck -->
+    <rect id="neck" x="90" y="55" width="20" height="15" fill="#D3D1C7"/>
+    <!-- Traps -->
+    <path id="trapezius" d="M70 60 Q100 70 130 60 L130 85 Q100 95 70 85 Z" fill="#D3D1C7"/>
+    <!-- Shoulders - Rear -->
+    <ellipse id="deltoid-posterior" cx="60" cy="75" rx="15" ry="12" fill="#D3D1C7"/>
+    <ellipse id="deltoid-posterior-right" cx="140" cy="75" rx="15" ry="12" fill="#D3D1C7"/>
+    <!-- Lats -->
+    <path id="latissimus-dorsi" d="M65 85 Q100 95 135 85 L130 150 Q100 160 70 150 Z" fill="#D3D1C7"/>
+    <!-- Triceps -->
+    <ellipse id="triceps-brachii" cx="50" cy="110" rx="10" ry="25" fill="#D3D1C7"/>
+    <ellipse id="triceps-brachii-right" cx="150" cy="110" rx="10" ry="25" fill="#D3D1C7"/>
+    <!-- Lower Back -->
+    <path id="erector-spinae" d="M85 150 L115 150 L115 190 L85 190 Z" fill="#D3D1C7"/>
+    <!-- Glutes -->
+    <ellipse id="gluteus-maximus" cx="75" cy="200" rx="20" ry="25" fill="#D3D1C7"/>
+    <ellipse id="gluteus-maximus-right" cx="125" cy="200" rx="20" ry="25" fill="#D3D1C7"/>
+    <!-- Hamstrings -->
+    <ellipse id="hamstrings" cx="75" cy="250" rx="15" ry="40" fill="#D3D1C7"/>
+    <ellipse id="hamstrings-right" cx="125" cy="250" rx="15" ry="40" fill="#D3D1C7"/>
+    <!-- Calves -->
+    <ellipse id="gastrocnemius" cx="75" cy="320" rx="12" ry="35" fill="#D3D1C7"/>
+    <ellipse id="gastrocnemius-right" cx="125" cy="320" rx="12" ry="35" fill="#D3D1C7"/>
+  </g>
+</svg>
