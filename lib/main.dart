@@ -1,0 +1,195 @@
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ai_gym_mentor/core/router/router.dart';
+import 'package:ai_gym_mentor/core/widgets/global_error_handler.dart';
+import 'dart:ui';
+import 'package:ai_gym_mentor/core/services/notification_service.dart';
+import 'package:ai_gym_mentor/core/services/timer_service.dart';
+import 'package:ai_gym_mentor/features/settings/models/settings_state.dart';
+import 'package:ai_gym_mentor/features/settings/settings_provider.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:ai_gym_mentor/l10n/app_localizations.dart';
+import 'package:ai_gym_mentor/services/background_worker.dart';
+import 'package:ai_gym_mentor/features/exercise_database/data/datasources/exercise_db_seeder.dart';
+import 'package:ai_gym_mentor/features/workout/data/datasources/program_db_seeder.dart';
+import 'package:ai_gym_mentor/core/database/database.dart';
+import 'package:ai_gym_mentor/core/services/watch_sync_service.dart';
+import 'package:ai_gym_mentor/features/analytics/measurements_repository.dart' as ai_gym_mentor_repo;
+import 'package:ai_gym_mentor/core/domain/entities/body_target.dart' as ai_gym_mentor_target;
+import 'package:ai_gym_mentor/core/domain/entities/body_measurement.dart' as ai_gym_mentor_measurement;
+
+void main() async {
+  // Ensure Flutter is initialized before any async code
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Load environment variables
+  try {
+    await dotenv.load(fileName: ".env");
+  } catch (e) {
+    debugPrint('Warning: .env file not found.');
+  }
+
+  // 1. Notification Service Initialization
+  try {
+    if (kDebugMode) debugPrint('Step 1: Initializing Notifications...');
+    await NotificationService().init();
+    if (kDebugMode) debugPrint('Notifications Initialized Successfully');
+  } catch (e) {
+    debugPrint('Notifications Initialization Failed: $e');
+  }
+
+  // 2. Timer Service Initialization
+  try {
+    if (kDebugMode) debugPrint('Step 2: Initializing Timer Service...');
+    await TimerService.initialize();
+    if (kDebugMode) debugPrint('Timer Service Initialized Successfully');
+  } catch (e) {
+    debugPrint('Timer Service Initialization Failed: $e');
+  }
+
+  // 3. Background workers initialization
+  try {
+    if (kDebugMode) debugPrint('Step 3: Initializing Background Worker...');
+    await BackgroundWorker.initialize();
+    if (kDebugMode) debugPrint('Background Worker Initialized Successfully');
+  } catch (e) {
+    debugPrint('Background Worker Initialization Failed: $e');
+  }
+
+  // 4. Exercise Database Seeding
+  try {
+    if (kDebugMode) debugPrint('Step 4: Seeding Exercise Database...');
+    await ExerciseDbSeeder.instance.seed();
+    
+    if (kDebugMode) debugPrint('Step 5: Seeding Workout Programs...');
+    await ProgramDbSeeder.instance.seed(AppDatabase());
+    
+    if (kDebugMode) debugPrint('Exercise and Program Database Seeded Successfully');
+  } catch (e) {
+    debugPrint('Exercise Database Seeding Failed: $e');
+  }
+
+
+
+  // 4. Framework error catchers
+  FlutterError.onError = (details) {
+    FlutterError.presentError(details);
+    debugPrint('FLUTTER ERROR: ${details.exception}');
+  };
+
+  PlatformDispatcher.instance.onError = (error, stack) {
+    debugPrint('ASYNC ERROR: $error');
+    return true;
+  };
+
+  ErrorWidget.builder = (details) {
+    return GlobalErrorScreen(details: details);
+  };
+
+  if (kDebugMode) debugPrint('--- APP STARTUP COMPLETE (OFFLINE MODE) ---');
+
+  runApp(
+    ProviderScope(
+      child: const GymMentorApp(),
+    ),
+  );
+}
+
+class GymMentorApp extends ConsumerWidget {
+  const GymMentorApp({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final settingsAsync = ref.watch(settingsProvider);
+    
+    // Start watch synchronization service
+    ref.watch(watchSyncServiceProvider);
+
+    return settingsAsync.when(
+      data: (settings) => MaterialApp.router(
+        title: 'Gym Mentor',
+        debugShowCheckedModeBanner: false,
+        themeMode: settings.themeMode,
+        theme: _buildTheme(
+            Brightness.light, settings.accentColor, settings.fontSize),
+        darkTheme: _buildTheme(
+            Brightness.dark, settings.accentColor, settings.fontSize),
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: const [
+          Locale('en'), // English
+          Locale('hi'), // Hindi
+          Locale('mr'), // Marathi
+        ],
+        routerConfig: router,
+        builder: (context, child) {
+          return AnimatedTheme(
+            data: Theme.of(context),
+            duration: const Duration(milliseconds: 400),
+            child: child!,
+          );
+        },
+      ),
+      loading: () => const MaterialApp(
+        home: Scaffold(
+          body: Center(child: CircularProgressIndicator()),
+        ),
+      ),
+      error: (e, stack) => MaterialApp(
+        home: GlobalErrorScreen(
+          details: FlutterErrorDetails(exception: e, stack: stack),
+        ),
+      ),
+    );
+  }
+
+  ThemeData _buildTheme(
+      Brightness brightness, Color accentColor, FontSize fontSize) {
+    final isDark = brightness == Brightness.dark;
+    final baseColor = isDark ? const Color(0xFF0F172A) : Colors.white;
+    final surfaceColor = isDark ? const Color(0xFF1E293B) : Colors.grey[50]!;
+
+    final baseTheme = isDark ? ThemeData.dark() : ThemeData.light();
+
+    return ThemeData(
+      useMaterial3: true,
+      brightness: brightness,
+      primaryColor: accentColor,
+      colorScheme: ColorScheme.fromSeed(
+        seedColor: accentColor,
+        brightness: brightness,
+        surface: baseColor,
+        error: Colors.red,
+        onSurface: isDark ? Colors.white : Colors.black87,
+        primary: accentColor,
+      ),
+      scaffoldBackgroundColor: baseColor,
+      textTheme: baseTheme.textTheme.apply(
+        bodyColor: isDark ? Colors.white : Colors.black87,
+        displayColor: isDark ? Colors.white : Colors.black87,
+        fontSizeFactor: fontSize == FontSize.large ? 1.2 : 1.0,
+      ),
+      cardTheme: CardThemeData(
+        color: surfaceColor,
+        elevation: 0,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      ),
+      appBarTheme: AppBarTheme(
+        backgroundColor: baseColor,
+        elevation: 0,
+        centerTitle: false,
+        titleTextStyle: TextStyle(
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+          color: isDark ? Colors.white : Colors.black87,
+        ),
+      ),
+    );
+  }
+}

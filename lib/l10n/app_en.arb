@@ -1,0 +1,21 @@
+{
+  "@@locale": "en",
+  "muscles_worked": "Muscles worked",
+  "how_to_perform": "How to perform",
+  "keep_in_mind": "Keep in mind ⚠️",
+  "avoid_mistakes": "Avoid these mistakes ❌",
+  "progression_path": "Progression path",
+  "similar_exercises": "Similar exercises",
+  "add_to_workout": "Add to workout",
+  "log_exercise": "Log this exercise",
+  "recently_viewed": "Recently viewed",
+  "you_are_offline": "You are offline — GIFs unavailable",
+  "select_exercise": "Select Exercise",
+  "library": "Library",
+  "no_exercises_found": "No exercises found. Try clearing a filter.",
+  "clear_all_filters": "Clear All Filters",
+  "search_hint": "Search movements, muscles...",
+  "primary": "Primary",
+  "secondary": "Secondary",
+  "inactive": "Inactive"
+}

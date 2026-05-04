@@ -1,0 +1,21 @@
+{
+  "@@locale": "mr",
+  "muscles_worked": "स्नायूंवर काम केले",
+  "how_to_perform": "कसे करावे",
+  "keep_in_mind": "लक्षात ठेवा ⚠️",
+  "avoid_mistakes": "या चुका टाळा ❌",
+  "progression_path": "प्रगती पथ",
+  "similar_exercises": "समान व्यायाम",
+  "add_to_workout": "वर्कआउटमध्ये जोडा",
+  "log_exercise": "हा व्यायाम लॉग करा",
+  "recently_viewed": "अलीकडे पाहिलेले",
+  "you_are_offline": "तुम्ही ऑफलाइन आहात — GIF उपलब्ध नाहीत",
+  "select_exercise": "व्यायाम निवडा",
+  "library": "लायब्ररी",
+  "no_exercises_found": "व्यायाम सापडला नाही. फिल्टर साफ करण्याचा प्रयत्न करा।",
+  "clear_all_filters": "सर्व फिल्टर साफ करा",
+  "search_hint": "हालचाल, स्नायू शोधा...",
+  "primary": "प्राथमिक",
+  "secondary": "दुय्यम",
+  "inactive": "निष्क्रिय"
+}
